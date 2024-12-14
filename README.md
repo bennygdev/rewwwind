@@ -3,10 +3,11 @@
 App development project
 
 ### Team Members
-Benny
-Nelson
-Ryan
-Femina
+
+- Benny
+- Nelson
+- Ryan
+- Femina
 
 ### Prerequisites
 

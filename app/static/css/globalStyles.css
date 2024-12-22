@@ -1,0 +1,45 @@
+/* Import fonts */
+@font-face {
+  font-family: "OpenSansRegular";
+  src: url(../fonts/OpenSans-Regular.ttf);
+}
+
+@font-face {
+  font-family: "OpenSansSemibold";
+  src: url(../fonts/OpenSans-SemiBold.ttf);
+}
+
+@font-face {
+  font-family: "OpenSansBold";
+  src: url(../fonts/OpenSans-Bold.ttf);
+}
+
+@font-face {
+  font-family: "CharisSILRegular";
+  src: url(../fonts/CharisSIL-Regular.ttf)
+}
+
+@font-face {
+  font-family: "CharisSILBold";
+  src: url(../fonts/CharisSIL-Bold.ttf)
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #FFF;
+  font-family: "OpenSansRegular";
+  /* margin-top: 75px; */
+}
+
+textarea:focus, input:focus{
+  outline: none;
+}

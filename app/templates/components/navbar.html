@@ -1,0 +1,63 @@
+<nav class="main__navbar">
+  <div class="nav__left">
+    <!-- <a href='/'><img src="" id="nav__logo" class="nav__logo" alt="Logo"></a> -->
+    <a href="/"><h1>Rewwwind</h1></a>
+     <!-- Search btn here -->
+     <div class="nav__search-container">
+       <input type="text" id="nav__search-bar" class="nav__search-bar" placeholder="Search..." autocomplete="off">
+       <i class="fa-solid fa-magnifying-glass nav__search-button" id="nav__search-button"></i>
+       <div id="nav__search--suggestions" class="nav__search--suggestions"></div>
+     </div>
+  </div>
+
+
+  <!-- Navigation links -->
+  <ul class="nav__links">
+    <li><a data-bs-toggle="offcanvas" href="#offcanvasMenu" role="button" aria-controls="offcanvasMenu" class="nav__link nav__hamburger-menu nav__mobile"><i class="fa-solid fa-bars"></i></a></li>
+    <li><a class="nav__link nav__desktop" href='/products'><i class="fa-solid fa-gifts fa-xl"></i>&nbsp;&nbsp;Products</a></li>
+    <li><a class="nav__link nav__desktop" href='/wishlist'><i class="fa-solid fa-heart fa-xl"></i>&nbsp;&nbsp;Wishlist</a></li>
+    <li><a class="nav__link nav__desktop" href='/cart'><i class="fa-solid fa-cart-shopping fa-xl"></i>&nbsp;&nbsp;Cart</a></li>
+    <li><a class="nav__link nav__desktop" href='/trade-in'><i class="fa-solid fa-bag-shopping fa-xl"></i>&nbsp;&nbsp;Trade-in</a></li>
+    <!-- <a class="nav__link nav__desktop" href="/cart"><button class="nav__button"><i class="fa-solid fa-cart-shopping"></i>&nbsp;&nbsp;Cart (?)</button></a> -->
+    <div class="nav__link nav__desktop nav__profile--options nav__profile"><button class="nav__button"><i class="fa-regular fa-user"></i>&nbsp;&nbsp;Sign in</button></div>
+    <!-- <div class="nav__link nav__desktop nav__profile"><button class="nav__button"><i class="fa-regular fa-user"></i> Sign In</button></div> -->
+    <!-- add options menu when click -->
+    <div class="nav__optionMenu">
+      <ul class="nav__optionMenu--links">
+        <!-- logged out -->
+        {% if user.is_authenticated %}
+        <li><a class="nav__optionMenu--link" href="/profile">Your Profile</a></li>
+        <li><a class="nav__optionMenu--link" href="/overview">My Dashboard</a></li>
+        <li><a class="nav__optionMenu--link" href="/orders">My Orders</a></li>
+        <li><a class="nav__optionMenu--link" href="/logout">Log Out</a></li>
+        <!-- logged in -->
+        {% else %}
+        <li><a class="nav__optionMenu--link" href="/login">Login</a></li>
+        <li><a class="nav__optionMenu--link" href="/register">Register</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </ul>
+</nav>
+
+<!-- Offcanvas menu -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenu">
+  <div class="offcanvas-header">
+    <img src="" class="offcanvas-logo" alt="Logo">
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <ul class="offcanvas-nav">
+      <li><a class='nav__link offcanvas__link--active' href='/'>Home</a></li>
+      <li><a class='nav__link' href='/products'>Products</a></li>
+      <li><a class='nav__link' href='/saved'>Saved</a></li>
+      <li><a class='nav__link' href='/cart'>Cart (?)</a></li>
+    </ul>
+    <div class="offcanvas-nav__extra">
+      <a href="/"><p>Privacy Policy</p></a>
+      <a href="/"><p>Terms of service</p></a>
+      <a href="/"><p>License</p></a>
+      <p>&copy; Brand 2024</p>
+    </div>
+  </div>
+</div>

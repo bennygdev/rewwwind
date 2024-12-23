@@ -32,3 +32,4 @@ App development project
 3. To save changes, do `git add .` > `git commit -m "message"` > `git push origin yourbranchname`
 4. Go to the Github, to the team repository and go to your branch. There should be a box saying that you have recent pushes. There should be a button that says "Compare & Pull Request". Click on it to make a new request for the leader to approve and make suggestions to. 
 5. If there is a suggestion, you can make changes to your project branch again and update the push with git add etc. in the pull request, the change should remain in the same pull request.
+6. After your pull request has been approved and merged, delete the branch and switch back to the main repository. Do `git pull` on the main branch to update your vscode with the latest changes and you can run the website from there, but remember do not edit the main branch if you are not editing.

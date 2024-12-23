@@ -1,0 +1,59 @@
+{% extends "views/base.html" %}
+{% set active_page = "login" %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/auth/login.css') }}">
+{% endblock %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="login__wrapper">
+  <div class="login__left">
+    <!-- <img src="{{ url_for('static', filename='../static/media/spiral_bg.jpg') }}" alt=""> -->
+  </div>
+  <div class="login__right">
+    <h1 id="login__header">Login</h1>
+    <p id="login__subtitle">Welcome back!</p>
+    <form method="POST" class="login__form">
+      {{ form.hidden_tag() }}
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-messages">
+            {% for category, message in messages %}
+              <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      
+      <div class="login__email">
+        {{ form.emailUsername.label }}
+        {{ form.emailUsername(class="form-control", placeholder="yourname@example.com") }}
+      </div>
+      <div class="login__password">
+        {{ form.password.label }}
+        {{ form.password(class="form-control", placeholder="Your password") }}
+      </div>
+      <p id="forgot__password"><a href="/forgot-password">Forgot Password?</a></p>
+      <hr id="divider">
+      <div class="button__wrapper">
+        {{ form.submit(class="login__button") }}
+        <button class="login__google"><img src="{{ url_for('static',filename='media/GoogleIcon.svg') }}" id="login__google" alt="GoogleIcon">Continue with Google</button>
+        <p id="login__subtitle--reminder">Don't have an account? <a href="/register">Register</a></p>
+      </div>
+    </form>
+    
+  </div>
+</div>
+
+<!-- <script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/login.js') }}"
+></script> -->
+
+{% endblock %}

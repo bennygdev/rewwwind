@@ -19,7 +19,13 @@
     <li><a class="nav__link nav__desktop" href='/cart'><i class="fa-solid fa-cart-shopping fa-xl"></i>&nbsp;&nbsp;Cart</a></li>
     <li><a class="nav__link nav__desktop" href='/trade-in'><i class="fa-solid fa-bag-shopping fa-xl"></i>&nbsp;&nbsp;Trade-in</a></li>
     <!-- <a class="nav__link nav__desktop" href="/cart"><button class="nav__button"><i class="fa-solid fa-cart-shopping"></i>&nbsp;&nbsp;Cart (?)</button></a> -->
-    <div class="nav__link nav__desktop nav__profile--options nav__profile"><button class="nav__button"><i class="fa-regular fa-user"></i>&nbsp;&nbsp;Sign in</button></div>
+    <div class="nav__link nav__desktop nav__profile--options nav__profile"><button class="nav__button">
+      {% if not user.is_authenticated %}
+      <i class="fa-regular fa-user"></i>&nbsp;&nbsp;Sign in
+      {% else %}
+      <img src="{{ url_for('static',filename='media/profile_image_default.jpg') }}" id="mini_profile_img" alt="Mini profile image">Hello, {{user.username}}
+      {% endif %}
+    </button></div>
     <!-- <div class="nav__link nav__desktop nav__profile"><button class="nav__button"><i class="fa-regular fa-user"></i> Sign In</button></div> -->
     <!-- add options menu when click -->
     <div class="nav__optionMenu">

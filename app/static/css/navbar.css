@@ -106,8 +106,8 @@ nav {
 }
 
 /* Profile */
-.nav__profile--picture {
-  /* background-color: grey; */
+/* .nav__profile--picture {
+  background-color: grey;
   background-image: url(../media/profile_image_default.jpg);
   background-size: cover;
   background-position: center;
@@ -115,6 +115,13 @@ nav {
   height: 40px;
   border-radius: 20px;
   cursor: pointer;
+} */
+
+img#mini_profile_img {
+  max-height: 100%;
+  max-width: 100%;
+  border-radius: 100px;
+  margin-right: 10px;
 }
 
 /* Sticky */

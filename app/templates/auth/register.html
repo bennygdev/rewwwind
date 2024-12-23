@@ -1,0 +1,69 @@
+{% extends "views/base.html" %}
+{% set active_page = "register" %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/auth/register.css') }}">
+{% endblock %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="register__wrapper">
+  <div class="register__left">
+    <!-- <img src="{{ url_for('static', filename='../static/media/spiral_bg.jpg') }}" alt=""> -->
+  </div>
+
+  
+  <div class="register__right">
+    <h1 id="register__header">Register</h1>
+    <p id="register__subtitle">Let's order something amazing together.</p>
+    <form method="POST" class="register__form">
+      {{ form.hidden_tag() }}
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-messages">
+            {% for category, message in messages %}
+              <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <div class="register__name">
+        <div class="register__firstName">
+          {{ form.firstName.label }}
+          {{ form.firstName(class="form-control", placeholder="First Name") }}
+        </div>
+        <div class="register__lastName">
+          {{ form.lastName.label }}
+          {{ form.lastName(class="form-control", placeholder="Last Name") }}
+        </div>
+      </div>
+      <div class="register__email">
+        {{ form.email.label }}
+        {{ form.email(class="form-control", placeholder="yourname@example.com") }}
+      </div>
+      <div class="register__password">
+        {{ form.password.label }}
+        {{ form.password(class="form-control", placeholder="Your password") }}
+      </div>
+      <div class="register__confirmPassword">
+        {{ form.confirmPassword.label }}
+        {{ form.confirmPassword(class="form-control", placeholder="Confirm password") }}
+      </div>
+      <hr id="divider">
+      <div class="button__wrapper">
+        {{ form.submit(class="register__button") }}
+        <button class="register__google"><img src="{{ url_for('static',filename='media/GoogleIcon.svg') }}" id="register__google" alt="GoogleIcon">Continue with Google</button>
+        <p id="register__subtitle--reminder">Already have an account? <a href="/login">Log in</a></p>
+      </div>
+    </form>
+    
+  </div>
+</div>
+
+{% endblock %}

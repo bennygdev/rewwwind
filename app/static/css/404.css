@@ -1,0 +1,28 @@
+html, body {
+  height: 100%;
+  margin: 0; /* Remove default margin */
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+#pageNotFound__title {
+  font-family: 'OpenSansBold'
+}
+
+#pageNotFound__subtitle {
+  color: grey;
+}
+
+#pageNotFound__button {
+  border: none;
+  background-color: #277dff;
+  color: #fff;
+  padding: 7px 15px 7px 15px;
+  border-radius: 10px;
+}

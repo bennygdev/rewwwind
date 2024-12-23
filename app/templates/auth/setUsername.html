@@ -1,0 +1,46 @@
+{% extends "views/base.html" %}
+{% set active_page = "setUsername" %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/auth/register.css') }}">
+{% endblock %}
+
+{% block title %}Set Username{% endblock %}
+
+{% block content %}
+<div class="register__wrapper">
+  <div class="register__left">
+    <!-- <img src="{{ url_for('static', filename='../static/media/spiral_bg.jpg') }}" alt=""> -->
+  </div>
+
+  
+  <div class="register__right">
+    <h1 id="register__header">Register</h1>
+    <p id="register__subtitle">Set your username!</p>
+    <form method="POST" class="register__form">
+      {{ form.hidden_tag() }}
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-messages">
+            {% for category, message in messages %}
+              <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <div class="register__username">
+        {{ form.username.label }}
+        {{ form.username(class="form-control", placeholder="") }}
+      </div>
+      {{ form.submit(class="username__button") }}
+    </form>
+    
+  </div>
+</div>
+
+{% endblock %}

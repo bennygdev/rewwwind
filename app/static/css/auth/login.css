@@ -1,0 +1,125 @@
+.login__wrapper {
+  display: flex;
+  flex-direction: row;
+  height: 100vh; /* full viewport height */
+}
+
+.login__left {
+  width: 50%;
+  height: 100%; 
+  background-image: url(../../media/green_placeholder.jpg); 
+  background-size: cover;
+  background-position: center;
+}
+
+.login__right {
+  width: 50%;
+  background-color: #fff;
+  height: 100%; 
+  padding: 100px 50px 100px 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.login__icon {
+  color: darkblue;
+  margin-top: 100px;
+}
+
+#login__header {
+  font-family: "OpenSansBold";
+  margin-top: 30px;
+}
+
+#login__subtitle {
+  margin-top: 5px;
+  color: grey;
+}
+
+.login__form {
+  width: 75%;
+}
+
+.login__email, .login__password {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 15px;
+}
+
+.login__email input, .login__password input {
+  border: 1px solid lightgrey;
+  border-radius: 5px;
+  height: 30px;
+  padding: 20px 15px 20px 15px;
+  font-size: 0.9em;
+}
+
+.button__wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.login__button {
+  width: 20vw;
+  height: 45px;
+  background-color: #039752;
+  border: 0;
+  font-family: "OpenSansSemibold";
+  color: #fff;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.login__google {
+  width: 20vw;
+  height: 45px;
+  background-color: #f3f3f3;
+  border: 0;
+  font-family: "OpenSansSemibold";
+  color: #000;
+  border-radius: 10px;
+}
+
+#login__google  {
+  margin-right: 10px;
+}
+
+.error {
+  font-size: 0.8em;
+  color: red;
+}
+
+#login__subtitle--reminder {
+  font-family: "OpenSansSemibold";
+  color: grey;
+  font-size: 0.8em;
+  margin-top: 10px;
+}
+
+#login__subtitle--reminder a {
+  color: #039752;
+}
+
+#forgot__password {
+  font-family: "OpenSansSemibold";
+  font-size: 0.8em;
+  margin-top: 10px;
+}
+
+#forgot__password a {
+  color: grey;
+}
+
+#login__submit {
+  margin-top: 10px;
+  padding: 10px 20px 10px 20px;
+  font-size: 1em;
+  color: #fff;
+  background-color: darkblue;
+  border: none;
+  border-radius: 10px;
+}

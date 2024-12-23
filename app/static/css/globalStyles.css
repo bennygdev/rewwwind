@@ -40,6 +40,10 @@ body {
   /* margin-top: 75px; */
 }
 
+.paddedContent {
+  margin-top: 75px;
+}
+
 textarea:focus, input:focus{
   outline: none;
 }

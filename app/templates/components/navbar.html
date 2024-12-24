@@ -32,9 +32,9 @@
       <ul class="nav__optionMenu--links">
         <!-- logged out -->
         {% if user.is_authenticated %}
-        <li><a class="nav__optionMenu--link" href="/profile">Your Profile</a></li>
-        <li><a class="nav__optionMenu--link" href="/overview">My Dashboard</a></li>
-        <li><a class="nav__optionMenu--link" href="/orders">My Orders</a></li>
+        <li><a class="nav__optionMenu--link" href="/dashboard/profile">Your Profile</a></li>
+        <li><a class="nav__optionMenu--link" href="/dashboard/overview">My Dashboard</a></li>
+        <li><a class="nav__optionMenu--link" href="/dashboard/manage-orders">My Orders</a></li>
         <li><a class="nav__optionMenu--link" href="/logout">Log Out</a></li>
         <!-- logged in -->
         {% else %}

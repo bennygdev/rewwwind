@@ -1,0 +1,23 @@
+{% extends "dashboard/base.html" %}
+{% set active_page = "manage_tradeins" %}
+{% block title %}Manage Trade-ins{% endblock %}
+
+
+{% block content %}
+<!-- Need to add logic here, to check if the user is customer, admin or owner -->
+
+{% block userTradeins %}
+<!-- Probably have to do a include block. -->
+{% if user.role_id == 1 %}
+{% include "dashboard/manageTradeins/customer_tradeins.html" %}
+{% elif user.role_id in [2, 3] %}
+{% include "dashboard/manageTradeins/admin_tradeins.html" %}
+{% endif %}
+
+{% endblock %}
+
+<!-- method of checking here -->
+<!-- {{ user.role_id }} -->
+<h1>Manage Tradeins</h1>
+
+{% endblock %}

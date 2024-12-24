@@ -16,12 +16,34 @@ def create_app():
   db.init_app(app)
   csrf.init_app(app)
 
+  # REMINDER: Only use camel casing, no hyphens etc. flask will flag an error if thats the case.
   # Initialise Routes
+
+  # Main pages
   from .views import views
-  from .auth import auth
 
   app.register_blueprint(views, url_prefix="/")
+  
+  # Authentication pages
+  from .auth import auth
   app.register_blueprint(auth, url_prefix="/")
+
+  # Dashboard pages
+  from .dashboard import dashboard
+  from .manageOrders import manageOrders
+  from .manageTradeins import manageTradeins
+  from .customerChat import customerChat
+  from .manageProducts import manageProducts
+  from .manageVouchers import manageVouchers
+  from .manageAccounts import manageAccounts
+  
+  app.register_blueprint(dashboard, url_prefix="/dashboard")
+  app.register_blueprint(manageOrders, url_prefix="/dashboard")
+  app.register_blueprint(manageTradeins, url_prefix="/dashboard")
+  app.register_blueprint(customerChat, url_prefix="/dashboard")
+  app.register_blueprint(manageProducts, url_prefix="/dashboard")
+  app.register_blueprint(manageVouchers, url_prefix="/dashboard")
+  app.register_blueprint(manageAccounts, url_prefix="/dashboard")
 
   # Initialise Database
   from .models import User, Product, Role, Order, OrderItem, Category, ProductCategory

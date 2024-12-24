@@ -1,0 +1,30 @@
+<ul class="dashboard__links">
+  <li class="links__top">
+    <p class="link__title">General</p>
+      <ul>
+          <li><a href="/dashboard/overview" class="dashboard__link {{ 'dashboard__link--active' if active_page == 'overview' else '' }}"><i class="fa-solid fa-chart-area"></i>Overview</a></li>
+          <li><a href="/dashboard/manage-orders" class="dashboard__link {{ 'dashboard__link--active' if active_page == 'manage_orders' else '' }}"><i class="fa-solid fa-box"></i>Manage Orders</a></li>
+          <li><a href="/dashboard/manage-tradeins" class="dashboard__link {{ 'dashboard__link--active' if active_page == 'manage_tradeins' else '' }}"><i class="fa-solid fa-shopping-bag"></i>Manage Trade-ins</a></li>
+          {% if user.role_id in [2, 3] %}
+          <li><a href="/dashboard/customer-chat" class="dashboard__link {{ 'dashboard__link--active' if active_page == 'customer_chat' else '' }}"><i class="fa-solid fa-comment"></i>Customer Chat</a></li>
+          <li><a href="/dashboard/manage-products" class="dashboard__link {{ 'dashboard__link--active' if active_page == 'manage_products' else '' }}"><i class="fa-solid fa-gifts"></i>Manage Products</a></li>
+          <li><a href="/dashboard/manage-vouchers" class="dashboard__link {{ 'dashboard__link--active' if active_page == 'manage_vouchers' else '' }}"><i class="fa-solid fa-ticket"></i>Manage Vouchers</a></li>
+          <li><a href="/dashboard/manage-accounts" class="dashboard__link {{ 'dashboard__link--active' if active_page == 'manage_accounts' else '' }}"><i class="fa-solid fa-users"></i>Manage Accounts</a></li>
+          {% endif %}
+          {% if user.role_id == 3 %}
+          <li><a href="/dashboard/add-admin-account" class="dashboard__link {{ 'dashboard__link--active' if active_page == 'add_admin_account' else '' }}"><i class="fa-solid fa-user-plus"></i>Add Admin Account</a></li>
+          {% endif %}
+        </ul>
+      </li>
+      <li class="links__bottom">
+        <p class="link__title">Personal</p>
+        <ul>
+          <li><a href="/dashboard/profile" class="dashboard__link {{ 'dashboard__link--active' if active_page == 'profile' else '' }}"><i class="fa-solid fa-user"></i>My Profile</a></li>
+          <li><a href="/dashboard/settings" class="dashboard__link {{ 'dashboard__link--active' if active_page == 'settings' else '' }}"><i class="fa-solid fa-gear"></i>Settings</a></li>
+        </ul>
+        <!-- <ul>
+          <li><a href="/" class="dashboard__link"><i class="fa-solid fa-shop"></i>Back to Shop</a></li>
+          <li><a href="/logout" class="dashboard__link"><i class="fa-solid fa-right-from-bracket"></i>Log Out</a></li>
+      </ul> -->
+  </li>
+</ul>

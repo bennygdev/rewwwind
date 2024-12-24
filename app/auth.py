@@ -70,6 +70,7 @@ def register():
         session['user_id'] = new_user.id
         return redirect(url_for('auth.register_step2'))
     
+    # actually not proper validation, needs to be updated later
     if form.confirmPassword.errors:
       flash("Passwords must match", "error")
 
@@ -99,7 +100,14 @@ def register_step2():
     return redirect(url_for('auth.register'))
   
   if form.validate_on_submit():
+    username_exists = User.query.filter_by(username=form.username.data).first()
+    if username_exists:
+      flash('An account with that username already exists.', 'error')
+      return render_template("auth/setUsername.html", user=current_user, form=form)
+
+    # update
     user.username = form.username.data
+
     db.session.commit()
     session.pop('user_id', None)
     print("Name change success")

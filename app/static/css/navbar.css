@@ -85,6 +85,15 @@ nav {
   color: blue;
 }
 
+.nav__wishlist-button {
+  color: transparent;
+  -webkit-text-stroke: 2px #039752;
+}
+
+.nav__cart-button {
+  color:#039752;
+}
+
 .nav__button {
   font-family: "OpenSansRegular";
   border: none;

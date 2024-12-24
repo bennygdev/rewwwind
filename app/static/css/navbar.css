@@ -31,6 +31,11 @@
   margin-right: 20px;
 }
 
+.nav__right {
+  display: flex;
+  flex-direction: row;
+}
+
 .nav__hamburger-menu {
   font-size: 1.5rem;
   display: none;
@@ -42,11 +47,20 @@
   max-width: 200px;
 }
 
-.nav__links {
+.nav__left--links {
   list-style-type: none;
   display: flex;
   flex-direction: row;
   gap: 30px;
+  margin-bottom: 0px;
+  align-items: center;
+}
+
+.nav__right--links {
+  list-style-type: none;
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
   margin-bottom: 0px;
   align-items: center;
 }
@@ -77,13 +91,13 @@
   position: relative;
   display: inline-block;
   margin-left: 20px;
-  width: 30vw;
+  width: 25vw;
 }
 
 .nav__search-bar {
   width: 100%;
   padding: 8px 40px 8px 15px;
-  border-radius: 0;
+  border-radius: 10px;
   background-color: #eee;
   border: none;
   /* border: 1px solid black; */
@@ -95,9 +109,9 @@
 }
 
 .nav__search-button {
-  background-color: #039752;
+  /* background-color: #039752; */
   padding: 12px;
-  color: #fff;
+  color: #039572;
   position: absolute;
   right: 0px;
   top: 50%;

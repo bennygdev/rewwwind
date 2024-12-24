@@ -2,48 +2,56 @@
   <div class="nav__left">
     <!-- <a href='/'><img src="" id="nav__logo" class="nav__logo" alt="Logo"></a> -->
     <a href="/"><h1>Rewwwind</h1></a>
+    <ul class="nav__left--links">
+      <li><a class="nav__link nav__desktop" href='/products'>Products</a></li>
+      <li><a class="nav__link nav__desktop" href='/trade-in'>Trade-in</a></li>
+      <li><a class="nav__link nav__desktop" href='/about-us'>About</a></li>
+    </ul>
      <!-- Search btn here -->
-     <div class="nav__search-container">
-       <input type="text" id="nav__search-bar" class="nav__search-bar" placeholder="Search..." autocomplete="off">
-       <i class="fa-solid fa-magnifying-glass nav__search-button" id="nav__search-button"></i>
-       <div id="nav__search--suggestions" class="nav__search--suggestions"></div>
-     </div>
+    </div>
+
+  <div class="nav__right">
+    <div class="nav__search-container">
+      <input type="text" id="nav__search-bar" class="nav__search-bar" placeholder="Search..." autocomplete="off">
+      <i class="fa-solid fa-magnifying-glass nav__search-button" id="nav__search-button"></i>
+      <div id="nav__search--suggestions" class="nav__search--suggestions"></div>
+    </div>
+
+    <!-- Navigation links -->
+    <ul class="nav__right--links">
+      <li><a data-bs-toggle="offcanvas" href="#offcanvasMenu" role="button" aria-controls="offcanvasMenu" class="nav__link nav__hamburger-menu nav__mobile"><i class="fa-solid fa-bars"></i></a></li>
+      <li><a class="nav__link nav__desktop" href='/wishlist'><i class="fa-solid fa-heart fa-xl"></i>&nbsp;&nbsp;</a></li>
+      <li><a class="nav__link nav__desktop" href='/cart'><i class="fa-solid fa-cart-shopping fa-xl"></i>&nbsp;&nbsp;</a></li>
+      <!-- <a class="nav__link nav__desktop" href="/cart"><button class="nav__button"><i class="fa-solid fa-cart-shopping"></i>&nbsp;&nbsp;Cart (?)</button></a> -->
+      <div class="nav__link nav__desktop nav__profile--options nav__profile"><button class="nav__button">
+        {% if not user.is_authenticated %}
+        <i class="fa-regular fa-user"></i>&nbsp;&nbsp;Sign in
+        {% else %}
+        <img src="{{ url_for('static',filename='media/profile_image_default.jpg') }}" id="mini_profile_img" alt="Mini profile image">Hello, {{user.username}}
+        {% endif %}
+      </button></div>
+      <!-- <div class="nav__link nav__desktop nav__profile"><button class="nav__button"><i class="fa-regular fa-user"></i> Sign In</button></div> -->
+      <!-- add options menu when click -->
+      <div class="nav__optionMenu">
+        <ul class="nav__optionMenu--links">
+          <!-- logged out -->
+          {% if user.is_authenticated %}
+          <li><a class="nav__optionMenu--link" href="/dashboard/profile">Your Profile</a></li>
+          <li><a class="nav__optionMenu--link" href="/dashboard/overview">My Dashboard</a></li>
+          <li><a class="nav__optionMenu--link" href="/dashboard/manage-orders">My Orders</a></li>
+          <li><a class="nav__optionMenu--link" href="/logout">Log Out</a></li>
+          <!-- logged in -->
+          {% else %}
+          <li><a class="nav__optionMenu--link" href="/login">Login</a></li>
+          <li><a class="nav__optionMenu--link" href="/register">Register</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </ul>
   </div>
 
 
-  <!-- Navigation links -->
-  <ul class="nav__links">
-    <li><a data-bs-toggle="offcanvas" href="#offcanvasMenu" role="button" aria-controls="offcanvasMenu" class="nav__link nav__hamburger-menu nav__mobile"><i class="fa-solid fa-bars"></i></a></li>
-    <li><a class="nav__link nav__desktop" href='/products'><i class="fa-solid fa-gifts fa-xl"></i>&nbsp;&nbsp;Products</a></li>
-    <li><a class="nav__link nav__desktop" href='/wishlist'><i class="fa-solid fa-heart fa-xl"></i>&nbsp;&nbsp;Wishlist</a></li>
-    <li><a class="nav__link nav__desktop" href='/cart'><i class="fa-solid fa-cart-shopping fa-xl"></i>&nbsp;&nbsp;Cart</a></li>
-    <li><a class="nav__link nav__desktop" href='/trade-in'><i class="fa-solid fa-bag-shopping fa-xl"></i>&nbsp;&nbsp;Trade-in</a></li>
-    <!-- <a class="nav__link nav__desktop" href="/cart"><button class="nav__button"><i class="fa-solid fa-cart-shopping"></i>&nbsp;&nbsp;Cart (?)</button></a> -->
-    <div class="nav__link nav__desktop nav__profile--options nav__profile"><button class="nav__button">
-      {% if not user.is_authenticated %}
-      <i class="fa-regular fa-user"></i>&nbsp;&nbsp;Sign in
-      {% else %}
-      <img src="{{ url_for('static',filename='media/profile_image_default.jpg') }}" id="mini_profile_img" alt="Mini profile image">Hello, {{user.username}}
-      {% endif %}
-    </button></div>
-    <!-- <div class="nav__link nav__desktop nav__profile"><button class="nav__button"><i class="fa-regular fa-user"></i> Sign In</button></div> -->
-    <!-- add options menu when click -->
-    <div class="nav__optionMenu">
-      <ul class="nav__optionMenu--links">
-        <!-- logged out -->
-        {% if user.is_authenticated %}
-        <li><a class="nav__optionMenu--link" href="/dashboard/profile">Your Profile</a></li>
-        <li><a class="nav__optionMenu--link" href="/dashboard/overview">My Dashboard</a></li>
-        <li><a class="nav__optionMenu--link" href="/dashboard/manage-orders">My Orders</a></li>
-        <li><a class="nav__optionMenu--link" href="/logout">Log Out</a></li>
-        <!-- logged in -->
-        {% else %}
-        <li><a class="nav__optionMenu--link" href="/login">Login</a></li>
-        <li><a class="nav__optionMenu--link" href="/register">Register</a></li>
-        {% endif %}
-      </ul>
-    </div>
-  </ul>
+
 </nav>
 
 <!-- Offcanvas menu -->

@@ -1,9 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from . import db
+from . import db, mail
 from .models import User
-from .forms import LoginForm, RegisterForm, UsernameForm
+from .forms import LoginForm, RegisterForm, UsernameForm, RequestResetForm, ResetPasswordForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, logout_user, current_user
+from flask_mail import Message
+import os
 
 auth = Blueprint('auth', __name__)
 
@@ -71,7 +73,7 @@ def register():
         return redirect(url_for('auth.register_step2'))
     
     # actually not proper validation, needs to be updated later
-    if form.confirmPassword.errors:
+    if form.confirmPassword.data != form.password.data:
       flash("Passwords must match", "error")
 
     if form.password.errors:
@@ -114,3 +116,74 @@ def register_step2():
     return redirect(url_for('auth.login'))
 
   return render_template("auth/setUsername.html", user=current_user, form=form)
+
+def send_reset_email(user):
+  token = user.get_reset_token()
+  msg = Message('Password Reset Request', sender='rewwwindhelp@gmail.com', recipients=[user.email])
+  msg.body = f'''To reset your password, visit the following link:
+  {url_for('auth.reset_token', token=token, _external=True)}
+
+  If you did not make this request then simply ignore this email and no changes will be made.
+  '''
+  mail.send(msg)
+
+@auth.route('/reset-password', methods=['GET', 'POST'])
+def reset_password_request():
+  print (os.environ.get("MAIL_USERNAME")) 
+  print (os.environ.get("MAIL_PASSWORD")) 
+
+  if current_user.is_authenticated:
+    return redirect(url_for('views.home'))
+
+  form = RequestResetForm() 
+
+  if form.validate_on_submit():
+    # Add this validation to auth later
+    user = User.query.filter_by(email=form.email.data).first()
+    if user is None:
+      flash("There is no account with that email. You must register first", "error")
+      print("Validation failed, email doesn't exist")
+      return render_template("auth/resetPasswordRequest.html", user=current_user, form=form)
+
+    print("Success")
+    send_reset_email(user)
+    flash('An email has been sent with instructions to reset your password.', 'info')
+    return redirect(url_for('auth.login'))
+
+  return render_template("auth/resetPasswordRequest.html", user=current_user, form=form)
+
+# need to update: disallow same previous password and both passwords need to match
+@auth.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_token(token):
+  form = ResetPasswordForm()
+  if current_user.is_authenticated:
+    return redirect(url_for('views.home'))
+  
+  user = User.verify_reset_token(token)
+  if user is None:
+    flash("That is an invalid or expired token", "error")
+    return redirect(url_for('auth.reset_password_request'))
+  
+  if form.validate_on_submit():
+    if check_password_hash(user.password, form.password.data):
+      flash("New password cannot be the same as the previous password", "error")
+      return redirect(url_for('auth.reset_token', token=token, _external=True))
+
+    # update
+    user.password = generate_password_hash(form.password.data, method='pbkdf2:sha256')
+
+    db.session.commit()
+    flash("Your password has been updated! You are now able to log in. ", "success")
+    return redirect(url_for('auth.login'))
+  
+  if form.confirmPassword.data != form.password.data:
+    flash("Both passwords must match.", "error")
+    return redirect(url_for('auth.reset_token', token=token, _external=True))
+  
+  form = ResetPasswordForm()
+  return render_template("auth/reset_token.html", user=current_user, form=form)
+
+# @auth.route('/resettest')
+# def resettest():
+#   form = ResetPasswordForm()
+#   return render_template("auth/reset_token.html", user=current_user, form=form)

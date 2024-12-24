@@ -4,17 +4,30 @@ from os import path
 from werkzeug.security import generate_password_hash
 from flask_login import LoginManager, current_user
 from flask_wtf.csrf import CSRFProtect
+from flask_mail import Mail
+import os
 
 db = SQLAlchemy()
 DB_NAME = "database.db"
 csrf = CSRFProtect()
+mail = Mail()
 
 def create_app():
   app = Flask(__name__)
   app.config['SECRET_KEY'] = '123456789'
   app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
+  app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
+  app.config['MAIL_PORT'] = 465
+  app.config['MAIL_USE_SSL'] = True
+  app.config['MAIL_USERNAME'] = os.environ.get('EMAIL_USER') # use python_dotenv later
+  app.config['MAIL_PASSWORD'] = os.environ.get('EMAIL_PASS') # use python_dotenv later
+  # print(app.config['MAIL_USERNAME'])
+  # print(app.config['MAIL_PASSWORD'])
+  mail = Mail(app)
+
   db.init_app(app)
   csrf.init_app(app)
+  mail.init_app(app)
 
   # REMINDER: Only use camel casing, no hyphens etc. flask will flag an error if thats the case.
   # Initialise Routes

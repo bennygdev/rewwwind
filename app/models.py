@@ -1,6 +1,9 @@
 from . import db
+from flask import current_app
 from flask_login import UserMixin
 from sqlalchemy.sql import func
+from itsdangerous import URLSafeTimedSerializer as Serializer
+
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
@@ -15,6 +18,21 @@ class User(db.Model, UserMixin):
     updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
     
     orders = db.relationship('Order', backref='user', lazy=True) # otm order
+
+    # Reset password methods
+    def get_reset_token(self):
+      s = Serializer(current_app.config['SECRET_KEY'])
+      return s.dumps({'user_id': self.id})
+    
+    @staticmethod
+    def verify_reset_token(token, expires_sec=1800):
+      s = Serializer(current_app.config['SECRET_KEY'])
+      try:
+        user_id = s.loads(token, max_age=expires_sec)['user_id']
+      except:
+        return None
+      
+      return User.query.get(user_id)
 
 class Role(db.Model):
     __tablename__ = 'roles'

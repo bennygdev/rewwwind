@@ -88,6 +88,16 @@
   margin-right: 10px;
 }
 
+.reset__button {
+  background-color: #039752;
+  padding: 10px 25px;
+  font-family: "OpenSansSemibold";
+  color: #fff;
+  border: 0;
+  border-radius: 10px;
+  margin-top: 15px;
+}
+
 .error {
   font-size: 0.8em;
   color: red;

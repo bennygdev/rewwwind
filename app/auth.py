@@ -77,7 +77,7 @@ def register():
       flash("Passwords must match", "error")
 
     if form.password.errors:
-       flash("Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.")
+      flash("Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.", "error")
 
     # debugger
     if form.errors:
@@ -178,6 +178,10 @@ def reset_token(token):
   
   if form.confirmPassword.data != form.password.data:
     flash("Both passwords must match.", "error")
+    return redirect(url_for('auth.reset_token', token=token, _external=True))
+  
+  if form.password.errors:
+    flash("Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.", "error")
     return redirect(url_for('auth.reset_token', token=token, _external=True))
   
   form = ResetPasswordForm()

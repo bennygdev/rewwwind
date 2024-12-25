@@ -19,11 +19,11 @@
   justify-content: center;
 }
 
-.nav__left a {
+.logo__title--link {
   text-decoration: none;
 }
 
-.nav__left h1 {
+.logo__title {
   font-family: "CharisSILBold";
   color: #039752; 
   font-size: 2em;
@@ -91,7 +91,7 @@
   position: relative;
   display: inline-block;
   margin-left: 20px;
-  width: 25vw;
+  width: 22vw;
 }
 
 .nav__search-bar {
@@ -152,8 +152,12 @@ img#mini_profile_img {
 }
 
 /* Offcanvas menu */
-.offcanvas-logo {
+/* .offcanvas-logo {
   width: 140px;
+} */
+
+.offcanvas-header {
+  padding-left: 30px;
 }
 
 .offcanvas-body {
@@ -177,6 +181,10 @@ img#mini_profile_img {
   font-size: 0.8rem;
   line-height: 0.7em;
   opacity: 0.8;
+}
+
+.offcanvas-nav__extra a {
+  color: #039752;
 }
 
 /* Options menu */
@@ -225,7 +233,17 @@ img#mini_profile_img {
   border-bottom: none;
 }
 
-@media (max-width: 1028px) {
+@media (max-width: 1100px) {
+  .nav__left--links {
+    gap: 20px;
+  }
+
+  .nav__right--links {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 1024px) {
   nav {
     padding: 10px 30px;
   }
@@ -246,6 +264,6 @@ img#mini_profile_img {
   }
 
   .nav__search-container {
-    width: 70vw;
+    width: 55vw;
   }
 }

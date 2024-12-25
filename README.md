@@ -15,6 +15,7 @@ App development project
 
 ### How to run
 
+IMPORTANT: Run the project in virutal environment when testing, and please read "How to commit changes" before making any changes.
 1. Clone this repository: `git clone https://github.com/bennygdev/rewwwind.git`
 2. Open this project: cd into the directory and do `code .`
 3. Install dependencies: Run `pip install -r requirements.txt` in project virtual environment. To access virutal environment, create a virtual environment (if you do not have a venv folder) by running `python -m venv .venv` then activate venv by running `.venv\Scripts\activate`, then run the installation command. To exit, run `deactivate` inside of virtual environment.

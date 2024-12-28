@@ -1,9 +1,132 @@
 {% extends "dashboard/base.html" %}
 {% set active_page = "manage_products" %}
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/pageInteractions/filters.css') }}">
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/manageProducts/productListing.css') }}">
+{% endblock %}
 {% block title %}Manage Products{% endblock %}
 
 
 {% block content %}
-<h1>Manage Products</h1>
+<div class="header">
+    <div class="header__left">
+        <h2>Manage Products</h2>
+        <div class="filters">
+            <div class="filter-container">
+                <label>Type</label>
+                <div class="filter">
+                    <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+                    <ul class="filter--options">
+                        <li class="highlighted">All</li>
+                        <li>short</li>
+                        <li>mediuuum</li>
+                        <li>looooooooong</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="filter-container">
+                <label>Type</label>
+                <div class="filter">
+                    <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+                    <ul class="filter--options">
+                        <li class="highlighted">All</li>
+                        <li>short</li>
+                        <li>mediuuum</li>
+                        <li>looooooooong</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="filter-container">
+                <label>Type</label>
+                <div class="filter">
+                    <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+                    <ul class="filter--options">
+                        <li class="highlighted">All</li>
+                        <li>short</li>
+                        <li>mediuuum</li>
+                        <li>looooooooong</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="filter-container">
+                <label>Type</label>
+                <div class="filter">
+                    <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+                    <ul class="filter--options">
+                        <li class="highlighted">All</li>
+                        <li>short</li>
+                        <li>mediuuum</li>
+                        <li>looooooooong</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="filter-container">
+                <label>Type</label>
+                <div class="filter">
+                    <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+                    <ul class="filter--options">
+                        <li class="highlighted">All</li>
+                        <li>short</li>
+                        <li>mediuuum</li>
+                        <li>looooooooong</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="filter-container">
+                <label>Type</label>
+                <div class="filter">
+                    <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+                    <ul class="filter--options">
+                        <li class="highlighted">All</li>
+                        <li>short</li>
+                        <li>mediuuum</li>
+                        <li>looooooooong</li>
+                    </ul>
+                </div>
+            </div>
+          </div>
+    </div>
+    <div class="header__right">
+        <h5><i class="bi bi-gift-fill"></i>&nbsp;&nbsp;{{ products|length }} Total Products</h5>
+        <a href='/dashboard/manage-products/add-product'><h3><i class="fa-solid fa-plus"></i>&nbsp;Add Product</h3></a>
+    </div>
+</div>
+<div class="nav__search-container">
+    <input type="text" id="nav__search-bar" class="nav__search-bar" placeholder="Search..." autocomplete="off">
+    <i class="fa-solid fa-magnifying-glass nav__search-button" id="nav__search-button"></i>
+    <div id="nav__search--suggestions" class="nav__search--suggestions"></div>
+  </div>
+<div class="products">
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Genre</th>
+                <th>Variants</th>
+                <th>Avg. Price</th>
+                <th>Stock</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        {% for product in products %}
+        <tr>
+            <td>
+                <div class="thumbnail"><img src="{{ url_for('static', filename=product.image_thumbnail) }}" alt="{{ product.name }}"/></div>
+                <div class="name"><p>{{ product.name }}</p><p>ID: {{ product.id }}</p></div>
+            </td>
+            <td>{{ product.category.category_name }}</td>
+            <td>{{ product.category.category_name }}</td>
+            <td>{{ product.variants|length }}</td>
+            <td>{{ product.variants[0].stock }}</td>
+            <td>&dollar;{{ '{:.2f}'.format(product.variants[0].price) }}</td>
+            <td>etc</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}
 
+{% block body_scripts %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/pageInteractions/filters.js') }}"></script>
 {% endblock %}

@@ -30,6 +30,15 @@
 .dashboard__right > .content {
   background-color: #f3f3f3;
   width: 85%;
-  height: 100vh;
+  height: 100%;
+  min-height: 100vh;
+  padding: 30px; /* please do remove this if each page is to have custom padding or margin -nelson */
   flex-direction: column;
+}
+
+
+.content h2 {
+  font-weight: bolder;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.4em;
 }

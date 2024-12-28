@@ -1,12 +1,13 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
 from flask_login import login_required, current_user
-from .forms import UpdatePersonalInformation
+from .forms import UpdatePersonalInformation, ChangePasswordForm
 from .models import User
 from .roleDecorator import role_required
 from . import db
 import secrets
 import os
 from PIL import Image
+from werkzeug.security import generate_password_hash, check_password_hash
 
 dashboard = Blueprint('dashboard', __name__)
 
@@ -100,6 +101,33 @@ def update_personal_information_form():
 
   return render_template("dashboard/settings/updatePersonalInfoForm.html", user=current_user, form=form, image_file=image_file)
 
+@dashboard.route('/change-password', methods=['GET', 'POST'])
+@login_required
+@role_required(1, 2, 3)
+def change_password():
+  form = ChangePasswordForm()
+
+  if form.validate_on_submit():
+    if check_password_hash(current_user.password, form.password.data):
+      flash("New password cannot be the same as the previous password", "error")
+      return render_template('dashboard/settings/changePassword.html', user=current_user, form=form)
+    
+    # update
+    current_user.password = generate_password_hash(form.password.data, method='pbkdf2:sha256')
+    db.session.commit()
+    flash("Password updated successfully!", "success")
+    return redirect(url_for('dashboard.update_personal_information'))
+  
+  if form.confirmPassword.data != form.password.data:
+    flash("Both passwords must match.", "error")
+    return render_template('dashboard/settings/changePassword.html', user=current_user, form=form)
+  
+  if form.password.errors:
+    flash("Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.", "error")
+    return render_template('dashboard/settings/changePassword.html', user=current_user, form=form)
+
+  return render_template('dashboard/settings/changePassword.html', user=current_user, form=form)
+  
 @dashboard.route('/update-billing-address')
 @login_required
 @role_required(1, 2, 3)

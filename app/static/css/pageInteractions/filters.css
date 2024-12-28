@@ -1,0 +1,65 @@
+/* filter styles */
+/* html can be found in js/pageInteractions/filters.js */
+
+.filters {
+    display: flex;
+    align-items: center;
+}
+
+.filters label {
+    font-weight: bold;
+    margin-right: 1em;
+}
+
+.filter {
+    display: flex;
+    position: relative;
+    border-radius: 1.5em;
+    background-color: #efefef;
+    transition: background-color 0.3s, color 0.5s;
+    padding: 0.4rem 1rem;
+    margin-right: 1.5em;
+    min-width: 130px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    z-index: 1;
+}
+
+.filter:last-child {
+    margin-right: 0;
+}
+
+.filter--options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    padding: 0;
+}
+
+.filter--options li {
+    padding: 0.2rem 1rem;
+    list-style-type: none;
+    display: none; 
+    background-color: #efefef;
+    transition: background-color 0.3s, color 0.5s;
+    color: black;
+    z-index: 10;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+.filter--options li:last-child {
+    border-radius: 0 0 1.5em 1.5em;
+    padding-bottom: 7px;
+}
+
+li.highlighted, .filter.activated {
+    background-color: #039752;
+    color: white;
+}
+
+.filter span {
+    width: 100%;
+}

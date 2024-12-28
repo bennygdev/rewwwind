@@ -1,0 +1,82 @@
+/* header */
+.header h2 {
+    margin: 0;
+}
+
+.header a, .button__wrapper input {
+    text-decoration: none;
+    color: black;
+    transition: background-color 0.3s, color 0.5s;
+    border: 1px solid black;
+    border-radius: 12px;
+    display: inline-block;
+    padding: 0.3em 0.7em;
+    margin: 1.5em 0;
+}
+
+.header a:hover, .button__wrapper input:hover {
+    background-color: #039752;
+    color: white;
+}
+
+/* forms */
+.centralise-content {
+    display: flex;
+    justify-content: space-between;
+}
+
+.product__type, .product__genre {
+    width: 47%;
+}
+
+form input, form select, .product__images label {
+    margin: 0.5em 0 1.5em 0;
+}
+
+form textarea.form-control {
+    margin-top: 0.5em;
+}
+
+form .resizeHandle {
+    margin-bottom: 1.5em
+}
+
+.product__images input {
+    display: none;
+}
+
+.product__images label {
+    cursor: pointer;
+    height: 400px;
+    width: 100%;
+    border: 1px solid black;
+    background: url('../../../media/upload_placeholder.png') no-repeat center;
+    background-size: 250px;
+}
+
+.product__images .file-list {
+    display: flex;
+    justify-content: space-evenly;
+    margin-bottom: 1.5rem;
+}
+
+.product__images .image__container {
+    display: grid;
+    width: 170px;
+    height: 140px;
+    border: 1px solid black;
+    cursor: pointer;
+}
+
+.product__images img {
+    justify-self: center;
+    align-self: center;
+    max-width: 150px;
+    max-height: 120px;
+}
+
+.button__wrapper input {
+    font-size: 1.4em;
+    padding: 0.3em 1em;
+    margin: 0;
+}

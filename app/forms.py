@@ -1,7 +1,11 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, IntegerField, TextAreaField, FieldList, FormField, EmailField
-from wtforms.validators import DataRequired, Email, Length, EqualTo, Optional, NumberRange, Regexp
-from .models import User
+from flask import request, flash
+from werkzeug.utils import secure_filename
+from wtforms import StringField, TextAreaField, IntegerField, FieldList, FormField, SelectField, FileField, MultipleFileField, EmailField, PasswordField, HiddenField, SubmitField
+from wtforms.validators import DataRequired, Email, Length, EqualTo, Optional, NumberRange, Regexp, ValidationError
+from PIL import Image # file object validator
+from mimetypes import guess_type # file extension validator
+from .models import User, Category, Product
 
 class LoginForm(FlaskForm):
   emailUsername = StringField('Email/Username', validators=[DataRequired()])
@@ -28,3 +32,33 @@ class ResetPasswordForm(FlaskForm):
   password = PasswordField('Password', validators=[DataRequired(), Length(min=8), Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", message="Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.")])
   confirmPassword = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message="Passwords must match")])
   submit = SubmitField('Reset Password')
+
+class AddProductForm(FlaskForm):
+  productName = StringField('Product Name', validators=[DataRequired(), Length(max=200)])
+  productImages = MultipleFileField('', render_kw={'accept':'image/*'})
+  productThumbnail = HiddenField()
+  productDescription = TextAreaField('Product Description')
+  productType = SelectField('Type', validators=[DataRequired()])
+  productGenre = SelectField('Genre', validators=[DataRequired()])
+  
+  # populating select choices from sql.
+  def process(self, formdata=None, obj=None, data=None, **kwargs):
+    categories = Category.query.all()
+    self.productType.choices = [(category.id, category.category_name) for category in categories]
+    self.productGenre.choices = [(category.id, category.category_name) for category in categories]
+    super(AddProductForm, self).process(formdata, obj, data, **kwargs)
+  
+  # validating images
+  def validate_productImages(self, field):
+    print('Working.')
+    for file in field.data:
+      mime_type, _ = guess_type(file.filename)
+
+      if not mime_type or not mime_type.startswith('image/'):
+          raise ValidationError('this is not a valid image file.', mime_type)
+
+      image = Image.open(file.stream) 
+      if image.verify():
+        raise ValidationError('This is not a valid image file.', image)
+  
+  submit = SubmitField('Add')

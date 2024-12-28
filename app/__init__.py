@@ -21,6 +21,11 @@ def create_app():
   app.config['MAIL_USE_SSL'] = True
   app.config['MAIL_USERNAME'] = os.environ.get('EMAIL_USER') # use python_dotenv later
   app.config['MAIL_PASSWORD'] = os.environ.get('EMAIL_PASS') # use python_dotenv later
+
+  app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'media', 'uploads') # temporary image upload folder
+  if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
+
   # print(app.config['MAIL_USERNAME'])
   # print(app.config['MAIL_PASSWORD'])
   mail = Mail(app)
@@ -57,6 +62,11 @@ def create_app():
   app.register_blueprint(manageProducts, url_prefix="/dashboard")
   app.register_blueprint(manageVouchers, url_prefix="/dashboard")
   app.register_blueprint(manageAccounts, url_prefix="/dashboard")
+
+  # Product Pages
+  from .productPagination import productPagination
+
+  app.register_blueprint(productPagination, url_prefix="/products")
 
   # Initialise Database
   from .models import User, Product, Role, Order, OrderItem, Category, ProductCategory
@@ -95,6 +105,9 @@ def create_database(app):
       insert_default_roles()
       insert_users()
       # insert_categories()
+
+      from .seed import insert_categories # will remove as time goes, added seed.py to avoid confusion here - nelson
+      insert_categories()
 
 def insert_default_roles():
   from .models import Role

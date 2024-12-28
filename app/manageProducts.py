@@ -17,3 +17,44 @@ def product_listings():
     for product in products:
       print(url_for('static', filename=product.image_thumbnail))
     return render_template("dashboard/manageProducts/products.html", user=current_user, products=products)
+
+@manageProducts.route('/manage-products/add-product', methods=['GET', 'POST'])
+@login_required
+@role_required(2, 3)
+def add_product():
+    form = AddProductForm()
+    
+    if form.validate_on_submit():
+        productName = form.productName.data
+        productDescription = form.productDescription.data
+        productType = form.productType.data
+        productGenre = form.productGenre.data
+        productThumbnail = int(form.productThumbnail.data)
+        
+        files = request.files.getlist('productImages')
+        upload_folder = current_app.config['UPLOAD_FOLDER']
+        for file in files:
+            file.seek(0)
+            file.save(os.path.join(upload_folder, secure_filename(file.filename))) 
+
+
+        new_product = Product (
+            name = productName,
+            creator = productName,
+            image_thumbnail = f'media/uploads/{secure_filename(files[productThumbnail].filename)}',
+            description = productDescription,
+            variants = [{'name': productType, 'price': 129, 'stock': productType}],
+            category_id = 1
+          )
+        
+        db.session.add(new_product)
+        db.session.commit()
+        print("item added successfully", form.data)
+
+    # debugger
+    if form.errors:
+        print("Form validation errors:")
+        for field, error_messages in form.errors.items():
+            print(f"{field}: {error_messages}")
+
+    return render_template("dashboard/manageProducts/addProduct.html", user=current_user, form=form)

@@ -1,0 +1,26 @@
+/* resizable text area styles */
+/* html can be found in js/pageInteractions/resizableTextArea.js */
+
+/* forms */
+.resizable {
+    resize: none;
+    min-height: 120px;
+    width: 100%;
+    padding-bottom: 30px;
+    position: relative;
+    box-sizing: border-box;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.resizeHandle {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 8px;
+    cursor: row-resize;
+    background-color: rgb(226, 226, 226);
+    background: linear-gradient(to bottom, rgb(187, 187, 187) 1px, transparent 1px) repeat-y;
+    background-size: 100% 3px;
+}

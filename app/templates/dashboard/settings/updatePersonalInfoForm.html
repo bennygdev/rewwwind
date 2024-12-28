@@ -15,6 +15,8 @@
 <form method="POST" class="updateInfo__form" enctype="multipart/form-data">
   {{ form.hidden_tag() }}
 
+  <input type="hidden" name="remove_image" id="remove_image" value="">
+
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       <div class="flash-messages">
@@ -65,9 +67,14 @@
   <div class="updateInfo__picture">
     <div class="image__preview">
       {{ form.picture.label }}
-      {% if user.image %}
+      {% if user.image != 'profile_image_default.jpg' %}
       <div class="profile-image-preview">
         <img src="{{ image_file }}" alt="Profile Picture" class="profile-picture-preview-img" id="imagePreview">
+      </div>
+      <div class="removeImage__wrapper">
+        <button type="button" class="removeImage__button" id="removeImageButton">
+          Remove Image
+        </button>
       </div>
       {% else %}
       <div class="profile-image-preview">

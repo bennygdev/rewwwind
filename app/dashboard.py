@@ -63,6 +63,11 @@ def update_personal_information_form():
   form = UpdatePersonalInformation()
   image_file = url_for('static', filename="profile_pics/" + current_user.image)
 
+  if current_user.image:
+    image_file = url_for('static', filename="profile_pics/" + current_user.image)
+  else:
+    image_file = url_for('static', filename='profile_pics/profile_image_default.jpg')
+
   # current user because logged in user
   if form.validate_on_submit():
 
@@ -81,6 +86,11 @@ def update_personal_information_form():
     if form.picture.data:
       picture_file = save_picture(form.picture.data)
       current_user.image = picture_file
+    elif 'remove_image' in request.form and request.form['remove_image'] == 'remove':
+      prev_picture = os.path.join(current_app.root_path, 'static/profile_pics', current_user.image)
+      if os.path.exists(prev_picture) and current_user.image != 'profile_image_default.jpg':
+        os.remove(prev_picture)
+      current_user.image = 'profile_image_default.jpg' 
 
     current_user.first_name = form.firstName.data
     current_user.last_name = form.lastName.data

@@ -112,6 +112,22 @@ h1 {
   object-fit: cover;
 }
 
+.removeImage__wrapper {
+  text-align: center;
+}
+
+.removeImage__button {
+  width: 7vw;
+  height: 35px;
+  background-color: #ff5533;
+  border: 0;
+  font-family: "OpenSansSemibold";
+  font-size: 0.9em;
+  color: #fff;
+  border-radius: 10px;
+  margin-top: 15px;
+}
+
 .updateInfo__button {
   width: 6vw;
   height: 45px;

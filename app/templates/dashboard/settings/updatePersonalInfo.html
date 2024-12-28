@@ -1,0 +1,91 @@
+{% extends "dashboard/base.html" %}
+{% set active_page = "settings" %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/settings/settings.css') }}">
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/settings/updatePersonalInfo.css') }}">
+{% endblock %}
+
+{% block title %}Update Personal Information{% endblock %}
+
+{% block headerContent %}
+<div class="settings__header">
+  <h1 id="settings__title">Update Personal Information</h1>
+  <p id="settings__subtitles">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</p>
+</div>
+{% endblock %}
+
+{% block content %}
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-messages">
+        {% for category, message in messages %}
+          {% if category == 'error' %}
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% elif category == 'info' %}
+          <div class="alert alert-primary alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% elif category == 'success'  %}
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+<a href="/dashboard/settings" class="back__button--darker settings__back">Back</a>
+
+<div class="profile__content">
+  <div class="profile__left">
+    <div class="profile__pictureBox">
+      <img src="{{ image_file }}" id="mini_profile_img" alt="Mini profile image">
+    </div>
+    <div class="profile__informationBox">
+      <div class="profile__info1 profile__row">
+        <div class="profile__firstName">
+          <h3>First Name</h3>
+          <p>{{ user.first_name }}</p>
+        </div>
+        <div class="profile__lastName">
+          <h3>Last Name</h3>
+          <p>{{ user.last_name }}</p>
+        </div>
+      </div>
+      <div class="profile__info2 profile__row">
+        <div class="profile__username">
+          <h3>Username</h3>
+          <p>{{ user.username }}</p>
+        </div>
+        <div class="profile__email">
+          <h3>Email Address</h3>
+          <p>{{ user.email }}</p>
+        </div>
+      </div>
+      <div class="profile__info3 profile__row">
+        <div class="profile__userId">
+          <h3>User ID</h3>
+          <p>{{ user.id }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="profile__right">
+    <div class="profile__buttons">
+      <a href="/dashboard/update-personal-information-form" class="back__button--darker"><i class="fa-solid fa-pen"></i>&nbsp; Update</a>
+      <a href="/dashboard/change-password" class="back__button--darker">Change Password</a>
+    </div>
+  </div>
+</div>
+
+<!-- <img src="{{ image_file }}" alt=""> -->
+
+{% endblock %}

@@ -1,9 +1,41 @@
 {% extends "dashboard/base.html" %}
 {% set active_page = "settings" %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/settings/settings.css') }}">
+{% endblock %}
+
 {% block title %}Settings{% endblock %}
 
+{% block headerContent %}
+
+<div class="settings__header">
+  <h1 id="settings__title">User Settings</h1>
+  <p id="settings__subtitles">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</p>
+</div>
+{% endblock %}
 
 {% block content %}
-<h1>User Settings</h1>
+
+<div class="settings__content">
+  <a href="/dashboard/update-personal-information" class="settings__container">
+    <div>
+      <h2 class="settings__title"><i class="fa-solid fa-user"></i> Personal Information</h2>
+      <p class="settings__paragraph">Update your Personal Information here.</p>
+    </div>
+  </a>
+  <a href="/dashboard/update-billing-address" class="settings__container">
+    <div>
+      <h2 class="settings__title"><i class="fa-solid fa-envelopes-bulk"></i> Billing Address</h2>
+      <p class="settings__paragraph">Update your Billing Address here.</p>
+    </div>
+  </a>
+  <a href="/dashboard/update-payment-information" class="settings__container">
+    <div>
+      <h2 class="settings__title"><i class="fa-solid fa-credit-card"></i> Payment Information</h2>
+      <p class="settings__paragraph">Update your Payment Information here.</p>
+    </div>
+  </a>
+</div>
 
 {% endblock %}

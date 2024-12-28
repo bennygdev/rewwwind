@@ -27,8 +27,14 @@
       <div class="dashboard__right">
         <div class="placeholder__left"></div>
         <div class="content">
-          {% block content %}
-          {% endblock %}
+          <div class="headerContent">
+            {% block headerContent %}
+            {% endblock %}
+          </div>
+          <div class="bodyContent">
+            {% block content %}
+            {% endblock %}
+          </div>
           <!-- Content is used for any page. But for overview it's shared by customer, admin and owner. So that is why i added another block inside overview.html's block content... makes sense? -->
         </div>
       </div>

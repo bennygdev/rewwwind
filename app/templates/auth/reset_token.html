@@ -45,16 +45,28 @@
       
       <div class="login__password">
         {{ form.password.label }}
-        {{ form.password(class="form-control") }}
+        <div class="password-wrapper">
+          {{ form.password(class="form-control password") }}
+          <button type="button" id="toggle-password" class="password-toggle">
+            <i class="fa-solid fa-eye" id="eye-icon"></i>
+          </button>
+        </div>
       </div>
       <div class="login__password">
         {{ form.confirmPassword.label }}
-        {{ form.confirmPassword(class="form-control") }}
+        <div class="password-wrapper">
+          {{ form.confirmPassword(class="form-control password") }}
+        </div>
       </div>
       {{ form.submit(class="reset__button") }}
     </form>
     
   </div>
 </div>
+
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/passwordVisibility.js') }}"
+></script>
 
 {% endblock %}

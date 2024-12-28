@@ -63,6 +63,26 @@
   align-items: center;
 }
 
+.password-wrapper {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2em;
+  color: #ccc;
+}
+
+.password-toggle:focus {
+  outline: none;
+}
+
 .login__button {
   width: 20vw;
   height: 45px;

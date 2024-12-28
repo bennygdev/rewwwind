@@ -47,3 +47,25 @@ body {
 textarea:focus, input:focus{
   outline: none;
 }
+
+.back__button {
+  font-family: "OpenSansSemibold";
+  text-decoration: none;
+  background-color: #eee;
+  padding: 10px 20px;
+  /* width: 85px; */
+  text-align: center;
+  color: #000;
+  border-radius: 10px;
+}
+
+.back__button--darker {
+  font-family: "OpenSansSemibold";
+  text-decoration: none;
+  background-color: #d6d6d6;
+  padding: 10px 20px;
+  /* width: 85px; */
+  text-align: center;
+  color: #000;
+  border-radius: 10px;
+}

@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash
 from flask_login import LoginManager, current_user
 from flask_wtf.csrf import CSRFProtect
 from flask_mail import Mail
+from dotenv import load_dotenv
 import os
 
 db = SQLAlchemy()
@@ -19,8 +20,8 @@ def create_app():
   app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
   app.config['MAIL_PORT'] = 465
   app.config['MAIL_USE_SSL'] = True
-  app.config['MAIL_USERNAME'] = os.environ.get('EMAIL_USER') # use python_dotenv later
-  app.config['MAIL_PASSWORD'] = os.environ.get('EMAIL_PASS') # use python_dotenv later
+  app.config['MAIL_USERNAME'] = os.getenv('EMAIL_USER')
+  app.config['MAIL_PASSWORD'] = os.getenv('EMAIL_PASS') 
   # print(app.config['MAIL_USERNAME'])
   # print(app.config['MAIL_PASSWORD'])
   mail = Mail(app)
@@ -116,6 +117,7 @@ def insert_users():
     last_name = "1",
     username = "admin1",
     email = "admin1@gmail.com",
+    image = None,
     password = generate_password_hash("admin1", method='pbkdf2:sha256'),
     role_id = 2
   )
@@ -125,6 +127,7 @@ def insert_users():
     last_name = "2",
     username = "admin2",
     email = "admin2@gmail.com",
+    image = None,
     password = generate_password_hash("admin2", method='pbkdf2:sha256'),
     role_id = 2
   )
@@ -134,6 +137,7 @@ def insert_users():
     last_name = "3",
     username = "owner",
     email = "owner@gmail.com",
+    image = None,
     password = generate_password_hash("ownerApp", method='pbkdf2:sha256'),
     role_id = 3
   )

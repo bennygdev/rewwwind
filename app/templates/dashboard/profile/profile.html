@@ -2,8 +2,26 @@
 {% set active_page = "profile" %}
 {% block title %}My Profile{% endblock %}
 
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/profile/profile.css') }}">
+{% endblock %}
+
+{% block headerContent %}
+<div class="profile__banner">
+  <!-- <img src="{{ url_for('static',filename='media/green_placeholder.jpg') }}" alt="Profile Banner"> -->
+  <div class="profile__pictureBox">
+    <img src="{{ image_file }}" id="mini_profile_image" alt="Mini profile image">
+  </div>
+</div>
+{% endblock %}
 
 {% block content %}
-<h1>My profile</h1>
-
+<div class="profile__content">
+  <div class="profile__username">
+    <p>{{ user.username }}</p>
+  </div>
+  <div class="profile__editButton">
+    <a href="/dashboard/update-personal-information">Update Information</a>
+  </div>
+</div>
 {% endblock %}

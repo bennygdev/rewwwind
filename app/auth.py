@@ -62,6 +62,7 @@ def register():
           last_name = last_name,
           username = f"User{User.query.count() + 1}",
           email = email,
+          image = None,
           password = generate_password_hash(password, method='pbkdf2:sha256'),
           role_id = 1
         )

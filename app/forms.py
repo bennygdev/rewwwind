@@ -57,6 +57,7 @@ class ConditionForm(FlaskForm): # specific conditions to be listed in the AddPro
 
 class AddProductForm(FlaskForm):
   productName = StringField('Product Name', validators=[DataRequired(), Length(max=200)])
+  productCreator = StringField('Product Creator', validators=[DataRequired(), Length(max=200)])
   productImages = MultipleFileField('', render_kw={'accept':'image/*'})
   productThumbnail = HiddenField()
   productDescription = TextAreaField('Product Description')

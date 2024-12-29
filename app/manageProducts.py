@@ -24,6 +24,7 @@ def add_product():
     
     if form.validate_on_submit():
         productName = form.productName.data
+        productCreator = form.productCreator.data
         productDescription = form.productDescription.data
         productType = form.productType.data
         productGenre = form.productGenre.data
@@ -39,7 +40,7 @@ def add_product():
 
         new_product = Product (
             name = productName,
-            creator = productName,
+            creator = productCreator,
             image_thumbnail = f'media/uploads/{secure_filename(files[productThumbnail].filename)}',
             description = productDescription,
             variants = productConditions,

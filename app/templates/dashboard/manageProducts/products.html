@@ -105,8 +105,8 @@
                 <th class="productGenre">Genre</th>
                 <th class="productVariants">Variants</th>
                 <th class="productAvgPrice">AvgPrice</th>
-                <th class="productStock">Stock</th>
-                <th class="productEtc">Etc</th>
+                <th class="productStock"></th>
+                <th class="controls">Controls</th>
             </tr>
         </thead>
         {% for product in products %}
@@ -132,7 +132,7 @@
             <td class="productStock {{ stock_class }}">
                 <div>{{ stock_text }}</div>
             </td>
-            <td class="productEtc">etc</td>
+            <td class="controls"><i class="bi bi-pencil-square"></i><i class="bi bi-eye-fill"></i><i class="bi bi-trash-fill"></i></td>
         </tr>
         {% endfor %}
     </table>

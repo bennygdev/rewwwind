@@ -60,6 +60,9 @@
     padding: 1rem 1rem 0.5rem 1rem;
     border-radius: 1rem 1rem 0 0; 
     border-bottom: 0;
+    display: flex;
+    align-items: center;
+    text-align: center;
     font-weight: bold;
 }
 
@@ -68,7 +71,7 @@
     color: white;
 }
 
-.header__right h3 i {
+.header__right h3 i, .header__right h5 i {
     font-size: 1.2em;
 }
 
@@ -117,6 +120,7 @@
     border: 1px solid black;
     border-radius: 6px;
     display: grid;
+    align-items: center;
     margin-right: 14px;
     overflow:hidden;
 }

@@ -7,34 +7,32 @@ class Form {
         this.init();
     }
 
-    // Initialize event listeners
+    // initialise event listeners
     init() {
         this.form.addEventListener('submit', (event) => this.handleSubmit(event));
     }
 
-    // Prepare form data for submission
+    // custom form data logic
     prepareFormData() {
         const formElements = this.form.querySelectorAll('input, select, textarea');
         formElements.forEach(element => {
             if (element.name && !['productImages', 'productThumbnail', /^productConditions.*/].includes(element.name)) {
-                console.log(element.name);
                 this.formData.append(element.name, element.value);
             }
         });
-        console.log('Called prepareFormData from:', this.constructor.name);
         return this.formData;
     }
 
-    // Handle form submission
+    // custom form submission
     async handleSubmit(event) {
         event.preventDefault();
 
         const formData = this.prepareFormData();
 
         // Debugging: Log the form data
-        for (let [key, value] of formData.entries()) {
-            console.log(`${key}:`, value);
-        }
+        // for (let [key, value] of formData.entries()) {
+        //     console.log(`${key}:`, value);
+        // }
 
         const response = await fetch(this.submitUrl, {
             method: 'POST',
@@ -42,13 +40,13 @@ class Form {
         });
 
         const result = await response.text();
-        console.log(result);  // Handle response if necessary
+        // console.log(result);
     }
 }
 
 class ImageHandler extends Form {
     constructor(fileInputName, formSelector, submitUrl) {
-        super(formSelector, submitUrl);  // Call the parent constructor
+        super(formSelector, submitUrl);
         this.fileInputName = fileInputName;
         this.fileInput = this.form.querySelector(`input[name="${this.fileInputName}"]`);
         this.fileList = [];
@@ -58,20 +56,19 @@ class ImageHandler extends Form {
         this.initImageHandling();
     }
 
-    // Initialize image-specific event listeners
+    // initialise imagehandler event listeners
     initImageHandling() {
         if (this.fileInput) {
             this.fileInput.addEventListener('change', (event) => this.handleFileSelect(event));
         }
     }
 
-    // Handle file selection (for image inputs)
     handleFileSelect(event) {
         const files = Array.from(event.target.files);
         this.fileList = this.fileList.concat(files);
     
-        // Logic to display files
-        this.fileListDisplay.innerHTML = '';  // Clear existing list
+        // displaying files (images)
+        this.fileListDisplay.innerHTML = '';  // resetting previous display list
         this.fileList.forEach((file, index) => {
             const fileItem = document.createElement('div');
             fileItem.classList.add('image__container');
@@ -83,25 +80,25 @@ class ImageHandler extends Form {
                 img.alt = `Image Preview ${index + 1}`;
                 fileItem.appendChild(img);
     
-                // Check if it's the first image and set background and active class
+                // check if this is first time uploading file, and set it to thumbnail
                 if (index === 0 && !Array.from(this.fileListDisplay.childNodes).find(file => file.classList.contains('active'))) {
-                    fileItem.classList.add('active');  // Mark first image as active
-                    this.fileInput.previousElementSibling.style.background = `url(${img.src}) no-repeat center`;  // Set background
+                    fileItem.classList.add('active');
+                    this.fileInput.previousElementSibling.style.background = `url(${img.src}) no-repeat center`;
                     this.fileInput.previousElementSibling.style.backgroundSize = '250px';
                     this.productThumbnail.value = index;
                 }
             };
     
-            reader.readAsDataURL(file);  // Start the reading process
+            reader.readAsDataURL(file);
             this.fileListDisplay.appendChild(fileItem);
             fileItem.addEventListener('click', () => this.handlePreviewImage(fileItem, index));
         });
     
-        // Clear input value to allow re-selection
+        // clear input value
         event.target.value = '';
     }
     
-    // Handle image preview (set as active)
+    // setting active image as thumbnail
     handlePreviewImage(targetNode, index) {
         const items = Array.from(this.fileListDisplay.childNodes);
         const currentNode = items.find(item => item.classList.contains('active'));
@@ -110,8 +107,8 @@ class ImageHandler extends Form {
             currentNode.classList.remove('active');
         }
     
-        targetNode.classList.add('active');  // Mark the clicked item as active
-        const img = targetNode.querySelector('img');  // Select the img element within targetNode
+        targetNode.classList.add('active');
+        const img = targetNode.querySelector('img');
     
         // Set the background to the clicked image
         if (img) {
@@ -121,11 +118,10 @@ class ImageHandler extends Form {
         this.productThumbnail.value = index;
     }
 
-    // Override the parent's method to append image files as well
+    // image file specific data preparation
     prepareFormData() {
         const formData = super.prepareFormData();
 
-        // Append image files to FormData
         this.fileList.forEach(file => formData.append(this.fileInput.name, file));
         formData.append(this.productThumbnail.name, this.productThumbnail.value)
 
@@ -133,9 +129,9 @@ class ImageHandler extends Form {
     }
 }
 
-class ConditionHandler extends Form {
-    constructor(formSelector, submitUrl) {
-        super(formSelector, submitUrl);
+class ConditionHandler extends ImageHandler {
+    constructor(fileInputName, formSelector, submitUrl) {
+        super(fileInputName, formSelector, submitUrl);
         this.conditionsContainer = this.form.querySelector('.product__conditions');
         this.conditionList = Array.from(this.form.querySelectorAll('.condition'));
         this.lastCondition = this.conditionList[this.conditionList.length - 1];
@@ -165,9 +161,8 @@ class ConditionHandler extends Form {
     }
 
     prepareFormData() {
-        const formData = super.prepareFormData();  // Get parent form data
+        const formData = super.prepareFormData();
 
-        // Append conditions to FormData
         this.conditionList.forEach((condition, index) => {
             const inputs = condition.querySelectorAll('input, select');
             inputs.forEach((input) => {
@@ -177,9 +172,8 @@ class ConditionHandler extends Form {
             });
         });
 
-        return formData;  // Return the updated form data
+        return formData;
     }
 }
 
-new ImageHandler('productImages', 'form', '/dashboard/manage-products/add-product');
-new ConditionHandler('form', '/dashboard/manage-products/add-product');
+new ConditionHandler('productImages', 'form', '/dashboard/manage-products/add-product');

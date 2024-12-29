@@ -100,27 +100,39 @@
     <table>
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Genre</th>
-                <th>Variants</th>
-                <th>Avg. Price</th>
-                <th>Stock</th>
-                <th>Name</th>
+                <th class="productName">Name</th>
+                <th class="productType">Type</th>
+                <th class="productGenre">Genre</th>
+                <th class="productVariants">Variants</th>
+                <th class="productAvgPrice">AvgPrice</th>
+                <th class="productStock">Stock</th>
+                <th class="productEtc">Etc</th>
             </tr>
         </thead>
         {% for product in products %}
         <tr>
-            <td>
+            <td class="productName">
                 <div class="thumbnail"><img src="{{ url_for('static', filename=product.image_thumbnail) }}" alt="{{ product.name }}"/></div>
                 <div class="name"><p>{{ product.name }}</p><p>ID: {{ product.id }}</p></div>
             </td>
-            <td>{{ product.category.category_name }}</td>
-            <td>{{ product.category.category_name }}</td>
-            <td>{{ product.variants|length }}</td>
-            <td>{{ product.variants[0].stock }}</td>
-            <td>&dollar;{{ '{:.2f}'.format(product.variants[0].price) }}</td>
-            <td>etc</td>
+            <td class="productType">{{ product.category.category_name }}</td>
+            <td class="productGenre">{{ product.category.category_name }}</td>
+            <td class="productVariants">{{ product.variants|length }}</td>
+            <td class="productAvgPrice">&dollar;{{ '{:.2f}'.format(product.variants[0].price) }}</td>
+            {% if product.variants[0].stock == 0 %}
+                {% set stock_class = 'noStock' %}
+                {% set stock_text = 'Out of stock' %}
+            {% elif product.variants[0].stock < 10 %}
+                {% set stock_class = 'lowStock' %}
+                {% set stock_text = 'Low on stock' %}
+            {% else %}
+                {% set stock_class = 'highStock' %}
+                {% set stock_text = 'High stock' %}
+            {% endif %}
+            <td class="productStock {{ stock_class }}">
+                <div>{{ stock_text }}</div>
+            </td>
+            <td class="productEtc">etc</td>
         </tr>
         {% endfor %}
     </table>

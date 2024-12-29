@@ -99,7 +99,29 @@
 }
 
 .content .products th, .content .products td {
-    padding: 10px;
+    padding: 10px 20px;
+}
+
+.content .products th, .content .products td:not(:first-child) {
+    text-align: center;
+}
+
+.content td.productStock div {
+    padding: 5px 0;
+    border-radius: 10px;
+}
+
+.content td.noStock div {
+    background-color: red;
+}
+
+.content td.lowStock div {
+    background-color: orange;
+}
+
+.content td.highStock div {
+    background-color: green;
+    color: white;
 }
 
 .content .products th {

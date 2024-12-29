@@ -14,8 +14,6 @@ manageProducts = Blueprint('manageProducts', __name__)
 @role_required(2, 3)
 def product_listings():
     products = Product.query.all()
-    for product in products:
-      print(url_for('static', filename=product.image_thumbnail))
     return render_template("dashboard/manageProducts/products.html", user=current_user, products=products)
 
 @manageProducts.route('/manage-products/add-product', methods=['GET', 'POST'])
@@ -31,7 +29,7 @@ def add_product():
         productGenre = form.productGenre.data
         productThumbnail = int(form.productThumbnail.data)
         productConditions = form.productConditions.data
-        print(productConditions)
+        print(productConditions[0]['stock'])
         
         files = request.files.getlist('productImages')
         upload_folder = current_app.config['UPLOAD_FOLDER']

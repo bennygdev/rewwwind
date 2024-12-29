@@ -1,30 +1,77 @@
-class FileFormHandler {
-    constructor(fileInputName, submitUrl) {
-        this.fileList = [];
-        this.form = document.querySelector('form');
-        this.fileInput = this.form.querySelector(`input[name="${fileInputName}"]`);
-        this.productThumbnail = this.form.querySelector('input[name="productThumbnail"]');
-        this.fileListDisplay = this.fileInput.nextElementSibling;
+class Form {
+    constructor(formSelector, submitUrl) {
+        this.form = document.querySelector(formSelector);
         this.submitUrl = submitUrl;
+        this.formData = new FormData();
 
         this.init();
     }
 
-    // initialise event listeners
+    // Initialize event listeners
     init() {
-        if (this.fileInput) {
-            this.fileInput.addEventListener('change', (event) => this.handleFileSelect(event));
-        }
-
         this.form.addEventListener('submit', (event) => this.handleSubmit(event));
     }
 
+    // Prepare form data for submission
+    prepareFormData() {
+        const formElements = this.form.querySelectorAll('input, select, textarea');
+        formElements.forEach(element => {
+            if (element.name && !['productImages', 'productThumbnail', /^productConditions.*/].includes(element.name)) {
+                console.log(element.name);
+                this.formData.append(element.name, element.value);
+            }
+        });
+        console.log('Called prepareFormData from:', this.constructor.name);
+        return this.formData;
+    }
+
+    // Handle form submission
+    async handleSubmit(event) {
+        event.preventDefault();
+
+        const formData = this.prepareFormData();
+
+        // Debugging: Log the form data
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}:`, value);
+        }
+
+        const response = await fetch(this.submitUrl, {
+            method: 'POST',
+            body: formData,
+        });
+
+        const result = await response.text();
+        console.log(result);  // Handle response if necessary
+    }
+}
+
+class ImageHandler extends Form {
+    constructor(fileInputName, formSelector, submitUrl) {
+        super(formSelector, submitUrl);  // Call the parent constructor
+        this.fileInputName = fileInputName;
+        this.fileInput = this.form.querySelector(`input[name="${this.fileInputName}"]`);
+        this.fileList = [];
+        this.productThumbnail = this.form.querySelector('input[name="productThumbnail"]');
+        this.fileListDisplay = this.fileInput.nextElementSibling;
+
+        this.initImageHandling();
+    }
+
+    // Initialize image-specific event listeners
+    initImageHandling() {
+        if (this.fileInput) {
+            this.fileInput.addEventListener('change', (event) => this.handleFileSelect(event));
+        }
+    }
+
+    // Handle file selection (for image inputs)
     handleFileSelect(event) {
         const files = Array.from(event.target.files);
         this.fileList = this.fileList.concat(files);
     
-        // logic to display files
-        this.fileListDisplay.innerHTML = '';  // clear existing list so that it is rendered correctly.
+        // Logic to display files
+        this.fileListDisplay.innerHTML = '';  // Clear existing list
         this.fileList.forEach((file, index) => {
             const fileItem = document.createElement('div');
             fileItem.classList.add('image__container');
@@ -54,6 +101,7 @@ class FileFormHandler {
         event.target.value = '';
     }
     
+    // Handle image preview (set as active)
     handlePreviewImage(targetNode, index) {
         const items = Array.from(this.fileListDisplay.childNodes);
         const currentNode = items.find(item => item.classList.contains('active'));
@@ -70,46 +118,68 @@ class FileFormHandler {
             this.fileInput.previousElementSibling.style.background = `url(${img.src}) no-repeat center`;
             this.fileInput.previousElementSibling.style.backgroundSize = '250px';
         }
-        this.productThumbnail.value = index
+        this.productThumbnail.value = index;
     }
-    
 
-    // Prepare form data for submission
+    // Override the parent's method to append image files as well
     prepareFormData() {
-        const formData = new FormData();
+        const formData = super.prepareFormData();
 
-        // Append files to FormData
+        // Append image files to FormData
         this.fileList.forEach(file => formData.append(this.fileInput.name, file));
-
-        // Get all other form fields and append them
-        const formElements = this.form.querySelectorAll('input, select, textarea');
-        formElements.forEach(element => {
-            if (element.name && element.name !== this.fileInput.name) {
-                formData.append(element.name, element.value);
-            }
-        });
+        formData.append(this.productThumbnail.name, this.productThumbnail.value)
 
         return formData;
     }
+}
 
-    // Handle form submission
-    async handleSubmit(event) {
-        event.preventDefault();
+class ConditionHandler extends Form {
+    constructor(formSelector, submitUrl) {
+        super(formSelector, submitUrl);
+        this.conditionsContainer = this.form.querySelector('.product__conditions');
+        this.conditionList = Array.from(this.form.querySelectorAll('.condition'));
+        this.lastCondition = this.conditionList[this.conditionList.length - 1];
+        this.addConditionBtn = this.form.querySelector('button.addCondition');
 
-        const formData = this.prepareFormData();
+        this.initConditionHandler();
+    }
 
-        // Debugging: Log the form data
-        for (let [key, value] of formData.entries()) {
-            console.log(`${key}:`, value);
-        }
+    initConditionHandler() {
+        this.addConditionBtn.addEventListener('click', () => this.addCondition());
+    }
 
-        const response = await fetch(this.submitUrl, {
-            method: 'POST',
-            body: formData,
+    addCondition() {
+        const newCondition = this.lastCondition.cloneNode(true);
+        const newConditionInputs = Array.from(newCondition.querySelectorAll('input, select'));
+        newConditionInputs.forEach(input => {
+            const name = input.name
+            if (name) {
+                const newName = name.replace(/\d+/, this.conditionList.length);
+                input.setAttribute('name', newName);
+                name.includes('condition') ? input.value = 1 : input.value = '';
+            };
         });
 
-        const result = await response.text();
+        this.conditionList.push(newCondition);
+        this.conditionsContainer.insertBefore(newCondition, this.addConditionBtn);
+    }
+
+    prepareFormData() {
+        const formData = super.prepareFormData();  // Get parent form data
+
+        // Append conditions to FormData
+        this.conditionList.forEach((condition, index) => {
+            const inputs = condition.querySelectorAll('input, select');
+            inputs.forEach((input) => {
+                if (input.name) {
+                    formData.append(input.name, input.value);
+                }
+            });
+        });
+
+        return formData;  // Return the updated form data
     }
 }
 
-new FileFormHandler('productImages', '/dashboard/manage-products/add-product');
+new ImageHandler('productImages', 'form', '/dashboard/manage-products/add-product');
+new ConditionHandler('form', '/dashboard/manage-products/add-product');

@@ -20,13 +20,14 @@
             {{ form.productName(class='form-control', placeholder='Enter product name here') }}
         </div>
         <div class="product__images">
+            <label>Test</label>
             {{ form.productImages.label }}
             {{ form.productImages() }}
             <div class="file-list"></div>
         </div>
         <div class="product__description">
             {{ form.productDescription.label }}
-            {{ form.productDescription(class='form-control resizable', placeholder='Enter product description here') }}
+            {{ form.productDescription(class='form-control resizable', placeholder='PLEASE BUY OUR PRODUCTS PLEASE PLEASE PLEASE') }}
         </div>
         <div class="centralise-content">
             <div class="product__type">
@@ -37,6 +38,21 @@
                 {{ form.productGenre.label }}
                 {{ form.productGenre(class='form-select') }}
             </div>
+        </div>
+        <div class="product__conditions">
+            {% for condition in form.productConditions %}
+            <div class="centralise-content condition">
+                {{ condition.condition.label }}
+                {{ condition.condition(class='form-select') }}
+        
+                {{ condition.stock.label }}
+                {{ condition.stock(class='form-control') }}
+        
+                {{ condition.price.label }}
+                {{ condition.price(class='form-control') }}
+            </div>
+            {% endfor %}
+            <button type="button" class="addCondition"><i class="fa-solid fa-plus"></i>&nbsp;Add Condition</button>
         </div>
         <div class="button__wrapper">
             {{ form.submit() }}

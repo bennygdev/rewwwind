@@ -62,7 +62,7 @@ class Product(db.Model):
     description = db.Column(db.Text, nullable=True)
     image_thumbnail = db.Column(db.String(300), nullable=True)
     images = db.Column(db.JSON, nullable=True)  # list of uploaded images
-    variants = db.Column(db.JSON, nullable=True)  # store variants (name, price, stock)
+    variants = db.Column(db.JSON, nullable=True)  # store variants (name, stock, price)
     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
     updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
     

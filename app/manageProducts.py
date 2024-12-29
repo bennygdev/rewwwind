@@ -30,6 +30,8 @@ def add_product():
         productType = form.productType.data
         productGenre = form.productGenre.data
         productThumbnail = int(form.productThumbnail.data)
+        productConditions = form.productConditions.data
+        print(productConditions)
         
         files = request.files.getlist('productImages')
         upload_folder = current_app.config['UPLOAD_FOLDER']
@@ -37,13 +39,12 @@ def add_product():
             file.seek(0)
             file.save(os.path.join(upload_folder, secure_filename(file.filename))) 
 
-
         new_product = Product (
             name = productName,
             creator = productName,
             image_thumbnail = f'media/uploads/{secure_filename(files[productThumbnail].filename)}',
             description = productDescription,
-            variants = [{'name': productType, 'price': 129, 'stock': productType}],
+            variants = productConditions,
             category_id = 1
           )
         

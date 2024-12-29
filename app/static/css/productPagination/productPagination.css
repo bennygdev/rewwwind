@@ -21,6 +21,10 @@
     gap: 5px;
 }
 
+.filter-container:not(:last-child) {
+    margin-right: 1.5em;
+}
+
 /* product styles */
 
 .products {

@@ -1,10 +1,10 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
   const togglePassword = document.getElementById("toggle-password");
   const eyeIcon = document.getElementById("eye-icon");
   const passwordFields = document.querySelectorAll(".password");
 
-  togglePassword.addEventListener("click", function () {
-    passwordFields.forEach(function (field) {
+  togglePassword.addEventListener("click", () => {
+    passwordFields.forEach((field) => {
       const type = field.type === "password" ? "text" : "password";
       field.type = type;
     });

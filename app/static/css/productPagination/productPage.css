@@ -1,0 +1,17 @@
+.product {
+    display: flex;
+    gap: 15px;
+}
+
+.image__container {
+    width: 300px;
+    height: 300px;
+    overflow: hidden;
+    border: 1px solid black;
+    border-radius: 12px;
+}
+
+.image__container img {
+    max-width: 300px;
+    max-height: 300px;
+}

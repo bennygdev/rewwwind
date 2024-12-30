@@ -8,79 +8,84 @@
 
 {% block content %}
 
-<div class="paddedContent">
-  <div class="listing__header">
-    <div class="header__left">
-        <h1>Products</h1>
-        <p>Showing 1
-          {% if 1 < products|length < 16 %}
-            - {{ products|length }}
-          {% elif products|length >= 16 %}
-            - 16
-          {% endif %}
-          of {{ products|length }} results
-        </p>
-    </div>
-    <div class="header__right">
-      <div class="filters">
-        <div class="filter-container">
-          <label>Type</label>
-          <div class="filter">
-            <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
-            <ul class="filter--options">
-              <li class="highlighted">All</li>
-              <li>short</li>
-              <li>mediuuum</li>
-              <li>looooooooong</li>
-            </ul>
-          </div>
+<div class="listing__header">
+  <div class="header__left">
+      <h1>Products</h1>
+      <p>Showing 1
+        {% if 1 < products|length < 16 %}
+          - {{ products|length }}
+        {% elif products|length >= 16 %}
+          - 16
+        {% endif %}
+        of {{ products|length }} results
+      </p>
+  </div>
+  <div class="header__right">
+    <div class="filters">
+      <div class="filter-container">
+        <label>Type</label>
+        <div class="filter">
+          <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+          <ul class="filter--options">
+            <li class="highlighted">All</li>
+            <li>short</li>
+            <li>mediuuum</li>
+            <li>looooooooong</li>
+          </ul>
         </div>
-        <div class="filter-container">
-          <label>Genre</label>
-          <div class="filter">
-            <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
-            <ul class="filter--options">
-              <li class="highlighted">All</li>
-              <li>short</li>
-              <li>mediuuum</li>
-              <li>looooooooong</li>
-            </ul>
-          </div>
+      </div>
+      <div class="filter-container">
+        <label>Genre</label>
+        <div class="filter">
+          <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+          <ul class="filter--options">
+            <li class="highlighted">All</li>
+            <li>short</li>
+            <li>mediuuum</li>
+            <li>looooooooong</li>
+          </ul>
         </div>
-        <div class="filter-container">
-          <label>Smt</label>
-          <div class="filter">
-            <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
-            <ul class="filter--options">
-              <li class="highlighted">All</li>
-              <li>short</li>
-              <li>mediuuum</li>
-              <li>looooooooong</li>
-            </ul>
-          </div>
+      </div>
+      <div class="filter-container">
+        <label>Smt</label>
+        <div class="filter">
+          <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+          <ul class="filter--options">
+            <li class="highlighted">All</li>
+            <li>short</li>
+            <li>mediuuum</li>
+            <li>looooooooong</li>
+          </ul>
         </div>
-        <div class="filter-container">
-          <label>Rating</label>
-          <div class="filter">
-            <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
-            <ul class="filter--options">
-              <li class="highlighted">All</li>
-              <li>short</li>
-              <li>mediuuum</li>
-              <li>looooooooong</li>
-            </ul>
-          </div>
+      </div>
+      <div class="filter-container">
+        <label>Rating</label>
+        <div class="filter">
+          <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+          <ul class="filter--options">
+            <li class="highlighted">All</li>
+            <li>short</li>
+            <li>mediuuum</li>
+            <li>looooooooong</li>
+          </ul>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <div class="products">
-    {% for product in products %}
-    <div class="product">
+<div class="products">
+  {% for product in products %}
+  <div class="product">
+    <a href="product/{{ product.id }}">
       <div class="thumbnail">
         <div class="rating">
-          <span><i class="bi bi-star-fill"></i>&nbsp;{{ product.rating }}</span>
+          {% if product.rating %} <!-- product.rating has not been set yet, please do so later -->
+            {% set rating = product.rating %}
+          {% else %}
+            {% set rating = "No rating yet" %}
+          {% endif %}
+          <span><i class="bi bi-star-fill"></i>&nbsp;{{ rating }}</span>
         </div>
         <div class="image">
           <img src="{{ url_for('static', filename=product.image_thumbnail) }}" alt="{{ product.name }}"/>
@@ -89,19 +94,19 @@
           <i class="fa-solid fa-cart-shopping fa-xl"></i>
         </div>
       </div>
-      <div class="info">
-        <div class="info_left">
-          <h5>{{ product.name }}</h5>
-          <span>{{ product.creator }}</span>
-        </div>
-        <div class="info_right">
-          <h5>&dollar;{{ '{:.2f}'.format(product.variants[0].price) }}</h5>
-          <span><i class="bi bi-short-fill"></i>&nbsp;{{ product.category.category_name }}</span>
-        </div>
+    </a>
+    <div class="info">
+      <div class="info_left">
+        <h5>{{ product.name }}</h5>
+        <span>{{ product.creator }}</span>
+      </div>
+      <div class="info_right">
+        <h5>&dollar;{{ '{:.2f}'.format(product.variants[0].price) }}</h5>
+        <span><i class="bi bi-short-fill"></i>&nbsp;{{ product.category.category_name }}</span>
       </div>
     </div>
-    {% endfor %}
   </div>
+  {% endfor %}
 </div>
 
 {% endblock %}

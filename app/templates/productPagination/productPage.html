@@ -1,0 +1,36 @@
+{% extends "views/base.html" %}
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/productPagination/productPage.css') }}">
+{% endblock %}
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="product">
+  <div class="product__left">
+    <div class="image__container">
+      <img src="{{ url_for('static', filename=product.image_thumbnail) }}" alt="{{ product.name }}"/>
+    </div>
+    <div class="variants"></div> <!-- not sure yet -->
+  </div>
+  <div class="product__right">
+    <div class="main">
+      <h1>{{ product.name }}</h1>
+      <span>{{ product.creator }}</span>
+    </div>
+    <div class="other">
+      <p>ISBN:{{ product.id }}</p>
+      <p></p>
+    </div>
+  </div>
+</div>
+<div class="body">
+  
+</div>
+
+<p>{{ product.description }}</p>
+<p><strong>Price:</strong> ${{ product.price }}</p>
+<a href="{{ url_for('productPagination.product_pagination') }}" class="btn btn-secondary">Back to Products</a>
+{% endblock %}
+
+{% block body_scripts %}
+{% endblock %}

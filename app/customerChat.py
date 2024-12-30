@@ -4,6 +4,7 @@ from .roleDecorator import role_required
 from . import db
 
 customerChat = Blueprint('customerChat', __name__)
+# Customer chat page
 
 @customerChat.route('/customer-chat')
 @login_required

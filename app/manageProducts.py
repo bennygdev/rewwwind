@@ -8,6 +8,7 @@ from . import db
 import os
 
 manageProducts = Blueprint('manageProducts', __name__)
+# Products page
 
 @manageProducts.route('/manage-products')
 @login_required

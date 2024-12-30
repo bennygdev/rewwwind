@@ -7,11 +7,13 @@ from flask_wtf.csrf import CSRFProtect
 from flask_mail import Mail
 from dotenv import load_dotenv
 import os
+from authlib.integrations.flask_client import OAuth
 
 db = SQLAlchemy()
 DB_NAME = "database.db"
 csrf = CSRFProtect()
 mail = Mail()
+oauth = OAuth()
 
 def create_app():
   app = Flask(__name__)
@@ -27,13 +29,29 @@ def create_app():
   if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
-  # print(app.config['MAIL_USERNAME'])
-  # print(app.config['MAIL_PASSWORD'])
+  app.config['OAUTH2_CLIENT_ID'] = os.getenv('GOOGLE_CLIENT_ID')
+  app.config['OAUTH2_CLIENT_SECRET'] = os.getenv('GOOGLE_CLIENT_SECRET')
+  app.config['OAUTH2_META_URL'] = 'https://accounts.google.com/.well-known/openid-configuration'
+
   mail = Mail(app)
 
   db.init_app(app)
   csrf.init_app(app)
   mail.init_app(app)
+
+  # Google oAuth setup
+  # oauth = OAuth(app)
+  oauth.init_app(app)
+
+  google = oauth.register(
+    name='google',
+    client_id = app.config['OAUTH2_CLIENT_ID'],
+    client_secret = app.config['OAUTH2_CLIENT_SECRET'],
+    server_metadata_url = app.config['OAUTH2_META_URL'],
+    client_kwargs = {
+      "scope": "openid profile email"
+    }
+  )
 
   # REMINDER: Only use camel casing, no hyphens etc. flask will flag an error if thats the case.
   # Initialise Routes
@@ -131,6 +149,7 @@ def insert_users():
     username = "admin1",
     email = "admin1@gmail.com",
     image = None,
+    google_account = False,
     password = generate_password_hash("admin1", method='pbkdf2:sha256'),
     role_id = 2
   )
@@ -141,6 +160,7 @@ def insert_users():
     username = "admin2",
     email = "admin2@gmail.com",
     image = None,
+    google_account = False,
     password = generate_password_hash("admin2", method='pbkdf2:sha256'),
     role_id = 2
   )
@@ -151,6 +171,7 @@ def insert_users():
     username = "owner",
     email = "owner@gmail.com",
     image = None,
+    google_account = False,
     password = generate_password_hash("ownerApp", method='pbkdf2:sha256'),
     role_id = 3
   )

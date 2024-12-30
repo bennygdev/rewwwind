@@ -4,6 +4,7 @@ from .roleDecorator import role_required
 from . import db
 
 manageTradeins = Blueprint('manageTradeins', __name__)
+# Tradeins page
 
 @manageTradeins.route('/manage-tradeins')
 @login_required

@@ -4,6 +4,7 @@ from .roleDecorator import role_required
 from . import db
 
 manageAccounts = Blueprint('manageAccounts', __name__)
+# Admin account (account listing) and adding accounts (Owner)
 
 @manageAccounts.route('/manage-accounts')
 @login_required

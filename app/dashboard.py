@@ -22,6 +22,15 @@ def overview():
 @role_required(1, 2, 3)
 def user_profile():
   image_file = url_for('static', filename="profile_pics/" + current_user.image)
+
+  if current_user.image:
+    if current_user.image.startswith('http'):
+      image_file = current_user.image
+    else:
+      image_file = url_for('static', filename="profile_pics/" + current_user.image)
+  else:
+    image_file = url_for('static', filename='profile_pics/profile_image_default.jpg')
+
   return render_template("dashboard/profile/profile.html", user=current_user, image_file=image_file)
 
 @dashboard.route('/settings')
@@ -35,6 +44,15 @@ def user_settings():
 @role_required(1, 2, 3)
 def update_personal_information():
   image_file = url_for('static', filename="profile_pics/" + current_user.image)
+
+  if current_user.image:
+    if current_user.image.startswith('http'):
+      image_file = current_user.image
+    else:
+      image_file = url_for('static', filename="profile_pics/" + current_user.image)
+  else:
+    image_file = url_for('static', filename='profile_pics/profile_image_default.jpg')
+
   return render_template("dashboard/settings/updatePersonalInfo.html", user=current_user, image_file=image_file)
 
 
@@ -64,7 +82,10 @@ def update_personal_information_form():
   image_file = url_for('static', filename="profile_pics/" + current_user.image)
 
   if current_user.image:
-    image_file = url_for('static', filename="profile_pics/" + current_user.image)
+    if current_user.image.startswith('http'):
+      image_file = current_user.image
+    else:
+      image_file = url_for('static', filename="profile_pics/" + current_user.image)
   else:
     image_file = url_for('static', filename='profile_pics/profile_image_default.jpg')
 

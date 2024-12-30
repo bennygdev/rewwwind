@@ -132,8 +132,8 @@
 } */
 
 img#mini_profile_img {
-  max-height: 100%;
-  max-width: 100%;
+  width: 24px;
+  height: 24px;
   border-radius: 100px;
   margin-right: 10px;
 }
@@ -223,6 +223,11 @@ img#mini_profile_img {
 
 .nav__optionMenu--links li:hover .nav__optionMenu--link {
   background-color: #eee;
+}
+
+.nav__optionMenu--links li:first-child:hover .nav__optionMenu--link {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 }
 
 .nav__optionMenu--links li:first-child {

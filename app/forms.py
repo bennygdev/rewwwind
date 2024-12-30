@@ -32,7 +32,7 @@ class ResetPasswordForm(FlaskForm):
 
 class UpdatePersonalInformation(FlaskForm):
   firstName = StringField('First Name', validators=[DataRequired()])
-  lastName = StringField('Last Name', validators=[DataRequired()])
+  lastName = StringField('Last Name') # most wesbites do not need last name
   username = StringField('Username', validators=[DataRequired(), Length(max=15)])
   email = EmailField('Email', validators=[DataRequired(), Email()])
   picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])

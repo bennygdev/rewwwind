@@ -60,7 +60,7 @@
       <hr id="divider">
       <div class="button__wrapper">
         {{ form.submit(class="login__button") }}
-        <button class="login__google"><img src="{{ url_for('static',filename='media/GoogleIcon.svg') }}" id="login__google" alt="GoogleIcon">Continue with Google</button>
+        <a class="login__google" href="{{ url_for('auth.google_login') }}"><img src="{{ url_for('static',filename='media/GoogleIcon.svg') }}" id="login__google" alt="GoogleIcon">Continue with Google</a>
         <p id="login__subtitle--reminder">Don't have an account? <a href="/register">Register</a></p>
       </div>
     </form>

@@ -1,14 +1,54 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from . import db, mail
+from . import db, mail, oauth
 from .models import User
 from .forms import LoginForm, RegisterForm, UsernameForm, RequestResetForm, ResetPasswordForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, logout_user, current_user
 from flask_mail import Message
 import os
+from secrets import token_urlsafe
 
 auth = Blueprint('auth', __name__)
 
+# Google login
+@auth.route('/login/google')
+def google_login():
+  nonce = token_urlsafe(32)
+  session['nonce'] = nonce
+  redirect_uri = url_for('auth.google_callback', _external=True)
+  return oauth.google.authorize_redirect(redirect_uri, nonce=nonce)
+
+@auth.route('/callback')
+def google_callback():
+  token = oauth.google.authorize_access_token()
+  user_info = oauth.google.parse_id_token(token, nonce=session.pop('nonce', None))
+    
+  # print(user_info)
+
+  user = User.query.filter_by(email=user_info['email']).first()
+
+  if user:
+    if not user.google_account:
+      flash("Email already registered. Use your email and password to login.", "error")
+      return redirect(url_for('auth.login'))
+  else:
+    user = User(
+      first_name=user_info.get('given_name', ''),
+      last_name=user_info.get('family_name', ''),
+      username=user_info.get('name', ''),
+      email=user_info['email'],
+      image=user_info.get('picture', 'profile_image_default.jpg'),
+      google_account=True,
+      role_id=1 
+    )
+    db.session.add(user)
+    db.session.commit()
+
+  login_user(user, remember=True)
+  # flash('Logged in successfully!', 'success')
+  return redirect(url_for('views.home'))
+
+# Normal login
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
   form = LoginForm()
@@ -18,12 +58,17 @@ def login():
         
     user = User.query.filter((User.email == emailUsername) | (User.username == emailUsername)).first()
 
-    if user and check_password_hash(user.password, password):
-      login_user(user, remember=True)
-      return redirect(url_for('views.home'))
+    if user:
+      if not user.google_account:  # check if user is a regular account
+        if check_password_hash(user.password, password):
+          login_user(user, remember=True)
+          return redirect(url_for('views.home'))
+        else:
+          flash('Invalid password', 'error')
+      else:  # if user signed up with google, display message
+        flash('This account was created with Google Sign-In. Please use Google login.', 'info')
     else:
-      # form.password.errors.append('Invalid email or password')
-      flash('Invalid email or password', 'error')
+      flash('Invalid email or username.', 'error')
 
   return render_template("auth/login.html", user=current_user, form=form)
 
@@ -141,15 +186,19 @@ def reset_password_request():
   if form.validate_on_submit():
     # Add this validation to auth later
     user = User.query.filter_by(email=form.email.data).first()
-    if user is None:
-      flash("There is no account with that email. You must register first", "error")
-      print("Validation failed, email doesn't exist")
+    
+    if user:
+      if user.google_account: 
+        flash("This email is linked to a Google account. Please sign in with Google.", "info")
+        return redirect(url_for('auth.login'))
+      else:
+        send_reset_email(user)
+        flash('An email has been sent with instructions to reset your password.', 'info')
+        return redirect(url_for('auth.login'))
+    else:
+      # Flash message for non-existing accounts
+      flash('There is no account with that email. You must register first', 'error')
       return render_template("auth/resetPasswordRequest.html", user=current_user, form=form)
-
-    print("Success")
-    send_reset_email(user)
-    flash('An email has been sent with instructions to reset your password.', 'info')
-    return redirect(url_for('auth.login'))
 
   return render_template("auth/resetPasswordRequest.html", user=current_user, form=form)
 

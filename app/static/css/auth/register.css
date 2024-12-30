@@ -124,6 +124,10 @@
   font-family: "OpenSansSemibold";
   color: #000;
   border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
 }
 
 .username__button {

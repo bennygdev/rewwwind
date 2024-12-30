@@ -10,6 +10,7 @@ from PIL import Image
 from werkzeug.security import generate_password_hash, check_password_hash
 
 dashboard = Blueprint('dashboard', __name__)
+# Overview, profile page, settings page
 
 @dashboard.route('/overview')
 @login_required

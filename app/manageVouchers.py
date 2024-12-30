@@ -4,6 +4,7 @@ from .roleDecorator import role_required
 from . import db
 
 manageVouchers = Blueprint('manageVouchers', __name__)
+# Vouchers page
 
 @manageVouchers.route('/manage-vouchers')
 @login_required

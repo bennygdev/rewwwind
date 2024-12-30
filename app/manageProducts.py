@@ -4,6 +4,7 @@ from .roleDecorator import role_required
 from . import db
 
 manageProducts = Blueprint('manageProducts', __name__)
+# Products page
 
 @manageProducts.route('/manage-products')
 @login_required

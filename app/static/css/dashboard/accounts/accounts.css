@@ -80,7 +80,7 @@
   width: 100%;
   padding: 12px 40px 12px 15px;
   border-radius: 10px;
-  background-color: #e6e6e6;
+  background-color: #fff;
   border: none;
   /* border: 1px solid black; */
 }
@@ -91,7 +91,7 @@
 }
 
 .search__button {
-  /* background-color: #039752; */
+  background-color: #fff;
   padding: 12px;
   color: #039572;
   position: absolute;
@@ -99,6 +99,7 @@
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
+  border: 0;
 }
 
 /* table */
@@ -154,14 +155,24 @@
   border-bottom: 1px solid rgb(175, 175, 175);
 }
 
-.accounts td:first-child {
+/* .accounts td:first-child {
   display: flex;
   align-items: center;
-}
+} */
 
 .accounts td:last-child {
   text-align: right;
   padding-right: 30px;
+  /* border-bottom-left-radius: 10px; */
+}
+
+.accounts tr:last-child td:last-child {
+  border-bottom-right-radius: 10px;
+
+}
+
+.accounts tr:last-child td:first-child {
+  border-bottom-left-radius: 10px;
 }
 
 .accounts td.controls {
@@ -215,4 +226,103 @@
 
 .accountId {
   padding-left: 20px;
+}
+
+.customer__badge {
+  color: #039752;
+  background-color: #bff5dc;
+  font-family: "OpenSansSemibold";
+  font-size: 0.9em;
+  padding: 5px 20px;
+  width: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+}
+
+.admin__badge {
+  color: #822adb;
+  background-color: #dabff5;
+  font-family: "OpenSansSemibold";
+  font-size: 0.9em;
+  padding: 5px 20px;
+  width: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+}
+
+.owner__badge {
+  color: #f58827;
+  background-color: #f7d4b5;
+  font-family: "OpenSansSemibold";
+  font-size: 0.9em;
+  padding: 5px 20px;
+  width: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+}
+
+/* Pagination */
+.accounts__pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.accounts__pagination ul {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  padding: 0;
+}
+
+.accounts__pagination li {
+  display: inline-block;
+  font-family: "OpenSansSemibold";
+}
+
+.accounts__pagination .page__button {
+  text-decoration: none;
+  padding: 8px 14px;
+  color: #039752;
+  border: 1px solid #039752;
+  border-radius: 100px;
+}
+
+.accounts__pagination .active .page__button {
+  background-color: #039752;
+  padding: 12px 18px;
+  color: white;
+}
+
+.pageNext__button {
+  margin-left: 10px;
+}
+
+.pagePrevious__button {
+  margin-right: 10px;
+}
+
+.pageNext__button a {
+  background-color: #e6e6e6;
+  padding: 10px 20px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #000;
+}
+
+.pagePrevious__button a {
+  background-color: #e6e6e6;
+  padding: 10px 20px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #000;
 }

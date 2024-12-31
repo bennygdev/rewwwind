@@ -161,6 +161,7 @@ def register_step2():
     db.session.commit()
     session.pop('user_id', None)
     print("Name change success")
+    flash("Account created successfully! Please log in with your new account.", "success")
     return redirect(url_for('auth.login'))
 
   return render_template("auth/setUsername.html", user=current_user, form=form)

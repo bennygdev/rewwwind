@@ -52,6 +52,11 @@
         <button type="submit" class="search__button" id="search__button">
           <i class="fa-solid fa-magnifying-glass"></i>
         </button>
+        {% if search_query %}
+          <a href="{{ url_for('manageAccounts.accounts_listing') }}" class="clear__button">
+            <i class="fa-solid fa-xmark fa-lg"></i>
+          </a>
+        {% endif %}
       </div>
     </form>
   </div>

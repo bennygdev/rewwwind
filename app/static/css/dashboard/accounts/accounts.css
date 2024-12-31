@@ -91,11 +91,23 @@
 }
 
 .search__button {
-  background-color: #fff;
+  background-color: transparent;
   padding: 12px;
   color: #039572;
   position: absolute;
   right: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  border: 0;
+}
+
+.clear__button {
+  background-color: transparent;
+  padding: 12px;
+  color: #039572;
+  position: absolute;
+  right: 25px;
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;

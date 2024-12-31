@@ -1,3 +1,7 @@
+.content {
+    padding: 80px 90px; /* please do remove this if each page is to have custom padding or margin -nelson */
+}
+
 .content .listing__header {
     display: flex;
     justify-content: space-between;

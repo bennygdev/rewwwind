@@ -122,7 +122,7 @@
             {% if product.variants[0].stock == 0 %}
                 {% set stock_class = 'noStock' %}
                 {% set stock_text = 'Out of stock' %}
-            {% elif product.variants[0].stock < 10 %}
+            {% elif product.variants[0].stock <= 10 %}
                 {% set stock_class = 'lowStock' %}
                 {% set stock_text = 'Low on stock' %}
             {% else %}

@@ -138,6 +138,7 @@ def insert_users():
     image = None,
     google_account = False,
     password = generate_password_hash("admin1", method='pbkdf2:sha256'),
+    orderCount = 0,
     role_id = 2
   )
 
@@ -149,6 +150,7 @@ def insert_users():
     image = None,
     google_account = False,
     password = generate_password_hash("admin2", method='pbkdf2:sha256'),
+    orderCount = 0,
     role_id = 2
   )
 
@@ -160,6 +162,7 @@ def insert_users():
     image = None,
     google_account = False,
     password = generate_password_hash("ownerApp", method='pbkdf2:sha256'),
+    orderCount = 0,
     role_id = 3
   )
 

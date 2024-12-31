@@ -10,7 +10,17 @@ manageAccounts = Blueprint('manageAccounts', __name__)
 @login_required
 @role_required(2, 3)
 def accounts_listing():
-  return render_template("dashboard/manageAccounts/accounts.html", user=current_user)
+  totalUsers = 0
+  newUsers = 0
+  onlineCount = 0
+
+
+  return render_template("dashboard/manageAccounts/accounts.html", user=current_user, totalUsers=totalUsers, newUsers=newUsers, onlineCount=onlineCount)
+
+# @manageAccounts.route('/account-details')
+# @login_required
+# @role_required(2, 3)
+# def account_details():
 
 @manageAccounts.route('/add-admin-account')
 @login_required

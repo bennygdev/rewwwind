@@ -39,6 +39,7 @@ def google_callback():
       email=user_info['email'],
       image=user_info.get('picture', 'profile_image_default.jpg'),
       google_account=True,
+      orderCount=0,
       role_id=1 
     )
     db.session.add(user)
@@ -109,6 +110,7 @@ def register():
           email = email,
           image = None,
           password = generate_password_hash(password, method='pbkdf2:sha256'),
+          orderCount = 0,
           role_id = 1
         )
         db.session.add(new_user)
@@ -168,6 +170,8 @@ def send_reset_email(user):
   msg = Message('Password Reset Request', sender='rewwwindhelp@gmail.com', recipients=[user.email])
   msg.body = f'''To reset your password, visit the following link:
   {url_for('auth.reset_token', token=token, _external=True)}
+
+  The link will expire in 30 minutes.
 
   If you did not make this request then simply ignore this email and no changes will be made.
   '''

@@ -325,18 +325,18 @@
     gap: 15px;
 }
 
-.delete__form-container .delete__form .button__wrapper input {
+.delete__form-container .button__wrapper input {
     padding: 0.3em 1em;
     border: 1px solid black;
     border-radius: 6px;
     transition: background-color 0.3s, color 0.1s;
 }
 
-.delete__form-container .delete__form .cancel_button input:hover {
+.delete__form-container .cancel_button input:hover {
     background-color: #c4c4c4;
 }
 
-.delete__form-container .delete__form .delete_button input:hover {
+.delete__form-container .delete_button input:hover {
     background-color: #ff0000;
     color: white;
 }

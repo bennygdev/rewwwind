@@ -90,18 +90,19 @@ class AddProductForm(FlaskForm):
   # validating images
   def validate_productImages(self, field):
     for file in field.data:
-        # Check mime type and extension
-        mime_type, _ = guess_type(file.filename)
-        extension = secure_filename(file.filename).split('.')[-1].lower()
-        if not mime_type or not mime_type.startswith('image/') and extension not in ['jpg', 'jpeg', 'png']: # prob overkill with extension but might as well i guess?
-            raise ValidationError('This is not a valid image file. Please submit an image file with .jpg, .jpeg, or .png extensions.')
+        if file:
+          # Check mime type and extension
+          mime_type, _ = guess_type(file.filename)
+          extension = secure_filename(file.filename).split('.')[-1].lower()
+          if not mime_type or not str(mime_type).startswith('image/') and extension not in ['jpg', 'jpeg', 'png']: # prob overkill with extension but might as well i guess?
+              raise ValidationError('The submitted image was not valid image file. Please submit an image file with .jpg, .jpeg, or .png extensions.')
 
-        # pillow corruption verification
-        try:
-            image = Image.open(file.stream)
-            image.verify()
-        except (IOError, SyntaxError):
-            raise ValidationError('The image file could not be submitted. Please check if the image file is corrupted, and submit a different file if so.')
+          # pillow corruption verification
+          try:
+              image = Image.open(file.stream)
+              image.verify()
+          except (IOError, SyntaxError):
+              raise ValidationError('The image file could not be submitted. Please check if the image file is corrupted, and submit a different file if so.')
 
 class DeleteProductForm(FlaskForm):
   productID = HiddenField()

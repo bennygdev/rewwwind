@@ -13,37 +13,8 @@
 </div>
 <div class="body">
     <form method="POST" class="product__form" enctype="multipart/form-data">
+        <div class="flash-messages"></div> <!-- Container for flash messages -->
         {{ form.hidden_tag() }}
-
-
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-            <div class="flash-messages">
-                {% for category, message in messages %}
-                {% if category == 'error' %}
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    There were some errors in the form. Please verify them.
-                    <ol style='margin: 0;'>
-                        <li>{{ message | join('') | replace("['", "") | replace("']", "") }}</li>
-                    </ol>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% elif category == 'info' %}
-                <div class="alert alert-primary alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% elif category == 'success'  %}
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endif %}
-                {% endfor %}
-            </div>
-            {% endif %}
-        {% endwith %}
-
 
         {{ form.productThumbnail() }}
         <div class="product__name">
@@ -58,14 +29,6 @@
             <label>Product Image Upload</label>
             {{ form.productImages.label }}
             {{ form.productImages() }}
-            {% if form.productImages.errors %}
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    {% for error in form.productImages.errors %}
-                        {{ error }}
-                    {% endfor %}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endif %}
             <div class="file-list"></div>
         </div>
         <div class="product__description">

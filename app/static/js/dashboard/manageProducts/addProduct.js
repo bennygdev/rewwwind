@@ -1,3 +1,5 @@
+// note to self: don't use this code anywhere else lol
+
 class Form {
     constructor(formSelector, submitUrl) {
         this.form = document.querySelector(formSelector);
@@ -25,23 +27,89 @@ class Form {
 
     // custom form submission
     async handleSubmit(event) {
-
+        event.preventDefault();
+    
         const formData = this.prepareFormData();
+    
+        try {
+            const response = await fetch(this.submitUrl, {
+                method: 'POST',
+                body: formData,
+            });
+    
+            const contentType = response.headers.get("Content-Type");
+    
+            if (contentType && contentType.includes("application/json")) {
+                const result = await response.json();
 
-        // Debugging: Log the form data
-        // for (let [key, value] of formData.entries()) {
-        //     console.log(`${key}:`, value);
-        // }
-
-        const response = await fetch(this.submitUrl, {
-            method: 'POST',
-            body: formData,
-        });
-
-        await response.text();
-        // const result = await response.text();
-        // console.log(result);
+                const flashContainer = document.querySelector('.flash-messages');
+                flashContainer.innerHTML = '';
+    
+                if (result.success) {
+                    this.displayFlashMessage(result.message, 'success');
+                } else {
+                    this.displayFlashMessage(result.message, 'error');
+                    console.log(result.message)
+                    this.fileList = [];
+                    this.fileListDisplay.innerHTML = '';
+                    this.fileInput.previousElementSibling.style.background = '';
+                    this.formData = new FormData()
+                }
+                window.scroll({top: 0, behavior: 'smooth'});
+            }
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            this.displayFlashMessage("An unexpected error occurred.", 'error');
+        }
     }
+    
+    // custom flash method because i can't code
+    displayFlashMessage(message, category) {
+    const flashContainer = document.querySelector('.flash-messages');
+    const alert = document.createElement('div');
+    alert.classList.add('alert');
+    alert.classList.add('alert-dismissible');
+    alert.classList.add('fade');
+    alert.classList.add('show');
+
+    if (category === 'error') {
+        alert.classList.add('alert-danger');
+        alert.innerHTML = `
+            <strong>Error:</strong> ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+    } else if (category === 'success') {
+        alert.classList.add('alert-success');
+        alert.innerHTML = `
+            <strong>Success:</strong> ${message}
+            <p id="countdown">Redirecting in 3 seconds...</p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+    } else {
+        alert.classList.add('alert-info');
+        alert.innerHTML = `
+            <strong>Info:</strong> ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+    }
+    
+    flashContainer.appendChild(alert);
+    if (category === 'success') {this.startCountdown(3)};
+}
+
+// Countdown logic for redirecting after 3 seconds
+startCountdown(seconds) {
+    const countdown = document.getElementById('countdown');
+    const timer = setInterval(() => {
+        seconds -= 1;
+        countdown.textContent = `Redirecting in ${seconds} seconds...`;
+
+        if (seconds <= 0) {
+            clearInterval(timer);
+            window.location.href = '../manage-products'; // Redirect to the provided URL
+        }
+    }, 1000);
+}
 }
 
 class ImageHandler extends Form {

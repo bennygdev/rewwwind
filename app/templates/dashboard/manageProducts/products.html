@@ -156,32 +156,9 @@
             <i class="bi bi-check-circle"></i>
             <h2>The product has been removed successfully.</h2>
         </div>
-        <div class="product" style="display: none;"></div>
-        <form class="delete__form" method="POST" action="{{ url_for('manageProducts.delete_product') }}">
-            {{ deleteForm.hidden_tag() }}
-            
-            <div class="delete__modal">
-                {{ deleteForm.productID() }}
-                {{ deleteForm.deleteConfirm(class='form-control', placeholder='Type CONFIRMDELETE to confirm deletion', style="display: none;") }}
-                {% if deleteForm.deleteConfirm.errors %}
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="display: none;">
-                        {% for error in deleteForm.deleteConfirm.errors %}
-                            {{ error }}
-                        {% endfor %}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endif %}
-
-                <div class="buttons">
-                    <div class="cancel_button button__wrapper">
-                        <input type="button" value="Exit">
-                    </div>
-                    <div class="delete_button button__wrapper" style="display: none;">
-                        {{ deleteForm.submit() }}
-                    </div>  
-                </div>                    
-            </div>
-        </form>
+        <div class="cancel_button button__wrapper">
+            <input type="button" value="Exit">
+        </div>
     {% else %}
         <div class="header">
             <i class="bi bi-exclamation-circle"></i>

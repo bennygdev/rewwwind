@@ -2,15 +2,18 @@ class DeleteProduct {
     constructor(product) {
         this.product = product;
         this.productID = product.getAttribute('product-id');
-        this.openModalBtn = product.querySelector('i.bi-trash-fill');
-
-        // target product-related stuff
         this.formContainer = document.querySelector('div.delete__form-container');
-        this.form = this.formContainer.querySelector('form.delete__form');
-        this.input = this.form.querySelector('input#deleteConfirm');
-        this.inputID = this.form.querySelector('input#productID');
-        this.formData = null;
-        this.productDisplay = this.formContainer.querySelector('.product');
+        this.success = product.classList.contains('success') || this.formContainer.classList.contains('success');
+
+        // target product-related stuff (some seriously messy code lol)
+        if (!this.success) {
+            this.form = this.formContainer.querySelector('form.delete__form');
+            this.input = this.form.querySelector('input#deleteConfirm');
+            this.inputID = this.form.querySelector('input#productID');
+            this.formData = null;
+            this.productDisplay = this.formContainer.querySelector('.product');
+            this.openModalBtn = product.querySelector('i.bi-trash-fill');
+        }
         this.closeModalBtn1 = this.formContainer.querySelector('.bi-x-lg');
         this.closeModalBtn2 = this.formContainer.querySelector('.cancel_button input');
         this.overlay = document.querySelector('.overlay');
@@ -27,9 +30,10 @@ class DeleteProduct {
 
     // initialise event listeners
     init() {
-        this.openModalBtn.addEventListener('click', () => this.toggleForm());
-
-        this.form.addEventListener('submit', (event) => this.handleSubmit(event));
+        if (!this.success) {
+            this.openModalBtn.addEventListener('click', () => this.toggleForm());
+            this.form.addEventListener('submit', () => this.handleSubmit());
+        }
         if (this.formContainer.style.display === 'flex' && this.formContainer.id === this.productID || this.formContainer.classList.contains('success')) {
             this.toggleForm();
             this.redirect = true;
@@ -45,13 +49,15 @@ class DeleteProduct {
             this.closeModalBtn1.addEventListener('click', this.toggleForm);
             this.closeModalBtn2.addEventListener('click', this.toggleForm);
 
-            // display target product
-            const thumbnail = this.product.querySelector('.thumbnail').cloneNode(true);
-            const identifier = this.product.querySelector('.name').cloneNode(true);
-            this.productDisplay.appendChild(thumbnail);
-            this.productDisplay.appendChild(identifier);
+            if(!this.success) {
+                // display target product
+                const thumbnail = this.product.querySelector('.thumbnail').cloneNode(true);
+                const identifier = this.product.querySelector('.name').cloneNode(true);
+                this.productDisplay.appendChild(thumbnail);
+                this.productDisplay.appendChild(identifier);
 
-            this.form.id = this.productID;
+                this.form.id = this.productID;
+            }
         } else {
             this.formContainer.style.display = 'none';
             this.overlay.style.display = 'none';
@@ -61,8 +67,10 @@ class DeleteProduct {
             this.closeModalBtn2.removeEventListener('click', this.toggleForm);
 
             // reset display and form
-            this.productDisplay.innerHTML = '';
-            this.input.value = '';
+            if (!this.success) {
+                this.productDisplay.innerHTML = '';
+                this.input.value = '';
+            }
 
             if (this.redirect) {window.location.href = '../manage-products'};
         };
@@ -79,7 +87,7 @@ class DeleteProduct {
     }
 
     // custom form submission
-    async handleSubmit(event) {
+    async handleSubmit() {
         if (this.productID == this.form.id) {        
             this.formData = new FormData();
             const formElements = this.form.querySelectorAll('input, select, textarea');
@@ -106,4 +114,10 @@ class DeleteProduct {
 };
 
 const rows = Array.from(document.querySelectorAll('.products tbody tr'));
-rows.forEach(row => new DeleteProduct(row));
+const checkElement = document.querySelector('.delete__form-container');
+if (rows) {
+    rows.forEach(row => new DeleteProduct(row));
+}
+if (checkElement.classList.contains('success')) {
+    new DeleteProduct(checkElement);
+}

@@ -2,8 +2,129 @@
 {% set active_page = "manage_accounts" %}
 {% block title %}Manage Accounts{% endblock %}
 
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/accounts/accounts.css') }}">
+{% endblock %}
+
+{% block headerContent %}
+<div class="accounts__header">
+  <h1 id="accounts__title">Manage Accounts</h1>
+  <div class="account__statistics">
+    <div class="statistic__box">
+      <i class="fa-solid fa-user-group fa-xl"></i>
+      <div class="user__statistic">
+        <p class="statistic__label">Total Users</p>
+        <span class="statistic__amount">{{ totalUsers }}</span>
+      </div>
+    </div>
+    <div class="statistic__box">
+      <i class="fa-solid fa-user-plus fa-xl"></i>
+      <div class="user__statistic">
+        <p class="statistic__label">New Users</p>
+        <span class="statistic__amount">{{ newUsers }}</span>
+      </div>
+    </div>
+    <div class="statistic__box">
+      <i class="fa-solid fa-globe fa-xl"></i>
+      <div class="user__statistic">
+        <p class="statistic__label">Users Online</p>
+        <span class="statistic__amount">{{ onlineCount }}</span>
+      </div>
+    </div>
+  </div>
+  <div class="extraPadding"></div>
+  <div class="search__wrapper">
+    <!-- <div class="search__container">
+      <input type="text" id="search__bar" class="search__bar" placeholder="Search by username..." autocomplete="off">
+      <i class="fa-solid fa-magnifying-glass search__button" id="search__button"></i>
+    </div> -->
+    <form method="get" action="{{ url_for('manageAccounts.accounts_listing') }}">
+      <div class="search__container">
+        <input
+          type="text"
+          name="q"
+          id="search__bar"
+          class="search__bar"
+          placeholder="Search by username..."
+          value="{{ search_query }}"
+          autocomplete="off"
+        >
+        <button type="submit" class="search__button" id="search__button">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+        {% if search_query %}
+          <a href="{{ url_for('manageAccounts.accounts_listing') }}" class="clear__button">
+            <i class="fa-solid fa-xmark fa-lg"></i>
+          </a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
 
 {% block content %}
-<h1>Manage Accounts</h1>
+<div class="accounts">
+  <table>
+    <thead>
+      <tr>
+        <th class="accountId">User ID</th>
+        <th class="accountUsername">Username</th>
+        <th class="accountEmail">Email</th>
+        <th class="accountStatus">Status</th>
+        <th class="accountRole">Role</th>
+        <th class="controls"></th>
+      </tr>
+    </thead>
+    {% for account in accounts %}
+    <tr>
+      <td class="accountId">{{ account.id }}</td>
+      <td class="accountUsername">{{ account.username }}</td>
+      <td class="accountEmail">{{ account.email }}</td>
+      <td class="accountStatus">
+        Offline/Online
+      </td>
+      <td class="accountRole">
+        {% if account.role_id == 1 %}
+          <div class="customer__badge">
+            Customer
+          </div>
+        {% elif account.role_id == 2 %}
+          <div class="admin__badge">
+            Admin
+          </div>
+        {% elif account.role_id == 3 %}
+          <div class="owner__badge">
+            Owner
+          </div>
+        {% else %}
+          None
+        {% endif %}
+      </td>
+          
+      <td class="controls">
+        <i class="fa-solid fa-pen"></i>
+        <i class="fa-solid fa-eye"></i>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+
+<div class="accounts__pagination">
+  <ul>
+    {% if current_page > 1 %}
+    <li class="pagePrevious__button"><a href="{{ url_for('manageAccounts.accounts_listing', page=current_page-1, q=search_query) }}">Previous</a></li>
+    {% endif %}
+    {% for p in range(1, total_pages + 1) %}
+    <li class="{% if p == current_page %}active{% endif %}">
+      <a href="{{ url_for('manageAccounts.accounts_listing', page=p, q=search_query) }}" class="page__button">{{ p }}</a>
+    </li>
+    {% endfor %}
+    {% if current_page < total_pages %}
+    <li class="pageNext__button"><a href="{{ url_for('manageAccounts.accounts_listing', page=current_page+1, q=search_query) }}">Next</a></li>
+    {% endif %}
+  </ul>
+</div>
 
 {% endblock %}

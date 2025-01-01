@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash
+from flask import Blueprint, render_template, redirect, url_for, request, flash, abort
 from flask_login import login_required, current_user
 from .roleDecorator import role_required
 from .models import Product
@@ -15,4 +15,6 @@ def product_pagination():
 def product_detail(product_id):
     # Query the database for the product
     product = Product.query.get(product_id) 
+    if product is None:
+       abort(404)
     return render_template("/productPagination/productPage.html", user=current_user, product=product)

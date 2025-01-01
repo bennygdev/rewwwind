@@ -15,13 +15,13 @@ App development project
 
 ### How to run
 
-**IMPORTANT: Run the project in virutal environment when testing, and please read "How to commit changes" before making any changes.**
+**IMPORTANT: Run the project in virutal environment when testing, and please read "How to commit changes" (scroll down) before making any changes.**
 1. Clone this repository: `git clone https://github.com/bennygdev/rewwwind.git`
 2. Open this project: cd into the directory and do `code .`
 3. Install dependencies: Run `pip install -r requirements.txt` in project **virtual environment**. To access virutal environment, create a virtual environment (if you do not have a venv folder) by running `python -m venv .venv` then activate venv by running `.venv\Scripts\activate`, then run the installation command. To exit, run `deactivate` inside of **virtual environment**.
 4. Run the project: In the **virtual environment**, Run `python main.py` to run the website.
 
-### To save new libraries to virtual environment
+### To save new installed libraries to virtual environment
 1. Go into the project **virtual environment** via terminal
 2. Install necessary packages
 3. Do `pip freeze > requirements.txt` after you are done installing packages
@@ -35,3 +35,4 @@ App development project
 4. Go to the Github, to the team repository and go to your branch. There should be a box saying that you have recent pushes. There should be a button that says **"Compare & Pull Request"**. Click on it to make a new request for the leader to approve and make suggestions to. 
 5. If there is a suggestion, you can make changes to your project branch again and update the push with git add etc. in the pull request, the change should **remain in the same pull request**.
 6. After your pull request has been approved and merged, **delete the branch** and switch back to the main repository. Do `git pull` on the main branch to update your vscode with the latest changes and you can run the website from there, but remember **do not edit the main branch if you are editing/making changes**.
+More information can be found on here. https://bennygoh.notion.site/Github-and-git-guide-1312b1075fb3801f8434c4e371db5ac7?pvs=74

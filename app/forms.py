@@ -65,15 +65,18 @@ class AddProductForm(FlaskForm):
   productGenre = SelectField('Genre', validators=[DataRequired()])
   productConditions = FieldList(FormField(ConditionForm), min_entries=1)
   
-  # populating select choices from sql.
-  def process(self, formdata=None, obj=None, data=None, **kwargs):
+  submit = SubmitField('Add')
 
+  def process(self, formdata=None, obj=None, data=None, **kwargs):
     super(AddProductForm, self).process(formdata, obj, data, **kwargs)
+
+  
+    # populating product select choices from sql.
     categories = Category.query.all()
     self.productType.choices = [(category.id, category.category_name) for category in categories]
     self.productGenre.choices = [(category.id, category.category_name) for category in categories]
 
-    # Populate condition choices dynamically
+    # populating condition select choices
     condition_choices = [
         ('1', 'Like New'),
         ('2', 'Very Good'),
@@ -86,15 +89,25 @@ class AddProductForm(FlaskForm):
   
   # validating images
   def validate_productImages(self, field):
-    print('Validating Images.')
     for file in field.data:
-      mime_type, _ = guess_type(file.filename)
+        # Check mime type and extension
+        mime_type, _ = guess_type(file.filename)
+        extension = secure_filename(file.filename).split('.')[-1].lower()
+        if not mime_type or not mime_type.startswith('image/') and extension not in ['jpg', 'jpeg', 'png']: # prob overkill with extension but might as well i guess?
+            raise ValidationError('This is not a valid image file. Please submit an image file with .jpg, .jpeg, or .png extensions.')
 
-      if not mime_type or not mime_type.startswith('image/'):
-          raise ValidationError('this is not a valid image file.', mime_type)
+        # pillow corruption verification
+        try:
+            image = Image.open(file.stream)
+            image.verify()
+        except (IOError, SyntaxError):
+            raise ValidationError('The image file could not be submitted. Please check if the image file is corrupted, and submit a different file if so.')
 
-      image = Image.open(file.stream) 
-      if image.verify():
-        raise ValidationError('This is not a valid image file.', image)
-  
-  submit = SubmitField('Add')
+class DeleteProductForm(FlaskForm):
+  productID = HiddenField()
+  deleteConfirm = StringField('Enter the text shown to confirm deletion', validators=[DataRequired()])
+  submit = SubmitField('Delete this product')
+
+  def validate_deleteConfirm(self, field):
+    if field.data != 'CONFIRMDELETE':
+       raise ValidationError('The confirmation input is invalid. Please type CONFIRMDELETE to confirm the deletion.')

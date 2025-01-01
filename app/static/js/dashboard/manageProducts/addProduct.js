@@ -25,7 +25,6 @@ class Form {
 
     // custom form submission
     async handleSubmit(event) {
-        event.preventDefault();
 
         const formData = this.prepareFormData();
 
@@ -39,7 +38,8 @@ class Form {
             body: formData,
         });
 
-        const result = await response.text();
+        await response.text();
+        // const result = await response.text();
         // console.log(result);
     }
 }
@@ -51,7 +51,7 @@ class ImageHandler extends Form {
         this.fileInput = this.form.querySelector(`input[name="${this.fileInputName}"]`);
         this.fileList = [];
         this.productThumbnail = this.form.querySelector('input[name="productThumbnail"]');
-        this.fileListDisplay = this.fileInput.nextElementSibling;
+        this.fileListDisplay = this.form.querySelector('.file-list');
 
         this.initImageHandling();
     }

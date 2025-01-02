@@ -125,8 +125,9 @@ def create_database(app):
       insert_users()
       # insert_categories()
 
-      from .seed import insert_categories # will remove as time goes, added seed.py to avoid confusion here - nelson
+      from .seed import insert_categories, add_products # will remove as time goes, added seed.py to avoid confusion here - nelson
       insert_categories()
+      add_products()
 
 def insert_default_roles():
   from .models import Role

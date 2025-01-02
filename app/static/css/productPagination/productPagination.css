@@ -62,6 +62,7 @@
 
 .thumbnail .image img {
     max-width: 166px;
+    max-height: 166px;
 }
 
 .rating {

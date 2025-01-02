@@ -1,7 +1,8 @@
 .content {
-    padding: 80px 90px; /* please do remove this if each page is to have custom padding or margin -nelson */
+    padding: 80px 90px; /* please do remove this if each page is to have custom padding or margin in base.css -nelson */
 }
 
+/* product */
 .product {
     display: flex;
     gap: 30px;
@@ -15,6 +16,7 @@
     border-radius: 12px;
     display: flex;
     align-items: center;
+    justify-content: center;
 }
 
 .image__container img {
@@ -117,9 +119,27 @@ hr {
     border-radius: 12px;
 }
 
-hr.docSeparator {
-    margin: 40px 0;
-    border: 1px solid black;
+.product__right .bottom a {
+    text-decoration: none;
+    color: black;
+    
+    width: 80%;
+    border-radius: 10px;
+    padding: 0.5em 1em;
+    text-align: center;
+    align-self: center;
+    background-color: #E3E3E3;
+    max-width: 550px;
+}
+
+.product__right .bottom .wishlist {
+    width: 50%;
+    max-width: 400px;
+}
+
+.product__right .bottom .buyNow {
+    background-color: #039752;
+    color: white;
 }
 
 hr.docSeparator {
@@ -127,6 +147,8 @@ hr.docSeparator {
     border: 1px solid black;
 }
 
+
+/* reviews */
 .review .header {
     display: flex;
     justify-content: space-between;

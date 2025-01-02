@@ -59,7 +59,7 @@ def add_product():
             new_product = Product(
                 name=productName,
                 creator=productCreator,
-                image_thumbnail=f"media/uploads/{secure_filename(files[productThumbnail].filename)}",  # Set the thumbnail image
+                image_thumbnail=f"media/uploads/{secure_filename(files[productThumbnail].filename)}",
                 description=productDescription,
                 variants=productConditions,
                 category_id=1

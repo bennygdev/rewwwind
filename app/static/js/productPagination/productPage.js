@@ -19,10 +19,10 @@ class RatingStars {
                 star.style.webkitBackgroundClip = 'text';
                 star.style.backgroundClip = 'text';
                 star.style.color = 'transparent';
-            }
-        })
+            };
+        });
     }
 }
 
 new RatingStars(".product .rating");
-new RatingStars(".review .rating")
+new RatingStars(".review .rating");

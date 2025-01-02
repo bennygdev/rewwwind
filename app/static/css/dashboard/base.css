@@ -38,3 +38,10 @@
 .bodyContent {
   padding: 20px 30px;
 }
+
+
+.content h2 {
+  font-weight: bolder;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.4em;
+}

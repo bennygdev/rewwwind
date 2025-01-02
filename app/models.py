@@ -58,12 +58,13 @@ class Role(db.Model):
 #     order_items = db.relationship('OrderItem', backref='product', lazy=True) # otm orderitems
 class Product(db.Model):
     __tablename__ = 'products'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200), nullable=False)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(200), nullable=True)
+    creator = db.Column(db.String(200), nullable=True)
     description = db.Column(db.Text, nullable=True)
     image_thumbnail = db.Column(db.String(300), nullable=True)
     images = db.Column(db.JSON, nullable=True)  # list of uploaded images
-    variants = db.Column(db.JSON, nullable=True)  # store variants (name, price, stock)
+    variants = db.Column(db.JSON, nullable=True)  # store variants (name, stock, price)
     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
     updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
     
@@ -93,7 +94,7 @@ class OrderItem(db.Model):
 
 class Category(db.Model):
     __tablename__ = 'categories'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     category_name = db.Column(db.String(100), unique=True, nullable=False)
 
 class ProductCategory(db.Model):

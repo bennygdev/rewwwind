@@ -65,6 +65,7 @@ db.sqlite3-journal
 instance/
 app/static/profile_pics/*
 .webassets-cache
+# app/static/media/uploads/*   **Add back if needed.**
 
 # Scrapy stuff:
 .scrapy

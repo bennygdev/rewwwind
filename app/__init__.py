@@ -1,7 +1,6 @@
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from os import path
-from werkzeug.security import generate_password_hash
 from flask_login import LoginManager, current_user
 from flask_wtf.csrf import CSRFProtect
 from flask_mail import Mail
@@ -121,75 +120,11 @@ def create_database(app):
     if not path.exists('instance/' + DB_NAME):
       db.create_all()
       print('Created Database!')
-      insert_default_roles()
-      insert_users()
       # insert_categories()
 
-      from .seed import insert_categories, add_products # will remove as time goes, added seed.py to avoid confusion here - nelson
+      from .seed import insert_categories, add_products, insert_users, insert_default_roles # will remove as time goes, added seed.py to avoid confusion here - nelson
+      # Seed is actually what i wanted to add, so this is a nice touch you added - Ben
+      insert_default_roles()
+      insert_users()
       insert_categories()
       add_products()
-
-def insert_default_roles():
-  from .models import Role
-  roles = ['Customer', 'Admin', 'Owner']
-
-  for role_name in roles:
-    role_exists = Role.query.filter_by(role_name=role_name).first()
-    if not role_exists:
-      new_role = Role(role_name=role_name)
-      db.session.add(new_role)
-    
-  db.session.commit()
-  print('Inserted default roles into the database!')
-
-def insert_users():
-  from .models import User
-  admin1 = User(
-    first_name = "Admin", 
-    last_name = "1",
-    username = "admin1",
-    email = "admin1@gmail.com",
-    image = None,
-    google_account = False,
-    password = generate_password_hash("admin1", method='pbkdf2:sha256'),
-    orderCount = 0,
-    role_id = 2
-  )
-
-  admin2 = User(
-    first_name = "Admin", 
-    last_name = "2",
-    username = "admin2",
-    email = "admin2@gmail.com",
-    image = None,
-    google_account = False,
-    password = generate_password_hash("admin2", method='pbkdf2:sha256'),
-    orderCount = 0,
-    role_id = 2
-  )
-
-  owner = User(
-    first_name = "Owner", 
-    last_name = "3",
-    username = "owner",
-    email = "owner@gmail.com",
-    image = None,
-    google_account = False,
-    password = generate_password_hash("ownerApp", method='pbkdf2:sha256'),
-    orderCount = 0,
-    role_id = 3
-  )
-
-  users = [
-    ("admin1@gmail.com", admin1),
-    ("admin2@gmail.com", admin2),
-    ("owner@gmail.com", owner)
-  ]
-
-  for email, user in users:
-    existing_user = User.query.filter_by(email=email).first()
-    if not existing_user:
-      db.session.add(user)
-
-  db.session.commit()
-  print('Inserted Admin and Owner accounts!')

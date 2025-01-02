@@ -64,6 +64,12 @@ db.sqlite3-journal
 # Flask stuff:
 instance/
 app/static/profile_pics/*
+app/static/media/uploads/*
+!app/static/media/uploads/profile_pics/dummy1.jpg
+!app/static/media/uploads/profile_pics/dummy2.jpg
+!app/static/media/uploads/profile_pics/dummy3.jpg
+!app/static/media/uploads/profile_pics/dummy4.jpg
+!app/static/media/uploads/profile_pics/dummy5.jpg
 .webassets-cache
 # app/static/media/uploads/*   **Add back if needed.**
 

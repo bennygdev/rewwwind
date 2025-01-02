@@ -19,7 +19,8 @@ App development project
 1. Clone this repository: `git clone https://github.com/bennygdev/rewwwind.git`
 2. Open this project: cd into the directory and do `code .`
 3. Install dependencies: Run `pip install -r requirements.txt` in project **virtual environment**. To access virutal environment, create a virtual environment (if you do not have a venv folder) by running `python -m venv .venv` then activate venv by running `.venv\Scripts\activate`, then run the installation command. To exit, run `deactivate` inside of **virtual environment**.
-4. Run the project: In the **virtual environment**, Run `python main.py` to run the website.
+5. Run the project: In the **virtual environment**, Run `python main.py` to run the website.
+If you would like the email and google functionality to actually work, create a `.env` file by copying the contents from `.env.template`. Then you need to PM me for the credentials and you can paste them into the file to get it working.
 
 ### To save new installed libraries to virtual environment
 1. Go into the project **virtual environment** via terminal

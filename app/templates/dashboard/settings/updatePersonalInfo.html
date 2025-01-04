@@ -42,7 +42,7 @@
     {% endif %}
   {% endwith %}
 
-<a href="/dashboard/settings" class="back__button--darker settings__back">Back</a>
+  {% include "components/backButton.html" %}
 
 <div class="profile__content">
   <div class="profile__left">
@@ -87,5 +87,10 @@
 </div>
 
 <!-- <img src="{{ image_file }}" alt=""> -->
+
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/backButton.js') }}"
+></script>
 
 {% endblock %}

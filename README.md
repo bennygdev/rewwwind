@@ -27,6 +27,7 @@ If you would like the email and google functionality to actually work, create a 
 2. Install necessary packages
 3. Do `pip freeze > requirements.txt` after you are done installing packages
 4. Update and commit requirements.txt to github, by doing `git add .` and doing `git commit -m "message"`
+5. After that, please do let everyone know new packages are added so everyone's version is not outdated.
 
 ### How to commit changes (IMPORTANT)
 **NOTE: Before running the app in a new branch, please do so in a virtual environment.**

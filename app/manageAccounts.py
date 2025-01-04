@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from .roleDecorator import role_required
 from .models import User
-from .forms import AdminChangeUserInfoForm, ChangePasswordForm
+from .forms import AdminChangeUserInfoForm, ChangePasswordForm, OwnerAddAccountForm
 from . import db
 from datetime import datetime, timedelta
 from math import ceil
@@ -199,8 +199,56 @@ def change_password(id):
 
   return render_template("dashboard/manageAccounts/changePassword.html", user=current_user, form=form, selectedUser=selectedUser)
 
-@manageAccounts.route('/add-admin-account')
+@manageAccounts.route('/add-any-account', methods=['GET', 'POST'])
 @login_required
 @role_required(3)
-def add_admin_account():
-  return render_template("dashboard/manageAccounts/add_admin_account.html", user=current_user)
+def add_any_account():
+  form = OwnerAddAccountForm()
+
+  if form.validate_on_submit():
+    first_name = form.firstName.data
+    last_name = form.lastName.data
+    username = form.username.data
+    email = form.email.data
+    password = form.password.data
+    role_id = form.role_id.data
+
+    # Check if the email already exists
+    email_exists = User.query.filter_by(email=email).first()
+    if email_exists:
+      flash('An account with that email already exists.', 'error')
+      return render_template("dashboard/manageAccounts/add_any_account.html", user=current_user, form=form)
+        
+    # Additional validation checks (already handled by WTForms)
+    if not first_name or not last_name:
+      flash('All fields are required.', 'error')
+      return render_template("dashboard/manageAccounts/add_any_account.html", user=current_user, form=form)
+    
+    username_exists = User.query.filter_by(username=form.username.data).first()
+    if username_exists:
+      flash('An account with that username already exists.', 'error')
+      return render_template("dashboard/manageAccounts/add_any_account.html", user=current_user, form=form)
+    
+    # add user to database
+    new_user = User(
+      first_name = first_name, 
+      last_name = last_name,
+      username = username,
+      email = email,
+      image = None,
+      password = generate_password_hash(password, method='pbkdf2:sha256'),
+      orderCount = 0,
+      role_id = role_id
+    )
+    db.session.add(new_user)
+    db.session.commit()
+    flash("Account created successfully.", "success")
+    return redirect(url_for('manageAccounts.accounts_listing'))
+
+  if form.role_id.errors:
+    flash("Please select a category.", "error")
+
+  if form.password.errors:
+    flash("Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.", "error")
+
+  return render_template("dashboard/manageAccounts/add_any_account.html", user=current_user, form=form)

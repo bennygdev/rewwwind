@@ -1,0 +1,89 @@
+{% extends "dashboard/base.html" %}
+{% set active_page = "add_any_account" %}
+{% block title %}Add Any Account{% endblock %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/accounts/addAnyAccount.css') }}">
+{% endblock %}
+
+{% block content %}
+<h1>Add any account</h1>
+
+<form method="POST" class="addAccount__form">
+  {{ form.hidden_tag() }}
+
+  <input type="hidden" name="remove_image" id="remove_image" value="">
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-messages">
+        {% for category, message in messages %}
+          {% if category == 'error' %}
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% elif category == 'info' %}
+          <div class="alert alert-primary alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% elif category == 'success'  %}
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+  
+  <div class="addAccount__name">
+    <div class="addAccount__firstName">
+      {{ form.firstName.label }}
+      {{ form.firstName(class="form-control") }}
+    </div>
+    <div class="addAccount__lastName">
+      {{ form.lastName.label }}
+      {{ form.lastName(class="form-control") }}
+    </div>
+  </div>
+  <div class="addAccount__username">
+    {{ form.username.label }}
+    {{ form.username(class="form-control") }}
+  </div>
+  <div class="addAccount__email">
+    {{ form.email.label }}
+    {{ form.email(class="form-control") }}
+  </div>
+  <div class="addAccount__role">
+    {{ form.role_id.label }}
+    <select name="role_id" class="form-control">
+      <option value="">Select a Category</option>
+      <option value="1">Customer</option>
+      <option value="2">Admin</option>
+      <option value="3">Owner</option>
+    </select>
+  </div>
+  <div class="addAccount__password">
+    {{ form.password.label }}
+    <div class="password-wrapper">
+      {{ form.password(class="form-control password", placeholder="Your password") }}
+      <button type="button" id="toggle-password" class="password-toggle">
+        <i class="fa-solid fa-eye" id="eye-icon"></i>
+      </button>
+    </div>
+  </div>
+  
+  <div class="button__wrapper">
+    {{ form.submit(class="addAccount__button") }}
+  </div>
+</form>
+
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/passwordVisibility.js') }}"
+></script>
+
+{% endblock %}

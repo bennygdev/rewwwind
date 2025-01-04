@@ -53,6 +53,15 @@
   line-height: 28px;
 }
 
+.statistic__text {
+  font-family: "OpenSansBold";
+  font-size: 1.3em;
+  margin: 0;
+  color: #039752;
+  /* height: 30px; */
+  line-height: 28px;
+}
+
 .statistic__box i , .statistic__label, .statistic__amount {
   color: #039752;
 }
@@ -198,6 +207,17 @@
 
 .accounts td.controls i:not(:last-child) {
   margin-right: 0.6em;
+}
+
+td.controls i {
+  color: #6e6e6e;
+}
+
+td.controls {
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+  align-items: center;
 }
 
 .accounts tbody tr {

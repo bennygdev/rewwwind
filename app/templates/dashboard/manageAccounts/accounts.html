@@ -103,8 +103,12 @@
       </td>
           
       <td class="controls">
+        {% if current_user.role_id == 3 or (current_user.role_id == 2 and account.role_id == 1) %}
+        <a href="{{ url_for('manageAccounts.account_details', id=account.id) }}">
+          <i class="fa-solid fa-eye"></i>
+        </a>
         <i class="fa-solid fa-pen"></i>
-        <i class="fa-solid fa-eye"></i>
+        {% endif %}
       </td>
     </tr>
     {% endfor %}

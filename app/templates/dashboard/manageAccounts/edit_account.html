@@ -1,21 +1,19 @@
 {% extends "dashboard/base.html" %}
-{% set active_page = "settings" %}
+{% set active_page = "manage_accounts" %}
 
 {% block styles %}
-<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/settings/updatePersonalInfo.css') }}">
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/accounts/editAccount.css') }}">
 {% endblock %}
 
-{% block title %}Update Personal Information{% endblock %}
+{% block title %}Edit Account Details{% endblock %}
 
 {% block content %}
 
-<h1>Update personal information</h1>
+<h1>Editing Account #{{ selectedUser.id }}</h1>
 {% include "components/backButton.html" %}
 
-<form method="POST" class="updateInfo__form" enctype="multipart/form-data">
+<form method="POST" class="editInfo__form">
   {{ form.hidden_tag() }}
-
-  <input type="hidden" name="remove_image" id="remove_image" value="">
 
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
@@ -42,60 +40,29 @@
     {% endif %}
   {% endwith %}
   
-  <div class="updateInfo__name">
-    <div class="updateInfo__firstName">
+  <div class="editInfo__name">
+    <div class="editInfo__firstName">
       {{ form.firstName.label }}
       {{ form.firstName(class="form-control") }}
     </div>
-    <div class="updateInfo__lastName">
+    <div class="editInfo__lastName">
       {{ form.lastName.label }}
       {{ form.lastName(class="form-control") }}
     </div>
   </div>
-  <div class="updateInfo__username">
+  <div class="editInfo__username">
     {{ form.username.label }}
     {{ form.username(class="form-control") }}
   </div>
-  <div class="updateInfo__email">
+  <div class="editInfo__email">
     {{ form.email.label }}
     {{ form.email(class="form-control") }}
   </div>
-  <!-- <div class="updateInfo__picture">
-    {{ form.picture.label }}
-    {{ form.picture(class="form-control-file") }}
-  </div> -->
-  <div class="updateInfo__picture">
-    <div class="image__preview">
-      {{ form.picture.label }}
-      {% if user.image != 'profile_image_default.jpg' %}
-      <div class="profile-image-preview">
-        <img src="{{ image_file }}" alt="Profile Picture" class="profile-picture-preview-img" id="imagePreview">
-      </div>
-      <div class="removeImage__wrapper">
-        <button type="button" class="removeImage__button" id="removeImageButton">
-          Remove Image
-        </button>
-      </div>
-      {% else %}
-      <div class="profile-image-preview">
-        <img src="{{ url_for('static', filename='profile_pics/profile_image_default.jpg') }}" alt="Default Profile Picture" class="profile-picture-preview-img" id="imagePreview">
-      </div>
-      {% endif %}
-      <div class="image__file">
-        {{ form.picture(class="form-control-file", id="imageInput") }}
-      </div>
-    </div>
-  </div>
-  
   <div class="button__wrapper">
-    {{ form.submit(class="updateInfo__button") }}
+    {{ form.submit(class="editInfo__button") }}
   </div>
 </form>
 
-<script
-  type="text/javascript"
-  src="{{ url_for('static', filename='js/previewImage.js') }}"
-></script>
 <script
   type="text/javascript"
   src="{{ url_for('static', filename='js/backButton.js') }}"

@@ -1,0 +1,125 @@
+{% extends "dashboard/base.html" %}
+{% set active_page = "manage_accounts" %}
+{% block title %}Account Detail{% endblock %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/accounts/accounts.css') }}">
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/accounts/accountDetails.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard/accounts/deleteModal.css') }}">
+{% endblock %}
+
+{% block headerContent %}
+<div class="accounts__header">
+  <h1 id="accounts__title">Manage Account #{{ selectedUser.id }}</h1>
+  <div class="account__statistics">
+    <div class="statistic__box">
+      <i class="fa-solid fa-calendar fa-xl"></i>
+      <div class="user__statistic">
+        <p class="statistic__label">Account Creation Date</p>
+        <span class="statistic__text">{{ formatted_created_at }}</span>
+      </div>
+    </div>
+    <div class="statistic__box">
+      <i class="fa-solid fa-shield fa-xl"></i>
+      <div class="user__statistic">
+        <p class="statistic__label">Role</p>
+        <span class="statistic__text">
+          {% if selectedUser.role_id == 1 %}
+            Customer
+          {% elif selectedUser.role_id == 2 %}
+            Admin
+          {% elif selectedUser.role_id == 3 %}
+            Owner
+          {% else %}
+            None
+          {% endif %}
+        </span>
+      </div>
+    </div>
+    <div class="statistic__box">
+      <i class="fa-solid fa-globe fa-xl"></i>
+      <div class="user__statistic">
+        <p class="statistic__label">Status</p>
+        <span class="statistic__text">Online/offline</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+
+{% include "components/backButton.html" %}
+
+<h2 id="personal__header">Personal Information</h2>
+
+<div class="personal__wrapper">
+  <div class="personal__information">
+    <div class="personal__left">
+      <div class="personal__image">
+        <img src="{{ image_file }}" id="mini_profile_image" alt="Mini profile image">
+      </div>
+      <div class="personal__data">
+        <div class="personal__name">
+          <div class="personal__firstName">
+            <h3>First Name</h3>
+            {{ selectedUser.first_name }}
+          </div>
+          <div class="personal__lastName">
+            <h3>Last Name</h3>
+            {{ selectedUser.last_name }}
+          </div>
+        </div>
+        <div class="personal__extra">
+          <div class="personal__username">
+            <h3>Username</h3>
+            {{ selectedUser.username }}
+          </div>
+          <div class="personal__id">
+            <h3>ID</h3>
+            {{ selectedUser.id }}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="personal__right">
+      <div class="personal__email">
+        <i class="fa-solid fa-envelope fa-lg"></i>{{ selectedUser.email }}
+      </div>
+      <div class="personal__totalOrders">
+        <i class="fa-solid fa-box-open fa-lg"></i> {{ selectedUser.orderCount }} Total Orders
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2 id="personal__header">Billing Address</h2>
+<!-- Will be added later -->
+
+<h2 id="personal__header">Payment Information</h2>
+<!-- Will be added later -->
+
+<div class="account__buttons">
+  {% if not (current_user.role_id == 3 and selectedUser.role_id == 3) %}
+    <a href="{{ url_for('manageAccounts.edit_account', id=selectedUser.id) }}" id="account__editButton">Edit</a>
+    <a href="{{ url_for('manageAccounts.change_password', id=selectedUser.id) }}" id="account__changePassword">Change Password</a>
+  {% endif %}
+  <form id="deleteForm-{{ selectedUser.id }}" action="{{ url_for('manageAccounts.delete_account', id=selectedUser.id) }}" method="POST" onsubmit="event.preventDefault(); openDeleteModal({{ selectedUser.id }})">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="button" id="account__deleteButton" onclick="openDeleteModal({{ selectedUser.id }})">Delete</button>
+  </form>
+</div>
+
+<!-- modal -->
+{% include "components/deleteModal.html" %}
+
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/deleteAccount.js') }}"
+></script>
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/backButton.js') }}"
+></script>
+
+{% endblock %}

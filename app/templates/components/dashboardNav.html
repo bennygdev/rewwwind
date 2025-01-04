@@ -12,7 +12,7 @@
           <li><a href="/dashboard/manage-accounts" class="dashboard__link {{ 'dashboard__link--active' if active_page == 'manage_accounts' else '' }}"><i class="fa-solid fa-users"></i>Manage Accounts</a></li>
           {% endif %}
           {% if user.role_id == 3 %}
-          <li><a href="/dashboard/add-admin-account" class="dashboard__link {{ 'dashboard__link--active' if active_page == 'add_admin_account' else '' }}"><i class="fa-solid fa-user-plus"></i>Add Admin Account</a></li>
+          <li><a href="/dashboard/add-any-account" class="dashboard__link {{ 'dashboard__link--active' if active_page == 'add_any_account' else '' }}"><i class="fa-solid fa-user-plus"></i>Add Any Account</a></li>
           {% endif %}
         </ul>
       </li>

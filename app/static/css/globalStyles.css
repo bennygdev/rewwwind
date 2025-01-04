@@ -68,4 +68,5 @@ textarea:focus, input:focus{
   text-align: center;
   color: #000;
   border-radius: 10px;
+  border: 0;
 }

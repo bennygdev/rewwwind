@@ -10,7 +10,7 @@
 {% block content %}
 
 <h1>Editing Account #{{ selectedUser.id }}</h1>
-<a href="{{ url_for('manageAccounts.accounts_listing') }}" class="back__button--darker">Back</a>
+{% include "components/backButton.html" %}
 
 <form method="POST" class="editInfo__form">
   {{ form.hidden_tag() }}
@@ -62,6 +62,11 @@
     {{ form.submit(class="editInfo__button") }}
   </div>
 </form>
+
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/backButton.js') }}"
+></script>
 
 {% endblock %}
 

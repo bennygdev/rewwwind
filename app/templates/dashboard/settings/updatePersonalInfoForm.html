@@ -10,7 +10,7 @@
 {% block content %}
 
 <h1>Update personal information</h1>
-<a href="/dashboard/update-personal-information" class="back__button--darker">Back</a>
+{% include "components/backButton.html" %}
 
 <form method="POST" class="updateInfo__form" enctype="multipart/form-data">
   {{ form.hidden_tag() }}
@@ -95,6 +95,10 @@
 <script
   type="text/javascript"
   src="{{ url_for('static', filename='js/previewImage.js') }}"
+></script>
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/backButton.js') }}"
 ></script>
 
 {% endblock %}

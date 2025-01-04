@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash,
 from flask_login import login_required, current_user
 from .roleDecorator import role_required
 from .models import User
+from .forms import AdminChangeUserInfoForm
 from . import db
 from datetime import datetime, timedelta
 from math import ceil
@@ -100,6 +101,59 @@ def delete_account(id):
 
   flash("Account successfully deleted.", "info")
   return redirect(url_for('manageAccounts.accounts_listing'))
+
+@manageAccounts.route('/edit-account/<int:id>', methods=['GET', 'POST'])
+@login_required
+@role_required(2, 3)
+def edit_account(id):
+  form = AdminChangeUserInfoForm()
+
+  selectedUser = User.query.get_or_404(id)
+
+  # admin cannot edit admin and owner accounts, but owner can edit any
+  if current_user.role_id == 2: 
+    if selectedUser.role_id in [2, 3]:
+      abort(404)
+
+  # owner cannot edit owner
+  if current_user.role_id == 3:
+    if selectedUser.role_id == 3:
+      abort(404)
+
+  # admin can only edit customer accounts
+  if current_user.role_id == 1: # restrict customer functions
+    abort(404)
+
+  if form.validate_on_submit():
+    
+    if form.username.data != selectedUser.username:
+      user = User.query.filter_by(username=form.username.data).first()
+      if user:
+        flash("That username is taken. Please choose another one.", "error")
+        return render_template("dashboard/manageAccounts/edit_account.html", user=current_user, form=form, selectedUser=selectedUser)
+      
+    if form.email.data != selectedUser.email:
+      user = User.query.filter_by(email=form.email.data).first()
+      if user:
+        flash("That email is taken. Please choose another one.", "error")
+        return render_template("dashboard/manageAccounts/edit_account.html", user=current_user, form=form, selectedUser=selectedUser)
+      
+    selectedUser.first_name = form.firstName.data
+    selectedUser.last_name = form.lastName.data
+    selectedUser.username = form.username.data
+    selectedUser.email = form.email.data
+    db.session.commit()
+    flash("Account has been updated.", 'success')
+    return redirect(url_for('manageAccounts.accounts_listing'))
+
+  elif request.method == 'GET':
+    form.firstName.data = selectedUser.first_name
+    form.lastName.data = selectedUser.last_name
+    form.username.data = selectedUser.username
+    form.email.data = selectedUser.email
+
+
+  return render_template("dashboard/manageAccounts/edit_account.html", user=current_user, form=form, selectedUser=selectedUser)
 
 @manageAccounts.route('/add-admin-account')
 @login_required

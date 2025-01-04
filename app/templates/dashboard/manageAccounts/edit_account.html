@@ -1,0 +1,67 @@
+{% extends "dashboard/base.html" %}
+{% set active_page = "manage_accounts" %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/accounts/editAccount.css') }}">
+{% endblock %}
+
+{% block title %}Edit Account Details{% endblock %}
+
+{% block content %}
+
+<h1>Editing Account #{{ selectedUser.id }}</h1>
+<a href="{{ url_for('manageAccounts.accounts_listing') }}" class="back__button--darker">Back</a>
+
+<form method="POST" class="editInfo__form">
+  {{ form.hidden_tag() }}
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-messages">
+        {% for category, message in messages %}
+          {% if category == 'error' %}
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% elif category == 'info' %}
+          <div class="alert alert-primary alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% elif category == 'success'  %}
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+  
+  <div class="editInfo__name">
+    <div class="editInfo__firstName">
+      {{ form.firstName.label }}
+      {{ form.firstName(class="form-control") }}
+    </div>
+    <div class="editInfo__lastName">
+      {{ form.lastName.label }}
+      {{ form.lastName(class="form-control") }}
+    </div>
+  </div>
+  <div class="editInfo__username">
+    {{ form.username.label }}
+    {{ form.username(class="form-control") }}
+  </div>
+  <div class="editInfo__email">
+    {{ form.email.label }}
+    {{ form.email(class="form-control") }}
+  </div>
+  <div class="button__wrapper">
+    {{ form.submit(class="editInfo__button") }}
+  </div>
+</form>
+
+{% endblock %}
+

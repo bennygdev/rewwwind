@@ -48,6 +48,12 @@ class ChangePasswordForm(FlaskForm):
   confirmPassword = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message="Passwords must match")])
   submit = SubmitField('Save')
 
+class AdminChangeUserInfoForm(FlaskForm):
+  firstName = StringField('First Name', validators=[DataRequired()])
+  lastName = StringField('Last Name')
+  username = StringField('Username', validators=[DataRequired(), Length(max=15)])
+  email = EmailField('Email', validators=[DataRequired(), Email()])
+  submit = SubmitField('Update')
 
 # New product forms
 class ConditionForm(FlaskForm): # specific conditions to be listed in the AddProductForm

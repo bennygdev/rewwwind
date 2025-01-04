@@ -14,6 +14,8 @@ csrf = CSRFProtect()
 mail = Mail()
 oauth = OAuth()
 
+load_dotenv()
+
 def create_app():
   app = Flask(__name__)
   app.config['SECRET_KEY'] = '123456789'

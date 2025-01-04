@@ -5,10 +5,13 @@ from .forms import LoginForm, RegisterForm, UsernameForm, RequestResetForm, Rese
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, logout_user, current_user
 from flask_mail import Message
+from dotenv import load_dotenv
 import os
 from secrets import token_urlsafe
 
 auth = Blueprint('auth', __name__)
+
+load_dotenv()
 
 # Google login
 @auth.route('/login/google')
@@ -180,8 +183,8 @@ def send_reset_email(user):
 
 @auth.route('/reset-password', methods=['GET', 'POST'])
 def reset_password_request():
-  print (os.environ.get("MAIL_USERNAME")) 
-  print (os.environ.get("MAIL_PASSWORD")) 
+  print(os.getenv("EMAIL_USER")) 
+  print(os.getenv("EMAIL_PASS")) 
 
   if current_user.is_authenticated:
     return redirect(url_for('views.home'))

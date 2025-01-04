@@ -9,7 +9,10 @@ function adjustProductSpacing() {
 
     // Card dimensions
     const cardWidth = products[0].offsetWidth;
-    const minGap = 30; // Minimum gap between cards
+    let minGap = 80; // Minimum gap between cards
+    if (window.innerWidth <= 1400) {
+        minGap = 40;
+    }
 
     // Calculate items per row
     const itemsPerRow = Math.floor((containerWidth + minGap) / (cardWidth + minGap));
@@ -22,7 +25,7 @@ function adjustProductSpacing() {
     // Reset styles
     container.style.display = 'flex';
     container.style.flexWrap = 'wrap';
-    container.style.rowGap = '0'; // No vertical gaps
+    container.style.rowGap = '10'; // Vertical gaps
     container.style.columnGap = `${gap}px`; // Horizontal gaps only
 
     // Apply width to each product for consistent alignment

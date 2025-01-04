@@ -3,7 +3,7 @@ class DeleteProduct {
         this.product = product;
         this.productID = product.getAttribute('product-id');
         this.formContainer = document.querySelector('div.delete__form-container');
-        this.success = product.classList.contains('success') || this.formContainer.classList.contains('success');
+        this.success = product.getAttribute('success') === 'true' || this.formContainer.getAttribute('success') === 'true';
 
         // target product-related stuff (some seriously messy code lol)
         if (!this.success) {
@@ -34,8 +34,9 @@ class DeleteProduct {
             this.openModalBtn.addEventListener('click', () => this.toggleForm());
             this.form.addEventListener('submit', () => this.handleSubmit());
         }
-        if (this.formContainer.style.display === 'flex' && this.formContainer.id === this.productID || this.formContainer.classList.contains('success')) {
+        if (this.formContainer.style.display === 'flex' && this.formContainer.id === this.productID || this.success) {
             this.toggleForm();
+            console.log(true);
             this.redirect = true;
         };
     }
@@ -72,7 +73,8 @@ class DeleteProduct {
                 this.input.value = '';
             }
 
-            if (this.redirect) {window.location.href = '../manage-products'};
+            if (this.redirect && window.location.href.includes('delete-product')) {window.location.href = '../manage-products'}
+            else if (this.redirect) {window.location.reload()};
         };
 
         this.active = !this.active;
@@ -118,6 +120,6 @@ const checkElement = document.querySelector('.delete__form-container');
 if (rows) {
     rows.forEach(row => new DeleteProduct(row));
 }
-if (checkElement.classList.contains('success')) {
+if (checkElement.getAttribute('success') === 'true') {
     new DeleteProduct(checkElement);
 }

@@ -1,25 +1,61 @@
 from werkzeug.utils import secure_filename
 from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
 from flask_login import login_required, current_user
+from sqlalchemy import func
+from sqlalchemy.dialects.postgresql import JSON
 from .roleDecorator import role_required
 from .forms import AddProductForm, DeleteProductForm #, EditProductForm
 from .models import Product
 from . import db
 import os
 
-from datetime import datetime
+from math import ceil
+# from datetime import datetime
 
 manageProducts = Blueprint('manageProducts', __name__)
+
 # Products page
+def pagination(products):
+    # count products
+    total_products = len(products)
+
+    # count warnings (low stock)
+    total_warnings = sum(
+        1 for product in products
+        if any(variant.get('stock') <= 10 for variant in product.variants)
+    )
+
+    # pagination
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+
+    # search logic
+    search_query = request.args.get('q', '', type=str)
+
+    if search_query:
+        products_query = Product.query.filter(Product.name.ilike(f"%{search_query}%"))
+    else:
+        products_query = Product.query
+
+    # pagination logic
+    total_products = products_query.count()
+    products = products_query.order_by(Product.id).paginate(page=page, per_page=per_page)
+
+    total_pages = ceil(total_products / per_page)
+
+    return products, total_products, total_warnings, total_pages, page, search_query
 
 @manageProducts.route('/manage-products')
 @login_required
 @role_required(2, 3)
-def product_listings():
+def products_listing():
     products = Product.query.all()
-    productDeleteForm = DeleteProductForm()
+    deleteForm = DeleteProductForm()
 
-    return render_template("dashboard/manageProducts/products.html", user=current_user, products=products, deleteForm=productDeleteForm, datetime=datetime)
+    products, total_products, total_warnings, total_pages, page, search_query = pagination(products)
+
+    return render_template("dashboard/manageProducts/products.html", user=current_user, products=products, total_products=total_products, total_warnings=total_warnings, deleteForm=deleteForm, total_pages=total_pages, current_page=page, search_query=search_query) #, datetime=datetime
+    
 
 from flask import jsonify, flash
 import os
@@ -70,6 +106,7 @@ def add_product():
             db.session.commit()
 
             # Return a success response
+            flash("The product has been added successfully.", "success")
             return jsonify({'success': True, 'message': 'Product added successfully!'})
 
         except Exception as e:
@@ -88,20 +125,23 @@ def add_product():
 @login_required
 @role_required(2, 3)
 def delete_product():
+    products = Product.query.all()
     deleteForm = DeleteProductForm()
+    products, total_products, total_warnings, total_pages, page, search_query = pagination(products)
 
     if deleteForm.validate_on_submit():
         id = deleteForm.productID.data
-
         product_to_delete = Product.query.get(id)
         if product_to_delete:
-            # print(f"Deleting product: {product_to_delete.name}")
             db.session.delete(product_to_delete)
             db.session.commit()
-            
+            flash("The product has been removed successfully.", "success")
 
-        deleteForm.deleteConfirm.data = 'success'
-        return render_template("dashboard/manageProducts/products.html", user=current_user, products=Product.query.all(), deleteForm=deleteForm) #datetime=datetime)
+        # Refresh the products list
+        products = Product.query.all()
+        products, total_products, total_warnings, total_pages, page, search_query = pagination(products)
 
-    # refresh with errors
-    return render_template("dashboard/manageProducts/products.html", user=current_user, products=Product.query.all(), deleteForm=deleteForm) #datetime=datetime)
+        return redirect(url_for('manageProducts.products_listing'))
+        
+
+    return render_template("dashboard/manageProducts/products.html", user=current_user, products=products, total_products=total_products, total_warnings=total_warnings, deleteForm=deleteForm, total_pages=total_pages, current_page=page, search_query=search_query) #, datetime=datetime

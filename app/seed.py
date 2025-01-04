@@ -108,16 +108,19 @@ def add_products():
                 variants=[{'name': 'standard', 'price': 50, 'stock': 10}],
                 category_id=1
             )
-    dummy5 = Product(
-                name='dummy 5',
-                creator='dummy 5',
-                image_thumbnail="media/uploads/dummy5.png",
-                description=lorem,
-                variants=[{'name': 'standard', 'price': 20, 'stock': 200}],
-                category_id=1
-            )
+    
     dummies = []
-    dummies.extend([dummy1, dummy2, dummy3, dummy4, dummy5])
+    for x in range(30):
+      dummy5 = Product(
+                  name='dummy 5',
+                  creator='dummy 5',
+                  image_thumbnail="media/uploads/dummy5.png",
+                  description=lorem,
+                  variants=[{'name': 'standard', 'price': 20, 'stock': 200}],
+                  category_id=1
+              )
+      dummies.append(dummy5)
+    dummies.extend([dummy1, dummy2, dummy3, dummy4])
     for dummy in dummies:
         db.session.add(dummy)
     db.session.commit()

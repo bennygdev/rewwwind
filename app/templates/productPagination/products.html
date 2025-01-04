@@ -11,14 +11,7 @@
 <div class="listing__header">
   <div class="header__left">
       <h1>Products</h1>
-      <p>Showing 1
-        {% if 1 < products|length < 16 %}
-          - {{ products|length }}
-        {% elif products|length >= 16 %}
-          - 16
-        {% endif %}
-        of {{ products|length }} results
-      </p>
+      <p>Showing <span class="productPerPage"></span> &minus; <span class="productPerPage"></span> of {{ total_products }} results</p>
   </div>
   <div class="header__right">
     <div class="filters">
@@ -108,7 +101,21 @@
   </div>
   {% endfor %}
 </div>
-
+<div class="products__pagination">
+  <ul>
+      {% if current_page > 1 %}
+          <li class="pagePrevious__button"><a href="{{ url_for('productPagination.product_pagination', page=current_page-1, q=search_query) }}">Previous</a></li>
+      {% endif %}
+      {% for p in range(1, total_pages + 1) %}
+          <li class="{% if p == current_page %}active{% endif %}">
+              <a href="{{ url_for('productPagination.product_pagination', page=p, q=search_query) }}" class="page__button">{{ p }}</a>
+          </li>
+      {% endfor %}
+      {% if current_page < total_pages %}
+          <li class="pageNext__button"><a href="{{ url_for('productPagination.product_pagination', page=current_page+1, q=search_query) }}">Next</a></li>
+      {% endif %}
+  </ul>
+</div>
 {% endblock %}
 
 {% block body_scripts %}

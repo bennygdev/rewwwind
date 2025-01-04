@@ -65,7 +65,7 @@ class AddProductForm(FlaskForm):
   productGenre = SelectField('Genre', validators=[DataRequired()])
   productConditions = FieldList(FormField(ConditionForm), min_entries=1)
   
-  submit = SubmitField('Add')
+  submit = SubmitField('Add Product')
 
   def process(self, formdata=None, obj=None, data=None, **kwargs):
     super(AddProductForm, self).process(formdata, obj, data, **kwargs)

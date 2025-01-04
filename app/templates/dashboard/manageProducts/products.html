@@ -6,11 +6,59 @@
 {% endblock %}
 {% block title %}Manage Products{% endblock %}
 
+{% block headerContent %}
+<div class="products__header">
+    <h1 id="products__title">Manage Products</h1>
+    <div class="product__statistics">
+        <div class="statistic__box">
+            <i class="bi bi-gift-fill fa-xl"></i>
+            <div class="product__statistic">
+                <p class="statistic__label">Total Products</p>
+                <span class="statistic__amount">{{ total_products }}</span>
+            </div>
+        </div>
+        <div class="statistic__box">
+            <i class="bi bi-exclamation-circle-fill fa-xl"></i>
+            <div class="product__statistic">
+                <p class="statistic__label">Warnings</p>
+                <span class="statistic__amount">{{ total_warnings }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="extraPadding"></div>
+    <div class="search__wrapper">
+        <!-- <div class="search__container">
+          <input type="text" id="search__bar" class="search__bar" placeholder="Search by username..." autocomplete="off">
+          <i class="fa-solid fa-magnifying-glass search__button" id="search__button"></i>
+        </div> -->
+        <form method="get" action="{{ url_for('manageProducts.products_listing') }}">
+            <div class="search__container">
+            <input
+              type="text"
+              name="q"
+              id="search__bar"
+              class="search__bar"
+              placeholder="Search by product name..."
+              value="{{ search_query }}"
+              autocomplete="off"
+            >
+            <button type="submit" class="search__button" id="search__button">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+            {% if search_query %}
+                <a href="{{ url_for('manageProducts.products_listing') }}" class="clear__button">
+                    <i class="fa-solid fa-xmark fa-lg"></i>
+                </a>
+            {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
 
 {% block content %}
 <div class="header">
     <div class="header__left">
-        <h2>Manage Products</h2>
         <div class="filters">
             <div class="filter-container">
                 <label>Type</label>
@@ -87,15 +135,9 @@
           </div>
     </div>
     <div class="header__right">
-        <div><h5><i class="bi bi-gift-fill"></i>{{ products|length }} Total Products</h5></div>
         <a href='/dashboard/manage-products/add-product'><h3><i class="fa-solid fa-plus"></i>Add Product</h3></a>
     </div>
 </div>
-<div class="nav__search-container">
-    <input type="text" id="nav__search-bar" class="nav__search-bar" placeholder="Search..." autocomplete="off">
-    <i class="fa-solid fa-magnifying-glass nav__search-button" id="nav__search-button"></i>
-    <div id="nav__search--suggestions" class="nav__search--suggestions"></div>
-  </div>
 <div class="products">
     <table>
         <thead>
@@ -134,8 +176,8 @@
             </td>
             <td class="controls">
                 <div>
-                    <i class="bi bi-pencil-square"></i>
-                    <a href="/products/product/{{ product.id }}"><i class="bi bi-eye-fill"></i></a>
+                    <i class="fa-solid fa-pen"></i>
+                    <a href="/products/product/{{ product.id }}"><i class="fa-solid fa-eye"></i></a>
                     <i class="bi bi-trash-fill"></i>
                 </div>
             </td>
@@ -143,18 +185,23 @@
         {% endfor %}
     </table>
 </div>
-<div class="overlay"></div>
-{% if deleteForm.deleteConfirm.errors or deleteForm.deleteConfirm.data == 'success' %}
+{% set message = get_flashed_messages()[0] if get_flashed_messages() else None %}
+{% if deleteForm.deleteConfirm.errors or message %}
     {% set display = 'flex' %}
 {% else %}
     {% set display = 'none' %}
 {% endif %}
-<div class="delete__form-container {{ deleteForm.deleteConfirm.data }}" id="{{ deleteForm.productID.data }}" style="display: {{ display }};"> <!-- if you're getting an error for this, don't mind it. vscode just assumes it as plain html rather than jinja, but when you run it the jinja template will still be processed -->
+<div class="overlay" style="display: {{ display }}"></div>
+<div class="delete__form-container" success="{{ 'true' if message else 'false' }}" id="{{ deleteForm.productID.data }}" style="display: {{ display }};">
+    <!-- if you're getting an error for the above, don't mind it. vscode just assumes it as plain html rather than jinja, but when you run it the jinja template will still be processed -->
+
     <i class="bi bi-x-lg"></i>
-    {% if deleteForm.deleteConfirm.data == 'success' %}
+    {% if message %}
         <div class="header">
             <i class="bi bi-check-circle"></i>
-            <h2>The product has been removed successfully.</h2>
+            <h2>
+                {{ message }}
+            </h2>
         </div>
         <div class="cancel_button button__wrapper">
             <input type="button" value="Exit">
@@ -193,9 +240,25 @@
         </form>
     {% endif %}
 </div>
+<div class="products__pagination">
+    <ul>
+        {% if current_page > 1 %}
+            <li class="pagePrevious__button"><a href="{{ url_for('manageProducts.products_listing', page=current_page-1, q=search_query) }}">Previous</a></li>
+        {% endif %}
+        {% for p in range(1, total_pages + 1) %}
+            <li class="{% if p == current_page %}active{% endif %}">
+                <a href="{{ url_for('manageProducts.products_listing', page=p, q=search_query) }}" class="page__button">{{ p }}</a>
+            </li>
+        {% endfor %}
+        {% if current_page < total_pages %}
+            <li class="pageNext__button"><a href="{{ url_for('manageProducts.products_listing', page=current_page+1, q=search_query) }}">Next</a></li>
+        {% endif %}
+    </ul>
+</div>
 {% endblock %}
 
 {% block body_scripts %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/pageInteractions/filters.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/dashboard/manageProducts/deleteProduct.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/dashboard/manageProducts/productListing.js') }}"></script>
 {% endblock %}

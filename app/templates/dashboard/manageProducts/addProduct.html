@@ -6,11 +6,14 @@
 {% endblock %}
 {% block title %}Add Product{% endblock %}
 
-{% block content %}
-<div class="header">
-    <h2>Add Product</h2>
-    <a href="/dashboard/manage-products"><i class="bi bi-arrow-left"></i>&nbsp;&nbsp;<span>Back</span></a>
+{% block headerContent %}
+<div class="products__header">
+    <h1 id="products__title">Add New Product</h1>
+    <a href="/dashboard/manage-products"><i class="bi bi-arrow-left"></i>&nbsp;&nbsp;<span>Go Back</span></a>
 </div>
+{% endblock %}
+
+{% block content %}
 <div class="body">
     <form method="POST" class="product__form" enctype="multipart/form-data">
         <div class="flash-messages"></div> <!-- Container for flash messages -->
@@ -19,21 +22,25 @@
         {{ form.productThumbnail() }}
         <div class="product__name">
             {{ form.productName.label }}
-            {{ form.productName(class='form-control', placeholder='Enter product name here') }}
+            {{ form.productName(class='form-control', placeholder='Enter product name here...') }}
         </div>
         <div class="product__creator">
             {{ form.productCreator.label }}
-            {{ form.productCreator(class='form-control', placeholder='Enter product creator name here') }}
+            {{ form.productCreator(class='form-control', placeholder='Enter product creator name here...') }}
         </div>
         <div class="product__images">
             <label>Product Image Upload</label>
             {{ form.productImages.label }}
             {{ form.productImages() }}
-            <div class="file-list"></div>
+            <div class="file-list-wrapper">
+                <button class="carousel-button left" type="button" style="display: none;">&lt;</button>
+                <div class="file-list"></div>
+                <button class="carousel-button right" type="button" style="display: none;">&gt;</button>
+            </div>            
         </div>
         <div class="product__description">
             {{ form.productDescription.label }}
-            {{ form.productDescription(class='form-control resizable', placeholder='PLEASE BUY OUR PRODUCTS PLEASE PLEASE PLEASE') }}
+            {{ form.productDescription(class='form-control resizable', placeholder='Enter product description here...') }}
         </div>
         <div class="centralise-content">
             <div class="product__type">
@@ -46,16 +53,19 @@
             </div>
         </div>
         <div class="product__conditions">
+            <label>Conditions</label>
             {% for condition in form.productConditions %}
             <div class="centralise-content condition">
                 {{ condition.condition.label }}
                 {{ condition.condition(class='form-select') }}
         
                 {{ condition.stock.label }}
-                {{ condition.stock(class='form-control') }}
+                {{ condition.stock(class='form-control', placeholder='Enter product stock here...') }}
         
                 {{ condition.price.label }}
-                {{ condition.price(class='form-control') }}
+                {{ condition.price(class='form-control', placeholder='Enter product price here...') }}
+
+                <button type="button" class="deleteCondition"><i class="bi bi-x-lg"></i></button>
             </div>
             {% endfor %}
             <button type="button" class="addCondition"><i class="fa-solid fa-plus"></i>&nbsp;Add Condition</button>

@@ -104,3 +104,12 @@
   color: #fff;
   font-family: "OpenSansSemibold";
 }
+
+#account__changePassword {
+  background-color: #039752;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 0;
+  color: #fff;
+  font-family: "OpenSansSemibold";
+}

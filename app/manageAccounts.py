@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, abort
 from flask_login import login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 from .roleDecorator import role_required
 from .models import User
-from .forms import AdminChangeUserInfoForm
+from .forms import AdminChangeUserInfoForm, ChangePasswordForm
 from . import db
 from datetime import datetime, timedelta
 from math import ceil
@@ -154,6 +155,49 @@ def edit_account(id):
 
 
   return render_template("dashboard/manageAccounts/edit_account.html", user=current_user, form=form, selectedUser=selectedUser)
+
+@manageAccounts.route('/change-account-password/<int:id>', methods=['GET', 'POST'])
+@login_required
+@role_required(2, 3)
+def change_password(id):
+  form = ChangePasswordForm()
+
+  selectedUser = User.query.get_or_404(id)
+
+  # admin cannot change password for admin and owner accounts, but owner can edit any
+  if current_user.role_id == 2: 
+    if selectedUser.role_id in [2, 3]:
+      abort(404)
+
+  # owner cannot edit owner
+  if current_user.role_id == 3:
+    if selectedUser.role_id == 3:
+      abort(404)
+
+  # admin can only edit customer accounts
+  if current_user.role_id == 1: # restrict customer functions
+    abort(404)
+
+  if form.validate_on_submit():
+    if check_password_hash(selectedUser.password, form.password.data):
+      flash("New password cannot be the same as the previous password", "error")
+      return render_template("dashboard/manageAccounts/changePassword.html", user=current_user, form=form, selectedUser=selectedUser)
+    
+    # update
+    selectedUser.password = generate_password_hash(form.password.data, method='pbkdf2:sha256')
+    db.session.commit()
+    flash("Password updated successfully.", "success")
+    return redirect(url_for('manageAccounts.accounts_listing'))
+  
+  if form.confirmPassword.data != form.password.data:
+    flash("Both passwords must match.", "error")
+    return render_template("dashboard/manageAccounts/changePassword.html", user=current_user, form=form, selectedUser=selectedUser)
+  
+  if form.password.errors:
+    flash("Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.", "error")
+    return render_template("dashboard/manageAccounts/changePassword.html", user=current_user, form=form, selectedUser=selectedUser)
+
+  return render_template("dashboard/manageAccounts/changePassword.html", user=current_user, form=form, selectedUser=selectedUser)
 
 @manageAccounts.route('/add-admin-account')
 @login_required

@@ -358,3 +358,7 @@ td.controls {
   text-decoration: none;
   color: #000;
 }
+
+.flash-messages {
+  margin-top: 20px;
+}

@@ -58,7 +58,7 @@ def account_details(id):
       abort(404)
 
   # admin can only view customer accounts
-  if current_user.role_id == 1:
+  if current_user.role_id == 1: # restrict customer functions
     abort(404)
 
   formatted_created_at = selectedUser.created_at.strftime("%d %B %Y")
@@ -75,14 +75,31 @@ def account_details(id):
 
   return render_template("dashboard/manageAccounts/account_details.html", user=current_user, selectedUser=selectedUser, formatted_created_at=formatted_created_at, image_file=image_file)
 
-@manageAccounts.route('/delete-account/<int:id>')
-@login_required()
+@manageAccounts.route('/delete-account/<int:id>', methods=['GET', 'POST'])
+@login_required
 @role_required(2, 3)
 def delete_account(id):
   selectedUser = User.query.get_or_404(id)
 
+  # admin cannot delete admin and owner accounts, but owner can delete any
+  if current_user.role_id == 2: 
+    if selectedUser.role_id in [2, 3]:
+      abort(404)
+
+  # owner cannot delete owner
+  if current_user.role_id == 3:
+    if selectedUser.role_id == 3:
+      abort(404)
+
+  # admin can only delete customer accounts
+  if current_user.role_id == 1: # restrict customer functions
+    abort(404)
+
   db.session.delete(selectedUser)
   db.session.commit()
+
+  flash("Account successfully deleted.", "info")
+  return redirect(url_for('manageAccounts.accounts_listing'))
 
 @manageAccounts.route('/add-admin-account')
 @login_required

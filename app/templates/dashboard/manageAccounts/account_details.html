@@ -5,6 +5,7 @@
 {% block styles %}
 <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/accounts/accounts.css') }}">
 <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/accounts/accountDetails.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard/accounts/deleteModal.css') }}">
 {% endblock %}
 
 {% block headerContent %}
@@ -100,7 +101,18 @@
 
 <div class="account__buttons">
   <a href="#" id="account__editButton">Edit</a> <!-- edit later -->
-  <a href="#" id="account__deleteButton">Delete</a> <!-- need modal when this pops up -->
+  <form id="deleteForm-{{ selectedUser.id }}" action="{{ url_for('manageAccounts.delete_account', id=selectedUser.id) }}" method="POST" onsubmit="event.preventDefault(); openDeleteModal({{ selectedUser.id }})">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="button" id="account__deleteButton" onclick="openDeleteModal({{ selectedUser.id }})">Delete</button>
+  </form>
 </div>
+
+<!-- modal -->
+{% include "components/deleteModal.html" %}
+
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/deleteAccount.js') }}"
+></script>
 
 {% endblock %}

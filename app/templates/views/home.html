@@ -1,17 +1,120 @@
 {% extends "views/base.html" %}
 {% set active_page = "home" %}
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/views/home.css') }}">
+{% endblock %}
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<div class="paddedContent">
-  <h1>Home</h1>
-
-  <!-- Just a test... -->
-  <p>Hi</p>
-  <p>Hi</p>
-  <p>Hi</p>
-  <p>Hi</p>
-  <p>Hi</p>
+<div class="banner">
+  <img src="{{ url_for('static', filename='media/banner1.png') }}"> <!-- add more later, replace this with a new image later -->
 </div>
+<div class="products__special featured">
+  <h1>Specials</h1>
+  <div class="products">
+    {% for product in max_special %}
+    <div class="product">
+      <a href="/products/product/{{ product.id }}">
+        <div class="thumbnail">
+          <img src="{{ url_for('static', filename=product.image_thumbnail) }}" alt="{{ product.name }}"/>
+        </div>
+      </a>
+      <div class="info">
+        <p class="name">{{ product.name }}</p>
+        <p class="creator">{{ product.creator }}</p>
+        <p class="type">{{ product.category.category_name }}</p>
+        <p class="price">&dollar;{{ '{:.2f}'.format(product.variants[0].price) }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="view_more">
+    <a href="/products/featured/specials">View All</a>
+  </div>
+</div>
+<div class="products__new featured">
+  <h1>New Arrivals</h1>
+  <div class="carousel-container">
+    <button class="carousel-control prev" aria-label="Previous"><i class="bi bi-caret-left-fill"></i></button>
+    <div class="carousel-track-container">
+      <div class="products carousel-track">
+        {% for product in max_new %}
+        <div class="product">
+          <a href="/products/product/{{ product.id }}">
+            <div class="thumbnail">
+              <img src="{{ url_for('static', filename=product.image_thumbnail) }}" alt="{{ product.name }}" />
+            </div>
+          </a>
+          <div class="info">
+            <div class="info__left">
+              <p class="name">{{ product.name }}</p>
+              <p class="creator">{{ product.creator }}</p>
+            </div>
+            <div class="info__right">
+              <p class="price">&dollar;{{ '{:.2f}'.format(product.variants[0].price) }}</p>
+              <p class="type">{{ product.category.category_name }}</p>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <button class="carousel-control next" aria-label="Next"><i class="bi bi-caret-right-fill"></i></button>
+    <button class="carousel-control go-to-start" aria-label="Go to Beginning"><i class="bi bi-arrow-counterclockwise"></i></button>
+  </div> 
+</div>
+<div class="products__special products__staff featured">
+  <h1>Staff Picks</h1>
+  <div class="products">
+    {% for product in max_special[:3] %} <!-- i'll add another condition for staff_picks later -->
+    <div class="product">
+      <a href="products/product/{{ product.id }}">
+        <div class="thumbnail">
+          <img src="{{ url_for('static', filename=product.image_thumbnail) }}" alt="{{ product.name }}" />
+        </div>
+      </a>
+      <div class="info">
+        <div class="info__left">
+          <p class="name">{{ product.name }}</p>
+          <p class="creator">{{ product.creator }}</p>
+        </div>
+        <div class="info__right">
+          <p class="price">&dollar;{{ '{:.2f}'.format(product.variants[0].price) }}</p>
+          <p class="type">{{ product.category.category_name }}</p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="view_more">
+    <a href="products/featured/staff_picks">View All</a>
+  </div>
+</div>
+<div class="discover featured"> <!-- if we're gonna colour-code categories i'll find other images -->
+  <h1>Discover</h1>
+  <div class="categories">
+    <div class="category books">
+      <div class="thumbnail">
+        <img src="{{ url_for('static', filename='media/discover__books.png') }}" alt="Books" />
+      </div>
+      <div class="description">
+        <p class="name">Books</p>
+        <p class="sub">Stories and media to inspire you.</p>
+      </div>
+    </div>
+    <div class="category vinyl">
+      <div class="thumbnail">
+        <img src="{{ url_for('static', filename='media/discover__vinyl.png') }}" alt="Vinyl" >
+      </div>
+      <div class="description">
+        <p class="name">Vinyl</p>
+        <p class="sub">Let the sonic intentions of yesterday&apos;s sounds move you.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
 
+{% block body_scripts %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/home.js') }}"></script>
 {% endblock %}

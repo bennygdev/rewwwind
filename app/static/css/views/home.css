@@ -1,0 +1,302 @@
+.content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+    margin: 80px 0;
+}
+
+/* banner */
+.banner {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    width: 100%;
+    height: 250px;
+}
+
+.banner img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+}
+
+@media  (max-height: 800px) {
+    .banner {
+        height: 150px;
+    }
+}
+
+/* general featured products styles */
+.featured {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+}
+
+h1 {
+    font-family: "CharisSIL";
+    font-size: 3em;
+    margin: 0;
+}
+
+.products {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, auto);  
+    gap: 80px; 
+}
+
+.product {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+}
+
+.thumbnail {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 200px;
+    height: 200px;
+    background-color: #f5f5f5;
+    overflow: hidden;
+    border-radius: var(--bs-border-radius);
+    border: 1px solid black;
+}
+
+.thumbnail img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+}
+
+/* 'special' products */
+.products__special {
+    width: 80%;
+}
+
+@media (max-width: 1400px) { /* worry about dynamic styles later */
+    .products__special .thumbnail, .products__special .thumbnail img {
+        width: 150px;
+        height: 150px;
+    }
+}
+
+.products__special:not(.products__staff) .product {
+    align-items: center;
+}
+
+.products__special p {
+    margin-bottom: 4px;
+}
+
+.products__special p {
+    margin-bottom: 4px;
+}
+
+.products__special .info p.name {
+    font-size: 2em;
+}
+
+.products__special .info p.creator {
+    font-size: 1.5em;
+}
+
+.products__special .info p.price {
+    font-size: 1.7em;
+}
+
+.products__special .view_more {
+    margin-top: 15px;
+}
+
+.products__special .view_more a {
+    font-size: 1.5em;
+    text-decoration: none;
+    color: black;
+    padding: 0.3em 1em;
+    border: 1px solid black;
+    border-radius: 30px;
+    transition: 0.5s background-color, 0.3s color;
+}
+
+.products__special .view_more a:hover {
+    color: white;
+    background-color: #039752;
+}
+
+/* 'new' products */
+.products__new {
+    padding-top: 30px;
+    width: 100%;
+    background-color: #039752;
+    color: white;
+}
+
+.products__new .products {
+    display: flex;
+    gap: 88px; /* cannot be changed otherwise display messes up, should address this if I find out how to fix it */
+}
+
+.products__new .product {
+    flex-direction: column;
+    gap: 3px;
+    flex: 0 0 auto;
+}
+
+.products__new .products .product:first-child {
+    margin-left: 40px; /* cannot be changed otherwise display messes up, should address this if I find out how to fix it */
+}
+
+.products__new .thumbnail, .products__new .thumbnail img {
+    width: 300px;
+    height: 300px;
+}
+
+.products__new .info {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.products__new .info__right {
+    text-align: right;
+}
+
+.products__new .info p {
+    margin-bottom: 0;
+}
+
+.products__new .info p:first-child {
+    font-size: 1.8em;
+}
+
+.carousel-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding-bottom: 70px;
+}
+  
+.carousel-track-container {
+    overflow: hidden;
+    width: 100%;
+}
+  
+.carousel-track {
+    display: flex;
+    transition: transform 0.5s ease;
+    will-change: transform;
+}
+
+.carousel-control {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: #fff;
+    font-size: 2rem;
+    cursor: pointer;
+    z-index: 1;
+    padding: 0.5rem 1rem;
+}
+
+.carousel-control.prev, .carousel-control.next {
+    top: 50%;
+    transform: translateY(-70%);
+}
+  
+.carousel-control.prev {
+    left: 10px;
+}
+  
+.carousel-control.next {
+    right: 10px;
+}
+
+.carousel-control.go-to-start {
+    font-size: 1.2em;
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+}
+
+.carousel-control.go-to-start:hover {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+/* 'staff picks' products */
+.products__staff .products {
+    width: 90%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.products__staff .product {
+    flex-direction: column;
+    gap: 3px;
+}
+
+.products__staff .thumbnail, .products__staff .thumbnail img {
+    width: 300px;
+    height: 300px;
+}
+
+.products__staff .info {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.products__staff .info__right {
+    text-align: right;
+}
+
+.products__staff .info p {
+    margin-bottom: 0;
+}
+
+.products__staff .info p.creator {
+    font-size: 1em;
+}
+
+.products__staff .info p:first-child {
+    font-size: 1.8em;
+}
+
+/* discover */
+.discover .categories {
+    width: 90vw;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.discover .category .thumbnail {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    align-items: center;
+}
+
+.discover .category .thumbnail img {
+    width: 400px;
+    height: 400px;
+}
+
+.discover .category .description p {
+    margin: 0;
+}
+
+.discover .category .description .name {
+    font-size: 2em;
+    font-weight: bold;
+}

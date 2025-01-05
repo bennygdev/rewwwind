@@ -32,7 +32,7 @@ def product_pagination():
 
   total_pages = ceil(total_products / per_page)
   
-  return render_template("/productPagination/products.html", user=current_user, products=products, total_products=total_products, total_pages=total_pages, current_page=page, search_query=search_query)
+  return render_template("/views/products.html", user=current_user, products=products, total_products=total_products, total_pages=total_pages, current_page=page, search_query=search_query)
 
 @productPagination.route('/product/<int:product_id>')
 def product_detail(product_id):
@@ -40,4 +40,4 @@ def product_detail(product_id):
     product = Product.query.get(product_id) 
     if product is None:
        abort(404)
-    return render_template("/productPagination/productPage.html", user=current_user, product=product)
+    return render_template("/views/productPage.html", user=current_user, product=product)

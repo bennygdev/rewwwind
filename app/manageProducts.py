@@ -71,6 +71,7 @@ def add_product():
     if form.validate_on_submit():
         try:
             # Extract form data
+            print(form.data)
             productName = form.productName.data
             productCreator = form.productCreator.data
             productDescription = form.productDescription.data
@@ -78,6 +79,7 @@ def add_product():
             productGenre = form.productGenre.data
             productThumbnail = int(form.productThumbnail.data)
             productConditions = form.productConditions.data
+            is_featured = form.productIsFeatured.data
 
             # Handle file upload
             files = request.files.getlist('productImages')
@@ -98,6 +100,7 @@ def add_product():
                 image_thumbnail=f"media/uploads/{secure_filename(files[productThumbnail].filename)}",
                 description=productDescription,
                 variants=productConditions,
+                is_featured = is_featured,
                 category_id=1
             )
 

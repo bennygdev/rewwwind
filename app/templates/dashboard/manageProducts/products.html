@@ -163,13 +163,13 @@
             <td class="productAvgPrice">&dollar;{{ '{:.2f}'.format(product.variants[0].price) }}</td>
             {% if product.variants[0].stock == 0 %}
                 {% set stock_class = 'noStock' %}
-                {% set stock_text = 'Out of stock' %}
+                {% set stock_text = 'Out of Stock' %}
             {% elif product.variants[0].stock <= 10 %}
                 {% set stock_class = 'lowStock' %}
-                {% set stock_text = 'Low on stock' %}
+                {% set stock_text = 'Limited Stock ( ' + product.variants[0].stock|string + ' left )' %}
             {% else %}
                 {% set stock_class = 'highStock' %}
-                {% set stock_text = 'High stock' %}
+                {% set stock_text = 'Plenty in Stock' %}
             {% endif %}
             <td class="productStock {{ stock_class }}">
                 <div>{{ stock_text }}</div>

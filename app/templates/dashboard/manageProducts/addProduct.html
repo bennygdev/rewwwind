@@ -70,6 +70,10 @@
             {% endfor %}
             <button type="button" class="addCondition"><i class="fa-solid fa-plus"></i>&nbsp;Add Condition</button>
         </div>
+        <div class="product__featured">
+            {{ form.productIsFeatured() }}
+            {{ form.productIsFeatured.label }}
+        </div>
         <div class="button__wrapper">
             {{ form.submit() }}
         </div>

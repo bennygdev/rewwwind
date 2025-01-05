@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from flask import request, flash
 from werkzeug.utils import secure_filename
-from wtforms import StringField, TextAreaField, IntegerField, FloatField, FieldList, FormField, SelectField, FileField, MultipleFileField, EmailField, PasswordField, HiddenField, SubmitField
+from wtforms import StringField, TextAreaField, IntegerField, FloatField, FieldList, FormField, SelectField, BooleanField, FileField, MultipleFileField, EmailField, PasswordField, HiddenField, SubmitField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, Optional, NumberRange, Regexp, ValidationError
 from PIL import Image # file object validator
 from mimetypes import guess_type # file extension validator
@@ -78,6 +78,7 @@ class AddProductForm(FlaskForm):
   productDescription = TextAreaField('Product Description')
   productType = SelectField('Type', validators=[DataRequired()])
   productGenre = SelectField('Genre', validators=[DataRequired()])
+  productIsFeatured = BooleanField('Feature this product?')
   productConditions = FieldList(FormField(ConditionForm), min_entries=1)
   
   submit = SubmitField('Add Product')

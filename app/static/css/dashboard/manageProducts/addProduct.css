@@ -56,6 +56,10 @@
     margin: 0;
 }
 
+.product__form select, .product__form input[type="checkbox"] {
+    cursor: pointer;
+}
+
 .centralise-content {
     display: flex;
     justify-content: space-between;
@@ -191,6 +195,10 @@
     color: white;
 }
 
+.product__conditions > label {
+    margin-bottom: 10px;
+}
+
 .product__conditions .condition {
     margin-bottom: 15px;
     padding: 0.8em 1em;
@@ -209,8 +217,8 @@
 
 .product__conditions .deleteCondition {
     border: none;
-    transition: 0.5s background-color, 0.3s color;
-    padding: 5px 8px;
+    transition: 0.3s background-color, 0.1s color;
+    padding: 2px 5px;
 }
 
 .product__conditions .deleteCondition:hover {
@@ -218,6 +226,28 @@
     color: white;
 }
 
+.product__conditions .deleteCondition i {
+    font-size: 1.5em;
+    -webkit-text-stroke: 2px;
+}
+
+.product__featured {
+    display: flex;
+    align-items: center;
+}
+
+.product__featured label {
+    margin: 0;
+}
+
+.product__featured input {
+    width: 1.2em;
+    height: 1.2em;
+    margin-right: 6px;
+    accent-color: #039752;
+}
+
 .product__form .button__wrapper input {
+    margin-top: 1.5em;
     font-size: 1.5em;
 }

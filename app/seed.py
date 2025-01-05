@@ -82,6 +82,7 @@ def add_products():
                 image_thumbnail="media/uploads/dummy1.jpg",
                 description=lorem,
                 variants=[{'name': 'standard', 'price': 100, 'stock': 1}],
+                is_featured = True,
                 category_id=1
             )
     dummy2 = Product(
@@ -90,6 +91,7 @@ def add_products():
                 image_thumbnail="media/uploads/dummy2.jpg",
                 description=lorem,
                 variants=[{'name': 'standard', 'price': 10, 'stock': 20}],
+                is_featured = True,
                 category_id=1
             )
     dummy3 = Product(
@@ -98,6 +100,7 @@ def add_products():
                 image_thumbnail="media/uploads/dummy3.jpeg",
                 description=lorem,
                 variants=[{'name': 'standard', 'price': 20, 'stock': 5}],
+                is_featured = True,
                 category_id=1
             )
     dummy4 = Product(
@@ -106,6 +109,7 @@ def add_products():
                 image_thumbnail="media/uploads/dummy4.jpeg",
                 description=lorem,
                 variants=[{'name': 'standard', 'price': 50, 'stock': 10}],
+                is_featured = True,
                 category_id=1
             )
     
@@ -117,6 +121,7 @@ def add_products():
                   image_thumbnail="media/uploads/dummy5.png",
                   description=lorem,
                   variants=[{'name': 'standard', 'price': 20, 'stock': 200}],
+                  is_featured = False,
                   category_id=1
               )
       dummies.append(dummy5)

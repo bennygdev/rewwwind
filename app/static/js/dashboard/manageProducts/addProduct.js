@@ -17,6 +17,8 @@ class Form {
         const formElements = this.form.querySelectorAll('input, select, textarea');
         formElements.forEach(element => {
             if (element.name && !['productImages', 'productThumbnail', /^productConditions.*/].includes(element.name)) {
+                element.type === 'checkbox' ? 
+                element.checked ? this.formData.append(element.name, element.value) : this.formData.append(element.name, 'false') :
                 this.formData.append(element.name, element.value);
             }
         });
@@ -73,23 +75,6 @@ class Form {
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         `;
         flashContainer.appendChild(alert);
-
-        if (category === 'success') {
-            this.startCountdown(3);
-        }
-    }
-
-    startCountdown(seconds) {
-        const countdown = document.getElementById('countdown');
-        const timer = setInterval(() => {
-            seconds -= 1;
-            countdown.textContent = `Redirecting in ${seconds} seconds...`;
-
-            if (seconds <= 0) {
-                clearInterval(timer);
-                window.location.href = '../manage-products';
-            }
-        }, 1000);
     }
 }
 

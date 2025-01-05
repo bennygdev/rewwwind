@@ -2,12 +2,9 @@
 {% set active_page = "home" %}
 {% block styles %}
 <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/views/home.css') }}">
-{% endblock %}
-{% block title %}Home{% endblock %}
-
-{% block styles %}
 <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/chatbot.css') }}">
 {% endblock %}
+{% block title %}Home{% endblock %}
 
 {% block content %}
 <div class="banner">
@@ -144,6 +141,7 @@
     </div>
   </div>
 </div>
+{% endblock %}
 
 {% block body_scripts %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/home.js') }}"></script>

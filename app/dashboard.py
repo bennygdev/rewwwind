@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
 from flask_login import login_required, current_user
-from .forms import UpdatePersonalInformation, ChangePasswordForm
-from .models import User
+from .forms import UpdatePersonalInformation, ChangePasswordForm, BillingAddressForm
+from .models import User, BillingAddress
 from .roleDecorator import role_required
 from . import db
 import secrets
@@ -164,7 +164,33 @@ def change_password():
 @login_required
 @role_required(1, 2, 3)
 def update_billing_address():
-  return render_template("dashboard/settings/updateBillingAddress.html", user=current_user)
+  billing_addresses = BillingAddress.query.filter_by(user_id=current_user.id).all()
+
+  return render_template("dashboard/settings/updateBillingAddress.html", user=current_user, billing_addresses=billing_addresses)
+
+@dashboard.route('/add-billing-address', methods=['GET', 'POST'])
+@login_required
+@role_required(1, 2, 3)
+def add_billing_address():
+  form = BillingAddressForm()
+
+  if form.validate_on_submit():
+    billing_address = BillingAddress(
+      user_id = current_user.id,
+      address_one = form.address_one.data,
+      address_two = form.address_two.data,
+      unit_number = form.unit_number.data,
+      postal_code = form.postal_code.data,
+      phone_number = form.phone_number.data
+    )
+
+    db.session.add(billing_address)
+    db.session.commit()
+    flash("Billing address added!", "success")
+    return redirect(url_for('dashboard.update_billing_address'))
+
+
+  return render_template("dashboard/settings/addBillingAddress.html", user=current_user, form=form)
 
 @dashboard.route('/update-payment-information')
 @login_required

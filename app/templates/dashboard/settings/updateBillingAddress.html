@@ -2,15 +2,90 @@
 {% set active_page = "settings" %}
 
 {% block styles %}
-
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/settings/updateBillingAddress.css') }}">
 {% endblock %}
 
 {% block title %}Update Billing Address{% endblock %}
 
+{% block headerContent %}
+<div class="billing__header">
+  <h1 id="billing__title">Update Billing Address</h1>
+  <p id="billing__subtitles">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</p>
+</div>
+{% endblock %}
+
 {% block content %}
 
-<h1>Update billing address</h1>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-messages">
+        {% for category, message in messages %}
+          {% if category == 'error' %}
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% elif category == 'info' %}
+          <div class="alert alert-primary alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% elif category == 'success'  %}
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
 {% include "components/backButton.html" %}
+
+<!-- When empty it will ask user to add a billing address, initially will not show billing content -->
+
+{% if billing_addresses %}
+  {% for address in billing_addresses %}
+  <div class="billing__content">
+    <div class="billing__left">
+      <h2>Billing Address #{{ loop.index }}</h2>
+      <div class="billing__addressOne">
+        <h3>Address One</h3>
+        {{ address.address_one }}
+      </div>
+      <div class="billing__addressTwo">
+        <h3>Address Two</h3>
+        {{ address.address_two or 'N/A' }}
+      </div>
+      <div class="billing__unitNumber">
+        <h3>Unit Number</h3>
+        {{ address.unit_number }}
+      </div>
+      <div class="billing__postalCode">
+        <h3>Postal Code</h3>
+        {{ address.postal_code }}
+      </div>
+      <div class="billing__phoneNumber">
+        <h3>Phone Number</h3>
+        {{ address.phone_number }}
+      </div>
+    </div>
+    <div class="billing__right">
+      <!-- Edit button -->
+      <a href="#" class="billing__editButton"><i class="fa-solid fa-pen"></i>Edit</a>
+  
+      <!-- Cancel and save button when the user is in edit state -->
+      <!-- <a href="#" class="">Save</a>
+      <a href="#" class="">Cancel</a> -->
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <p>No billing addresses found.</p>
+{% endif %}
+<!-- include add button here -->
+<a href="{{ url_for('dashboard.add_billing_address') }}" class="billing__addButton"><i class="fa-solid fa-plus fa-lg"></i>Add</a>
 
 <script
   type="text/javascript"

@@ -8,8 +8,8 @@
 
 {% block headerContent %}
 <div class="products__header">
-    <h1 id="products__title">Add New Product</h1>
-    <a href="/dashboard/manage-products"><i class="bi bi-arrow-left"></i>&nbsp;&nbsp;<span>Go Back</span></a>
+    <h1 id="products__title">{% block h1 %}Add New Product{% endblock %}</h1>
+    <a href="{{ url_for('manageProducts.products_listing') }}"><i class="bi bi-arrow-left"></i>&nbsp;&nbsp;<span>Go Back</span></a>
 </div>
 {% endblock %}
 
@@ -70,9 +70,13 @@
             {% endfor %}
             <button type="button" class="addCondition"><i class="fa-solid fa-plus"></i>&nbsp;Add Condition</button>
         </div>
-        <div class="product__featured">
-            {{ form.productIsFeatured() }}
-            {{ form.productIsFeatured.label }}
+        <div class="product__featured special">
+            {{ form.productIsFeaturedSpecial() }}
+            <label for="productIsFeaturedSpecial">Feature product in &quot;<a href="/">Specials</a>&quot; &quest;</label>
+        </div>
+        <div class="product__featured staff">
+            {{ form.productIsFeaturedStaff() }}
+            <label for="productIsFeaturedStaff">Feature product in &quot;<a href="/">Staff Picks</a>&quot; &quest;</label>
         </div>
         <div class="button__wrapper">
             {{ form.submit() }}

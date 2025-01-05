@@ -363,4 +363,6 @@ class ConditionHandler extends ImageHandler {
     }
 }
 
-new ConditionHandler('productImages', 'form', '/dashboard/manage-products/add-product');
+window.location.href.includes('/manage-products/add-product') ?
+new ConditionHandler('productImages', 'form', '/dashboard/manage-products/add-product') :
+new ConditionHandler('productImages', 'form', `/dashboard/manage-products/update-product/${document.getElementById('getIdHere').innerText}`);

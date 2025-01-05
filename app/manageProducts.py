@@ -79,7 +79,8 @@ def add_product():
             productGenre = form.productGenre.data
             productThumbnail = int(form.productThumbnail.data)
             productConditions = form.productConditions.data
-            is_featured = form.productIsFeatured.data
+            is_featured_special = form.productIsFeaturedSpecial.data
+            is_featured_staff = form.productIsFeaturedStaff.data
 
             # Handle file upload
             files = request.files.getlist('productImages')
@@ -100,7 +101,8 @@ def add_product():
                 image_thumbnail=f"media/uploads/{secure_filename(files[productThumbnail].filename)}",
                 description=productDescription,
                 variants=productConditions,
-                is_featured = is_featured,
+                is_featured_special = is_featured_special,
+                is_featured_staff = is_featured_staff,
                 category_id=1
             )
 
@@ -123,6 +125,70 @@ def add_product():
 
     # Default return in case of GET request or no validation errors
     return render_template("dashboard/manageProducts/addProduct.html", user=current_user, form=form)
+
+@manageProducts.route('/manage-products/update-product/<int:product_id>', methods=['GET', 'POST'])
+@login_required
+@role_required(2, 3)
+def update_product(product_id):
+    product = Product.query.get_or_404(product_id)
+    form = AddProductForm()
+
+    if request.method == 'GET':  # Populate the form with product data for GET
+        form.productName.data = product.name
+        form.productCreator.data = product.creator
+        form.productDescription.data = product.description
+        form.productType.data = product.category_id
+        form.productGenre.data = product.category_id
+        form.productThumbnail.data = product.image_thumbnail
+        form.productIsFeaturedSpecial.data = product.is_featured_special
+        form.productIsFeaturedStaff.data = product.is_featured_staff
+
+        for variant in product.variants:
+            form.productConditions.append_entry({
+                'condition': variant['condition'],
+                'stock': variant['stock'],
+                'price': variant['price']
+            })
+
+    if form.validate_on_submit():  # Handle POST request
+        try:
+            # Update product details
+            product.name = form.productName.data
+            product.creator = form.productCreator.data
+            product.description = form.productDescription.data
+            product.category_id = form.productType.data
+            product.image_thumbnail = form.productThumbnail.data
+            product.is_featured_special = form.productIsFeaturedSpecial.data
+            product.is_featured_staff = form.productIsFeaturedStaff.data
+
+            # Handle file uploads
+            files = request.files.getlist('productImages')
+            uploaded_file_paths = []
+            upload_folder = current_app.config['UPLOAD_FOLDER']
+            for file in files:
+                if file:
+                    file_path = os.path.join(upload_folder, secure_filename(file.filename))
+                    file.save(file_path)
+                    uploaded_file_paths.append(f"media/uploads/{secure_filename(file.filename)}")
+            
+            if uploaded_file_paths:
+                product.images.extend(uploaded_file_paths)  # Assuming product has an `images` attribute
+            print(vars(product))
+            
+            # Commit changes
+            db.session.commit()
+            flash("The product has been updated successfully.", "success")
+            return redirect(url_for('manageProducts.products_listing'))
+
+        except Exception as e:
+            db.session.rollback()  # Rollback on error
+            flash(f"An error occurred: {str(e)}", "danger")
+
+    if request.method == 'POST' and form.errors:  # Handle validation errors
+        flash("Please fix the errors in the form.", "danger")
+        print(form.errors)
+
+    return render_template("dashboard/manageProducts/updateProduct.html", user=current_user, form=form, product=product)
 
 @manageProducts.route('/manage-products/delete-product', methods=['POST'])
 @login_required

@@ -78,7 +78,8 @@ class AddProductForm(FlaskForm):
   productDescription = TextAreaField('Product Description')
   productType = SelectField('Type', validators=[DataRequired()])
   productGenre = SelectField('Genre', validators=[DataRequired()])
-  productIsFeatured = BooleanField('Feature this product?')
+  productIsFeaturedSpecial = BooleanField()
+  productIsFeaturedStaff = BooleanField()
   productConditions = FieldList(FormField(ConditionForm), min_entries=1)
   
   submit = SubmitField('Add Product')

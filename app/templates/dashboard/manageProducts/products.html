@@ -135,7 +135,7 @@
           </div>
     </div>
     <div class="header__right">
-        <a href='/dashboard/manage-products/add-product'><h3><i class="fa-solid fa-plus"></i>Add Product</h3></a>
+        <a href="{{ url_for('manageProducts.add_product') }}"><h3><i class="fa-solid fa-plus"></i>Add Product</h3></a>
     </div>
 </div>
 <div class="products">
@@ -176,8 +176,8 @@
             </td>
             <td class="controls">
                 <div>
-                    <i class="fa-solid fa-pen"></i>
-                    <a href="/products/product/{{ product.id }}"><i class="fa-solid fa-eye"></i></a>
+                    <a href="{{ url_for('manageProducts.update_product', product_id = product.id) }}"><i class="fa-solid fa-pen"></i></a>
+                    <a href="{{ url_for('productPagination.product_detail', product_id = product.id) }}"><i class="fa-solid fa-eye"></i></a>
                     <i class="bi bi-trash-fill"></i>
                 </div>
             </td>

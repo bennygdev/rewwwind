@@ -21,7 +21,7 @@
 {% include "components/flashValidation.html" %}
 
 <!-- Back button -->
-{% include "components/backButton.html" %}
+<a href="{{ url_for('dashboard.user_settings') }}" class="back__button--darker">Back</a>
 
 {% if billing_addresses %}
   {% for address in billing_addresses %}
@@ -108,10 +108,6 @@
 <!-- modal -->
 {% include "components/deleteModal.html" %}
 
-<script
-  type="text/javascript"
-  src="{{ url_for('static', filename='js/backButton.js') }}"
-></script>
 <script
   type="text/javascript"
   src="{{ url_for('static', filename='js/editBilling.js') }}"

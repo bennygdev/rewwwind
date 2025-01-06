@@ -10,7 +10,7 @@
 {% block content %}
 
 <h1>Add Billing Address</h1>
-{% include "components/backButton.html" %}
+<a href="{{ url_for('dashboard.update_billing_address') }}" class="back__button--darker">Back</a>
 
 <form method="POST" class="addBilling__form">
   {{ form.hidden_tag() }}
@@ -45,11 +45,6 @@
     {{ form.submit(class="addBilling__button") }}
   </div>
 </form>
-
-<script
-  type="text/javascript"
-  src="{{ url_for('static', filename='js/backButton.js') }}"
-></script>
 
 {% endblock %}
 

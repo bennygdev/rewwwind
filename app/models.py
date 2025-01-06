@@ -49,6 +49,18 @@ class BillingAddress(db.Model):
   created_at = db.Column(db.DateTime(timezone=True), default=func.now())
   updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
 
+class PaymentInformation(db.Model):
+  __tablename__ = 'payment_information'
+  id = db.Column(db.Integer, primary_key=True)
+  user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+  payment_type = db.Column(db.String(20), nullable=False)
+  card_number = db.Column(db.String(16), nullable=False) # store as string since leading zeros
+  card_name = db.Column(db.String(255), nullable=False)
+  expiry_date = db.Column(db.Date, nullable=False)
+  card_cvv = db.Column(db.String(3), nullable=False) # store as string since leading zeros
+  created_at = db.Column(db.DateTime(timezone=True), default=func.now())
+  updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
+
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)

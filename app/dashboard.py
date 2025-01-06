@@ -216,3 +216,18 @@ def add_billing_address():
 @role_required(1, 2, 3)
 def update_payment_information():
   return render_template("dashboard/settings/updatePaymentInfo.html", user=current_user)
+
+@dashboard.route('/delete-billing/<int:id>', methods=['GET', 'POST'])
+@login_required
+@role_required(1, 2, 3)
+def delete_billing(id):
+  billing_address = BillingAddress.query.get_or_404(id)
+
+  if billing_address and billing_address.user_id == current_user.id:
+    db.session.delete(billing_address)
+    db.session.commit()
+    flash("Billing address deleted.", "success")
+    return redirect(url_for('dashboard.update_billing_address'))
+  else:
+    flash("Invalid billing address or unauthorized access.", "error")
+    return redirect(url_for('dashboard.update_billing_address'))

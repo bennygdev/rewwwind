@@ -3,6 +3,7 @@
 
 {% block styles %}
 <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/settings/updateBillingAddress.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard/accounts/deleteModal.css') }}">
 {% endblock %}
 
 {% block title %}Update Billing Address{% endblock %}
@@ -104,18 +105,18 @@
     </div>
 
     <div class="billing__right">
-      <div class="billing__right--top">
-        <button class="billing__editButton" id="editButton{{ address.id }}" onclick="toggleEditForm({{ address.id }})"><i class="fa-solid fa-pen"></i>Edit</button>
+      <button class="billing__editButton" id="editButton{{ address.id }}" onclick="toggleEditForm({{ address.id }})"><i class="fa-solid fa-pen"></i>Edit</button>
 
-        <!-- hidden by default -->
-        <div class="button-group" id="buttonGroup{{ address.id }}" style="display: none;">
-          <button type="submit" class="billing__saveButton" form="editForm{{ address.id }}">Save</button>
-          <button type="button" class="billing__cancelButton" onclick="toggleEditForm({{ address.id }})">Cancel</button>
-        </div>
+      <!-- hidden by default -->
+      <div class="button-group" id="buttonGroup{{ address.id }}" style="display: none;">
+        <button type="submit" class="billing__saveButton" form="editForm{{ address.id }}">Save</button>
+        <button type="button" class="billing__cancelButton" onclick="toggleEditForm({{ address.id }})">Cancel</button>
       </div>
-      <div class="billing__right--bottom">
-        <button type="button"></button>
-      </div>
+
+      <form id="deleteForm-{{ address.id }}" action="{{ url_for('dashboard.delete_billing', id=address.id) }}" method="POST" onsubmit="event.preventDefault(); openDeleteModal({{ address.id }})">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="button" class="billing__deleteButton" id="deleteButton{{ address.id }}" onclick="openDeleteModal({{ address.id }})">Delete</button>
+      </form>
     </div>
   </div>
   {% endfor %}
@@ -125,6 +126,9 @@
 <!-- include add button here -->
 <a href="{{ url_for('dashboard.add_billing_address') }}" class="billing__addButton"><i class="fa-solid fa-plus fa-lg"></i>Add</a>
 
+<!-- modal -->
+{% include "components/deleteModal.html" %}
+
 <script
   type="text/javascript"
   src="{{ url_for('static', filename='js/backButton.js') }}"
@@ -132,6 +136,10 @@
 <script
   type="text/javascript"
   src="{{ url_for('static', filename='js/editBilling.js') }}"
+></script>
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/deleteModal.js') }}"
 ></script>
 
 {% endblock %}

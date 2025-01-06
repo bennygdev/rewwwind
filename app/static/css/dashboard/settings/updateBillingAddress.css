@@ -86,6 +86,17 @@ h1 {
   border: none;
 }
 
+.billing__deleteButton {
+  display: flex;
+  justify-self: end;
+  background-color: #ff4c24;
+  padding: 10px 20px;
+  color: #fff;
+  border-radius: 10px;
+  border: none;
+  margin-top: 10px;
+}
+
 .billing__editButton i {
   margin-right: 10px;
 }

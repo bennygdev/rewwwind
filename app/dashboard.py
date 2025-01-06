@@ -160,13 +160,32 @@ def change_password():
 
   return render_template('dashboard/settings/changePassword.html', user=current_user, form=form)
   
-@dashboard.route('/update-billing-address')
+@dashboard.route('/update-billing-address', methods=['GET', 'POST'])
 @login_required
 @role_required(1, 2, 3)
 def update_billing_address():
+  form = BillingAddressForm()
   billing_addresses = BillingAddress.query.filter_by(user_id=current_user.id).all()
 
-  return render_template("dashboard/settings/updateBillingAddress.html", user=current_user, billing_addresses=billing_addresses)
+  if form.validate_on_submit():
+    billing_id = request.form.get('billing_id')  # get billing id from hidden field
+    billing_address = BillingAddress.query.get(billing_id)
+        
+    if billing_address and billing_address.user_id == current_user.id:
+      billing_address.address_one = form.address_one.data
+      billing_address.address_two = form.address_two.data
+      billing_address.unit_number = form.unit_number.data
+      billing_address.postal_code = form.postal_code.data
+      billing_address.phone_number = form.phone_number.data
+            
+      db.session.commit()
+      flash("Billing address updated successfully!", "success")
+    else:
+      flash("Invalid billing address or unauthorized access.", "error")
+        
+    return redirect(url_for('dashboard.update_billing_address'))
+
+  return render_template("dashboard/settings/updateBillingAddress.html", user=current_user, billing_addresses=billing_addresses, form=form)
 
 @dashboard.route('/add-billing-address', methods=['GET', 'POST'])
 @login_required

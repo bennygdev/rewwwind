@@ -43,41 +43,79 @@
 
 {% include "components/backButton.html" %}
 
-<!-- When empty it will ask user to add a billing address, initially will not show billing content -->
-
 {% if billing_addresses %}
   {% for address in billing_addresses %}
   <div class="billing__content">
     <div class="billing__left">
       <h2>Billing Address #{{ loop.index }}</h2>
-      <div class="billing__addressOne">
-        <h3>Address One</h3>
-        {{ address.address_one }}
+
+      <!-- hide when editing -->
+      <div class="billing__details" id="details{{ address.id }}">
+        <div class="billing__addressOne">
+          <h3>Address One</h3>
+          {{ address.address_one }}
+        </div>
+        <div class="billing__addressTwo">
+          <h3>Address Two</h3>
+          {{ address.address_two or 'N/A' }}
+        </div>
+        <div class="billing__unitNumber">
+          <h3>Unit Number</h3>
+          {{ address.unit_number }}
+        </div>
+        <div class="billing__postalCode">
+          <h3>Postal Code</h3>
+          {{ address.postal_code }}
+        </div>
+        <div class="billing__phoneNumber">
+          <h3>Phone Number</h3>
+          {{ address.phone_number }}
+        </div>
       </div>
-      <div class="billing__addressTwo">
-        <h3>Address Two</h3>
-        {{ address.address_two or 'N/A' }}
-      </div>
-      <div class="billing__unitNumber">
-        <h3>Unit Number</h3>
-        {{ address.unit_number }}
-      </div>
-      <div class="billing__postalCode">
-        <h3>Postal Code</h3>
-        {{ address.postal_code }}
-      </div>
-      <div class="billing__phoneNumber">
-        <h3>Phone Number</h3>
-        {{ address.phone_number }}
-      </div>
+
+      <!-- editable Form (hidden by Default) -->
+      <form method="POST" class="editBilling__form" id="editForm{{ address.id }}" style="display: none;">
+        {{ form.hidden_tag() }}
+        <input type="hidden" name="billing_id" value="{{ address.id }}">
+        
+        <div class="billing__editAddressOne">
+          {{ form.address_one.label }} 
+          {{ form.address_one(class="form-control", value=address.address_one) }}
+        </div>
+        <div class="billing__editAddressTwo">
+          {{ form.address_two.label }} 
+          {{ form.address_two(class="form-control", value=address.address_two) }}
+        </div>
+        <div class="billing__addressRow">
+          <div class="billing__editUnitNumber">
+            {{ form.unit_number.label }} 
+            {{ form.unit_number(class="form-control", value=address.unit_number) }}
+          </div>
+          <div class="billing__editPostalCode">
+            {{ form.postal_code.label }} 
+            {{ form.postal_code(class="form-control", value=address.postal_code) }}
+          </div>
+        </div>
+        <div class="billing__editPhoneNumber">
+          {{ form.phone_number.label }} 
+          {{ form.phone_number(class="form-control", value=address.phone_number) }}
+        </div>
+      </form>
     </div>
+
     <div class="billing__right">
-      <!-- Edit button -->
-      <a href="#" class="billing__editButton"><i class="fa-solid fa-pen"></i>Edit</a>
-  
-      <!-- Cancel and save button when the user is in edit state -->
-      <!-- <a href="#" class="">Save</a>
-      <a href="#" class="">Cancel</a> -->
+      <div class="billing__right--top">
+        <button class="billing__editButton" id="editButton{{ address.id }}" onclick="toggleEditForm({{ address.id }})"><i class="fa-solid fa-pen"></i>Edit</button>
+
+        <!-- hidden by default -->
+        <div class="button-group" id="buttonGroup{{ address.id }}" style="display: none;">
+          <button type="submit" class="billing__saveButton" form="editForm{{ address.id }}">Save</button>
+          <button type="button" class="billing__cancelButton" onclick="toggleEditForm({{ address.id }})">Cancel</button>
+        </div>
+      </div>
+      <div class="billing__right--bottom">
+        <button type="button"></button>
+      </div>
     </div>
   </div>
   {% endfor %}
@@ -90,6 +128,10 @@
 <script
   type="text/javascript"
   src="{{ url_for('static', filename='js/backButton.js') }}"
+></script>
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/editBilling.js') }}"
 ></script>
 
 {% endblock %}

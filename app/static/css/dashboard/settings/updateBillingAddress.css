@@ -66,19 +66,57 @@ h1 {
   margin-right: 5px;
 }
 
-.billing__editButton {
-  width: 5vw;
+.billing__editButton, .billing__saveButton {
   background-color: #039752;
   padding: 10px 20px;
-  text-decoration: none;
   color: #fff;
   border-radius: 10px;
-  margin-top: 15px !important;
+  border: none;
+}
+
+.billing__saveButton {
+  margin-right: 10px;
+}
+
+.billing__cancelButton {
+  background-color: #ff4c24;
+  padding: 10px 20px;
+  color: #fff;
+  border-radius: 10px;
+  border: none;
 }
 
 .billing__editButton i {
   margin-right: 10px;
 }
+
+.editBilling__form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.billing__editAddressOne, .billing__editAddressTwo {
+  width: 30vw;
+}
+
+.billing__addressRow {
+  display: flex;
+  flex-direction: row;
+  gap: 35px;
+  margin-bottom: 0;
+}
+
+.billing__editUnitNumber, .billing__editPostalCode {
+  width: 10vw;
+  margin-bottom: 0 !important;
+}
+
+.billing__editPhoneNumber {
+  width: 15vw;
+}
+
+/* Add billing form */
 
 .addBilling__form {
   display: flex;

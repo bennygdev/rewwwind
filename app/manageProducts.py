@@ -99,6 +99,7 @@ def add_product():
                 name=productName,
                 creator=productCreator,
                 image_thumbnail=f"media/uploads/{secure_filename(files[productThumbnail].filename)}",
+                images=uploaded_file_paths,
                 description=productDescription,
                 variants=productConditions,
                 is_featured_special = is_featured_special,
@@ -143,12 +144,23 @@ def update_product(product_id):
         form.productIsFeaturedSpecial.data = product.is_featured_special
         form.productIsFeaturedStaff.data = product.is_featured_staff
 
-        for variant in product.variants:
+        if product.variants:
+            variant = product.variants[0]  # Take the first variant condition
+            form.productConditions[0].condition.data = variant['condition']
+            form.productConditions[0].stock.data = variant['stock']
+            form.productConditions[0].price.data = variant['price']
+
+        for variant in product.variants[1:]:  # Skip the first variant since it's already set
             form.productConditions.append_entry({
                 'condition': variant['condition'],
                 'stock': variant['stock'],
                 'price': variant['price']
             })
+        
+        if product.images:
+            print(product.images)
+        else:
+            flash('No images were uploaded.', "update_images_false")
 
     if form.validate_on_submit():  # Handle POST request
         try:
@@ -156,6 +168,7 @@ def update_product(product_id):
             product.name = form.productName.data
             product.creator = form.productCreator.data
             product.description = form.productDescription.data
+            product.variants = form.productConditions.data
             product.category_id = form.productType.data
             product.image_thumbnail = form.productThumbnail.data
             product.is_featured_special = form.productIsFeaturedSpecial.data

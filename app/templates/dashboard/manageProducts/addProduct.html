@@ -41,7 +41,7 @@
         <div class="product__description">
             {{ form.productDescription.label }}
             {{ form.productDescription(class='form-control resizable', placeholder='Enter product description here...') }}
-        </div>
+        </div>aaa
         <div class="centralise-content">
             <div class="product__type">
                 {{ form.productType.label }}
@@ -83,6 +83,8 @@
         </div>
     </form>
 </div>
+{% block images_hidden %}
+{% endblock %}
 {% endblock %}
 
 {% block body_scripts %}

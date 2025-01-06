@@ -79,7 +79,7 @@ class Form {
 }
 
 class ImageHandler extends Form {
-    constructor(fileInputName, formSelector, submitUrl) {
+    constructor(fileInputName, formSelector, submitUrl, is_update) {
         super(formSelector, submitUrl);
         this.fileInputName = fileInputName;
         this.fileInput = this.form.querySelector(`input[name="${this.fileInputName}"]`);
@@ -92,10 +92,20 @@ class ImageHandler extends Form {
         this.activeImageIndex = 0; // Track the index of the active image within visible images
         this.productThumbnail = this.form.querySelector('input[name="productThumbnail"]');
         this.fileListDisplay = this.form.querySelector('.file-list');
+
+        this.update = is_update;
+
         this.initImageHandling();
     }
 
     initImageHandling() {
+        if (this.update) {
+            const images = document.getElementById('images').getAttribute('images').replace('[', '').replace(']', '').replaceAll(" ", "").replaceAll("'", "").split(',')
+            this.fileList = images;
+            this.updateVisibleImages();
+            this.update = !this.update;
+            console.log(this.update)
+        }
 
         if (this.fileInput) {
             this.fileInput.addEventListener('change', (event) => this.handleFileSelect(event));
@@ -179,7 +189,18 @@ class ImageHandler extends Form {
                     this.setThumbnail(fileItem, img.src, index);
                 }
             };
-            reader.readAsDataURL(file);
+            if (typeof file !== 'string') {
+                reader.readAsDataURL(file)
+            } else {
+                const img = document.createElement('img');
+                img.src = `/static/${file}`;
+                img.alt = `Image Preview ${index + 1}`;
+                fileItem.appendChild(img);
+    
+                if (index === this.activeImageIndex) {
+                    this.setThumbnail(fileItem, img.src, index);
+                }
+            }
     
             // Create delete button with icon
             const deleteButton = document.createElement('button');
@@ -305,8 +326,8 @@ class ImageHandler extends Form {
 }
 
 class ConditionHandler extends ImageHandler {
-    constructor(fileInputName, formSelector, submitUrl) {
-        super(fileInputName, formSelector, submitUrl);
+    constructor(fileInputName, formSelector, submitUrl, is_update) {
+        super(fileInputName, formSelector, submitUrl, is_update);
         this.conditionsContainer = this.form.querySelector('.product__conditions');
         this.conditionList = Array.from(this.form.querySelectorAll('.condition'));
         this.addConditionBtn = this.form.querySelector('button.addCondition');
@@ -364,5 +385,5 @@ class ConditionHandler extends ImageHandler {
 }
 
 window.location.href.includes('/manage-products/add-product') ?
-new ConditionHandler('productImages', 'form', '/dashboard/manage-products/add-product') :
-new ConditionHandler('productImages', 'form', `/dashboard/manage-products/update-product/${document.getElementById('getIdHere').innerText}`);
+new ConditionHandler('productImages', 'form', '/dashboard/manage-products/add-product', false) :
+new ConditionHandler('productImages', 'form', `/dashboard/manage-products/update-product/${document.getElementById('getIdHere').innerText}`, true);

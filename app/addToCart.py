@@ -13,8 +13,8 @@ def view_cart():
     print(f"Current user: {current_user}")  # Debugging: Should print user object
     print(f"Authenticated: {current_user.is_authenticated}")  # Debugging: Should be True
     cart_items = Cart.query.filter_by(user_id=current_user.id).join(Product).all()
-    cart_total = sum(item.quantity * item.product.price for item in cart_items)
-    return render_template('addToCart/cart.html', cart_items=cart_items, cart_total=cart_total)
+    #cart_total = sum(item.quantity * item.product.price for item in cart_items)
+    return render_template('addToCart/cart.html', cart_items=cart_items) #cart_total=cart_total)
 
 
 @addToCart.route('/update-cart/<int:product_id>', methods=['POST'])
@@ -52,4 +52,3 @@ def add_to_cart(product_id):
     db.session.commit()
     flash("Item added to cart!")
     return redirect(url_for('addToCart.view_cart'))
-

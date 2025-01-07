@@ -7,6 +7,9 @@ from flask_mail import Mail
 from dotenv import load_dotenv
 import os
 from authlib.integrations.flask_client import OAuth
+from flask_migrate import Migrate
+
+migrate = Migrate()
 
 db = SQLAlchemy()
 DB_NAME = "database.db"
@@ -32,11 +35,15 @@ def create_app():
   app.config['OAUTH2_CLIENT_SECRET'] = os.getenv('GOOGLE_CLIENT_SECRET')
   app.config['OAUTH2_META_URL'] = 'https://accounts.google.com/.well-known/openid-configuration'
 
+
   mail = Mail(app)
 
   db.init_app(app)
   csrf.init_app(app)
   mail.init_app(app)
+
+  migrate.init_app(app, db)  # Initialize Flask-Migrate
+
 
   # Google oAuth setup
   # oauth = OAuth(app)

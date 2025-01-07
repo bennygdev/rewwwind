@@ -137,7 +137,7 @@ hr {
     max-width: 400px;
 }
 
-.product__right .bottom .buyNow {
+.product__right .bottom .buyNow{
     background-color: #039752;
     color: white;
 }
@@ -154,3 +154,5 @@ hr.docSeparator {
     justify-content: space-between;
     align-items: center;
 }
+
+

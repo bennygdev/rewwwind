@@ -77,16 +77,14 @@
         </span>
       </div>
       <hr>
-      <a href="/add-to-cart/{{ product.id }}" class="cta addToCart">
-        <div>
-          <span>Add to Cart</span>
-        </div>
-      </a>
-      <a href="/check-out/{{ product.id }}" class="cta buyNow">
-        <div>
-          <span>Buy Now</span>
-        </div>
-      </a>
+      <form action="/add-to-cart/{{ product.id }}" method="POST" class="cta-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="filter">Add to Cart</button>
+      </form>
+      <form action="/check-out/{{ product.id }}" method="POST" class="cta-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="filter">Buy Now</button>
+      </form>
       <hr>
       <a href="/dashboard/manage-products" class="cta wishlist">
         <div>

@@ -2,7 +2,8 @@ class RatingStars {
     constructor(container) {
         this.container = document.querySelector(container);
         this.stars = Array.from(this.container.querySelectorAll('i.bi-star-fill'));
-        this.rating = 4;
+        this.getRatingInputs = Array.from(document.querySelectorAll('.review__section .review .rating input'));
+        this.rating = this.getRatingInputs.map(rating => Number(rating.value)).reduce((acc, curr) => acc + curr, 0) / this.getRatingInputs.length;
 
         this.fillStars();
     }
@@ -25,4 +26,4 @@ class RatingStars {
 }
 
 new RatingStars(".product .rating");
-new RatingStars(".review .rating");
+new RatingStars(".review__section .rating");

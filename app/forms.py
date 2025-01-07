@@ -130,8 +130,6 @@ class AddProductForm(FlaskForm):
               image.verify()
           except (IOError, SyntaxError):
               raise ValidationError('The image file could not be submitted. Please check if the image file is corrupted, and submit a different file if so.')
-          
-
 
 class DeleteProductForm(FlaskForm):
   productID = HiddenField()
@@ -141,3 +139,14 @@ class DeleteProductForm(FlaskForm):
   def validate_deleteConfirm(self, field):
     if field.data != 'CONFIRMDELETE':
        raise ValidationError('The confirmation input is invalid. Please type CONFIRMDELETE to confirm the deletion.')
+
+class AddReviewForm(FlaskForm):
+  rating = HiddenField('Rating:')
+  show_username = BooleanField('Show username', default=True)
+  description = TextAreaField()
+  
+  submit = SubmitField('Post Review')
+
+  def validate_rating(self, field):
+    if not field.data:
+      raise ValidationError('Please select a rating to give this product.')

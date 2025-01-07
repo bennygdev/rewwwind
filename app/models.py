@@ -62,54 +62,69 @@ class PaymentInformation(db.Model):
   updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
 
 class Role(db.Model):
-    __tablename__ = 'roles'
-    id = db.Column(db.Integer, primary_key=True)
-    role_name = db.Column(db.String(50), unique=True, nullable=False)
-    users = db.relationship('User', backref='role', lazy=True)  # otm
+  __tablename__ = 'roles'
+  id = db.Column(db.Integer, primary_key=True)
+  role_name = db.Column(db.String(50), unique=True, nullable=False)
+  users = db.relationship('User', backref='role', lazy=True)  # otm
 
 
 class Product(db.Model):
-    __tablename__ = 'products'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(200), nullable=True)
-    creator = db.Column(db.String(200), nullable=True)
-    description = db.Column(db.Text, nullable=True)
-    image_thumbnail = db.Column(db.String(300), nullable=True)
-    images = db.Column(db.JSON, nullable=True)  # list of uploaded images
-    variants = db.Column(db.JSON, nullable=True)  # store variants (name, stock, price)
-    is_featured_special = db.Column(db.Boolean, nullable=False)
-    is_featured_staff = db.Column(db.Boolean, nullable=False)
-    created_at = db.Column(db.DateTime(timezone=True), default=func.now())
-    updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
-    
-    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False) 
-    category = db.relationship('Category', backref='products', lazy=True)  # backref categories
-    
-    order_items = db.relationship('OrderItem', backref='product', lazy=True)  # otm orderItem
+  __tablename__ = 'products'
+  id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+  name = db.Column(db.String(200), nullable=True)
+  creator = db.Column(db.String(200), nullable=True)
+  description = db.Column(db.Text, nullable=True)
+  image_thumbnail = db.Column(db.String(300), nullable=True)
+  images = db.Column(db.JSON, nullable=True)  # list of uploaded images
+  variants = db.Column(db.JSON, nullable=True)  # store variants (name, stock, price)
+  is_featured_special = db.Column(db.Boolean, nullable=False)
+  is_featured_staff = db.Column(db.Boolean, nullable=False)
+  created_at = db.Column(db.DateTime(timezone=True), default=func.now())
+  updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
+  
+  category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False) 
+  category = db.relationship('Category', backref='products', lazy=True)  # backref categories
+  
+  order_items = db.relationship('OrderItem', backref='product', lazy=True)  # otm orderItem
+
+class Review(db.Model):
+  __tablename__ = 'reviews'
+  id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+  show_username = db.Column(db.Boolean, default=False)
+  rating = db.Column(db.Integer, nullable=False)
+  description = db.Column(db.String(1000), nullable=True)
+  created_at = db.Column(db.DateTime(timezone=True), default=func.now())
+  updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
+
+  product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
+  product = db.relationship('Product', backref='reviews', lazy=True)
+
+  user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+  user = db.relationship('User', backref='reviews', lazy=True)
 
 
 class Order(db.Model):
-    __tablename__ = 'orders'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    order_date = db.Column(db.DateTime(timezone=True), default=func.now())
-    total_amount = db.Column(db.Numeric(10, 2), nullable=False)
-    status = db.Column(db.String(50), default='Pending', nullable=False)
-    
-    order_items = db.relationship('OrderItem', backref='order', lazy=True) # otm orderitems
+  __tablename__ = 'orders'
+  id = db.Column(db.Integer, primary_key=True)
+  user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+  order_date = db.Column(db.DateTime(timezone=True), default=func.now())
+  total_amount = db.Column(db.Numeric(10, 2), nullable=False)
+  status = db.Column(db.String(50), default='Pending', nullable=False)
+  
+  order_items = db.relationship('OrderItem', backref='order', lazy=True) # otm orderitems
 
 class OrderItem(db.Model):
-    __tablename__ = 'order_items'
-    id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False) 
-    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
-    unit_price = db.Column(db.Numeric(10, 2), nullable=False)
+  __tablename__ = 'order_items'
+  id = db.Column(db.Integer, primary_key=True)
+  order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False) 
+  product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
+  quantity = db.Column(db.Integer, nullable=False)
+  unit_price = db.Column(db.Numeric(10, 2), nullable=False)
 
 class Category(db.Model):
-    __tablename__ = 'categories'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    category_name = db.Column(db.String(100), unique=True, nullable=False)
+  __tablename__ = 'categories'
+  id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+  category_name = db.Column(db.String(100), unique=True, nullable=False)
 
 class ProductCategory(db.Model):
   __tablename__ = 'product_categories'

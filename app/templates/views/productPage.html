@@ -6,6 +6,7 @@
 {% block title %}{{ product.name }}{% endblock %}
 
 {% block content %}
+<input type="hidden" id="get-id-here" product-id="{{ product.id }}">
 <div class="product">
   <div class="product__left">
     <div class="image__container">
@@ -97,7 +98,7 @@
   </div>
 </div>
 <hr class="docSeparator">
-<div class="review">
+<div class="review__section">
   <div class="header">
     <div class="header__left">
       <div class="rating">
@@ -111,8 +112,10 @@
       </div>
     </div>
     <div class="header__right">
-      <div class="write"><i class="bi bi-pencil-square"></i><span>Write a review</span></div>
-      <div class="filter">
+      {% if user.role.role_name %}
+      <div class="write"><span>Write a review</span>&nbsp;&nbsp;<i class="bi bi-pencil-square"></i></div>
+      {% endif %}
+      <div class="filter review activated">
         <span class="selected">Top Reviews</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
         <ul class="filter--options">
             <li class="highlighted">Top Reviews</li>
@@ -123,12 +126,89 @@
       </div>
     </div>
   </div>
-
+  <div class="body">
+    <div class="reviews">
+      {% for review in reviews %}
+      <div class="review">
+        <div class="left">
+          <img src="{{ url_for('static',filename='profile_pics/' + current_user.image) }}">
+        </div>
+        <div class="right">
+          <div class="section">
+            <p class="name">{{ review.user.username if review.show_username else "Annonymous" }}</p>
+            <div class="rating">
+              {% for x in range(review.rating|int) %}
+              <i class="bi bi-star-fill" style="color: orange"></i>
+              {% endfor %}
+              {% for x in range(5-review.rating|int) %}
+              <i class="bi bi-star-fill" style="color: #d9d9d9"></i>
+              {% endfor %}
+              <input type="hidden" value="{{ review.rating }}">
+            </div>
+          </div>
+          <p class="date"><i class="bi bi-calendar-plus-fill"></i>&nbsp;&nbsp;Reviewed on {{ review.created_at.strftime('%Y-%m-%d') }}</p>
+          <p class="description">{{ review.description }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
 </div>
+{% with messages = get_flashed_messages(with_categories=true) %}
+<div class="overlay" style="display: {{ block if messages else none }};"></div>
+<div class="review__modal" style="display: {{ block if messages else none }};">
+  {% if messages and messages[0][0] == 'success' %}
+  <div class="success">
+    <i class="bi bi-x-lg fa-2xl"></i>
+    <i class="bi bi-check-circle fa-2xl"></i>
+    <h2>{{ messages[0][1] }}</h2>
+    <div class="button-wrapper">
+      <input id="cancel" name="cancel" type="button" value="Exit">
+    </div>
+  </div>
+  {% elif not messages or messages[0][0] == 'error' %}
+  <form method="POST" action="{{ url_for('productPagination.add_review', product_id=product.id) }}">
+    {{ form.hidden_tag() }}
+    <div class="addReview">
+      <div class="header">
+        <h1>Add a Review for {{ product.name }}</h1>
+        <i class="bi bi-x-lg fa-2xl"></i>
+      </div>
+        {{ form.rating() }}
+        <div class="rating">
+          {{ form.rating.label }}
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+        </div>
+        <div class="username">
+          {{ form.show_username.label }}
+          {{ form.show_username() }}
+        </div>
+        <div class="description">
+          {{ form.description(class="form-control", placeholder="Write your thoughts!", rows=10) }}
+        </div>
+        <div class="buttons">
+          <div class="button-wrapper">
+            <input id="cancel" name="cancel" type="button" value="Cancel">
+          </div>
+          <div class="button-wrapper">
+            {{ form.submit() }}
+          </div>
+        </div>
+    </div>
+  </form>
+  {%endif%}
+</div>
+{% endwith %}
+
 <a href="{{ url_for('productPagination.product_pagination') }}" class="btn btn-secondary">Back to Products</a>
 {% endblock %}
 
 {% block body_scripts %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/pageInteractions/filters.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/productPagination/productPage.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/productPagination/addReview.js') }}"></script>
 {% endblock %}

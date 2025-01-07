@@ -13,15 +13,16 @@
 
 // filters (custom select) interaction
 class Filter {
-    constructor(filter) {
+    constructor(filter, maxWidth) {
         this.filter = filter;
         this.icon = filter.querySelector('i.bi-chevron-down');
         this.options = Array.from(filter.querySelectorAll('li'));
         this.currentlySelected = filter.querySelector('span');
         this.active = false;
+        this.maxWidth = maxWidth
 
         // make sure label does not grow too long
-        parseFloat(window.getComputedStyle(this.currentlySelected).width) >= 74 ?
+        parseFloat(window.getComputedStyle(this.currentlySelected).width) >= this.maxWidth ?
         this.currentlySelected.innerText = this.currentlySelected.innerText.substring(0, 6) + '...' :
         this.currentlySelected.innerText.replace('...', '');
 
@@ -62,7 +63,7 @@ class Filter {
             document.removeEventListener('keydown', this.handleKeyboard);
         };
         // make sure label does not grow too long
-        parseFloat(window.getComputedStyle(this.currentlySelected).width) >= 74 ?
+        parseFloat(window.getComputedStyle(this.currentlySelected).width) >= this.maxWidth ?
         this.currentlySelected.innerText = this.currentlySelected.innerText.substring(0, 6) + '...' :
         this.currentlySelected.innerText.replace('...', '');
     };
@@ -111,5 +112,6 @@ class Filter {
     };
 };
 // initialise Filters
-const filters = document.querySelectorAll('.filter');
-filters.forEach(filter => new Filter(filter));
+const filters = Array.from(document.querySelectorAll('.filter')).filter(filter => !filter.classList.contains('review'));
+filters.forEach(filter => new Filter(filter, 74));
+new Filter(document.querySelector('.filter.review'), 100);

@@ -1,7 +1,8 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash, abort
+from flask import Blueprint, render_template, redirect, url_for, request, flash, abort, jsonify
 from flask_login import login_required, current_user
 from .roleDecorator import role_required
-from .models import Product
+from .models import Product, Review
+from .forms import AddReviewForm
 from . import db
 from math import ceil
 
@@ -34,13 +35,49 @@ def product_pagination():
   
   return render_template("/views/products.html", user=current_user, products=products, total_products=total_products, total_pages=total_pages, current_page=page, search_query=search_query)
 
-@productPagination.route('/product/<int:product_id>')
+@productPagination.route('/product/<int:product_id>', methods=['GET', 'POST'])
 def product_detail(product_id):
     # Query the database for the product
-    product = Product.query.get(product_id) 
+    product = Product.query.get_or_404(product_id) 
+    reviews = product.reviews
     if product is None:
        abort(404)
-    return render_template("/views/productPage.html", user=current_user, product=product)
+    
+    reviewForm = AddReviewForm()
+
+    return render_template("/views/productPage.html", user=current_user, product=product, form=reviewForm, reviews=reviews)
+
+@productPagination.route('/product/<int:product_id>/add-review', methods=['GET', 'POST'])
+@login_required
+@role_required(1, 2, 3)
+def add_review(product_id):
+    product = Product.query.get_or_404(product_id)
+    reviewForm = AddReviewForm()
+
+    if reviewForm.validate_on_submit():
+        # Create a new review object and save it to the database
+        new_review = Review(
+            rating=reviewForm.rating.data,
+            show_username = reviewForm.show_username.data,
+            description=reviewForm.description.data,
+            product_id=product.id,
+            user_id=current_user.id,
+        )
+        db.session.add(new_review)
+        db.session.commit()
+        
+        print(new_review.rating, new_review.show_username, new_review.description, new_review.product_id, new_review.user_id)
+
+        flash("Your review was added successfully!", "success")
+        
+    
+    # Return an error response if validation fails
+    if reviewForm.errors:
+        for error in reviewForm.errors:
+            print(error)
+        flash("There were errors.", "error")
+
+    return render_template("/views/productPage.html", user=current_user, product=product, form=reviewForm)
 
 @productPagination.route('/featured/specials')
 def product_specials():

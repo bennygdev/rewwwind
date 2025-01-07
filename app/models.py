@@ -19,14 +19,16 @@ class User(db.Model, UserMixin):
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)  # role table
     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
     updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
-    
-    orders = db.relationship('Order', backref='user', lazy=True) # otm order
+
+    # Relationship to Cart
+    cart_items = db.relationship('Cart', backref='cart_user', lazy=True)
+
 
     # Reset password methods
     def get_reset_token(self):
       s = Serializer(current_app.config['SECRET_KEY'])
       return s.dumps({'user_id': self.id})
-    
+
     @staticmethod
     def verify_reset_token(token, expires_sec=1800):
       s = Serializer(current_app.config['SECRET_KEY'])
@@ -34,7 +36,7 @@ class User(db.Model, UserMixin):
         user_id = s.loads(token, max_age=expires_sec)['user_id']
       except:
         return None
-      
+
       return User.query.get(user_id)
 
 class BillingAddress(db.Model):
@@ -68,6 +70,20 @@ class Role(db.Model):
     users = db.relationship('User', backref='role', lazy=True)  # otm
 
 
+# class Product(db.Model):
+#     __tablename__ = 'products'
+#     id = db.Column(db.Integer, primary_key=True)
+#     name = db.Column(db.String(200), nullable=False)
+#     description = db.Column(db.Text, nullable=True)
+#     price = db.Column(db.Numeric(10, 2), nullable=False)
+#     stock_quantity = db.Column(db.Integer, default=0)
+#     image_path = db.Column(db.String(300), nullable=True)
+#     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
+#     updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
+
+#     categories = db.relationship('Category', secondary='product_categories', lazy='subquery', backref=db.backref('products', lazy=True)) # mtm category
+#     order_items = db.relationship('OrderItem', backref='product', lazy=True) # otm orderitems
+
 class Product(db.Model):
     __tablename__ = 'products'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -79,11 +95,15 @@ class Product(db.Model):
     variants = db.Column(db.JSON, nullable=True)  # store variants (name, stock, price)
     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
     updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
-    
-    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False) 
+
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
     category = db.relationship('Category', backref='products', lazy=True)  # backref categories
-    
+
     order_items = db.relationship('OrderItem', backref='product', lazy=True)  # otm orderItem
+
+    cart_entries = db.relationship('Cart', backref='carted_product', lazy=True)
+
+
 
 
 class Order(db.Model):
@@ -93,13 +113,13 @@ class Order(db.Model):
     order_date = db.Column(db.DateTime(timezone=True), default=func.now())
     total_amount = db.Column(db.Numeric(10, 2), nullable=False)
     status = db.Column(db.String(50), default='Pending', nullable=False)
-    
+
     order_items = db.relationship('OrderItem', backref='order', lazy=True) # otm orderitems
 
 class OrderItem(db.Model):
     __tablename__ = 'order_items'
     id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False) 
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     unit_price = db.Column(db.Numeric(10, 2), nullable=False)
@@ -113,3 +133,19 @@ class ProductCategory(db.Model):
   __tablename__ = 'product_categories'
   product_id = db.Column(db.Integer, db.ForeignKey('products.id'), primary_key=True)
   category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), primary_key=True)
+
+
+class Cart(db.Model):
+    _tablename_ = 'cart'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
+    quantity = db.Column(db.Integer, default=1, nullable=False)
+
+    user = db.relationship('User', backref='cart_entries')  # Changed backref name to 'cart_entries'
+    product = db.relationship('Product', backref='cart_items')  # Product can appear in multiple carts
+
+
+
+
+

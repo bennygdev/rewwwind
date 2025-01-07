@@ -1,0 +1,73 @@
+{% extends "views/base.html" %}
+{% set active_page = "cart" %}
+
+{% block title %} Your Cart {% endblock %}
+
+{% block content %}
+<style>
+    .content {
+        padding: 80px 90px;
+    }
+</style>
+<h1>Your Cart</h1>
+
+    <!-- If the cart is empty -->
+    {% if not cart_items %}
+    <p>Your cart is empty! <a href="/products">Continue shopping</a>.</p>
+    {% else %}
+
+
+    <!-- Cart Table -->
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart_items %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>
+                    <form action="/update-cart/{{ item.product_id }}" method="POST">
+                        <input type="number" name="quantity" value="{{ item.quantity }}" min="1">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit">Update</button>
+                    </form>
+                </td>
+                <td>${{ item.product.price }}</td>
+                <td>${{ item.quantity * item.product.variants[0]['price'] }}</td>
+                <td>
+                    <form action="/remove-from-cart/{{ item.product_id }}" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="remove-btn">Remove</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Cart Summary -->
+    <div class="cart-summary">
+        <h3>Cart Total: ${{ cart_total }}</h3>
+        <a href="/checkout" class="btn btn-primary">Proceed to Checkout</a>
+    </div>
+
+    {%endif%}
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class="flash-messages">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+
+{% endblock %}

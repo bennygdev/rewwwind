@@ -21,6 +21,10 @@ class User(db.Model, UserMixin):
     updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
     
     orders = db.relationship('Order', backref='user', lazy=True) # otm order
+    # Relationship to Cart
+    cart_items = db.relationship('Cart', backref='cart_user', lazy=True)
+    def __repr__(self):
+        return f"<User id={self.id}, username={self.username}>"
 
     # Reset password methods
     def get_reset_token(self):
@@ -73,6 +77,12 @@ class Product(db.Model):
     
     order_items = db.relationship('OrderItem', backref='product', lazy=True)  # otm orderItem
 
+    cart_entries = db.relationship('Cart', backref='carted_product', lazy=True)
+
+    def __repr__(self):
+        return f"<Product id={self.id}, name={self.name}, price={self.price}>"
+
+
 
 class Order(db.Model):
     __tablename__ = 'orders'
@@ -101,3 +111,20 @@ class ProductCategory(db.Model):
   __tablename__ = 'product_categories'
   product_id = db.Column(db.Integer, db.ForeignKey('products.id'), primary_key=True)
   category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), primary_key=True)
+
+
+class Cart(db.Model):
+    __tablename__ = 'cart'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
+    quantity = db.Column(db.Integer, default=1, nullable=False)
+
+    user = db.relationship('User', backref='cart_entries')  # Changed backref name to 'cart_entries'
+    product = db.relationship('Product', backref='cart_items')  # Product can appear in multiple carts
+
+    def __repr__(self):
+        return f"<Cart id={self.id}, user_id={self.user_id}, product_id={self.product_id}, quantity={self.quantity}>"
+
+
+

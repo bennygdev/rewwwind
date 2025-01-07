@@ -86,6 +86,13 @@ def create_app():
 
   app.register_blueprint(productPagination, url_prefix="/products")
 
+  # Cart Pages
+  from .addToCart import addToCart
+
+
+  app.register_blueprint(addToCart, url_prefix="/")
+
+
   # Initialise Database
   from .models import User, Product, Role, Order, OrderItem, Category, ProductCategory
 
@@ -99,6 +106,10 @@ def create_app():
   @login_manager.user_loader
   def load_user(id):
     return User.query.get(int(id))
+
+  @app.context_processor
+  def inject_user():
+    return dict(user=current_user)
   
   # 404, 403, 401 handler
   @app.errorhandler(404)

@@ -81,10 +81,10 @@
         <div class="button__wrapper">
             {{ form.submit() }}
         </div>
+        {% block images_hidden %}
+        {% endblock %}
     </form>
 </div>
-{% block images_hidden %}
-{% endblock %}
 {% endblock %}
 
 {% block body_scripts %}

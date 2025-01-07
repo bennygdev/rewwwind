@@ -10,7 +10,7 @@
 
 <div class="listing__header">
   <div class="header__left">
-      <h1>Products</h1>
+      <h1>{% block h1 %}Products{% endblock %}</h1>
       <p>Showing <span class="productPerPage">{{ 16 * current_page - 15 }}</span> &minus; <span class="productPerPage">{{ 16 * current_page if 16 * current_page < total_products else total_products  }}</span> of {{ total_products }} results</p>
   </div>
   <div class="header__right">

@@ -41,3 +41,45 @@ def product_detail(product_id):
     if product is None:
        abort(404)
     return render_template("/views/productPage.html", user=current_user, product=product)
+
+@productPagination.route('/featured/specials')
+def product_specials():
+    page = request.args.get('page', 1, type=int)
+    per_page = 16
+
+    search_query = request.args.get('q', '', type=str)
+
+    products_query = Product.query.filter_by(is_featured_special=True)
+
+    if search_query:
+        products_query = products_query.filter(Product.name.ilike(f"%{search_query}%"))
+
+    total_products = products_query.count()
+
+    products = products_query.order_by(Product.id).paginate(page=page, per_page=per_page)
+
+    total_pages = ceil(total_products / per_page)
+
+
+    return render_template("/views/productSpecials.html", user=current_user, products=products, total_products=total_products, total_pages=total_pages, current_page=page)
+
+@productPagination.route('/featured/staff_picks')
+def product_staff():
+    page = request.args.get('page', 1, type=int)
+    per_page = 16
+
+    search_query = request.args.get('q', '', type=str)
+
+    products_query = Product.query.filter_by(is_featured_staff=True)
+
+    if search_query:
+        products_query = products_query.filter(Product.name.ilike(f"%{search_query}%"))
+
+    total_products = products_query.count()
+
+    products = products_query.order_by(Product.id).paginate(page=page, per_page=per_page)
+
+    total_pages = ceil(total_products / per_page)
+
+
+    return render_template("/views/productStaff.html", user=current_user, products=products, total_products=total_products, total_pages=total_pages, current_page=page)

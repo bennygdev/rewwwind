@@ -2,6 +2,7 @@ from werkzeug.utils import secure_filename
 from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
 from flask_login import login_required, current_user
 from sqlalchemy import func
+from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.dialects.postgresql import JSON
 from .roleDecorator import role_required
 from .forms import AddProductForm, DeleteProductForm #, EditProductForm
@@ -71,7 +72,6 @@ def add_product():
     if form.validate_on_submit():
         try:
             # Extract form data
-            print(form.data)
             productName = form.productName.data
             productCreator = form.productCreator.data
             productDescription = form.productDescription.data
@@ -156,11 +156,8 @@ def update_product(product_id):
                 'stock': variant['stock'],
                 'price': variant['price']
             })
-        
-        if product.images:
-            print(product.images)
-        else:
-            flash('No images were uploaded.', "update_images_false")
+        # if not product.images:
+        #     print('No images were uploaded.')
 
     if form.validate_on_submit():  # Handle POST request
         try:
@@ -170,28 +167,35 @@ def update_product(product_id):
             product.description = form.productDescription.data
             product.variants = form.productConditions.data
             product.category_id = form.productType.data
-            product.image_thumbnail = form.productThumbnail.data
             product.is_featured_special = form.productIsFeaturedSpecial.data
             product.is_featured_staff = form.productIsFeaturedStaff.data
 
             # Handle file uploads
             files = request.files.getlist('productImages')
+            
             uploaded_file_paths = []
             upload_folder = current_app.config['UPLOAD_FOLDER']
             for file in files:
                 if file:
+                    file.seek(0)  # Ensure we're at the start of the file
                     file_path = os.path.join(upload_folder, secure_filename(file.filename))
                     file.save(file_path)
                     uploaded_file_paths.append(f"media/uploads/{secure_filename(file.filename)}")
             
+            product.images = [img for img in product.images if img in form.images.data.split(',')]
+
             if uploaded_file_paths:
-                product.images.extend(uploaded_file_paths)  # Assuming product has an `images` attribute
-            print(vars(product))
+                product.images.extend(uploaded_file_paths)
+                flag_modified(product, 'images')
+            
+            product.image_thumbnail = product.images[int(form.productThumbnail.data)]
+
+            # print(vars(product))
             
             # Commit changes
             db.session.commit()
             flash("The product has been updated successfully.", "success")
-            return redirect(url_for('manageProducts.products_listing'))
+            return jsonify({'success': True, 'message': 'Product updated successfully!'})
 
         except Exception as e:
             db.session.rollback()  # Rollback on error

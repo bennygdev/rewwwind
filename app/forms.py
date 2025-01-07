@@ -89,6 +89,8 @@ class AddProductForm(FlaskForm):
   productIsFeaturedSpecial = BooleanField()
   productIsFeaturedStaff = BooleanField()
   productConditions = FieldList(FormField(ConditionForm), min_entries=1)
+
+  images = HiddenField('images') # purely for update product
   
   submit = SubmitField('Add Product')
 
@@ -115,7 +117,7 @@ class AddProductForm(FlaskForm):
   # validating images
   def validate_productImages(self, field):
     for file in field.data:
-        if file:
+        if file and not isinstance(file, str):
           # Check mime type and extension
           mime_type, _ = guess_type(file.filename)
           extension = secure_filename(file.filename).split('.')[-1].lower()

@@ -4,5 +4,5 @@
 {% block h1 %}Update Product <span id="getIdHere">{{ product.id }}</span>{% endblock %}
 
 {% block images_hidden %}
-<input id="images" type="hidden" images="{{ product.images }}">
+{{ form.images(images=product.images) }}
 {% endblock %}

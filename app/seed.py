@@ -69,8 +69,12 @@ def insert_users():
 
 
 def insert_categories():
-    category1 = Category(category_name="Music")
-    db.session.add(category1)
+    dummies = []
+    category1 = Category(category_name="Vinyl")
+    category2 = Category(category_name="Book")
+    dummies.extend([category1, category2])
+    for dummy in dummies:
+       db.session.add(dummy)
     db.session.commit()
     print('Inserted categories.')
 
@@ -80,36 +84,40 @@ def add_products():
                 name='dummy 1',
                 creator='dummy 1',
                 image_thumbnail="media/uploads/dummy1.jpg",
+                images=['media/uploads/dummy1.jpg'],
                 description=lorem,
                 variants=[{'condition': 1, 'price': 100, 'stock': 1}],
                 is_featured_special = True,
                 is_featured_staff = True,
-                category_id=1
+                category_id=2
             )
     dummy2 = Product(
                 name='dummy 2',
                 creator='dummy 2',
                 image_thumbnail="media/uploads/dummy2.jpg",
+                images=['media/uploads/dummy2.jpg'],
                 description=lorem,
                 variants=[{'condition': 1, 'price': 10, 'stock': 20}],
                 is_featured_special = True,
                 is_featured_staff = True,
-                category_id=1
+                category_id=2
             )
     dummy3 = Product(
                 name='dummy 3',
                 creator='dummy 3',
                 image_thumbnail="media/uploads/dummy3.jpeg",
+                images=['media/uploads/dummy3.jpeg'],
                 description=lorem,
                 variants=[{'condition': 1, 'price': 20, 'stock': 5}],
                 is_featured_special = True,
                 is_featured_staff = True,
-                category_id=1
+                category_id=2
             )
     dummy4 = Product(
                 name='dummy 4',
                 creator='dummy 4',
                 image_thumbnail="media/uploads/dummy4.jpeg",
+                images=['media/uploads/dummy4.jpeg'],
                 description=lorem,
                 variants=[{'condition': 1, 'price': 50, 'stock': 10}],
                 is_featured_special = True,
@@ -123,6 +131,7 @@ def add_products():
                   name='dummy 5',
                   creator='dummy 5',
                   image_thumbnail="media/uploads/dummy5.png",
+                  images=['media/uploads/dummy5.png'],
                   description=lorem,
                   variants=[{'condition': 1, 'price': 20, 'stock': 200}],
                   is_featured_special = False,

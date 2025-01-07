@@ -15,7 +15,7 @@
   <div class="products">
     {% for product in max_special %}
     <div class="product">
-      <a href="/products/product/{{ product.id }}">
+      <a href="{{ url_for('productPagination.product_detail', product_id = product.id) }}">
         <div class="thumbnail">
           <img src="{{ url_for('static', filename=product.image_thumbnail) }}" alt="{{ product.name }}"/>
         </div>
@@ -30,7 +30,7 @@
     {% endfor %}
   </div>
   <div class="view_more">
-    <a href="/products/featured/specials">View All</a>
+    <a href="{{ url_for('productPagination.product_specials') }}">View All</a>
   </div>
 </div>
 <div class="products__new featured">
@@ -41,7 +41,7 @@
       <div class="products carousel-track">
         {% for product in max_new %}
         <div class="product">
-          <a href="/products/product/{{ product.id }}">
+          <a href="{{ url_for('productPagination.product_detail', product_id = product.id) }}">
             <div class="thumbnail">
               <img src="{{ url_for('static', filename=product.image_thumbnail) }}" alt="{{ product.name }}" />
             </div>
@@ -69,7 +69,7 @@
   <div class="products">
     {% for product in max_special[:3] %} <!-- i'll add another condition for staff_picks later -->
     <div class="product">
-      <a href="products/product/{{ product.id }}">
+      <a href="{{ url_for('productPagination.product_detail', product_id = product.id) }}">
         <div class="thumbnail">
           <img src="{{ url_for('static', filename=product.image_thumbnail) }}" alt="{{ product.name }}" />
         </div>
@@ -88,7 +88,7 @@
     {% endfor %}
   </div>
   <div class="view_more">
-    <a href="products/featured/staff_picks">View All</a>
+    <a href="{{ url_for('productPagination.product_staff') }}">View All</a>
   </div>
 </div>
 <div class="discover featured"> <!-- if we're gonna colour-code categories i'll find other images -->

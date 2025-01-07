@@ -45,8 +45,7 @@ class Form {
                 flashContainer.innerHTML = '';
 
                 if (result.success) {
-                    this.displayFlashMessage(result.message, 'success');
-                    window.location.href = '../manage-products';
+                    result.message.includes('add') ? window.location.href = '../manage-products' : window.location.href = '../../manage-products'
                 } else {
                     this.displayFlashMessage(result.message, 'error');
                     this.resetForm();
@@ -101,10 +100,8 @@ class ImageHandler extends Form {
     initImageHandling() {
         if (this.update) {
             const images = document.getElementById('images').getAttribute('images').replace('[', '').replace(']', '').replaceAll(" ", "").replaceAll("'", "").split(',')
-            this.fileList = images;
-            this.updateVisibleImages();
+            images.forEach(image => this.processFiles(image));
             this.update = !this.update;
-            console.log(this.update)
         }
 
         if (this.fileInput) {
@@ -215,6 +212,8 @@ class ImageHandler extends Form {
             this.fileListDisplay.appendChild(fileItem);
     
             fileItem.addEventListener('click', () => this.setThumbnail(fileItem, fileItem.querySelector('img').src, index));
+
+            if (document.getElementById('images')) {document.getElementById('images').value = this.fileList};
         });
     }
 
@@ -383,6 +382,8 @@ class ConditionHandler extends ImageHandler {
         return formData;
     }
 }
+
+document.getElementById('images').remove()
 
 window.location.href.includes('/manage-products/add-product') ?
 new ConditionHandler('productImages', 'form', '/dashboard/manage-products/add-product', false) :

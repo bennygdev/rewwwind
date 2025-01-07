@@ -7,6 +7,9 @@ from flask_mail import Mail
 from dotenv import load_dotenv
 import os
 from authlib.integrations.flask_client import OAuth
+from flask_migrate import Migrate
+
+migrate = Migrate()
 
 db = SQLAlchemy()
 DB_NAME = "database.db"
@@ -34,11 +37,15 @@ def create_app():
   app.config['OAUTH2_CLIENT_SECRET'] = os.getenv('GOOGLE_CLIENT_SECRET')
   app.config['OAUTH2_META_URL'] = 'https://accounts.google.com/.well-known/openid-configuration'
 
+
   mail = Mail(app)
 
   db.init_app(app)
   csrf.init_app(app)
   mail.init_app(app)
+
+  migrate.init_app(app, db)  # Initialize Flask-Migrate
+
 
   # Google oAuth setup
   # oauth = OAuth(app)
@@ -66,6 +73,11 @@ def create_app():
   from .auth import auth
   app.register_blueprint(auth, url_prefix="/")
 
+  # Chatbot API
+  from .chatbot import chatbot
+
+  app.register_blueprint(chatbot, url_prefix="/")
+
   # Dashboard pages
   from .dashboard import dashboard
   from .manageOrders import manageOrders
@@ -88,6 +100,13 @@ def create_app():
 
   app.register_blueprint(productPagination, url_prefix="/products")
 
+  # Cart Pages
+  from .addToCart import addToCart
+
+
+  app.register_blueprint(addToCart, url_prefix="/")
+
+
   # Initialise Database
   from .models import User, Product, Role, Order, OrderItem, Category, ProductCategory
 
@@ -101,6 +120,10 @@ def create_app():
   @login_manager.user_loader
   def load_user(id):
     return User.query.get(int(id))
+
+  @app.context_processor
+  def inject_user():
+    return dict(user=current_user)
   
   # 404, 403, 401 handler
   @app.errorhandler(404)

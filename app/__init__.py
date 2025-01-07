@@ -66,6 +66,11 @@ def create_app():
   from .auth import auth
   app.register_blueprint(auth, url_prefix="/")
 
+  # Chatbot API
+  from .chatbot import chatbot
+
+  app.register_blueprint(chatbot, url_prefix="/")
+
   # Dashboard pages
   from .dashboard import dashboard
   from .manageOrders import manageOrders

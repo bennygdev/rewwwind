@@ -6,12 +6,7 @@ const chatbotWrapper = document.querySelector('.chatbot__wrapper');
 const chatbotHeaderCloseBtn = document.querySelector('.chatbot header span') ;
 
 let userMessage;
-
-// vanilla js doesn't have dotenv, so flask is needed
-const GEMINI_API_KEY = "AIzaSyBg2iS-gjeFujlOCrNIWQIBiMXR4fAriFE";
 const inputInitHeight = chatInput.scrollHeight;
-
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`
 
 const createChatLi = (message, className) => {
   // create a chat li element with passed message and classname
@@ -24,30 +19,30 @@ const createChatLi = (message, className) => {
   return chatLi;
 }
 
-// Gemini AI here for now, may move it to flask backend
 const generateResponse = async (incomingChatLi) => {
-  const messageElement = incomingChatLi.querySelector("p")
+  const messageElement = incomingChatLi.querySelector("p");
 
-  // post request
   try {
-    const response = await fetch(API_URL, {
+    const response = await fetch('/api/chat', { // gemini api endpoint
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "X-CSRFToken": document.querySelector('meta[name="csrf-token"]')?.content
+      },
       body: JSON.stringify({
-        contents: [{
-          parts: [{ text: userMessage }]
-        }]
+        message: userMessage
       })
     });
 
     const data = await response.json();
-    const apiResponse = data?.candidates[0].content.parts[0].text;
-
-    console.log(apiResponse)
-    messageElement.textContent = apiResponse
+      
+    if (response.ok) {
+      messageElement.textContent = data.response;
+    } else {
+      throw new Error(data.error || 'Failed to get response');
+    }
   } catch (error) {
-    console.log(error);
-    // console.log('Message element:', messageElement);
+    console.error(error);
     messageElement.classList.add("error");
     messageElement.textContent = "Oops! Something went wrong. Please try again.";
   } finally {

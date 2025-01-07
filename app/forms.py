@@ -64,6 +64,14 @@ class OwnerAddAccountForm(FlaskForm):
   role_id = IntegerField('Role ID', validators=[DataRequired()])
   submit = SubmitField('Create Account')
 
+class BillingAddressForm(FlaskForm):
+  address_one = StringField('Address One', validators=[DataRequired()])
+  address_two = StringField('Address Two')
+  unit_number = StringField('Unit Number', validators=[DataRequired(), Length(max=15)])
+  postal_code = IntegerField('Postal Code', validators=[DataRequired(), NumberRange(min=1, max=999999)])
+  phone_number = IntegerField('Phone Number', validators=[DataRequired(), NumberRange(min=60000000, max=99999999)])
+  submit = SubmitField('Save')
+
 # New product forms
 class ConditionForm(FlaskForm): # specific conditions to be listed in the AddProductForm
   condition = SelectField('Condition', validators=[DataRequired()])
@@ -120,6 +128,8 @@ class AddProductForm(FlaskForm):
               image.verify()
           except (IOError, SyntaxError):
               raise ValidationError('The image file could not be submitted. Please check if the image file is corrupted, and submit a different file if so.')
+          
+
 
 class DeleteProductForm(FlaskForm):
   productID = HiddenField()

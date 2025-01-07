@@ -10,11 +10,6 @@
 {% block content %}
 
 <h1>Update payment information</h1>
-{% include "components/backButton.html" %}
-
-<script
-  type="text/javascript"
-  src="{{ url_for('static', filename='js/backButton.js') }}"
-></script>
+<a href="{{ url_for('dashboard.user_settings') }}" class="back__button--darker">Back</a>
 
 {% endblock %}

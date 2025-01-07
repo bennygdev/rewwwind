@@ -49,7 +49,7 @@
 
 {% block content %}
 
-{% include "components/backButton.html" %}
+<a href="{{ url_for('manageAccounts.accounts_listing') }}" class="back__button--darker">Back</a>
 
 <h2 id="personal__header">Personal Information</h2>
 
@@ -115,11 +115,7 @@
 
 <script
   type="text/javascript"
-  src="{{ url_for('static', filename='js/deleteAccount.js') }}"
-></script>
-<script
-  type="text/javascript"
-  src="{{ url_for('static', filename='js/backButton.js') }}"
+  src="{{ url_for('static', filename='js/deleteModal.js') }}"
 ></script>
 
 {% endblock %}

@@ -1,7 +1,7 @@
 let currentFormId = null;
 
-function openDeleteModal(accountId) {
-  currentFormId = `deleteForm-${accountId}`;
+function openDeleteModal(id) {
+  currentFormId = `deleteForm-${id}`;
   toggleModal();
 }
 

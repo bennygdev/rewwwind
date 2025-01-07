@@ -2,19 +2,119 @@
 {% set active_page = "settings" %}
 
 {% block styles %}
-
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/settings/updateBillingAddress.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard/accounts/deleteModal.css') }}">
 {% endblock %}
 
 {% block title %}Update Billing Address{% endblock %}
 
+{% block headerContent %}
+<div class="billing__header">
+  <h1 id="billing__title">Update Billing Address</h1>
+  <p id="billing__subtitles">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</p>
+</div>
+{% endblock %}
+
 {% block content %}
 
-<h1>Update billing address</h1>
-{% include "components/backButton.html" %}
+<!-- Flash validation -->
+{% include "components/flashValidation.html" %}
+
+<!-- Back button -->
+<a href="{{ url_for('dashboard.user_settings') }}" class="back__button--darker">Back</a>
+
+{% if billing_addresses %}
+  {% for address in billing_addresses %}
+  <div class="billing__content">
+    <div class="billing__left">
+      <h2>Billing Address #{{ loop.index }}</h2>
+
+      <!-- hide when editing -->
+      <div class="billing__details" id="details{{ address.id }}">
+        <div class="billing__addressOne">
+          <h3>Address One</h3>
+          {{ address.address_one }}
+        </div>
+        <div class="billing__addressTwo">
+          <h3>Address Two</h3>
+          {{ address.address_two or 'N/A' }}
+        </div>
+        <div class="billing__unitNumber">
+          <h3>Unit Number</h3>
+          {{ address.unit_number }}
+        </div>
+        <div class="billing__postalCode">
+          <h3>Postal Code</h3>
+          {{ address.postal_code }}
+        </div>
+        <div class="billing__phoneNumber">
+          <h3>Phone Number</h3>
+          {{ address.phone_number }}
+        </div>
+      </div>
+
+      <!-- editable Form (hidden by Default) -->
+      <form method="POST" class="editBilling__form" id="editForm{{ address.id }}" style="display: none;">
+        {{ form.hidden_tag() }}
+        <input type="hidden" name="billing_id" value="{{ address.id }}">
+        
+        <div class="billing__editAddressOne">
+          {{ form.address_one.label }} 
+          {{ form.address_one(class="form-control", value=address.address_one) }}
+        </div>
+        <div class="billing__editAddressTwo">
+          {{ form.address_two.label }} 
+          {{ form.address_two(class="form-control", value=address.address_two) }}
+        </div>
+        <div class="billing__addressRow">
+          <div class="billing__editUnitNumber">
+            {{ form.unit_number.label }} 
+            {{ form.unit_number(class="form-control", value=address.unit_number) }}
+          </div>
+          <div class="billing__editPostalCode">
+            {{ form.postal_code.label }} 
+            {{ form.postal_code(class="form-control", value=address.postal_code) }}
+          </div>
+        </div>
+        <div class="billing__editPhoneNumber">
+          {{ form.phone_number.label }} 
+          {{ form.phone_number(class="form-control", value=address.phone_number) }}
+        </div>
+      </form>
+    </div>
+
+    <div class="billing__right">
+      <button class="billing__editButton" id="editButton{{ address.id }}" onclick="toggleEditForm({{ address.id }})"><i class="fa-solid fa-pen"></i>Edit</button>
+
+      <!-- hidden by default -->
+      <div class="button-group" id="buttonGroup{{ address.id }}" style="display: none;">
+        <button type="submit" class="billing__saveButton" form="editForm{{ address.id }}">Save</button>
+        <button type="button" class="billing__cancelButton" onclick="toggleEditForm({{ address.id }})">Cancel</button>
+      </div>
+
+      <form id="deleteForm-{{ address.id }}" action="{{ url_for('dashboard.delete_billing', id=address.id) }}" method="POST" onsubmit="event.preventDefault(); openDeleteModal({{ address.id }})">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="button" class="billing__deleteButton" id="deleteButton{{ address.id }}" onclick="openDeleteModal({{ address.id }})">Delete</button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <p>No billing addresses found.</p>
+{% endif %}
+<!-- include add button here -->
+<a href="{{ url_for('dashboard.add_billing_address') }}" class="billing__addButton"><i class="fa-solid fa-plus fa-lg"></i>Add</a>
+
+<!-- modal -->
+{% include "components/deleteModal.html" %}
 
 <script
   type="text/javascript"
-  src="{{ url_for('static', filename='js/backButton.js') }}"
+  src="{{ url_for('static', filename='js/dashboard/settings/editBilling.js') }}"
+></script>
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/deleteModal.js') }}"
 ></script>
 
 {% endblock %}

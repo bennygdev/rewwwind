@@ -1,0 +1,50 @@
+{% extends "dashboard/base.html" %}
+{% set active_page = "settings" %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/settings/updateBillingAddress.css') }}">
+{% endblock %}
+
+{% block title %}Add Billing Address{% endblock %}
+
+{% block content %}
+
+<h1>Add Billing Address</h1>
+<a href="{{ url_for('dashboard.update_billing_address') }}" class="back__button--darker">Back</a>
+
+<form method="POST" class="addBilling__form">
+  {{ form.hidden_tag() }}
+
+  <!-- Flash validation -->
+  {% include "components/flashValidation.html" %}
+  
+  <div class="addBilling__addressOne">
+    {{ form.address_one.label }}
+    {{ form.address_one(class="form-control") }}
+  </div>
+  <div class="addBilling__addressTwo">
+    {{ form.address_two.label }}
+    {{ form.address_two(class="form-control") }}
+  </div>
+  <div class="addBilling__addressRow">
+    <div class="addBilling__unitNumber">
+      {{ form.unit_number.label }}
+      {{ form.unit_number(class="form-control") }}
+    </div>
+    <div class="addBilling__postalCode">
+      {{ form.postal_code.label }}
+      {{ form.postal_code(class="form-control") }}
+    </div>
+  </div>
+  <div class="addBilling__phoneNumber">
+    {{ form.phone_number.label }}
+    {{ form.phone_number(class="form-control") }}
+  </div>
+  
+  <div class="button__wrapper">
+    {{ form.submit(class="addBilling__button") }}
+  </div>
+</form>
+
+{% endblock %}
+

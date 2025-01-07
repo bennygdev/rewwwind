@@ -39,11 +39,36 @@ class User(db.Model, UserMixin):
 
       return User.query.get(user_id)
 
+class BillingAddress(db.Model):
+  __tablename__ = 'billing_addresses'
+  id = db.Column(db.Integer, primary_key=True)
+  user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+  address_one = db.Column(db.String(255), nullable=False)
+  address_two = db.Column(db.String(255), nullable=True)  # Optional
+  unit_number = db.Column(db.String(15), nullable=False)
+  postal_code = db.Column(db.String(20), nullable=False)
+  phone_number = db.Column(db.String(20), nullable=False)
+  created_at = db.Column(db.DateTime(timezone=True), default=func.now())
+  updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
+
+class PaymentInformation(db.Model):
+  __tablename__ = 'payment_information'
+  id = db.Column(db.Integer, primary_key=True)
+  user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+  payment_type = db.Column(db.String(20), nullable=False)
+  card_number = db.Column(db.String(16), nullable=False) # store as string since leading zeros
+  card_name = db.Column(db.String(255), nullable=False)
+  expiry_date = db.Column(db.Date, nullable=False)
+  card_cvv = db.Column(db.String(3), nullable=False) # store as string since leading zeros
+  created_at = db.Column(db.DateTime(timezone=True), default=func.now())
+  updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
+
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
     role_name = db.Column(db.String(50), unique=True, nullable=False)
     users = db.relationship('User', backref='role', lazy=True)  # otm
+
 
 # class Product(db.Model):
 #     __tablename__ = 'products'
@@ -58,6 +83,7 @@ class Role(db.Model):
 
 #     categories = db.relationship('Category', secondary='product_categories', lazy='subquery', backref=db.backref('products', lazy=True)) # mtm category
 #     order_items = db.relationship('OrderItem', backref='product', lazy=True) # otm orderitems
+
 class Product(db.Model):
     __tablename__ = 'products'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

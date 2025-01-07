@@ -1,7 +1,9 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash
+from flask import Blueprint, render_template, redirect, url_for, request, flash, abort
 from flask_login import login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 from .roleDecorator import role_required
 from .models import User
+from .forms import AdminChangeUserInfoForm, ChangePasswordForm, OwnerAddAccountForm
 from . import db
 from datetime import datetime, timedelta
 from math import ceil
@@ -46,13 +48,207 @@ def accounts_listing():
 
   return render_template("dashboard/manageAccounts/accounts.html", user=current_user, totalUsers=totalUsers, newUsers=newUsers, onlineCount=onlineCount, accounts=accounts, total_pages=total_pages, current_page=page, search_query=search_query)
 
-# @manageAccounts.route('/account-details')
-# @login_required
-# @role_required(2, 3)
-# def account_details():
+@manageAccounts.route('/account-details/<int:id>')
+@login_required
+@role_required(2, 3)
+def account_details(id):
+  selectedUser = User.query.get_or_404(id)
 
-@manageAccounts.route('/add-admin-account')
+  # admin cannot view admin and owner accounts, but owner can view any
+  if current_user.role_id == 2: 
+    if selectedUser.role_id in [2, 3]:
+      abort(404)
+
+  # admin can only view customer accounts
+  if current_user.role_id == 1: # restrict customer functions
+    abort(404)
+
+  formatted_created_at = selectedUser.created_at.strftime("%d %B %Y")
+
+  image_file = url_for('static', filename="profile_pics/" + selectedUser.image)
+
+  if selectedUser.image:
+    if selectedUser.image.startswith('http'):
+      image_file = selectedUser.image
+    else:
+      image_file = url_for('static', filename="profile_pics/" + selectedUser.image)
+  else:
+    image_file = url_for('static', filename='profile_pics/profile_image_default.jpg')
+
+  return render_template("dashboard/manageAccounts/account_details.html", user=current_user, selectedUser=selectedUser, formatted_created_at=formatted_created_at, image_file=image_file)
+
+@manageAccounts.route('/delete-account/<int:id>', methods=['GET', 'POST'])
+@login_required
+@role_required(2, 3)
+def delete_account(id):
+  selectedUser = User.query.get_or_404(id)
+
+  # admin cannot delete admin and owner accounts, but owner can delete any
+  if current_user.role_id == 2: 
+    if selectedUser.role_id in [2, 3]:
+      abort(404)
+
+  # owner cannot delete owner
+  if current_user.role_id == 3:
+    if selectedUser.role_id == 3:
+      abort(404)
+
+  # admin can only delete customer accounts
+  if current_user.role_id == 1: # restrict customer functions
+    abort(404)
+
+  db.session.delete(selectedUser)
+  db.session.commit()
+
+  flash("Account successfully deleted.", "info")
+  return redirect(url_for('manageAccounts.accounts_listing'))
+
+@manageAccounts.route('/edit-account/<int:id>', methods=['GET', 'POST'])
+@login_required
+@role_required(2, 3)
+def edit_account(id):
+  form = AdminChangeUserInfoForm()
+
+  selectedUser = User.query.get_or_404(id)
+
+  # admin cannot edit admin and owner accounts, but owner can edit any
+  if current_user.role_id == 2: 
+    if selectedUser.role_id in [2, 3]:
+      abort(404)
+
+  # owner cannot edit owner
+  if current_user.role_id == 3:
+    if selectedUser.role_id == 3:
+      abort(404)
+
+  # admin can only edit customer accounts
+  if current_user.role_id == 1: # restrict customer functions
+    abort(404)
+
+  if form.validate_on_submit():
+    
+    if form.username.data != selectedUser.username:
+      user = User.query.filter_by(username=form.username.data).first()
+      if user:
+        flash("That username is taken. Please choose another one.", "error")
+        return render_template("dashboard/manageAccounts/edit_account.html", user=current_user, form=form, selectedUser=selectedUser)
+      
+    if form.email.data != selectedUser.email:
+      user = User.query.filter_by(email=form.email.data).first()
+      if user:
+        flash("That email is taken. Please choose another one.", "error")
+        return render_template("dashboard/manageAccounts/edit_account.html", user=current_user, form=form, selectedUser=selectedUser)
+      
+    selectedUser.first_name = form.firstName.data
+    selectedUser.last_name = form.lastName.data
+    selectedUser.username = form.username.data
+    selectedUser.email = form.email.data
+    db.session.commit()
+    flash("Account has been updated.", 'success')
+    return redirect(url_for('manageAccounts.accounts_listing'))
+
+  elif request.method == 'GET':
+    form.firstName.data = selectedUser.first_name
+    form.lastName.data = selectedUser.last_name
+    form.username.data = selectedUser.username
+    form.email.data = selectedUser.email
+
+
+  return render_template("dashboard/manageAccounts/edit_account.html", user=current_user, form=form, selectedUser=selectedUser)
+
+@manageAccounts.route('/change-account-password/<int:id>', methods=['GET', 'POST'])
+@login_required
+@role_required(2, 3)
+def change_password(id):
+  form = ChangePasswordForm()
+
+  selectedUser = User.query.get_or_404(id)
+
+  # admin cannot change password for admin and owner accounts, but owner can edit any
+  if current_user.role_id == 2: 
+    if selectedUser.role_id in [2, 3]:
+      abort(404)
+
+  # owner cannot edit owner
+  if current_user.role_id == 3:
+    if selectedUser.role_id == 3:
+      abort(404)
+
+  # admin can only edit customer accounts
+  if current_user.role_id == 1: # restrict customer functions
+    abort(404)
+
+  if form.validate_on_submit():
+    if check_password_hash(selectedUser.password, form.password.data):
+      flash("New password cannot be the same as the previous password", "error")
+      return render_template("dashboard/manageAccounts/changePassword.html", user=current_user, form=form, selectedUser=selectedUser)
+    
+    # update
+    selectedUser.password = generate_password_hash(form.password.data, method='pbkdf2:sha256')
+    db.session.commit()
+    flash("Password updated successfully.", "success")
+    return redirect(url_for('manageAccounts.accounts_listing'))
+  
+  if form.confirmPassword.data != form.password.data:
+    flash("Both passwords must match.", "error")
+    return render_template("dashboard/manageAccounts/changePassword.html", user=current_user, form=form, selectedUser=selectedUser)
+  
+  if form.password.errors:
+    flash("Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.", "error")
+    return render_template("dashboard/manageAccounts/changePassword.html", user=current_user, form=form, selectedUser=selectedUser)
+
+  return render_template("dashboard/manageAccounts/changePassword.html", user=current_user, form=form, selectedUser=selectedUser)
+
+@manageAccounts.route('/add-any-account', methods=['GET', 'POST'])
 @login_required
 @role_required(3)
-def add_admin_account():
-  return render_template("dashboard/manageAccounts/add_admin_account.html", user=current_user)
+def add_any_account():
+  form = OwnerAddAccountForm()
+
+  if form.validate_on_submit():
+    first_name = form.firstName.data
+    last_name = form.lastName.data
+    username = form.username.data
+    email = form.email.data
+    password = form.password.data
+    role_id = form.role_id.data
+
+    # Check if the email already exists
+    email_exists = User.query.filter_by(email=email).first()
+    if email_exists:
+      flash('An account with that email already exists.', 'error')
+      return render_template("dashboard/manageAccounts/add_any_account.html", user=current_user, form=form)
+        
+    # Additional validation checks (already handled by WTForms)
+    if not first_name or not last_name:
+      flash('All fields are required.', 'error')
+      return render_template("dashboard/manageAccounts/add_any_account.html", user=current_user, form=form)
+    
+    username_exists = User.query.filter_by(username=form.username.data).first()
+    if username_exists:
+      flash('An account with that username already exists.', 'error')
+      return render_template("dashboard/manageAccounts/add_any_account.html", user=current_user, form=form)
+    
+    # add user to database
+    new_user = User(
+      first_name = first_name, 
+      last_name = last_name,
+      username = username,
+      email = email,
+      image = None,
+      password = generate_password_hash(password, method='pbkdf2:sha256'),
+      orderCount = 0,
+      role_id = role_id
+    )
+    db.session.add(new_user)
+    db.session.commit()
+    flash("Account created successfully.", "success")
+    return redirect(url_for('manageAccounts.accounts_listing'))
+
+  if form.role_id.errors:
+    flash("Please select a category.", "error")
+
+  if form.password.errors:
+    flash("Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.", "error")
+
+  return render_template("dashboard/manageAccounts/add_any_account.html", user=current_user, form=form)

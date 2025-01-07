@@ -17,6 +17,8 @@ csrf = CSRFProtect()
 mail = Mail()
 oauth = OAuth()
 
+load_dotenv()
+
 def create_app():
   app = Flask(__name__)
   app.config['SECRET_KEY'] = '123456789'
@@ -70,6 +72,11 @@ def create_app():
   # Authentication pages
   from .auth import auth
   app.register_blueprint(auth, url_prefix="/")
+
+  # Chatbot API
+  from .chatbot import chatbot
+
+  app.register_blueprint(chatbot, url_prefix="/")
 
   # Dashboard pages
   from .dashboard import dashboard

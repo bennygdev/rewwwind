@@ -48,6 +48,29 @@ class ChangePasswordForm(FlaskForm):
   confirmPassword = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message="Passwords must match")])
   submit = SubmitField('Save')
 
+class AdminChangeUserInfoForm(FlaskForm):
+  firstName = StringField('First Name', validators=[DataRequired()])
+  lastName = StringField('Last Name')
+  username = StringField('Username', validators=[DataRequired(), Length(max=15)])
+  email = EmailField('Email', validators=[DataRequired(), Email()])
+  submit = SubmitField('Update')
+
+class OwnerAddAccountForm(FlaskForm):
+  firstName = StringField('First Name', validators=[DataRequired()])
+  lastName = StringField('Last Name', validators=[DataRequired()])
+  username = StringField('Username', validators=[DataRequired(), Length(max=15)])
+  email = EmailField('Email', validators=[DataRequired(), Email()])
+  password = PasswordField('Password', validators=[DataRequired(), Length(min=8), Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", message="Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.")])
+  role_id = IntegerField('Role ID', validators=[DataRequired()])
+  submit = SubmitField('Create Account')
+
+class BillingAddressForm(FlaskForm):
+  address_one = StringField('Address One', validators=[DataRequired()])
+  address_two = StringField('Address Two')
+  unit_number = StringField('Unit Number', validators=[DataRequired(), Length(max=15)])
+  postal_code = IntegerField('Postal Code', validators=[DataRequired(), NumberRange(min=1, max=999999)])
+  phone_number = IntegerField('Phone Number', validators=[DataRequired(), NumberRange(min=60000000, max=99999999)])
+  submit = SubmitField('Save')
 
 # New product forms
 class ConditionForm(FlaskForm): # specific conditions to be listed in the AddProductForm
@@ -103,6 +126,8 @@ class AddProductForm(FlaskForm):
               image.verify()
           except (IOError, SyntaxError):
               raise ValidationError('The image file could not be submitted. Please check if the image file is corrupted, and submit a different file if so.')
+          
+
 
 class DeleteProductForm(FlaskForm):
   productID = HiddenField()

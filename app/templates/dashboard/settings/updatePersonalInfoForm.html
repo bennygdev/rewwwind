@@ -10,37 +10,15 @@
 {% block content %}
 
 <h1>Update personal information</h1>
-<a href="/dashboard/update-personal-information" class="back__button--darker">Back</a>
+<a href="{{ url_for('dashboard.update_personal_information') }}" class="back__button--darker">Back</a>
 
 <form method="POST" class="updateInfo__form" enctype="multipart/form-data">
   {{ form.hidden_tag() }}
 
   <input type="hidden" name="remove_image" id="remove_image" value="">
 
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="flash-messages">
-        {% for category, message in messages %}
-          {% if category == 'error' %}
-          <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-          {% elif category == 'info' %}
-          <div class="alert alert-primary alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-          {% elif category == 'success'  %}
-          <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-          {% endif %}
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
+  <!-- Flash validation -->
+  {% include "components/flashValidation.html" %}
   
   <div class="updateInfo__name">
     <div class="updateInfo__firstName">
@@ -94,7 +72,7 @@
 
 <script
   type="text/javascript"
-  src="{{ url_for('static', filename='js/previewImage.js') }}"
+  src="{{ url_for('static', filename='js/dashboard/settings/previewImage.js') }}"
 ></script>
 
 {% endblock %}

@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
 from flask_login import login_required, current_user
-from .forms import UpdatePersonalInformation, ChangePasswordForm
-from .models import User
+from .forms import UpdatePersonalInformation, ChangePasswordForm, BillingAddressForm
+from .models import User, BillingAddress
 from .roleDecorator import role_required
 from . import db
 import secrets
@@ -160,14 +160,74 @@ def change_password():
 
   return render_template('dashboard/settings/changePassword.html', user=current_user, form=form)
   
-@dashboard.route('/update-billing-address')
+@dashboard.route('/update-billing-address', methods=['GET', 'POST'])
 @login_required
 @role_required(1, 2, 3)
 def update_billing_address():
-  return render_template("dashboard/settings/updateBillingAddress.html", user=current_user)
+  form = BillingAddressForm()
+  billing_addresses = BillingAddress.query.filter_by(user_id=current_user.id).all()
+
+  if form.validate_on_submit():
+    billing_id = request.form.get('billing_id')  # get billing id from hidden field
+    billing_address = BillingAddress.query.get(billing_id)
+        
+    if billing_address and billing_address.user_id == current_user.id:
+      billing_address.address_one = form.address_one.data
+      billing_address.address_two = form.address_two.data
+      billing_address.unit_number = form.unit_number.data
+      billing_address.postal_code = form.postal_code.data
+      billing_address.phone_number = form.phone_number.data
+            
+      db.session.commit()
+      flash("Billing address updated successfully!", "success")
+    else:
+      flash("Invalid billing address or unauthorized access.", "error")
+        
+    return redirect(url_for('dashboard.update_billing_address'))
+
+  return render_template("dashboard/settings/updateBillingAddress.html", user=current_user, billing_addresses=billing_addresses, form=form)
+
+@dashboard.route('/add-billing-address', methods=['GET', 'POST'])
+@login_required
+@role_required(1, 2, 3)
+def add_billing_address():
+  form = BillingAddressForm()
+
+  if form.validate_on_submit():
+    billing_address = BillingAddress(
+      user_id = current_user.id,
+      address_one = form.address_one.data,
+      address_two = form.address_two.data,
+      unit_number = form.unit_number.data,
+      postal_code = form.postal_code.data,
+      phone_number = form.phone_number.data
+    )
+
+    db.session.add(billing_address)
+    db.session.commit()
+    flash("Billing address added!", "success")
+    return redirect(url_for('dashboard.update_billing_address'))
+
+
+  return render_template("dashboard/settings/addBillingAddress.html", user=current_user, form=form)
 
 @dashboard.route('/update-payment-information')
 @login_required
 @role_required(1, 2, 3)
 def update_payment_information():
   return render_template("dashboard/settings/updatePaymentInfo.html", user=current_user)
+
+@dashboard.route('/delete-billing/<int:id>', methods=['GET', 'POST'])
+@login_required
+@role_required(1, 2, 3)
+def delete_billing(id):
+  billing_address = BillingAddress.query.get_or_404(id)
+
+  if billing_address and billing_address.user_id == current_user.id:
+    db.session.delete(billing_address)
+    db.session.commit()
+    flash("Billing address deleted.", "success")
+    return redirect(url_for('dashboard.update_billing_address'))
+  else:
+    flash("Invalid billing address or unauthorized access.", "error")
+    return redirect(url_for('dashboard.update_billing_address'))

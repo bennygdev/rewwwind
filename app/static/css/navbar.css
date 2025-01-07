@@ -238,7 +238,7 @@ img#mini_profile_img {
   border-bottom: none;
 }
 
-.nav__optionMenu--links li .nav__optionMenu--link:last-child:hover {
+.nav__optionMenu--links li:last-child:hover .nav__optionMenu--link {
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
 }

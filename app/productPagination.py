@@ -10,30 +10,44 @@ productPagination = Blueprint('productPagination', __name__)
 
 @productPagination.route('/')
 def product_pagination():
-  products = Product.query.all()
+    # Base query
+    products_query = Product.query
 
-  # count products
-  total_products = len(products)
+    # Search logic
+    search_query = request.args.get('q', '', type=str)
+    if search_query:
+        products_query = products_query.filter(Product.name.ilike(f"%{search_query}%"))
 
-  # pagination
-  page = request.args.get('page', 1, type=int)
-  per_page = 16
+    # Filter logic
+    type_filter = request.args.get('type', '', type=str)
+    genre_filter = request.args.get('genre', '', type=str)
 
-  # search logic
-  search_query = request.args.get('q', '', type=str)
+    if type_filter and type_filter != 'all':
+        products_query = products_query.filter(Product.type.ilike(f"%{type_filter}%"))  # Adjust based on your database schema
 
-  if search_query:
-      products_query = Product.query.filter(Product.name.ilike(f"%{search_query}%"))
-  else:
-      products_query = Product.query
+    if genre_filter and genre_filter != 'all':
+        products_query = products_query.filter(Product.genre.ilike(f"%{genre_filter}%"))  # Adjust based on your database schema
 
-  # pagination logic
-  total_products = products_query.count()
-  products = products_query.order_by(Product.id).paginate(page=page, per_page=per_page)
+    # Pagination logic
+    page = request.args.get('page', 1, type=int)
+    per_page = 16
+    total_products = products_query.count()
+    products = products_query.order_by(Product.id).paginate(page=page, per_page=per_page)
 
-  total_pages = ceil(total_products / per_page)
-  
-  return render_template("/views/products.html", user=current_user, products=products, total_products=total_products, total_pages=total_pages, current_page=page, search_query=search_query)
+    total_pages = ceil(total_products / per_page)
+
+    # Render the template
+    return render_template(
+        "/views/products.html",
+        user=current_user,
+        products=products,
+        total_products=total_products,
+        total_pages=total_pages,
+        current_page=page,
+        search_query=search_query,
+        type_filter=type_filter,
+        genre_filter=genre_filter
+    )
 
 @productPagination.route('/product/<int:product_id>', methods=['GET', 'POST'])
 def product_detail(product_id):

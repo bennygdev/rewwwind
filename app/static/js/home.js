@@ -88,3 +88,24 @@ document.addEventListener("DOMContentLoaded", function () {
         moveToSlide(0);
     });
 });
+
+function adjustText() {
+    console.log(true);
+    if (window.innerWidth > 1400) {
+        document.querySelectorAll('p.name').forEach(p => {
+            console.log(getComputedStyle(p).width)
+            if (parseFloat(getComputedStyle(p).width) >= 200) {
+                p.innerText = p.innerText.slice(0, 11).trim() + '...'; // not foolproof i'd assume, but will just leave it as is for now
+            }
+        })
+    } else {
+        document.querySelectorAll('p.name').forEach(p => {
+            if (parseFloat(getComputedStyle(p).width) >= 120) {
+                p.innerText = p.innerText.slice(0, 6).trim() + '...';
+            }
+        })
+    }
+}
+
+window.addEventListener('resize', adjustText);
+adjustText();

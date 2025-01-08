@@ -17,14 +17,14 @@
     <div class="product">
       <a href="{{ url_for('productPagination.product_detail', product_id = product.id) }}">
         <div class="thumbnail">
-          <img src="{{ url_for('static', filename=product.image_thumbnail) }}" alt="{{ product.name }}"/>
+          <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}"/>
         </div>
       </a>
       <div class="info">
         <p class="name">{{ product.name }}</p>
         <p class="creator">{{ product.creator }}</p>
         <p class="type">{{ product.category.category_name }}</p>
-        <p class="price">&dollar;{{ '{:.2f}'.format(product.variants[0].price) }}</p>
+        <p class="price">&dollar;{{ '{:.2f}'.format(product.conditions[0].price) }}</p>
       </div>
     </div>
     {% endfor %}
@@ -43,7 +43,7 @@
         <div class="product">
           <a href="{{ url_for('productPagination.product_detail', product_id = product.id) }}">
             <div class="thumbnail">
-              <img src="{{ url_for('static', filename=product.image_thumbnail) }}" alt="{{ product.name }}" />
+              <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}" />
             </div>
           </a>
           <div class="info">
@@ -52,7 +52,7 @@
               <p class="creator">{{ product.creator }}</p>
             </div>
             <div class="info__right">
-              <p class="price">&dollar;{{ '{:.2f}'.format(product.variants[0].price) }}</p>
+              <p class="price">&dollar;{{ '{:.2f}'.format(product.conditions[0].price) }}</p>
               <p class="type">{{ product.category.category_name }}</p>
             </div>
           </div>
@@ -71,7 +71,7 @@
     <div class="product">
       <a href="{{ url_for('productPagination.product_detail', product_id = product.id) }}">
         <div class="thumbnail">
-          <img src="{{ url_for('static', filename=product.image_thumbnail) }}" alt="{{ product.name }}" />
+          <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}" />
         </div>
       </a>
       <div class="info">
@@ -80,7 +80,7 @@
           <p class="creator">{{ product.creator }}</p>
         </div>
         <div class="info__right">
-          <p class="price">&dollar;{{ '{:.2f}'.format(product.variants[0].price) }}</p>
+          <p class="price">&dollar;{{ '{:.2f}'.format(product.conditions[0].price) }}</p>
           <p class="type">{{ product.category.category_name }}</p>
         </div>
       </div>
@@ -99,7 +99,7 @@
         <img src="{{ url_for('static', filename='media/discover__books.png') }}" alt="Books" />
       </div>
       <div class="description">
-        <p class="name">Books</p>
+        <p class="category_name">Books</p>
         <p class="sub">Stories and media to inspire you.</p>
       </div>
     </div>
@@ -108,7 +108,7 @@
         <img src="{{ url_for('static', filename='media/discover__vinyl.png') }}" alt="Vinyl" >
       </div>
       <div class="description">
-        <p class="name">Vinyl</p>
+        <p class="category_name">Vinyl</p>
         <p class="sub">Let the sonic intentions of yesterday&apos;s sounds move you.</p>
       </div>
     </div>
@@ -142,7 +142,6 @@
   </div>
 </div>
 {% endblock %}
-
 {% block body_scripts %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/home.js') }}"></script>
 {% endblock %}

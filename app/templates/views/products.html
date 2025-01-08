@@ -5,9 +5,7 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/pageInteractions/filters.css') }}">
 {% endblock %}
 {% block title %}Products{% endblock %}
-
 {% block content %}
-
 <div class="listing__header">
   <div class="header__left">
       <h1>{% block h1 %}Products{% endblock %}</h1>
@@ -67,21 +65,23 @@
   </div>
 </div>
 
+{% if products %}
+
 <div class="products">
   {% for product in products %}
   <div class="product">
-    <a href="product/{{ product.id }}">
+    <a href="{{ url_for('productPagination.product_detail', product_id = product.id) }}">
       <div class="thumbnail">
         <div class="rating">
-          {% if product.rating %} <!-- product.rating has not been set yet, please do so later -->
-            {% set rating = product.rating %}
+          {% if product.reviews %}
+            {% set rating = '{:.1f}'.format(product.reviews | map(attribute='rating') | sum / product.reviews | length) %}
           {% else %}
             {% set rating = "No rating yet" %}
           {% endif %}
           <span><i class="bi bi-star-fill"></i>&nbsp;{{ rating }}</span>
         </div>
         <div class="image">
-          <img src="{{ url_for('static', filename=product.image_thumbnail) }}" alt="{{ product.name }}"/>
+          <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}"/>
         </div>
         <div class="cart">
           <i class="fa-solid fa-cart-shopping fa-xl"></i>
@@ -90,11 +90,11 @@
     </a>
     <div class="info">
       <div class="info_left">
-        <h5>{{ product.name }}</h5>
+        <h5 class="name">{{ product.name }}</h5>
         <span>{{ product.creator }}</span>
       </div>
       <div class="info_right">
-        <h5>&dollar;{{ '{:.2f}'.format(product.variants[0].price) }}</h5>
+        <h5>&dollar;{{ '{:.2f}'.format(product.conditions[0].price) }}</h5>
         <span><i class="bi bi-short-fill"></i>&nbsp;{{ product.category.category_name }}</span>
       </div>
     </div>
@@ -116,6 +116,10 @@
       {% endif %}
   </ul>
 </div>
+
+{% else %}
+<h2>Sorry, no products were found with the given search queries or filters.</h2>
+{% endif %}
 {% endblock %}
 
 {% block body_scripts %}

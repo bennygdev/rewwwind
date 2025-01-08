@@ -4,7 +4,7 @@
     justify-content: center;
     align-items: center;
     gap: 50px;
-    margin: 80px 0;
+    margin-top: 80px;
 }
 
 /* banner */
@@ -101,6 +101,7 @@ h1 {
 }
 
 .products__special .info p.name {
+    font-weight: bold;
     font-size: 2em;
 }
 
@@ -175,6 +176,7 @@ h1 {
 }
 
 .products__new .info p:first-child {
+    font-weight: bold;
     font-size: 1.8em;
 }
 
@@ -272,6 +274,11 @@ h1 {
 }
 
 /* discover */
+.discover {
+    padding: 30px;
+    width: 100%;
+    background-color: #F5F5DC;
+}
 .discover .categories {
     width: 90vw;
     display: flex;
@@ -296,7 +303,7 @@ h1 {
     margin: 0;
 }
 
-.discover .category .description .name {
+.discover .category .description .category_name {
     font-size: 2em;
     font-weight: bold;
 }

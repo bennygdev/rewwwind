@@ -1,4 +1,21 @@
 function adjustProductSpacing() {
+
+    if (window.innerWidth > 1400) {
+        document.querySelectorAll('h5.name').forEach(h5 => {
+            console.log(getComputedStyle(h5).width)
+            if (parseFloat(getComputedStyle(h5).width) >= 250) {
+                h5.innerText = h5.innerText.slice(0, 22).trim()  + '...'; // not foolproof i'd assume, but will just leave it as is for now
+            }
+        })
+    } else {
+        document.querySelectorAll('h5.name').forEach(h5 => {
+            console.log(getComputedStyle(h5).width);
+            if (parseFloat(getComputedStyle(h5).width) >= 180) {
+                h5.innerText = h5.innerText.slice(0, 15).trim()  + '...';
+            }
+        })
+    }
+    
     const container = document.querySelector('.products');
     const products = Array.from(container.children);
 
@@ -31,7 +48,7 @@ function adjustProductSpacing() {
     // Apply width to each product for consistent alignment
     products.forEach(product => {
         product.style.marginBottom = '40px'; // Ensure no margin between rows
-    });
+    });    
 }
 
 // Initial setup

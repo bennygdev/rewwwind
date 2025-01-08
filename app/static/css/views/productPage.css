@@ -2,6 +2,52 @@
     padding: 80px 90px; /* please do remove this if each page is to have custom padding or margin in base.css -nelson */
 }
 
+/* CTA styles extending from filters */
+.cta-form button.filter {
+    flex-wrap: wrap;
+    border: 2px solid #039752; /* Green border */
+    outline: none;
+    text-align: center;
+    width: 80%; /* Adjust button width */
+    font-size: 1.1em;
+    font-weight: bold;
+    display: block;
+    cursor: pointer;
+    padding: 0.8rem 1rem; /* Padding for a larger button */
+    margin: 10px auto; /* Center the button */
+    background-color: white; /* White background */
+    color: #039752; /* Green text */
+    border-radius: 12px; /* Rounded corners */
+    transition: all 0.3s ease; /* Smooth hover transition */
+}
+
+/* Hover effect for buttons */
+.cta-form button.filter:hover {
+    background-color: rgb(2, 110, 58); /* Green background on hover */
+    color: white; /* White text on hover */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
+    transform: scale(1.02); /* Slight enlargement on hover */
+}
+
+/* Respects existing .filter styles */
+.cta-form .filter {
+    display: flex;
+    position: relative;
+    border-radius: 1.5em;
+    background-color: #efefef;
+    transition: background-color 0.3s, color 0.5s;
+    padding: 0.4rem 1rem;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    z-index: 1;
+}
+
+.cta-form .filter span {
+    width: 100%;
+    text-align: center;
+}
+
 /* product */
 .product {
     display: flex;
@@ -25,15 +71,44 @@
     object-fit: cover;
 }
 
+.image-list {
+    display: flex;
+    flex-direction: row;
+    gap: 32px;
+    flex-wrap: wrap;
+    margin-top: 30px;
+}
+
+.image-list .image__container {
+    width: 100px;
+    height: 100px;
+    opacity: 60%;
+    cursor: pointer;
+    border: none;
+}
+
+.image-list .image__container.active {
+    opacity: 100%;
+}
+
+.image-list .image__container img {
+    width: 100px;
+    height: 100px;
+}
+
 @media (max-width: 1400px) {
-    .image__container {
+    .image__container, .image__container img {
         width: 300px;
         height: 300px;
     }
-    
-    .image__container img {
-        max-width: 300px;
-        max-height: 300px;
+
+    .image-list {
+        gap: 30px;
+    }
+
+    .image-list .image__container, .image-list .image__container img {
+        width: 80px;
+        height: 80px;
     }
 }
 
@@ -86,6 +161,18 @@ hr {
 
 .rating {
     font-size: 1.2em;
+}
+
+.rating span {
+    font-size: 0.8em;
+}
+
+.rating span:first-child {
+    margin-right: 3px;
+}
+
+.rating span:last-child {
+    margin-left: 3px;
 }
 
 .vSeparator {
@@ -189,7 +276,7 @@ hr.docSeparator {
 }
 
 .filter.review__section {
-    width: 150px;
+    width: 100%;
 }
 
 .header__left .bi-star-fill, .header__left .ratingScore {
@@ -323,6 +410,7 @@ hr.docSeparator {
     padding: 0.2em 0.7em;
     color: white;
     border-radius: var(--bs-border-radius);
+    cursor: pointer;
 }
 
 .review__modal .button-wrapper input#submit {

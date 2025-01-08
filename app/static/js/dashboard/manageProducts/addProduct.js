@@ -161,7 +161,7 @@ class ImageHandler extends Form {
             this.labelImg = img;
         }
         if (this.fileList.length === 0) {
-            this.label.innerHTML = '';
+            this.labelImg.src = '';
         }
         if (this.fileList.length > 1) {
             document.querySelector('.carousel-button.left').style.display = 'flex';
@@ -190,7 +190,7 @@ class ImageHandler extends Form {
                 reader.readAsDataURL(file)
             } else {
                 const img = document.createElement('img');
-                img.src = `/static/${file}`;
+                img.src = `/static/media/uploads/${file}`;
                 img.alt = `Image Preview ${index + 1}`;
                 fileItem.appendChild(img);
     

@@ -23,7 +23,7 @@ def pagination(products):
     # count warnings (low stock)
     total_warnings = sum(
         1 for product in products
-        if any(variant.get('stock') <= 10 for variant in product.variants)
+        if any(condition.get('stock') <= 10 for condition in product.conditions)
     )
 
     # pagination
@@ -92,16 +92,16 @@ def add_product():
                     file.seek(0)  # Ensure we're at the start of the file
                     file_path = os.path.join(upload_folder, secure_filename(file.filename))
                     file.save(file_path)
-                    uploaded_file_paths.append(f"media/uploads/{secure_filename(file.filename)}")
+                    uploaded_file_paths.append(secure_filename(file.filename))
 
             # Create the new product object
             new_product = Product(
                 name=productName,
                 creator=productCreator,
-                image_thumbnail=f"media/uploads/{secure_filename(files[productThumbnail].filename)}",
+                image_thumbnail=secure_filename(files[productThumbnail].filename),
                 images=uploaded_file_paths,
                 description=productDescription,
-                variants=productConditions,
+                conditions=productConditions,
                 is_featured_special = is_featured_special,
                 is_featured_staff = is_featured_staff,
                 category_id=1
@@ -143,18 +143,19 @@ def update_product(product_id):
         form.productThumbnail.data = product.image_thumbnail
         form.productIsFeaturedSpecial.data = product.is_featured_special
         form.productIsFeaturedStaff.data = product.is_featured_staff
+        
+        # still does not work when adding multiple conditions, but will just leave it as is for now.
+        if product.conditions:
+            condition = product.conditions[0]  # Take the first variant condition
+            form.productConditions[0].condition.data = condition['name']
+            form.productConditions[0].stock.data = condition['stock']
+            form.productConditions[0].price.data = condition['price']
 
-        if product.variants:
-            variant = product.variants[0]  # Take the first variant condition
-            form.productConditions[0].condition.data = variant['condition']
-            form.productConditions[0].stock.data = variant['stock']
-            form.productConditions[0].price.data = variant['price']
-
-        for variant in product.variants[1:]:  # Skip the first variant since it's already set
+        for condition in product.conditions[1:]:  # Skip the first condition since it's already set
             form.productConditions.append_entry({
-                'condition': variant['condition'],
-                'stock': variant['stock'],
-                'price': variant['price']
+                'condition': condition['name'],
+                'stock': condition['stock'],
+                'price': condition['price']
             })
         # if not product.images:
         #     print('No images were uploaded.')
@@ -165,14 +166,13 @@ def update_product(product_id):
             product.name = form.productName.data
             product.creator = form.productCreator.data
             product.description = form.productDescription.data
-            product.variants = form.productConditions.data
+            product.conditions = form.productConditions.data
             product.category_id = form.productType.data
             product.is_featured_special = form.productIsFeaturedSpecial.data
             product.is_featured_staff = form.productIsFeaturedStaff.data
 
             # Handle file uploads
             files = request.files.getlist('productImages')
-            
             uploaded_file_paths = []
             upload_folder = current_app.config['UPLOAD_FOLDER']
             for file in files:
@@ -180,13 +180,15 @@ def update_product(product_id):
                     file.seek(0)  # Ensure we're at the start of the file
                     file_path = os.path.join(upload_folder, secure_filename(file.filename))
                     file.save(file_path)
-                    uploaded_file_paths.append(f"media/uploads/{secure_filename(file.filename)}")
+                    uploaded_file_paths.append(secure_filename(file.filename))
             
             product.images = [img for img in product.images if img in form.images.data.split(',')]
+            print(form.images.data)
 
             if uploaded_file_paths:
                 product.images.extend(uploaded_file_paths)
                 flag_modified(product, 'images')
+            print(product.images)
             
             product.image_thumbnail = product.images[int(form.productThumbnail.data)]
 

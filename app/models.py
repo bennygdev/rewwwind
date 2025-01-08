@@ -1,6 +1,8 @@
 from . import db
 from flask import current_app
 from flask_login import UserMixin
+from sqlalchemy import event
+from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
 from itsdangerous import URLSafeTimedSerializer as Serializer
 
@@ -90,12 +92,22 @@ class Product(db.Model):
   category = db.relationship('Category', back_populates='products')
 
   subcategories = db.relationship('SubCategory', secondary='product_subcategories', back_populates='products')
-
-  reviews = db.relationship('Review', back_populates='product', lazy=True, cascade='all, delete-orphan')
   
   order_items = db.relationship('OrderItem', backref='product', lazy=True)  # otm orderItem
 
   cart_entries = db.relationship('Cart', back_populates='product', lazy=True)
+
+  reviews = db.relationship('Review', back_populates='product', lazy=True, cascade='all, delete-orphan')
+  rating = db.Column(db.Float, default=0, nullable=True)
+  def update_rating(self):
+    if self.reviews:
+      total_rating = sum(review.rating for review in self.reviews)
+      self.rating = total_rating / len(self.reviews)
+    else:
+      self.rating = 0
+    
+    session = Session.object_session(self)
+    session.commit()
 
 class Review(db.Model):
   __tablename__ = 'reviews'

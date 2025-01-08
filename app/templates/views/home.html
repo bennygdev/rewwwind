@@ -95,18 +95,22 @@
   <h1>Discover</h1>
   <div class="categories">
     <div class="category books">
-      <div class="thumbnail">
-        <img src="{{ url_for('static', filename='media/discover__books.png') }}" alt="Books" />
-      </div>
+      <a href="{{ url_for('productPagination.product_pagination', type='book') }}">
+        <div class="thumbnail">
+          <img src="{{ url_for('static', filename='media/discover__books.png') }}" alt="Books" />
+        </div>
+      </a>
       <div class="description">
         <p class="category_name">Books</p>
         <p class="sub">Stories and media to inspire you.</p>
       </div>
     </div>
     <div class="category vinyl">
-      <div class="thumbnail">
-        <img src="{{ url_for('static', filename='media/discover__vinyl.png') }}" alt="Vinyl" >
-      </div>
+      <a href="{{ url_for('productPagination.product_pagination', type='vinyl') }}">
+        <div class="thumbnail">
+          <img src="{{ url_for('static', filename='media/discover__vinyl.png') }}" alt="Vinyl" >
+        </div>
+      </a>
       <div class="description">
         <p class="category_name">Vinyl</p>
         <p class="sub">Let the sonic intentions of yesterday&apos;s sounds move you.</p>

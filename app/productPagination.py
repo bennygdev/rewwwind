@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, abort, jsonify
 from flask_login import login_required, current_user
+from sqlalchemy import cast, Float, Integer
 from .roleDecorator import role_required
-from .models import Product, Review
+from .models import Product, Review, Category, SubCategory
 from .forms import AddReviewForm
 from . import db
 from math import ceil
@@ -19,22 +20,47 @@ def product_pagination():
         products_query = products_query.filter(Product.name.ilike(f"%{search_query}%"))
 
     # Filter logic
-    type_filter = request.args.get('type', '', type=str)
-    genre_filter = request.args.get('genre', '', type=str)
+    category_filter = request.args.get('type', '', type=str).title()
+    subcategory_filter = request.args.get('genre', '', type=str).title()
+    price_filter = request.args.get('price', '', type=str)
+    rating_filter = request.args.get('rating', '', type=str)
 
-    if type_filter and type_filter != 'all':
-        products_query = products_query.filter(Product.type.ilike(f"%{type_filter}%"))  # Adjust based on your database schema
-
-    if genre_filter and genre_filter != 'all':
-        products_query = products_query.filter(Product.genre.ilike(f"%{genre_filter}%"))  # Adjust based on your database schema
+    if category_filter and category_filter != 'All':
+        products_query = products_query.join(Product.category).filter(Category.category_name == category_filter)
+    if subcategory_filter and subcategory_filter != 'All':
+        products_query = products_query.join(Product.subcategories).filter(SubCategory.subcategory_name == subcategory_filter)
+    if price_filter and price_filter != 'all':
+        if 'highest' in price_filter:
+            products_query = products_query.order_by(cast(Product.conditions[0]['price'], Float).desc())
+        else:
+            products_query = products_query.order_by(cast(Product.conditions[0]['price'], Float).asc())
+    if rating_filter and rating_filter != 'all':
+        if 'star' in rating_filter:
+            products_query = products_query.filter(cast(Product.rating, Integer) == int(rating_filter[0]))
+        else:
+            if 'highest' in rating_filter:
+                products_query = products_query.order_by(Product.rating.desc())
+            else:
+                products_query = products_query.order_by(Product.rating.asc())
+        
 
     # Pagination logic
     page = request.args.get('page', 1, type=int)
     per_page = 16
     total_products = products_query.count()
+
+    if category_filter or subcategory_filter or price_filter or rating_filter:
+        page = 1 # prevent error where 404 is returned when product query is <= 16 * current page number
+
     products = products_query.order_by(Product.id).paginate(page=page, per_page=per_page)
 
     total_pages = ceil(total_products / per_page)
+
+    categories = Category.query.all()[:8]
+    subcategories = SubCategory.query.join(Category).filter(Category.category_name == category_filter)[:8]
+
+    if not category_filter:
+        subcategory_filter = ""
 
     # Render the template
     return render_template(
@@ -45,22 +71,64 @@ def product_pagination():
         total_pages=total_pages,
         current_page=page,
         search_query=search_query,
-        type_filter=type_filter,
-        genre_filter=genre_filter
+        categories=categories,
+        subcategories=subcategories,
+        category_filter=category_filter,
+        subcategory_filter=subcategory_filter,
+        price_filter=price_filter,
+        rating_filter=rating_filter
     )
 
 @productPagination.route('/product/<int:product_id>', methods=['GET', 'POST'])
 def product_detail(product_id):
     # Query the database for the product
-    product = Product.query.get_or_404(product_id) 
-    reviews = product.reviews
-    if product is None:
-       abort(404)
+    product = Product.query.get_or_404(product_id)
     
+    # Query for reviews related to the product
+    reviews_query = Review.query.filter_by(product_id=product_id)
+    
+    # Filter logic
+    rating_filter = request.args.get('rating', '', type=str)
+    if rating_filter and rating_filter != 'all':
+        if 'star' in rating_filter:
+            # Filter reviews by exact rating (e.g., 4-star reviews)
+            reviews_query = reviews_query.filter(cast(Review.rating, Integer) == int(rating_filter[0]))
+        elif 'highest' in rating_filter:
+            # Sort reviews by highest rating
+            reviews_query = reviews_query.order_by(Review.rating.desc())
+        elif 'lowest' in rating_filter:
+            # Sort reviews by lowest rating
+            reviews_query = reviews_query.order_by(Review.rating.asc())
+    
+    # Pagination logic
+    page = request.args.get('page', 1, type=int)
+    per_page = 5
+    total_reviews = reviews_query.count()
+
+    if rating_filter:
+        page = 1  # Reset to page 1 when a filter is applied
+
+    reviews = reviews_query.order_by(Review.id).paginate(page=page, per_page=per_page)
+    total_pages = ceil(total_reviews / per_page)
+    
+    # Ensure product exists
+    if product is None:
+        abort(404)
+    
+    # Review form instance
     reviewForm = AddReviewForm()
 
-    return render_template("/views/productPage.html", user=current_user, product=product, form=reviewForm, reviews=reviews)
-
+    # Render template
+    return render_template(
+        "/views/productPage.html",
+        user=current_user,
+        product=product,
+        form=reviewForm,
+        reviews=reviews,
+        total_pages=total_pages,
+        current_page=page,
+        rating_filter=rating_filter
+    )
 @productPagination.route('/product/<int:product_id>/add-review', methods=['GET', 'POST'])
 @login_required
 @role_required(1, 2, 3)
@@ -78,6 +146,10 @@ def add_review(product_id):
             user_id=current_user.id,
         )
         db.session.add(new_review)
+        
+        db.session.commit()
+
+        product.update_rating()
         db.session.commit()
         
         print(new_review.rating, new_review.show_username, new_review.description, new_review.product_id, new_review.user_id)
@@ -87,9 +159,9 @@ def add_review(product_id):
     
     # Return an error response if validation fails
     if reviewForm.errors:
-        for error in reviewForm.errors:
-            print(error)
-        flash("There were errors.", "error")
+        for field, errors in reviewForm.errors.items():
+            for error in errors:
+                flash(f"<strong>Error:</strong> {error}", "error")
 
     return render_template("/views/productPage.html", user=current_user, product=product, form=reviewForm)
 

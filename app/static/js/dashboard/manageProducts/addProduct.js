@@ -161,6 +161,7 @@ class ImageHandler extends Form {
             this.labelImg = img;
         }
         if (this.fileList.length === 0) {
+            this.productThumbnail.value = null;
             this.labelImg.src = '';
         }
         if (this.fileList.length > 1) {

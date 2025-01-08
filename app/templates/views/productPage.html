@@ -117,18 +117,24 @@
       </div>
     </div>
     <div class="header__right">
-      {% if user.role.role_name %}
+      {% if user.role_id %}
       <div class="write"><span>Write a review</span>&nbsp;&nbsp;<i class="bi bi-pencil-square"></i></div>
       {% endif %}
-      <div class="filter review activated" id="filter">
-        <span class="selected">Top Reviews</span><i class="bi bi-chevron-down"></i>
-        <ul class="filter--options">
-            <li class="highlighted">Top Reviews</li>
-            <li>Recent Reviews</li>
-            <li>1 Star</li>
-            <li>2 Star</li>
-        </ul>
+      {% if reviews %}
+      <div class="filters">
+        <div class="filter-container">
+          <div class="filter {% if rating_filter %}activated{% endif %}" filter-for="rating" id="filter">
+            <span class="selected {% if not rating_filter %}highlighted{% endif %}">{% if rating_filter %}{{ rating_filter|title }}{% else %}All{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+            <ul class="filter--options">
+              <li class="highlighted">All</li>
+              {% for tag in ['Highest first', 'Lowest first', '1 star', '2 star', '3 star', '4 star', '5 star'] %}
+              <li class="{% if tag == rating_filter %}highlighted{% endif %}">{{ tag }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
       </div>
+      {% endif %}
     </div>
   </div>
   <div class="body">
@@ -137,7 +143,7 @@
       {% for review in reviews %}
       <div class="review">
         <div class="left">
-          <img src="{{ url_for('static',filename='profile_pics/' + current_user.image) }}">
+          <img src="{{ url_for('static',filename='profile_pics/' + review.user.image) }}">
         </div>
         <div class="right">
           <div class="section">
@@ -166,9 +172,11 @@
   </div>
 </div>
 {% with messages = get_flashed_messages(with_categories=true) %}
-<div class="overlay" style="display: {{ block if messages else none }};"></div>
-<div class="review__modal" style="display: {{ block if messages else none }};">
+<div class="overlay" style="display: {{ 'block' if messages else 'none' }};"></div>
+<div class="review__modal" style="display: {{ 'block' if messages else 'none' }};">
+  
   {% if messages and messages[0][0] == 'success' %}
+  <!-- Success Block -->
   <div class="success">
     <i class="bi bi-x-lg fa-2xl"></i>
     <i class="bi bi-check-circle fa-2xl"></i>
@@ -177,7 +185,9 @@
       <input id="cancel" name="cancel" type="button" value="Exit">
     </div>
   </div>
-  {% elif not messages or messages[0][0] == 'error' %}
+
+  {% else %}
+  <!-- Form Block -->
   <form method="POST" action="{{ url_for('productPagination.add_review', product_id=product.id) }}">
     {{ form.hidden_tag() }}
     <div class="addReview">
@@ -185,35 +195,55 @@
         <h1>Add a review for {{ product.name }}</h1>
         <i class="bi bi-x-lg fa-2xl"></i>
       </div>
+
+      <!-- Display error messages -->
+      {% if messages %}
+      <div class="alert alert-danger">
+        {% for category, message in messages %}
+          {% if category == 'error' %}
+          <span>{{ message | safe }}</span>
+          {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+      
+      <!-- Rating Field -->
+      <div class="rating">
+        {{ form.rating.label }}
         {{ form.rating() }}
-        <div class="rating">
-          {{ form.rating.label }}
-          <i class="bi bi-star-fill"></i>
-          <i class="bi bi-star-fill"></i>
-          <i class="bi bi-star-fill"></i>
-          <i class="bi bi-star-fill"></i>
-          <i class="bi bi-star-fill"></i>
+        <i class="bi bi-star-fill"></i>
+        <i class="bi bi-star-fill"></i>
+        <i class="bi bi-star-fill"></i>
+        <i class="bi bi-star-fill"></i>
+        <i class="bi bi-star-fill"></i>
+      </div>
+
+      <!-- Username Field -->
+      <div class="username">
+        {{ form.show_username.label }}
+        {{ form.show_username() }}
+      </div>
+
+      <!-- Description Field -->
+      <div class="description">
+        {{ form.description(class="form-control", placeholder="Write your thoughts!", rows=10) }}
+      </div>
+
+      <!-- Buttons -->
+      <div class="buttons">
+        <div class="button-wrapper">
+          <input id="cancel" name="cancel" type="button" value="Cancel">
         </div>
-        <div class="username">
-          {{ form.show_username.label }}
-          {{ form.show_username() }}
+        <div class="button-wrapper">
+          {{ form.submit() }}
         </div>
-        <div class="description">
-          {{ form.description(class="form-control", placeholder="Write your thoughts!", rows=10) }}
-        </div>
-        <div class="buttons">
-          <div class="button-wrapper">
-            <input id="cancel" name="cancel" type="button" value="Cancel">
-          </div>
-          <div class="button-wrapper">
-            {{ form.submit() }}
-          </div>
-        </div>
+      </div>
     </div>
   </form>
-  {%endif%}
+  {% endif %}
 </div>
 {% endwith %}
+
 
 <a href="{{ url_for('productPagination.product_pagination') }}" class="btn btn-secondary">Back to Products</a>
 {% endblock %}
@@ -221,5 +251,7 @@
 {% block body_scripts %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/pageInteractions/filters.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/productPagination/productPage.js') }}"></script>
+{% if user.role_id %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/productPagination/addReview.js') }}"></script>
+{% endif %}
 {% endblock %}

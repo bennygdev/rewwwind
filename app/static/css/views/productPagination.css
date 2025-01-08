@@ -186,3 +186,8 @@
     text-decoration: none;
     color: #000;
   }
+
+  /* no products */
+  h2.none {
+      margin-top: 30px;
+  }

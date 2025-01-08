@@ -61,7 +61,7 @@
     height: 14px;
 }
 
-.search__wrapper {
+.headerContent .search__wrapper {
     position: absolute;
     bottom: -24px;
     width: 100%;
@@ -69,14 +69,14 @@
     max-width: calc(100% - 30px);
 }
 
-.search__container {
+.headerContent .search__container {
     position: relative;
     display: flex;
     width: 100%;
     /* max-width: calc(100% - 30px); */
 }
 
-.search__bar {
+.headerContent .search__bar {
     width: 100%;
     padding: 12px 40px 12px 15px;
     border-radius: 10px;
@@ -85,12 +85,12 @@
     /* border: 1px solid black; */
 }
 
-.search__bar.focused {
+.headerContent .search__bar.focused {
     border-radius: 8px 8px 0 0;
     border-bottom: none;
 }
 
-.search__button {
+.headerContent .search__button {
     background-color: transparent;
     padding: 12px;
     color: #039572;
@@ -102,7 +102,7 @@
     border: 0;
 }
 
-.clear__button {
+.headerContent .clear__button {
     background-color: transparent;
     padding: 12px;
     color: #039572;
@@ -519,4 +519,9 @@ td.highStock div {
     border-radius: 10px;
     text-decoration: none;
     color: #000;
+  }
+
+  /* if no products */
+  h1.none {
+    margin-top: 30px;
   }

@@ -1,12 +1,12 @@
 from werkzeug.utils import secure_filename
-from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
+from flask import Blueprint, render_template, redirect, url_for, request, jsonify, flash, current_app, session
 from flask_login import login_required, current_user
-from sqlalchemy import func
+from sqlalchemy import cast, Integer
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.dialects.postgresql import JSON
 from .roleDecorator import role_required
 from .forms import AddProductForm, DeleteProductForm #, EditProductForm
-from .models import Product
+from .models import Product, Category, SubCategory
 from . import db
 import os
 
@@ -26,25 +26,57 @@ def pagination(products):
         if any(condition.get('stock') <= 10 for condition in product.conditions)
     )
 
-    # pagination
-    page = request.args.get('page', 1, type=int)
-    per_page = 10
+    products_query = Product.query
 
     # search logic
     search_query = request.args.get('q', '', type=str)
-
     if search_query:
         products_query = Product.query.filter(Product.name.ilike(f"%{search_query}%"))
-    else:
-        products_query = Product.query
+    
+    # filter logic
+    category_filter = request.args.get('type', '', type=str).title()
+    subcategory_filter = request.args.get('genre', '', type=str).title()
+    featured_filter = request.args.get('featured', '', type=str)
+    stock_filter = request.args.get('stock', '', type=str)
+    
+    if category_filter and category_filter != 'All':
+        products_query = products_query.join(Product.category).filter(Category.category_name == category_filter)
+    if subcategory_filter and subcategory_filter != 'All':
+        products_query = products_query.join(Product.subcategories).filter(SubCategory.subcategory_name == subcategory_filter)
+    if featured_filter and featured_filter != 'none':
+        if 'special' in featured_filter:
+            products_query = products_query.filter(Product.is_featured_special)
+        else:
+            products_query = products_query.filter(Product.is_featured_staff)
+
+    if not stock_filter and session.get('first_time_opening', True):
+        session['first_time_opening'] = False  # Mark as no longer the first visit
+        stock_filter = 'Lowest first'
+    if stock_filter and stock_filter != 'all':
+        if 'limited' in stock_filter:
+            products_query = products_query.filter(cast(Product.conditions[0]['stock'], Integer) <= 10)
+        elif 'plenty' in stock_filter:
+            products_query = products_query.filter(cast(Product.conditions[0]['stock'], Integer) > 10)
+        elif 'no' in stock_filter:
+            products_query = products_query.filter(cast(Product.conditions[0]['stock'], Integer) == 0)
+        elif 'lowest' in stock_filter:
+            products_query = products_query.order_by(cast(Product.conditions[0]['stock'], Integer).asc())
+        else:
+            products_query = products_query.order_by(cast(Product.conditions[0]['stock'], Integer).desc())
+    
+    if not category_filter:
+        subcategory_filter = ""
 
     # pagination logic
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+
     total_products = products_query.count()
     products = products_query.order_by(Product.id).paginate(page=page, per_page=per_page)
 
     total_pages = ceil(total_products / per_page)
 
-    return products, total_products, total_warnings, total_pages, page, search_query
+    return products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter
 
 @manageProducts.route('/manage-products')
 @login_required
@@ -53,14 +85,32 @@ def products_listing():
     products = Product.query.all()
     deleteForm = DeleteProductForm()
 
-    products, total_products, total_warnings, total_pages, page, search_query = pagination(products)
+    products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter = pagination(products)
 
-    return render_template("dashboard/manageProducts/products.html", user=current_user, products=products, total_products=total_products, total_warnings=total_warnings, deleteForm=deleteForm, total_pages=total_pages, current_page=page, search_query=search_query) #, datetime=datetime
+    categories = Category.query.all()[:8]
+    subcategories = SubCategory.query.join(Category).filter(Category.category_name == category_filter)[:8]
     
+    if category_filter or subcategory_filter or featured_filter or stock_filter:
+        page = 1 # prevent error where 404 is returned when product query is <= 10 * current page number
 
-from flask import jsonify, flash
-import os
-from werkzeug.utils import secure_filename
+    return render_template(
+        "dashboard/manageProducts/products.html", 
+        user=current_user, 
+        products=products, 
+        total_products=total_products, 
+        total_warnings=total_warnings, 
+        deleteForm=deleteForm, 
+        total_pages=total_pages, 
+        current_page=page, 
+        search_query=search_query,
+        categories=categories,
+        subcategories=subcategories,
+        category_filter=category_filter,
+        subcategory_filter=subcategory_filter,
+        featured_filter=featured_filter,
+        stock_filter=stock_filter
+        ) #, datetime=datetime
+
 
 @manageProducts.route('/manage-products/add-product', methods=['GET', 'POST'])
 @login_required
@@ -114,7 +164,9 @@ def add_product():
             # Return a success response
             flash("The product has been added successfully.", "success")
             return jsonify({'success': True, 'message': 'Product added successfully!'})
-
+        
+        except ValueError:
+            return jsonify({'error': False, 'message': "No images were uploaded. Please upload at least one image."})
         except Exception as e:
             # Return error response if anything goes wrong
             return jsonify({'error': False, 'message': f"An error occurred: {str(e)}"})
@@ -147,7 +199,7 @@ def update_product(product_id):
         # still does not work when adding multiple conditions, but will just leave it as is for now.
         if product.conditions:
             condition = product.conditions[0]  # Take the first variant condition
-            form.productConditions[0].condition.data = condition['name']
+            form.productConditions[0].condition.data = condition['condition']
             form.productConditions[0].stock.data = condition['stock']
             form.productConditions[0].price.data = condition['price']
 
@@ -198,14 +250,15 @@ def update_product(product_id):
             db.session.commit()
             flash("The product has been updated successfully.", "success")
             return jsonify({'success': True, 'message': 'Product updated successfully!'})
-
+        except ValueError:
+            return jsonify({'error': False, 'message': "No images were uploaded. Please upload at least one image."})
         except Exception as e:
-            db.session.rollback()  # Rollback on error
-            flash(f"An error occurred: {str(e)}", "danger")
+            # Return error response if anything goes wrong
+            return jsonify({'error': False, 'message': f"An error occurred: {str(e)}"})
 
-    if request.method == 'POST' and form.errors:  # Handle validation errors
-        flash("Please fix the errors in the form.", "danger")
-        print(form.errors)
+    if form.errors:
+        error_messages = [f"{', '.join(errors)}" for field, errors in form.errors.items()]
+        return jsonify({'error': False, 'message': f"{', '.join(error_messages)}"})
 
     return render_template("dashboard/manageProducts/updateProduct.html", user=current_user, form=form, product=product)
 
@@ -214,8 +267,10 @@ def update_product(product_id):
 @role_required(2, 3)
 def delete_product():
     products = Product.query.all()
+    categories = Category.query.all()[:8]
+    subcategories = SubCategory.query.join(Category).filter(Category.category_name == category_filter)[:8]
     deleteForm = DeleteProductForm()
-    products, total_products, total_warnings, total_pages, page, search_query = pagination(products)
+    products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter = pagination(products)
 
     if deleteForm.validate_on_submit():
         id = deleteForm.productID.data
@@ -227,9 +282,25 @@ def delete_product():
 
         # Refresh the products list
         products = Product.query.all()
-        products, total_products, total_warnings, total_pages, page, search_query = pagination(products)
+        products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter = pagination(products)
 
         return redirect(url_for('manageProducts.products_listing'))
         
 
-    return render_template("dashboard/manageProducts/products.html", user=current_user, products=products, total_products=total_products, total_warnings=total_warnings, deleteForm=deleteForm, total_pages=total_pages, current_page=page, search_query=search_query) #, datetime=datetime
+    return render_template(
+        "dashboard/manageProducts/products.html", 
+        user=current_user, 
+        products=products, 
+        total_products=total_products, 
+        total_warnings=total_warnings, 
+        deleteForm=deleteForm, 
+        total_pages=total_pages, 
+        current_page=page, 
+        search_query=search_query,
+        categories=categories,
+        subcategories=subcategories,
+        category_filter=category_filter,
+        subcategory_filter=subcategory_filter,
+        featured_filter=featured_filter,
+        stock_filter=stock_filter
+        ) #, datetime=datetime

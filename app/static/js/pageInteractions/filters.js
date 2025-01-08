@@ -40,12 +40,14 @@ class Filter {
     init() {
         this.filter.addEventListener('click', () => this.toggleFilter());
         this.options.forEach(option => {
-            option.addEventListener('mouseover', () => this.handleHover(option));
-            option.addEventListener('click', (e) => {
-                if (e.target === option) {
-                    this.selectOption();
-                }
-            });
+            if (!option.classList.contains('disabled')) {
+                option.addEventListener('mouseover', () => this.handleHover(option));
+                option.addEventListener('click', (e) => {
+                    if (e.target === option) {
+                        this.selectOption();
+                    }
+                });
+            }
         });
     }
 
@@ -107,11 +109,13 @@ class Filter {
     selectOption() {
         const selectedOption = this.options.find(option => option.classList.contains('highlighted'));
         this.currentlySelected.innerText = selectedOption.innerText;
-
-        const filterKey = this.filter.previousElementSibling.innerText.toLowerCase(); // e.g., 'type', 'genre'
+        const filterKey = this.filter.getAttribute('filter-for'); // e.g., 'type', 'genre'
         const params = new URLSearchParams(window.location.search);
 
-        if (selectedOption.innerText.toLowerCase() === 'all') {
+        if (['all','none'].includes(selectedOption.innerText.toLowerCase())) {
+            if (filterKey === 'type') {
+                params.delete('genre')
+            }
             params.delete(filterKey);
         } else {
             params.set(filterKey, selectedOption.innerText.toLowerCase());

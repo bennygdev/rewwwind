@@ -28,6 +28,7 @@ function toggleModal() {
         modal.style.display = 'none';
 
         stars.forEach(star => star.style.color = '#D9D9D9');
+        document.getElementById('rating').value = null;
         document.getElementById('show_username').checked = false;
         document.getElementById('description').value = '';
     } else {

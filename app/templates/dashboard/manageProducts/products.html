@@ -62,73 +62,53 @@
         <div class="filters">
             <div class="filter-container">
                 <label>Type</label>
-                <div class="filter">
-                    <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+                <div class="filter {% if category_filter %}activated{% endif %}" filter-for="type">
+                    <span class="selected">{% if category_filter %}{{ category_filter|title }}{% else %}All{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
                     <ul class="filter--options">
-                        <li class="highlighted">All</li>
-                        <li>short</li>
-                        <li>mediuuum</li>
-                        <li>looooooooong</li>
+                        <li class="{% if not category_filter %}highlighted{% endif %}">All</li>
+                        {% for category in categories %}
+                        <li class="{% if category.category_name == category_filter|title %}highlighted{% endif %}">{{ category.category_name }}</li>
+                        {% endfor %}
                     </ul>
                 </div>
             </div>
             <div class="filter-container">
-                <label>Type</label>
-                <div class="filter">
-                    <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+                <label>Genre</label>
+                <div class="filter {% if subcategory_filter %}activated{% endif %}" filter-for="genre">
+                    <span class="selected">{% if subcategory_filter %}{{ subcategory_filter|title }}{% else %}All{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
                     <ul class="filter--options">
-                        <li class="highlighted">All</li>
-                        <li>short</li>
-                        <li>mediuuum</li>
-                        <li>looooooooong</li>
+                    {% if category_filter %}
+                        <li class="{% if not subcategory_filter %}highlighted{% endif %}">All</li>
+                        {% for subcategory in subcategories %}
+                        <li class="{% if subcategory.subcategory_name == subcategory_filter|title %}highlighted{% endif %}">{{ subcategory.subcategory_name }}</li>
+                        {% endfor %}
+                    {% else %}
+                        <li class="disabled" style="background-color: red; color: white;">Please select a type first!</li>
+                    {% endif %}
                     </ul>
                 </div>
             </div>
             <div class="filter-container">
-                <label>Type</label>
-                <div class="filter">
-                    <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+                <label>Featured</label>
+                <div class="filter {% if featured_filter %}activated{% endif %}" filter-for="featured">
+                    <span class="selected">{% if featured_filter %}{{ featured_filter|title }}{% else %}None{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
                     <ul class="filter--options">
-                        <li class="highlighted">All</li>
-                        <li>short</li>
-                        <li>mediuuum</li>
-                        <li>looooooooong</li>
+                        <li class="{% if not featured_filter %}highlighted{% endif %}">None</li>
+                        {% for tag in ['Special', 'Staff Picks'] %}
+                        <li class="{% if tag == featured_filter|title %}highlighted{% endif %}">{{ tag }}</li>
+                        {% endfor %}
                     </ul>
                 </div>
             </div>
             <div class="filter-container">
-                <label>Type</label>
-                <div class="filter">
-                    <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+                <label>Stock</label>
+                <div class="filter {% if stock_filter %}activated{% endif %}" filter-for="stock">
+                    <span class="selected">{% if stock_filter %}{{ stock_filter|title }}{% else %}All{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
                     <ul class="filter--options">
-                        <li class="highlighted">All</li>
-                        <li>short</li>
-                        <li>mediuuum</li>
-                        <li>looooooooong</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="filter-container">
-                <label>Type</label>
-                <div class="filter">
-                    <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
-                    <ul class="filter--options">
-                        <li class="highlighted">All</li>
-                        <li>short</li>
-                        <li>mediuuum</li>
-                        <li>looooooooong</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="filter-container">
-                <label>Type</label>
-                <div class="filter">
-                    <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
-                    <ul class="filter--options">
-                        <li class="highlighted">All</li>
-                        <li>short</li>
-                        <li>mediuuum</li>
-                        <li>looooooooong</li>
+                        <li class="{% if not stock_filter %}highlighted{% endif %}">All</li>
+                        {% for tag in ['Plenty in stock', 'Limited stock', 'No stock', 'Highest first', 'Lowest first'] %}
+                        <li class="{% if tag|lower == stock_filter|lower %}highlighted{% endif %}">{{ tag }}</li>
+                        {% endfor %}
                     </ul>
                 </div>
             </div>
@@ -138,6 +118,7 @@
         <a href="{{ url_for('manageProducts.add_product') }}"><h3><i class="fa-solid fa-plus"></i>Add Product</h3></a>
     </div>
 </div>
+{% if products.items %}
 <div class="products">
     <table>
         <thead>
@@ -243,18 +224,32 @@
 <div class="products__pagination">
     <ul>
         {% if current_page > 1 %}
-            <li class="pagePrevious__button"><a href="{{ url_for('manageProducts.products_listing', page=current_page-1, q=search_query) }}">Previous</a></li>
+            <li class="pagePrevious__button">
+              <a href="{{ url_for('manageProducts.products_listing', page=current_page-1, q=search_query if search_query else None, type=category_filter if category_filter else None, subcategory=subcategory_filter if subcategory_filter else None, featured=featured_filter if featured_filter else None, stock=stock_rating if stock_rating else None) }}">
+              Previous
+              </a>
+            </li>
         {% endif %}
         {% for p in range(1, total_pages + 1) %}
             <li class="{% if p == current_page %}active{% endif %}">
-                <a href="{{ url_for('manageProducts.products_listing', page=p, q=search_query) }}" class="page__button">{{ p }}</a>
+              <a class="page__button" href="{{ url_for('manageProducts.products_listing', page=p, q=search_query if search_query else None, type=category_filter if category_filter else None, subcategory=subcategory_filter if subcategory_filter else None, featured=featured_filter if featured_filter else None, stock=stock_rating if stock_rating else None) }}">
+              {{ p }}
+              </a>
             </li>
         {% endfor %}
         {% if current_page < total_pages %}
-            <li class="pageNext__button"><a href="{{ url_for('manageProducts.products_listing', page=current_page+1, q=search_query) }}">Next</a></li>
+            <li class="pageNext__button">
+              <a href="{{ url_for('manageProducts.products_listing', page=current_page+1, q=search_query if search_query else None, type=category_filter if category_filter else None, subcategory=subcategory_filter if subcategory_filter else None, featured=featured_filter if featured_filter else None, stock=stock_rating if stock_rating else None) }}">
+              Next
+              </a>
+            </li>
         {% endif %}
     </ul>
 </div>
+{% else %}
+<h1 class="none">Sorry, no entries were found with the given search queries and/or filters.</h1>
+{% endif %}
+  
 {% endblock %}
 
 {% block body_scripts %}

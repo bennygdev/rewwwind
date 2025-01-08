@@ -90,10 +90,8 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function adjustText() {
-    console.log(true);
     if (window.innerWidth > 1400) {
         document.querySelectorAll('p.name').forEach(p => {
-            console.log(getComputedStyle(p).width)
             if (parseFloat(getComputedStyle(p).width) >= 200) {
                 p.innerText = p.innerText.slice(0, 11).trim() + '...'; // not foolproof i'd assume, but will just leave it as is for now
             }

@@ -2,8 +2,8 @@ class RatingStars {
     constructor(container, text) {
         this.container = document.querySelector(container);
         this.stars = Array.from(this.container.querySelectorAll('i.bi-star-fill'));
-        this.getRatingInputs = Array.from(document.querySelectorAll('.review__section .review .rating input'));
-        this.rating = this.getRatingInputs.map(rating => Number(rating.value)).reduce((acc, curr) => acc + curr, 0) / this.getRatingInputs.length;
+        // this.getRatingInputs = Array.from(document.querySelectorAll('.review__section .review .rating input'));
+        this.rating = parseFloat(document.getElementById('rating').getAttribute('get-rating-here'))
         isNaN(this.rating) ? this.rating = 0 : this.rating = this.rating.toFixed(1);
         this.rating0Text = text;
         this.ratingScore = this.container.querySelector('.ratingScore');
@@ -16,13 +16,6 @@ class RatingStars {
     init() {
         if (this.rating === Math.round(this.rating) && this.rating !== 0) {
             this.rating = this.rating.toString() + '.0';
-        }
-        if (this.rating === 0) {
-            this.ratingScore.innerText = this.rating0Text;
-            this.container.insertBefore(this.ratingScore, this.reviewNum);
-        } else {
-            this.ratingScore.innerText = this.rating;
-            if (this.reviewNum) {this.reviewNum.innerText = this.getRatingInputs.length;}
         }
     }
     

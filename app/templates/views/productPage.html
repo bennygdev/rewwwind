@@ -32,13 +32,13 @@
         <span>{{ product.creator }}</span>
       </div>
       <div class="rating">
-        <span class="ratingScore"></span>
+        <span class="ratingScore">{% if product.rating %}{{ product.rating }}{% endif %}</span>
         <i class="bi bi-star-fill"></i>
         <i class="bi bi-star-fill"></i>
         <i class="bi bi-star-fill"></i>
         <i class="bi bi-star-fill"></i>
         <i class="bi bi-star-fill"></i>
-        <span class="numOfReviews"></span>
+        <span class="numOfReviews">{% if not product.rating %}No reviews yet. Be the first one!{% else %}({{ product.reviews|length }}){% endif %}</span>
       </div>
     </div>
     <hr>
@@ -113,7 +113,7 @@
         <i class="bi bi-star-fill"></i>
         <i class="bi bi-star-fill"></i>
         <i class="bi bi-star-fill"></i>
-        <span class="ratingScore"></span>
+        <span class="ratingScore" id="rating" get-rating-here="{{ product.rating }}">{% if product.rating %}{{ product.rating }}{% else %}No reviews yet. Be the first one!{% endif %}</span>
       </div>
     </div>
     <div class="header__right">
@@ -139,7 +139,7 @@
   </div>
   <div class="body">
     <div class="reviews">
-      {% if reviews %}
+      {% if reviews.items %}
       {% for review in reviews %}
       <div class="review">
         <div class="left">
@@ -165,7 +165,7 @@
       {% endfor %}
       {% else %}
       <div class="review">
-        <h3>No reviews yet. Be the first one!</h3>
+        <h3>Sorry, no reviews were found with the given filter.</h3>
       </div>
       {% endif %}
     </div>
@@ -250,6 +250,7 @@
 
 {% block body_scripts %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/pageInteractions/filters.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/pageInteractions/persistentScrollPosition.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/productPagination/productPage.js') }}"></script>
 {% if user.role_id %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/productPagination/addReview.js') }}"></script>

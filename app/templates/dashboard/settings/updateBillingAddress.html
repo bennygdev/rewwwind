@@ -108,6 +108,9 @@
 <!-- modal -->
 {% include "components/deleteModal.html" %}
 
+{% endblock %}
+
+{% block body_scripts %}
 <script
   type="text/javascript"
   src="{{ url_for('static', filename='js/dashboard/settings/editBilling.js') }}"
@@ -116,5 +119,4 @@
   type="text/javascript"
   src="{{ url_for('static', filename='js/deleteModal.js') }}"
 ></script>
-
 {% endblock %}

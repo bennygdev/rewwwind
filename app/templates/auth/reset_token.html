@@ -42,9 +42,12 @@
   </div>
 </div>
 
+
+{% endblock %}
+
+{% block body_scripts %}
 <script
   type="text/javascript"
   src="{{ url_for('static', filename='js/passwordVisibility.js') }}"
 ></script>
-
 {% endblock %}

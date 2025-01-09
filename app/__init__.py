@@ -147,9 +147,10 @@ def create_database(app):
       print('Created Database!')
       # insert_categories()
 
-      from .seed import insert_categories, insert_products, insert_users, insert_default_roles, insert_subcategories # will remove as time goes, added seed.py to avoid confusion here - nelson
-      # Seed is actually what i wanted to add, so this is a nice touch you added - Ben
+      from .seed import insert_categories, insert_products, insert_users, insert_payment_types, insert_default_roles, insert_subcategories 
+
       insert_default_roles()
+      insert_payment_types()
       insert_users()
       insert_categories()
       insert_subcategories()

@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from flask import request, flash
 from werkzeug.utils import secure_filename
-from wtforms import StringField, TextAreaField, IntegerField, FloatField, FieldList, FormField, SelectField, BooleanField, FileField, MultipleFileField, EmailField, PasswordField, HiddenField, SubmitField
+from wtforms import StringField, TextAreaField, IntegerField, DateField, FloatField, FieldList, FormField, SelectField, BooleanField, FileField, MultipleFileField, EmailField, PasswordField, HiddenField, SubmitField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, Optional, NumberRange, Regexp, ValidationError
 from PIL import Image # file object validator
 from mimetypes import guess_type # file extension validator
@@ -70,6 +70,14 @@ class BillingAddressForm(FlaskForm):
   unit_number = StringField('Unit Number', validators=[DataRequired(), Length(max=15)])
   postal_code = IntegerField('Postal Code', validators=[DataRequired(), NumberRange(min=1, max=999999)])
   phone_number = IntegerField('Phone Number', validators=[DataRequired(), NumberRange(min=60000000, max=99999999)])
+  submit = SubmitField('Save')
+
+class PaymentMethodForm(FlaskForm):
+  paymentType_id = IntegerField('Payment Type', validators=[DataRequired()])
+  card_name = StringField('Card Name', validators=[DataRequired()])
+  card_number = StringField('Card Number', validators=[DataRequired(), Length(min=16, max=16), Regexp(r"^[0-9]*$", message="CVV must be numbers only.")])
+  expiry_date = DateField('Expiry Date', validators=[DataRequired()])
+  card_cvv = PasswordField('CVV', validators=[DataRequired(), Length(min=3, max=3), Regexp(r"^[0-9]*$", message="CVV must be numbers only.")])
   submit = SubmitField('Save')
 
 # New product forms

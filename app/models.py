@@ -60,13 +60,19 @@ class PaymentInformation(db.Model):
   __tablename__ = 'payment_information'
   id = db.Column(db.Integer, primary_key=True)
   user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-  payment_type = db.Column(db.String(20), nullable=False)
+  paymentType_id = db.Column(db.Integer, db.ForeignKey('payment_types.id'), nullable=False)  # payment method table
   card_number = db.Column(db.String(16), nullable=False) # store as string since leading zeros
   card_name = db.Column(db.String(255), nullable=False)
   expiry_date = db.Column(db.Date, nullable=False)
   card_cvv = db.Column(db.String(3), nullable=False) # store as string since leading zeros
   created_at = db.Column(db.DateTime(timezone=True), default=func.now())
   updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
+
+class PaymentType(db.Model):
+  __tablename__ = 'payment_types'
+  id = db.Column(db.Integer, primary_key=True)
+  payment_type = db.Column(db.String(50), unique=True, nullable=False)
+  payment_information = db.relationship('PaymentInformation', backref='payment_types', lazy=True) # otm
 
 class Role(db.Model):
   __tablename__ = 'roles'

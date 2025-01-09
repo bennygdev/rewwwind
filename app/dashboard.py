@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
 from flask_login import login_required, current_user
-from .forms import UpdatePersonalInformation, ChangePasswordForm, BillingAddressForm
-from .models import User, BillingAddress
+from .forms import UpdatePersonalInformation, ChangePasswordForm, BillingAddressForm, PaymentMethodForm
+from .models import User, BillingAddress, PaymentInformation, PaymentType
 from .roleDecorator import role_required
 from . import db
 import secrets
@@ -40,7 +40,7 @@ def user_profile():
 def user_settings():
   return render_template("dashboard/settings/settings.html", user=current_user)
 
-@dashboard.route('/update-personal-information')
+@dashboard.route('/settings/update-personal-information')
 @login_required
 @role_required(1, 2, 3)
 def update_personal_information():
@@ -75,7 +75,7 @@ def save_picture(form_picture):
 
   return picture_fn
 
-@dashboard.route('/update-personal-information-form', methods=['GET', 'POST'])
+@dashboard.route('/settings/update-personal-information-form', methods=['GET', 'POST'])
 @login_required
 @role_required(1, 2, 3)
 def update_personal_information_form():
@@ -133,7 +133,7 @@ def update_personal_information_form():
 
   return render_template("dashboard/settings/updatePersonalInfoForm.html", user=current_user, form=form, image_file=image_file)
 
-@dashboard.route('/change-password', methods=['GET', 'POST'])
+@dashboard.route('/settings/change-password', methods=['GET', 'POST'])
 @login_required
 @role_required(1, 2, 3)
 def change_password():
@@ -160,7 +160,7 @@ def change_password():
 
   return render_template('dashboard/settings/changePassword.html', user=current_user, form=form)
   
-@dashboard.route('/update-billing-address', methods=['GET', 'POST'])
+@dashboard.route('/settings/update-billing-address', methods=['GET', 'POST'])
 @login_required
 @role_required(1, 2, 3)
 def update_billing_address():
@@ -187,7 +187,7 @@ def update_billing_address():
 
   return render_template("dashboard/settings/updateBillingAddress.html", user=current_user, billing_addresses=billing_addresses, form=form)
 
-@dashboard.route('/add-billing-address', methods=['GET', 'POST'])
+@dashboard.route('/settings/add-billing-address', methods=['GET', 'POST'])
 @login_required
 @role_required(1, 2, 3)
 def add_billing_address():
@@ -211,13 +211,7 @@ def add_billing_address():
 
   return render_template("dashboard/settings/addBillingAddress.html", user=current_user, form=form)
 
-@dashboard.route('/update-payment-information')
-@login_required
-@role_required(1, 2, 3)
-def update_payment_information():
-  return render_template("dashboard/settings/updatePaymentInfo.html", user=current_user)
-
-@dashboard.route('/delete-billing/<int:id>', methods=['GET', 'POST'])
+@dashboard.route('/settings/delete-billing/<int:id>', methods=['GET', 'POST'])
 @login_required
 @role_required(1, 2, 3)
 def delete_billing(id):
@@ -231,3 +225,88 @@ def delete_billing(id):
   else:
     flash("Invalid billing address or unauthorized access.", "error")
     return redirect(url_for('dashboard.update_billing_address'))
+  
+@dashboard.route('/settings/update-payment-information', methods=['GET', 'POST'])
+@login_required
+@role_required(1, 2, 3)
+def update_payment_information():
+  form = PaymentMethodForm()
+  payment_methods = PaymentInformation.query.filter_by(user_id=current_user.id).all()
+
+  payment_types = PaymentType.query.all()
+
+  if form.validate_on_submit():
+    method_id = request.form.get('method_id')  # get payment id from hidden field
+    payment_method = PaymentInformation.query.get(method_id)
+        
+    if payment_method and payment_method.user_id == current_user.id:
+      payment_method.paymentType_id = form.paymentType_id.data
+      payment_method.card_name = form.card_name.data
+      payment_method.card_number = form.card_number.data
+      payment_method.expiry_date = form.expiry_date.data
+      payment_method.card_cvv = form.card_cvv.data
+            
+      db.session.commit()
+      flash("Payment method updated successfully!", "success")
+    else:
+      flash("Invalid Payment method or unauthorized access.", "error")
+        
+    return redirect(url_for('dashboard.update_payment_information'))
+  
+  if form.paymentType_id.errors:
+    flash("Please select a payment type.", "error")
+
+  if form.card_number.errors:
+    flash("Card number must be in digits", "error")
+
+  if form.card_cvv.errors:
+    flash("CVV must be in digits.", "error")
+
+  return render_template("dashboard/settings/updatePaymentInfo.html", user=current_user, payment_methods=payment_methods, payment_types=payment_types, form=form)
+
+@dashboard.route('/settings/add-payment-method', methods=['GET', 'POST'])
+@login_required
+@role_required(1, 2, 3)
+def add_payment_method():
+  form = PaymentMethodForm()
+
+  if form.validate_on_submit():
+    payment_method = PaymentInformation(
+      user_id = current_user.id,
+      paymentType_id = form.paymentType_id.data,
+      card_name = form.card_name.data,
+      card_number = form.card_number.data,
+      expiry_date = form.expiry_date.data,
+      card_cvv = form.card_cvv.data
+    )
+
+    db.session.add(payment_method)
+    db.session.commit()
+    flash("Payment Method added!", "success")
+    return redirect(url_for('dashboard.update_payment_information'))
+  
+  if form.paymentType_id.errors:
+    flash("Please select a payment type.", "error")
+
+  if form.card_number.errors:
+    flash("Card number must be in digits", "error")
+
+  if form.card_cvv.errors:
+    flash("CVV must be in digits.", "error")
+
+  return render_template("dashboard/settings/addPaymentMethod.html", user=current_user, form=form)
+
+@dashboard.route('/settings/delete-payment-method/<int:id>', methods=['GET', 'POST'])
+@login_required
+@role_required(1, 2, 3)
+def delete_payment_method(id):
+  payment_method = PaymentInformation.query.get_or_404(id)
+
+  if payment_method and payment_method.user_id == current_user.id:
+    db.session.delete(payment_method)
+    db.session.commit()
+    flash("Payment method deleted.", "success")
+    return redirect(url_for('dashboard.update_payment_information'))
+  else:
+    flash("Invalid billing address or unauthorized access.", "error")
+    return redirect(url_for('dashboard.update_payment_information'))

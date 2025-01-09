@@ -1,0 +1,258 @@
+{% extends "views/base.html" %}
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/pageInteractions/filters.css') }}">
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/views/productPage.css') }}">
+{% endblock %}
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<input type="hidden" id="get-id-here" product-id="{{ product.id }}">
+<div class="product">
+  <div class="product__left">
+    <div class="image__container">
+      <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}"/>
+    </div>
+    <div class="image-list">
+      {% for image in product.images %}
+      <div class="image__container">
+        <img src="{{ url_for('static', filename='media/uploads/' + image) }}" alt="{{ product.name }}">
+      </div>
+      {% endfor %}
+    </div>
+    <div class="variants"></div> <!-- not sure yet -->
+  </div>
+  <div class="product__right">
+    <div class="top">
+      <h1>{{ product.name }}</h1>
+      <div class="typeCreator">
+        <i class="bi bi-person-fill"></i>
+        <span>{{ product.category.category_name }}</span>
+        <div class="vSeparator"></div>
+        <i class="bi bi-person-fill"></i>
+        <span>{{ product.creator }}</span>
+      </div>
+      <div class="rating">
+        <span class="ratingScore">{% if product.rating %}{{ product.rating }}{% endif %}</span>
+        <i class="bi bi-star-fill"></i>
+        <i class="bi bi-star-fill"></i>
+        <i class="bi bi-star-fill"></i>
+        <i class="bi bi-star-fill"></i>
+        <i class="bi bi-star-fill"></i>
+        <span class="numOfReviews">{% if not product.rating %}No reviews yet. Be the first one!{% else %}({{ product.reviews|length }}){% endif %}</span>
+      </div>
+    </div>
+    <hr>
+    <div class="middle">
+      <h3>&dollar;{{ '{:.2f}'.format(product.conditions[0].price) }}</h3>
+      <div class="stock">
+        {% if product.conditions[0].stock <= 10 %}
+          <i class="bi bi-exclamation-circle-fill"></i>
+          <span>Only {{ product.conditions[0].stock }} left. Order soon!</span>
+        {% else %}
+          <i class="bi bi-check-circle-fill"></i>
+          <span>Plenty of stock to go around!</span>
+        {% endif %}
+      </div>
+    </div>
+    <hr>
+    <div class="bottom">
+      <div class="condition">
+        <div class="header">
+          <h3>Condition</h3><i class="bi bi-question-circle-fill"></i>
+        </div>
+        <div class="conditionTypes">
+          {% for type in ['Brand New', 'Like New', 'Lightly Used', 'Well Used'] %}
+            <div>
+              <span>{{ type }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="description">
+        <div class="header"><h3>Description</h3></div>
+        <span>{{ product.description }}</span>
+      </div>
+      <div class="miscellaneous">
+        <div class="header"><h3>About this item</h3></div>
+        <span>
+          ID: <b>{{ product.id }}</b>
+          <br>
+          Type: <b>{{ product.category.category_name }}</b>
+          <br>
+          Author: <b>{{ product.creator }}</b>
+          <br>
+          Date of Publication: <b>dummy</b>
+        </span>
+      </div>
+      <hr>
+      <form action="/add-to-cart/{{ product.id }}" method="POST" class="cta-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="filter">Add to Cart</button>
+      </form>
+      <form action="/check-out/{{ product.id }}" method="POST" class="cta-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="filter">Buy Now</button>
+      </form>
+      <hr>
+      <a href="/dashboard/manage-products" class="cta wishlist">
+        <div>
+          <span>Wishlist</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+<hr class="docSeparator">
+<div class="review__section">
+  <div class="header">
+    <div class="header__left">
+      <div class="rating">
+        <h1>Customer Reviews</h1>
+        <i class="bi bi-star-fill"></i>
+        <i class="bi bi-star-fill"></i>
+        <i class="bi bi-star-fill"></i>
+        <i class="bi bi-star-fill"></i>
+        <i class="bi bi-star-fill"></i>
+        <span class="ratingScore" id="rating" get-rating-here="{{ product.rating }}">{% if product.rating %}{{ product.rating }}{% else %}No reviews yet. Be the first one!{% endif %}</span>
+      </div>
+    </div>
+    <div class="header__right">
+      {% if user.role_id %}
+      <div class="write"><span>Write a review</span>&nbsp;&nbsp;<i class="bi bi-pencil-square"></i></div>
+      {% endif %}
+      {% if reviews %}
+      <div class="filters">
+        <div class="filter-container">
+          <div class="filter {% if rating_filter %}activated{% endif %}" filter-for="rating" id="filter">
+            <span class="selected {% if not rating_filter %}highlighted{% endif %}">{% if rating_filter %}{{ rating_filter|title }}{% else %}All{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+            <ul class="filter--options">
+              <li class="highlighted">All</li>
+              {% for tag in ['Highest first', 'Lowest first', '1 star', '2 star', '3 star', '4 star', '5 star'] %}
+              <li class="{% if tag == rating_filter %}highlighted{% endif %}">{{ tag }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="body">
+    <div class="reviews">
+      {% if reviews.items %}
+      {% for review in reviews %}
+      <div class="review">
+        <div class="left">
+          <img src="{{ url_for('static',filename='profile_pics/' + review.user.image) }}">
+        </div>
+        <div class="right">
+          <div class="section">
+            <p class="name">{{ review.user.username if review.show_username else "Annonymous" }}</p>
+            <div class="rating">
+              {% for x in range(review.rating|int) %}
+              <i class="bi bi-star-fill" style="color: orange"></i>
+              {% endfor %}
+              {% for x in range(5-review.rating|int) %}
+              <i class="bi bi-star-fill" style="color: #d9d9d9"></i>
+              {% endfor %}
+              <input type="hidden" value="{{ review.rating }}">
+            </div>
+          </div>
+          <p class="date"><i class="bi bi-calendar-plus-fill"></i>&nbsp;&nbsp;Reviewed on {{ review.created_at.strftime('%Y-%m-%d') }}</p>
+          <p class="description">{{ review.description }}</p>
+        </div>
+      </div>
+      {% endfor %}
+      {% else %}
+      <div class="review">
+        <h3>Sorry, no reviews were found with the given filter.</h3>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% with messages = get_flashed_messages(with_categories=true) %}
+<div class="overlay" style="display: {{ 'block' if messages else 'none' }};"></div>
+<div class="review__modal" style="display: {{ 'block' if messages else 'none' }};">
+  
+  {% if messages and messages[0][0] == 'success' %}
+  <!-- Success Block -->
+  <div class="success">
+    <i class="bi bi-x-lg fa-2xl"></i>
+    <i class="bi bi-check-circle fa-2xl"></i>
+    <h2>{{ messages[0][1] }}</h2>
+    <div class="button-wrapper">
+      <input id="cancel" name="cancel" type="button" value="Exit">
+    </div>
+  </div>
+
+  {% else %}
+  <!-- Form Block -->
+  <form method="POST" action="{{ url_for('productPagination.add_review', product_id=product.id) }}">
+    {{ form.hidden_tag() }}
+    <div class="addReview">
+      <div class="header">
+        <h1>Add a review for {{ product.name }}</h1>
+        <i class="bi bi-x-lg fa-2xl"></i>
+      </div>
+
+      <!-- Display error messages -->
+      {% if messages %}
+      <div class="alert alert-danger">
+        {% for category, message in messages %}
+          {% if category == 'error' %}
+          <span>{{ message | safe }}</span>
+          {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+      
+      <!-- Rating Field -->
+      <div class="rating">
+        {{ form.rating.label }}
+        {{ form.rating() }}
+        <i class="bi bi-star-fill"></i>
+        <i class="bi bi-star-fill"></i>
+        <i class="bi bi-star-fill"></i>
+        <i class="bi bi-star-fill"></i>
+        <i class="bi bi-star-fill"></i>
+      </div>
+
+      <!-- Username Field -->
+      <div class="username">
+        {{ form.show_username.label }}
+        {{ form.show_username() }}
+      </div>
+
+      <!-- Description Field -->
+      <div class="description">
+        {{ form.description(class="form-control", placeholder="Write your thoughts!", rows=10) }}
+      </div>
+
+      <!-- Buttons -->
+      <div class="buttons">
+        <div class="button-wrapper">
+          <input id="cancel" name="cancel" type="button" value="Cancel">
+        </div>
+        <div class="button-wrapper">
+          {{ form.submit() }}
+        </div>
+      </div>
+    </div>
+  </form>
+  {% endif %}
+</div>
+{% endwith %}
+
+
+<a href="{{ url_for('productPagination.product_pagination') }}" class="btn btn-secondary">Back to Products</a>
+{% endblock %}
+
+{% block body_scripts %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/pageInteractions/filters.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/pageInteractions/persistentScrollPosition.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/productPagination/productPage.js') }}"></script>
+{% if user.role_id %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/productPagination/addReview.js') }}"></script>
+{% endif %}
+{% endblock %}

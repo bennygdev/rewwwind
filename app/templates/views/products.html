@@ -1,0 +1,144 @@
+{% extends "views/base.html" %}
+{% set active_page = "products" %}
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/views/productPagination.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/pageInteractions/filters.css') }}">
+{% endblock %}
+{% block title %}Products{% endblock %}
+{% block content %}
+<div class="listing__header">
+  <div class="header__left">
+      <h1>{% block h1 %}Products{% endblock %}</h1>
+      {% if products.items %}
+      <p>Showing <span class="productPerPage">{{ 16 * current_page - 15 }}</span> &minus; <span class="productPerPage">{{ 16 * current_page if 16 * current_page < total_products else total_products  }}</span> of {{ total_products }} results</p>
+      {% endif %}
+  </div>
+  <div class="header__right">
+    <div class="filters">
+      <div class="filter-container">
+        <label>Type</label>
+        <div class="filter {% if category_filter %}activated{% endif %}" filter-for="type">
+          <span class="selected">{% if category_filter %}{{ category_filter|title }}{% else %}All{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+          <ul class="filter--options">
+            <li class="{% if not category_filter %}highlighted{% endif %}">All</li>
+            {% for category in categories %}
+            <li class="{% if category.category_name == category_filter|title %}highlighted{% endif %}">{{ category.category_name }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <div class="filter-container">
+        <label>Genre</label>
+        <div class="filter {% if subcategory_filter %}activated{% endif %}" filter-for="genre">
+          <span class="selected">{% if subcategory_filter %}{{ subcategory_filter|title }}{% else %}All{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+          <ul class="filter--options">
+          {% if category_filter %}
+            <li class="{% if not subcategory_filter %}highlighted{% endif %}">All</li>
+            {% for subcategory in subcategories %}
+            <li class="{% if subcategory.subcategory_name == subcategory_filter|title %}highlighted{% endif %}">{{ subcategory.subcategory_name }}</li>
+            {% endfor %}
+          {% else %}
+            <li class="disabled" style="background-color: red; color: white;">Please select a type first!</li>
+          {% endif %}
+          </ul>
+        </div>
+      </div>
+      <div class="filter-container">
+        <label>Price</label>
+        <div class="filter {% if price_filter %}activated{% endif %}" filter-for="price">
+          <span class="selected {% if not price_filter %}highlighted{% endif %}">{% if price_filter %}{{ price_filter | title }}{% else %}All{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+          <ul class="filter--options">
+            <li class="highlighted">All</li>
+            {% for tag in ['Highest first', 'Lowest first'] %}
+            <li class="{% if tag | lower == price_filter | lower %}highlighted{% endif %}">{{ tag }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <div class="filter-container">
+        <label>Rating</label>
+        <div class="filter {% if rating_filter %}activated{% endif %}" filter-for="rating">
+          <span class="selected {% if not rating_filter %}highlighted{% endif %}">{% if rating_filter %}{{ rating_filter|title }}{% else %}All{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+          <ul class="filter--options">
+            <li class="highlighted">All</li>
+            {% for tag in ['Highest first', 'Lowest first', '1 star', '2 star', '3 star', '4 star', '5 star'] %}
+            <li class="{% if tag == rating_filter %}highlighted{% endif %}">{{ tag }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% if products.items %}
+
+<div class="products">
+  {% for product in products %}
+  <div class="product">
+    <a href="{{ url_for('productPagination.product_detail', product_id = product.id) }}">
+      <div class="thumbnail">
+        <div class="rating">
+          {% if product.reviews %}
+            {% set rating = product.rating %}
+          {% else %}
+            {% set rating = "No rating yet" %}
+          {% endif %}
+          <span><i class="bi bi-star-fill"></i>&nbsp;{{ rating }}</span>
+        </div>
+        <div class="image">
+          <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}"/>
+        </div>
+        <div class="cart">
+          <i class="fa-solid fa-cart-shopping fa-xl"></i>
+        </div>
+      </div>
+    </a>
+    <div class="info">
+      <div class="info_left">
+        <h5 class="name">{{ product.name }}</h5>
+        <span>{{ product.creator }}</span>
+      </div>
+      <div class="info_right">
+        <h5>&dollar;{{ '{:.2f}'.format(product.conditions[0].price) }}</h5>
+        <span><i class="bi bi-short-fill"></i>&nbsp;{{ product.category.category_name }}</span>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+<div class="products__pagination">
+  <ul>
+      {% if current_page > 1 %}
+          <li class="pagePrevious__button">
+            <a href="{{ url_for('productPagination.product_pagination', page=current_page-1, q=search_query if search_query else None, category=category_filter if category_filter else None, subcategory=subcategory_filter if subcategory_filter else None, price=price_filter if price_filter else None, rating=rating_filter if rating_filter else None) }}">
+            Previous
+            </a>
+          </li>
+      {% endif %}
+      {% for p in range(1, total_pages + 1) %}
+          <li class="{% if p == current_page %}active{% endif %}">
+            <a class="page__button" href="{{ url_for('productPagination.product_pagination', page=p, q=search_query if search_query else None, category=category_filter if category_filter else None, subcategory=subcategory_filter if subcategory_filter else None, price=price_filter if price_filter else None, rating=rating_filter if rating_filter else None) }}">
+            {{ p }}
+            </a>
+          </li>
+      {% endfor %}
+      {% if current_page < total_pages %}
+          <li class="pageNext__button">
+            <a href="{{ url_for('productPagination.product_pagination', page=current_page+1, q=search_query if search_query else None, category=category_filter if category_filter else None, subcategory=subcategory_filter if subcategory_filter else None, price=price_filter if price_filter else None, rating=rating_filter if rating_filter else None) }}">
+            Next
+            </a>
+          </li>
+      {% endif %}
+  </ul>
+</div>
+
+
+{% else %}
+<h2 class="none">Sorry, no products were found with the given search queries and/or filters.</h2>
+{% endif %}
+{% endblock %}
+
+{% block body_scripts %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/pageInteractions/filters.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/productPagination/productPagination.js') }}"></script>
+{% endblock %}

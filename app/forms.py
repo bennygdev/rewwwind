@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from flask import request, flash
 from werkzeug.utils import secure_filename
-from wtforms import StringField, TextAreaField, IntegerField, FloatField, FieldList, FormField, SelectField, FileField, MultipleFileField, EmailField, PasswordField, HiddenField, SubmitField
+from wtforms import StringField, TextAreaField, IntegerField, FloatField, FieldList, FormField, SelectField, BooleanField, FileField, MultipleFileField, EmailField, PasswordField, HiddenField, SubmitField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, Optional, NumberRange, Regexp, ValidationError
 from PIL import Image # file object validator
 from mimetypes import guess_type # file extension validator
@@ -86,9 +86,13 @@ class AddProductForm(FlaskForm):
   productDescription = TextAreaField('Product Description')
   productType = SelectField('Type', validators=[DataRequired()])
   productGenre = SelectField('Genre', validators=[DataRequired()])
+  productIsFeaturedSpecial = BooleanField()
+  productIsFeaturedStaff = BooleanField()
   productConditions = FieldList(FormField(ConditionForm), min_entries=1)
+
+  images = HiddenField('images') # purely for update product
   
-  submit = SubmitField('Add')
+  submit = SubmitField('Add Product')
 
   def process(self, formdata=None, obj=None, data=None, **kwargs):
     super(AddProductForm, self).process(formdata, obj, data, **kwargs)
@@ -113,7 +117,7 @@ class AddProductForm(FlaskForm):
   # validating images
   def validate_productImages(self, field):
     for file in field.data:
-        if file:
+        if file and not isinstance(file, str):
           # Check mime type and extension
           mime_type, _ = guess_type(file.filename)
           extension = secure_filename(file.filename).split('.')[-1].lower()
@@ -126,8 +130,6 @@ class AddProductForm(FlaskForm):
               image.verify()
           except (IOError, SyntaxError):
               raise ValidationError('The image file could not be submitted. Please check if the image file is corrupted, and submit a different file if so.')
-          
-
 
 class DeleteProductForm(FlaskForm):
   productID = HiddenField()
@@ -137,3 +139,14 @@ class DeleteProductForm(FlaskForm):
   def validate_deleteConfirm(self, field):
     if field.data != 'CONFIRMDELETE':
        raise ValidationError('The confirmation input is invalid. Please type CONFIRMDELETE to confirm the deletion.')
+
+class AddReviewForm(FlaskForm):
+  rating = HiddenField('Rating:')
+  show_username = BooleanField('Show username', default=True)
+  description = TextAreaField()
+  
+  submit = SubmitField('Post Review')
+
+  def validate_rating(self, field):
+    if not field.data:
+      raise ValidationError('Please select a rating to give this product.')

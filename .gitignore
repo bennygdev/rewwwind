@@ -66,11 +66,32 @@ db.sqlite3-journal
 instance/
 app/static/profile_pics/*
 app/static/media/uploads/*
-!app/static/media/uploads/profile_pics/dummy1.jpg
-!app/static/media/uploads/profile_pics/dummy2.jpg
-!app/static/media/uploads/profile_pics/dummy3.jpg
-!app/static/media/uploads/profile_pics/dummy4.jpg
-!app/static/media/uploads/profile_pics/dummy5.jpg
+!app/static/media/uploads/1984.png
+!app/static/media/uploads/a_night_at_the_opera.png
+!app/static/media/uploads/abbey_road_vinyl_only.png
+!app/static/media/uploads/abbey_road_vinyl.png
+!app/static/media/uploads/abbey_road.png
+!app/static/media/uploads/back_in_black.png
+!app/static/media/uploads/brave_new_world.png
+!app/static/media/uploads/electric_ladyland.png
+!app/static/media/uploads/kind_of_blue_vinyl_only.png
+!app/static/media/uploads/kind_of_blue_vinyl.png
+!app/static/media/uploads/kind_of_blue.png
+!app/static/media/uploads/let_it_be.png
+!app/static/media/uploads/lotr_the_fellowship_of_the_ring.png
+!app/static/media/uploads/revolver.png
+!app/static/media/uploads/rumours.png
+!app/static/media/uploads/sapiens__a_brief_history_of_humankind.png
+!app/static/media/uploads/the_best_of_miles_davis.png
+!app/static/media/uploads/the_catcher_in_the_rye.png
+!app/static/media/uploads/the_catcher_was_a_spy.png
+!app/static/media/uploads/the_dark_side_of_the_moon_vinyl.png
+!app/static/media/uploads/the_dark_side_of_the_moon.png
+!app/static/media/uploads/the_great_gatsby.png
+!app/static/media/uploads/the_hobbit.png
+!app/static/media/uploads/the_wall.png
+!app/static/media/uploads/to_kill_a_mockingbird.png
+!app/static/media/uploads/to_kill_a_mockingbird2.png
 .webassets-cache
 # app/static/media/uploads/*   **Add back if needed.**
 

@@ -1,10 +1,22 @@
 class RatingStars {
-    constructor(container) {
+    constructor(container, text) {
         this.container = document.querySelector(container);
         this.stars = Array.from(this.container.querySelectorAll('i.bi-star-fill'));
-        this.rating = 4;
+        // this.getRatingInputs = Array.from(document.querySelectorAll('.review__section .review .rating input'));
+        this.rating = parseFloat(document.getElementById('rating').getAttribute('get-rating-here'))
+        isNaN(this.rating) ? this.rating = 0 : this.rating = this.rating.toFixed(1);
+        this.rating0Text = text;
+        this.ratingScore = this.container.querySelector('.ratingScore');
+        this.reviewNum = this.container.querySelector('.numOfReviews');
 
+        this.init();
         this.fillStars();
+    }
+
+    init() {
+        if (this.rating === Math.round(this.rating) && this.rating !== 0) {
+            this.rating = this.rating.toString() + '.0';
+        }
     }
     
     fillStars() {
@@ -24,5 +36,34 @@ class RatingStars {
     }
 }
 
-new RatingStars(".product .rating");
-new RatingStars(".review .rating");
+new RatingStars(".product .rating", 'No reviews yet. Be the first one!');
+new RatingStars(".review__section .rating", '0');
+
+class Images {
+    constructor(container) {
+        this.container = container;
+        this.images = Array.from(this.container.querySelectorAll('.image__container img'));
+        this.display = this.container.previousElementSibling.querySelector('img');
+        this.imagePrev = this.images.find(image => image.src === this.display.src);
+        console.log(this.display.src, this.images)
+
+        this.init();
+    }
+
+    init() {
+        this.imagePrev.parentElement.classList.add('active');
+
+        this.images.forEach(image => {
+            image.addEventListener('click', () => {this.selectImage(image)});
+        });
+    }
+
+    selectImage(target) {
+        this.imagePrev.parentElement.classList.remove('active');
+        this.imagePrev = target;
+        target.parentElement.classList.add('active');
+        this.display.src = target.src;
+    }
+}
+
+new Images(document.querySelector('.image-list'));

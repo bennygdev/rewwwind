@@ -11,10 +11,28 @@
     </div>
 
   <div class="nav__right">
-    <div class="nav__search-container">
-      <input type="text" id="nav__search-bar" class="nav__search-bar" placeholder="Search..." autocomplete="off">
-      <i class="fa-solid fa-magnifying-glass nav__search-button" id="nav__search-button"></i>
-      <div id="nav__search--suggestions" class="nav__search--suggestions"></div>
+    <div class="search__wrapper">
+      <form method="get" action="{{ url_for('productPagination.product_pagination') }}">
+          <div class="nav__search-container">
+          <input
+            type="text"
+            name="q"
+            id="search__bar"
+            class="search__bar"
+            placeholder="Search by product name..."
+            value="{{ search_query }}"
+            autocomplete="off"
+          >
+          <button type="submit" class="search__button" id="search__button">
+              <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+          {% if search_query %}
+              <a href="{{ url_for('productPagination.product_pagination') }}" class="clear__button">
+                  <i class="fa-solid fa-xmark fa-lg"></i>
+              </a>
+          {% endif %}
+          </div>
+      </form>
     </div>
 
     <!-- Navigation links -->

@@ -6,96 +6,119 @@
 {% endblock %}
 {% block title %}Manage Products{% endblock %}
 
+{% block headerContent %}
+<div class="products__header">
+    <h1 id="products__title">Manage Products</h1>
+    <div class="product__statistics">
+        <div class="statistic__box">
+            <i class="bi bi-gift-fill fa-xl"></i>
+            <div class="product__statistic">
+                <p class="statistic__label">Total Products</p>
+                <span class="statistic__amount">{{ total_products }}</span>
+            </div>
+        </div>
+        <div class="statistic__box">
+            <i class="bi bi-exclamation-circle-fill fa-xl"></i>
+            <div class="product__statistic">
+                <p class="statistic__label">Warnings</p>
+                <span class="statistic__amount">{{ total_warnings }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="extraPadding"></div>
+    <div class="search__wrapper">
+        <!-- <div class="search__container">
+          <input type="text" id="search__bar" class="search__bar" placeholder="Search by username..." autocomplete="off">
+          <i class="fa-solid fa-magnifying-glass search__button" id="search__button"></i>
+        </div> -->
+        <form method="get" action="{{ url_for('manageProducts.products_listing') }}">
+            <div class="search__container">
+            <input
+              type="text"
+              name="q"
+              id="search__bar"
+              class="search__bar"
+              placeholder="Search by product name..."
+              value="{{ search_query }}"
+              autocomplete="off"
+            >
+            <button type="submit" class="search__button" id="search__button">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+            {% if search_query %}
+                <a href="{{ url_for('manageProducts.products_listing') }}" class="clear__button">
+                    <i class="fa-solid fa-xmark fa-lg"></i>
+                </a>
+            {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
 
 {% block content %}
 <div class="header">
     <div class="header__left">
-        <h2>Manage Products</h2>
         <div class="filters">
             <div class="filter-container">
                 <label>Type</label>
-                <div class="filter">
-                    <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+                <div class="filter {% if category_filter %}activated{% endif %}" filter-for="type">
+                    <span class="selected">{% if category_filter %}{{ category_filter|title }}{% else %}All{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
                     <ul class="filter--options">
-                        <li class="highlighted">All</li>
-                        <li>short</li>
-                        <li>mediuuum</li>
-                        <li>looooooooong</li>
+                        <li class="{% if not category_filter %}highlighted{% endif %}">All</li>
+                        {% for category in categories %}
+                        <li class="{% if category.category_name == category_filter|title %}highlighted{% endif %}">{{ category.category_name }}</li>
+                        {% endfor %}
                     </ul>
                 </div>
             </div>
             <div class="filter-container">
-                <label>Type</label>
-                <div class="filter">
-                    <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+                <label>Genre</label>
+                <div class="filter {% if subcategory_filter %}activated{% endif %}" filter-for="genre">
+                    <span class="selected">{% if subcategory_filter %}{{ subcategory_filter|title }}{% else %}All{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
                     <ul class="filter--options">
-                        <li class="highlighted">All</li>
-                        <li>short</li>
-                        <li>mediuuum</li>
-                        <li>looooooooong</li>
+                    {% if category_filter %}
+                        <li class="{% if not subcategory_filter %}highlighted{% endif %}">All</li>
+                        {% for subcategory in subcategories %}
+                        <li class="{% if subcategory.subcategory_name == subcategory_filter|title %}highlighted{% endif %}">{{ subcategory.subcategory_name }}</li>
+                        {% endfor %}
+                    {% else %}
+                        <li class="disabled" style="background-color: red; color: white;">Please select a type first!</li>
+                    {% endif %}
                     </ul>
                 </div>
             </div>
             <div class="filter-container">
-                <label>Type</label>
-                <div class="filter">
-                    <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+                <label>Featured</label>
+                <div class="filter {% if featured_filter %}activated{% endif %}" filter-for="featured">
+                    <span class="selected">{% if featured_filter %}{{ featured_filter|title }}{% else %}None{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
                     <ul class="filter--options">
-                        <li class="highlighted">All</li>
-                        <li>short</li>
-                        <li>mediuuum</li>
-                        <li>looooooooong</li>
+                        <li class="{% if not featured_filter %}highlighted{% endif %}">None</li>
+                        {% for tag in ['Special', 'Staff Picks'] %}
+                        <li class="{% if tag == featured_filter|title %}highlighted{% endif %}">{{ tag }}</li>
+                        {% endfor %}
                     </ul>
                 </div>
             </div>
             <div class="filter-container">
-                <label>Type</label>
-                <div class="filter">
-                    <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+                <label>Stock</label>
+                <div class="filter {% if stock_filter %}activated{% endif %}" filter-for="stock">
+                    <span class="selected">{% if stock_filter %}{{ stock_filter|title }}{% else %}All{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
                     <ul class="filter--options">
-                        <li class="highlighted">All</li>
-                        <li>short</li>
-                        <li>mediuuum</li>
-                        <li>looooooooong</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="filter-container">
-                <label>Type</label>
-                <div class="filter">
-                    <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
-                    <ul class="filter--options">
-                        <li class="highlighted">All</li>
-                        <li>short</li>
-                        <li>mediuuum</li>
-                        <li>looooooooong</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="filter-container">
-                <label>Type</label>
-                <div class="filter">
-                    <span class="selected">All</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
-                    <ul class="filter--options">
-                        <li class="highlighted">All</li>
-                        <li>short</li>
-                        <li>mediuuum</li>
-                        <li>looooooooong</li>
+                        <li class="{% if not stock_filter %}highlighted{% endif %}">All</li>
+                        {% for tag in ['Plenty in stock', 'Limited stock', 'No stock', 'Highest first', 'Lowest first'] %}
+                        <li class="{% if tag|lower == stock_filter|lower %}highlighted{% endif %}">{{ tag }}</li>
+                        {% endfor %}
                     </ul>
                 </div>
             </div>
           </div>
     </div>
     <div class="header__right">
-        <div><h5><i class="bi bi-gift-fill"></i>{{ products|length }} Total Products</h5></div>
-        <a href='/dashboard/manage-products/add-product'><h3><i class="fa-solid fa-plus"></i>Add Product</h3></a>
+        <a href="{{ url_for('manageProducts.add_product') }}"><h3><i class="fa-solid fa-plus"></i>Add Product</h3></a>
     </div>
 </div>
-<div class="nav__search-container">
-    <input type="text" id="nav__search-bar" class="nav__search-bar" placeholder="Search..." autocomplete="off">
-    <i class="fa-solid fa-magnifying-glass nav__search-button" id="nav__search-button"></i>
-    <div id="nav__search--suggestions" class="nav__search--suggestions"></div>
-  </div>
+{% if products.items %}
 <div class="products">
     <table>
         <thead>
@@ -103,7 +126,7 @@
                 <th class="productName">Name</th>
                 <th class="productType">Type</th>
                 <th class="productGenre">Genre</th>
-                <th class="productVariants">Variants</th>
+                <th class="productConditions">Conditions</th>
                 <th class="productAvgPrice">Avg. Price</th>
                 <th class="productStock"></th>
                 <th class="controls"></th>
@@ -112,30 +135,30 @@
         {% for product in products %}
         <tr product-id="{{ product.id }}">
             <td class="productName">
-                <div class="thumbnail"><img src="{{ url_for('static', filename=product.image_thumbnail) }}" alt="{{ product.name }}"/></div>
+                <div class="thumbnail"><img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}"/></div>
                 <div class="name"><p>{{ product.name }}</p><p>ID: {{ product.id }}</p></div>
             </td>
             <td class="productType">{{ product.category.category_name }}</td>
             <td class="productGenre">{{ product.category.category_name }}</td>
-            <td class="productVariants">{{ product.variants|length }}</td>
-            <td class="productAvgPrice">&dollar;{{ '{:.2f}'.format(product.variants[0].price) }}</td>
-            {% if product.variants[0].stock == 0 %}
+            <td class="productconditions">{{ product.conditions|length }}</td>
+            <td class="productAvgPrice">&dollar;{{ '{:.2f}'.format(product.conditions[0].price) }}</td>
+            {% if product.conditions[0].stock == 0 %}
                 {% set stock_class = 'noStock' %}
-                {% set stock_text = 'Out of stock' %}
-            {% elif product.variants[0].stock <= 10 %}
+                {% set stock_text = 'Out of Stock' %}
+            {% elif product.conditions[0].stock <= 10 %}
                 {% set stock_class = 'lowStock' %}
-                {% set stock_text = 'Low on stock' %}
+                {% set stock_text = 'Limited Stock ( ' + product.conditions[0].stock|string + ' left )' %}
             {% else %}
                 {% set stock_class = 'highStock' %}
-                {% set stock_text = 'High stock' %}
+                {% set stock_text = 'Plenty in Stock' %}
             {% endif %}
             <td class="productStock {{ stock_class }}">
                 <div>{{ stock_text }}</div>
             </td>
             <td class="controls">
                 <div>
-                    <i class="bi bi-pencil-square"></i>
-                    <a href="/products/product/{{ product.id }}"><i class="bi bi-eye-fill"></i></a>
+                    <a href="{{ url_for('manageProducts.update_product', product_id = product.id) }}"><i class="fa-solid fa-pen"></i></a>
+                    <a href="{{ url_for('productPagination.product_detail', product_id = product.id) }}"><i class="fa-solid fa-eye"></i></a>
                     <i class="bi bi-trash-fill"></i>
                 </div>
             </td>
@@ -143,18 +166,23 @@
         {% endfor %}
     </table>
 </div>
-<div class="overlay"></div>
-{% if deleteForm.deleteConfirm.errors or deleteForm.deleteConfirm.data == 'success' %}
+{% set message = get_flashed_messages()[0] if get_flashed_messages() else None %}
+{% if deleteForm.deleteConfirm.errors or message %}
     {% set display = 'flex' %}
 {% else %}
     {% set display = 'none' %}
 {% endif %}
-<div class="delete__form-container {{ deleteForm.deleteConfirm.data }}" id="{{ deleteForm.productID.data }}" style="display: {{ display }};"> <!-- if you're getting an error for this, don't mind it. vscode just assumes it as plain html rather than jinja, but when you run it the jinja template will still be processed -->
+<div class="overlay" style="display: {{ display }}"></div>
+<div class="delete__form-container" success="{{ 'true' if message else 'false' }}" id="{{ deleteForm.productID.data }}" style="display: {{ display }};">
+    <!-- if you're getting an error for the above, don't mind it. vscode just assumes it as plain html rather than jinja, but when you run it the jinja template will still be processed -->
+
     <i class="bi bi-x-lg"></i>
-    {% if deleteForm.deleteConfirm.data == 'success' %}
+    {% if message %}
         <div class="header">
             <i class="bi bi-check-circle"></i>
-            <h2>The product has been removed successfully.</h2>
+            <h2>
+                {{ message }}
+            </h2>
         </div>
         <div class="cancel_button button__wrapper">
             <input type="button" value="Exit">
@@ -193,9 +221,39 @@
         </form>
     {% endif %}
 </div>
+<div class="products__pagination">
+    <ul>
+        {% if current_page > 1 %}
+            <li class="pagePrevious__button">
+              <a href="{{ url_for('manageProducts.products_listing', page=current_page-1, q=search_query if search_query else None, type=category_filter if category_filter else None, subcategory=subcategory_filter if subcategory_filter else None, featured=featured_filter if featured_filter else None, stock=stock_rating if stock_rating else None) }}">
+              Previous
+              </a>
+            </li>
+        {% endif %}
+        {% for p in range(1, total_pages + 1) %}
+            <li class="{% if p == current_page %}active{% endif %}">
+              <a class="page__button" href="{{ url_for('manageProducts.products_listing', page=p, q=search_query if search_query else None, type=category_filter if category_filter else None, subcategory=subcategory_filter if subcategory_filter else None, featured=featured_filter if featured_filter else None, stock=stock_rating if stock_rating else None) }}">
+              {{ p }}
+              </a>
+            </li>
+        {% endfor %}
+        {% if current_page < total_pages %}
+            <li class="pageNext__button">
+              <a href="{{ url_for('manageProducts.products_listing', page=current_page+1, q=search_query if search_query else None, type=category_filter if category_filter else None, subcategory=subcategory_filter if subcategory_filter else None, featured=featured_filter if featured_filter else None, stock=stock_rating if stock_rating else None) }}">
+              Next
+              </a>
+            </li>
+        {% endif %}
+    </ul>
+</div>
+{% else %}
+<h1 class="none">Sorry, no entries were found with the given search queries and/or filters.</h1>
+{% endif %}
+  
 {% endblock %}
 
 {% block body_scripts %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/pageInteractions/filters.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/dashboard/manageProducts/deleteProduct.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/dashboard/manageProducts/productListing.js') }}"></script>
 {% endblock %}

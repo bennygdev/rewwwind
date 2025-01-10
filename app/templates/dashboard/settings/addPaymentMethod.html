@@ -20,12 +20,17 @@
   
   <div class="addPayment__paymentType">
     {{ form.paymentType_id.label }}
-    <select name="paymentType_id" class="form-control">
-      <option value="">Select a Category</option>
-      <option value="1">Visa</option>
-      <option value="2">Mastercard</option>
-      <option value="3">American Express</option>
-    </select>
+    <div class="payment-types">
+      {% for value, label in form.paymentType_id.choices %}
+      <div class="payment-type">
+        <input type="radio" name="paymentType_id" id="type_{{ value }}" value="{{ value }}" 
+               {% if form.paymentType_id.data == value %}checked{% endif %}>
+        <label for="type_{{ value }}">
+          <img src="{{ url_for('static', filename='media/card_logos/' ~ label|lower ~ '.svg') }}" alt="{{ label }}" title="{{ label }}">
+        </label>
+      </div>
+      {% endfor %}
+    </div>
   </div>
   <div class="addPayment__cardName">
     {{ form.card_name.label }}
@@ -37,7 +42,7 @@
   </div>
   <div class="addPayment__cardExpiryDate">
     {{ form.expiry_date.label }}
-    {{ form.expiry_date(class="form-control") }}
+    {{ form.expiry_date(class="form-control", placeholder="MM/YY") }}
   </div>
   <div class="addPayment__cardCVV">
     {{ form.card_cvv.label }}
@@ -49,4 +54,11 @@
   </div>
 </form>
 
+{% endblock %}
+
+{% block body_scripts %}
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/dashboard/settings/paymentType.js') }}"
+></script>
 {% endblock %}

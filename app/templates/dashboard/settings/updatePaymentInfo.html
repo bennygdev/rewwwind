@@ -59,14 +59,17 @@
         {{ form.hidden_tag() }}
         <input type="hidden" name="method_id" value="{{ method.id }}">
         
-        <div class="payment__editPaymentType">
-          {{ form.paymentType_id.label }}
-          <select name="paymentType_id" class="form-control">
-            <option value="">Select a Category</option>
-            {% for type in payment_types %}
-              <option value="{{ type.id }}" {% if type.id == method.paymentType_id %}selected{% endif %}>{{ type.payment_type }}</option>
-            {% endfor %}
-          </select>
+        <div class="payment-types">
+          {% for type in payment_types %}
+          <div class="payment-type">
+            <input type="radio" name="paymentType_id" id="type_{{ method.id }}_{{ type.id }}" value="{{ type.id }}" 
+                   {% if type.id == method.paymentType_id %}checked{% endif %}>
+            <label for="type_{{ method.id }}_{{ type.id }}">
+              <img src="{{ url_for('static', filename='media/card_logos/' ~ type.payment_type|lower ~ '.svg') }}" 
+                   alt="{{ type.payment_type }}" title="{{ type.payment_type }}">
+            </label>
+          </div>
+          {% endfor %}
         </div>
         <div class="payment__editCardName">
           {{ form.card_name.label }} 
@@ -122,5 +125,9 @@
 <script
   type="text/javascript"
   src="{{ url_for('static', filename='js/deleteModal.js') }}"
+></script>
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/dashboard/settings/paymentType.js') }}"
 ></script>
 {% endblock %}

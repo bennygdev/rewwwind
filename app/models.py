@@ -63,7 +63,7 @@ class PaymentInformation(db.Model):
   paymentType_id = db.Column(db.Integer, db.ForeignKey('payment_types.id'), nullable=False)  # payment method table
   card_number = db.Column(db.String(16), nullable=False) # store as string since leading zeros
   card_name = db.Column(db.String(255), nullable=False)
-  expiry_date = db.Column(db.Date, nullable=False)
+  expiry_date = db.Column(db.String(5), nullable=False)
   card_cvv = db.Column(db.String(3), nullable=False) # store as string since leading zeros
   created_at = db.Column(db.DateTime(timezone=True), default=func.now())
   updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())

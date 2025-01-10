@@ -184,6 +184,9 @@ def update_billing_address():
       flash("Invalid billing address or unauthorized access.", "error")
         
     return redirect(url_for('dashboard.update_billing_address'))
+  
+  if form.postal_code.errors:
+    flash("Postal code must be in numbers.", "error")
 
   return render_template("dashboard/settings/updateBillingAddress.html", user=current_user, billing_addresses=billing_addresses, form=form)
 
@@ -208,6 +211,8 @@ def add_billing_address():
     flash("Billing address added!", "success")
     return redirect(url_for('dashboard.update_billing_address'))
 
+  if form.postal_code.errors:
+    flash("Postal code must be in numbers.", "error")
 
   return render_template("dashboard/settings/addBillingAddress.html", user=current_user, form=form)
 
@@ -253,14 +258,24 @@ def update_payment_information():
         
     return redirect(url_for('dashboard.update_payment_information'))
   
-  if form.paymentType_id.errors:
-    flash("Please select a payment type.", "error")
-
-  if form.card_number.errors:
-    flash("Card number must be in digits", "error")
-
-  if form.card_cvv.errors:
-    flash("CVV must be in digits.", "error")
+  # Handle specific validation errors for any scenario
+  if form.errors:
+    for field, errors in form.errors.items():
+      for error in errors:
+        # Convert field name to more readable format
+        field_name = {
+          'paymentType_id': 'Card Type',
+          'card_name': 'Card Name',
+          'card_number': 'Card Number',
+          'expiry_date': 'Expiry Date',
+          'card_cvv': 'CVV'
+        }.get(field, field.replace('_', ' ').title())
+                
+        # Don't include field name if it's already in the error message
+        if error.startswith('This appears to be') or error.startswith('Invalid'):
+          flash(error, "error")
+        else:
+          flash(f"{field_name}: {error}", "error")
 
   return render_template("dashboard/settings/updatePaymentInfo.html", user=current_user, payment_methods=payment_methods, payment_types=payment_types, form=form)
 
@@ -284,15 +299,25 @@ def add_payment_method():
     db.session.commit()
     flash("Payment Method added!", "success")
     return redirect(url_for('dashboard.update_payment_information'))
-  
-  if form.paymentType_id.errors:
-    flash("Please select a payment type.", "error")
 
-  if form.card_number.errors:
-    flash("Card number must be in digits", "error")
-
-  if form.card_cvv.errors:
-    flash("CVV must be in digits.", "error")
+  # Handle specific validation errors for any scenario
+  if form.errors:
+    for field, errors in form.errors.items():
+      for error in errors:
+        # Convert field name to more readable format
+        field_name = {
+          'paymentType_id': 'Card Type',
+          'card_name': 'Card Name',
+          'card_number': 'Card Number',
+          'expiry_date': 'Expiry Date',
+          'card_cvv': 'CVV'
+        }.get(field, field.replace('_', ' ').title())
+                
+        # Don't include field name if it's already in the error message
+        if error.startswith('This appears to be') or error.startswith('Invalid'):
+          flash(error, "error")
+        else:
+          flash(f"{field_name}: {error}", "error")
 
   return render_template("dashboard/settings/addPaymentMethod.html", user=current_user, form=form)
 

@@ -40,7 +40,7 @@
                     </form>
                 </td>
                 <td>${{ item.product.price }}</td>
-                <td>${{ item.quantity * item.product.variants[0]['price'] }}</td>
+                <td>${{ item.quantity * item.product.conditions[0]['price'] }}</td>
                 <td>
                     <form action="/remove-from-cart/{{ item.product_id }}" method="POST">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

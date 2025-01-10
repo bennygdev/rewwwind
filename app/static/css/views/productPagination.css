@@ -96,15 +96,26 @@
     justify-self: center;
 }
 
+/* a:has(.cart) {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+} */
 .cart {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
     border-radius: 100%;
     padding: 1em;
     background-color: #039752;
     font-size: 1em;
     color: white;
-    position: absolute;
-    bottom: 15px;
-    right: 15px;
+    z-index: 1;
+    cursor: pointer;
+}
+
+.cart form button {
+    all: unset;
 }
 
 .info {

@@ -120,7 +120,7 @@ class Filter {
         } else {
             params.set(filterKey, selectedOption.innerText.toLowerCase());
         }
-
+        params.set('filters_changed', true)
         window.location.search = params.toString(); // Update the URL
     }
 

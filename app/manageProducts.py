@@ -49,9 +49,9 @@ def pagination(products):
         else:
             products_query = products_query.filter(Product.is_featured_staff)
 
-    if not stock_filter and session.get('first_time_opening', True):
-        session['first_time_opening'] = False  # Mark as no longer the first visit
-        stock_filter = 'Lowest first'
+    # if not stock_filter and session.get('first_time_opening', True):
+    #     session['first_time_opening'] = False  # Mark as no longer the first visit
+    #     stock_filter = 'Lowest first' will add this back on another day.
     if stock_filter and stock_filter != 'all':
         if 'limited' in stock_filter:
             products_query = products_query.filter(cast(Product.conditions[0]['stock'], Integer) <= 10)
@@ -90,8 +90,19 @@ def products_listing():
     categories = Category.query.all()[:8]
     subcategories = SubCategory.query.join(Category).filter(Category.category_name == category_filter)[:8]
     
-    if category_filter or subcategory_filter or featured_filter or stock_filter:
-        page = 1 # prevent error where 404 is returned when product query is <= 10 * current page number
+    filters_changed = request.args.get('filters_changed', 'false').lower() == 'true'
+    if filters_changed:
+        page = 1
+        return redirect(url_for(
+            'manageProducts.products_listing', 
+            page=1, 
+            q=search_query if search_query else None, 
+            type=category_filter if category_filter else None, 
+            genre=subcategory_filter if subcategory_filter else None, 
+            featured=featured_filter if featured_filter else None, 
+            stock=stock_filter if stock_filter else None, 
+            filters_changed='false'
+            ))
 
     return render_template(
         "dashboard/manageProducts/products.html", 
@@ -195,20 +206,26 @@ def update_product(product_id):
         form.productThumbnail.data = product.image_thumbnail
         form.productIsFeaturedSpecial.data = product.is_featured_special
         form.productIsFeaturedStaff.data = product.is_featured_staff
-        
-        # still does not work when adding multiple conditions, but will just leave it as is for now.
+
+        condition_choices = [
+        ('Brand New', 'Brand New'),
+        ('Like New', 'Like New'),
+        ('Lightly Used', 'Lightly Used'),
+        ('Well Used', 'Well Used')
+        ]
         if product.conditions:
             condition = product.conditions[0]  # Take the first variant condition
             form.productConditions[0].condition.data = condition['condition']
             form.productConditions[0].stock.data = condition['stock']
             form.productConditions[0].price.data = condition['price']
 
-        for condition in product.conditions[1:]:  # Skip the first condition since it's already set
-            form.productConditions.append_entry({
-                'condition': condition['name'],
-                'stock': condition['stock'],
-                'price': condition['price']
-            })
+            for condition in product.conditions[1:]:  # Skip the first condition since it's already set
+                entry = form.productConditions.append_entry({
+                    'stock': condition['stock'],
+                    'price': condition['price']
+                })
+                entry.condition.choices = condition_choices
+                entry.condition.data = condition['condition']
         # if not product.images:
         #     print('No images were uploaded.')
 

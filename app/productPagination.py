@@ -47,12 +47,24 @@ def product_pagination():
     # Pagination logic
     page = request.args.get('page', 1, type=int)
     per_page = 16
+
+    filters_changed = request.args.get('filters_changed', 'false').lower() == 'true'
+    if filters_changed:
+        page = 1
+        return redirect(url_for(
+            'productPagination.product_pagination', 
+            page=1, 
+            q=search_query if search_query else None, 
+            type=category_filter if category_filter else None, 
+            genre=subcategory_filter if subcategory_filter else None, 
+            price=price_filter if price_filter else None, 
+            rating=rating_filter if rating_filter else None, 
+            filters_changed='false'
+            ))
+
     total_products = products_query.count()
-
-    if category_filter or subcategory_filter or price_filter or rating_filter:
-        page = 1 # prevent error where 404 is returned when product query is <= 16 * current page number
-
     products = products_query.order_by(Product.id).paginate(page=page, per_page=per_page)
+
 
     total_pages = ceil(total_products / per_page)
 
@@ -135,6 +147,7 @@ def product_detail(product_id):
 def add_review(product_id):
     product = Product.query.get_or_404(product_id)
     reviewForm = AddReviewForm()
+    reviews = product.reviews
 
     if reviewForm.validate_on_submit():
         # Create a new review object and save it to the database
@@ -163,7 +176,7 @@ def add_review(product_id):
             for error in errors:
                 flash(f"<strong>Error:</strong> {error}", "error")
 
-    return render_template("/views/productPage.html", user=current_user, product=product, form=reviewForm)
+    return render_template("/views/productPage.html", user=current_user, product=product, form=reviewForm, reviews=reviews)
 
 @productPagination.route('/featured/specials')
 def product_specials():

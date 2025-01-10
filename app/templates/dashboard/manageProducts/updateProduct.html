@@ -2,7 +2,7 @@
 {% block title %}Update Product{% endblock %}
 
 {% block h1 %}Update Product <span id="getIdHere">{{ product.id }}</span>{% endblock %}
-
+{% block submit_value %}Update Product{% endblock %}
 {% block images_hidden %}
 {{ form.images(images=product.images) }}
 {% endblock %}

@@ -105,10 +105,10 @@ class AddProductForm(FlaskForm):
 
     # populating condition select choices
     condition_choices = [
-        ('1', 'Like New'),
-        ('2', 'Very Good'),
-        ('3', 'Good'),
-        ('4', 'Well Used')
+        ('Brand New', 'Brand New'),
+        ('Like New', 'Like New'),
+        ('Lightly Used', 'Lightly Used'),
+        ('Well Used', 'Well Used')
     ]
     if self.productConditions.entries:
       for condition_form in self.productConditions.entries:  # Use entries to access each form

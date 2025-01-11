@@ -145,6 +145,14 @@ def add_review(product_id):
     reviews_query = Review.query.filter_by(product_id=product_id)
     reviews = reviews_query.order_by(Review.id).paginate(page=page, per_page=per_page)
 
+    # Condition logic
+    selected_condition_name = request.args.get('condition')
+    if not selected_condition_name:
+        selected_condition = product.conditions[0]
+    else:
+        selected_condition = next((condition for condition in product.conditions if condition['condition'] == selected_condition_name), None)
+    print(selected_condition)
+
     if reviewForm.validate_on_submit():
         new_review = Review(
             rating=reviewForm.rating.data,
@@ -169,7 +177,7 @@ def add_review(product_id):
             for error in errors:
                 flash(f"<strong>Error:</strong> {error}", "error")
 
-    return render_template("/views/productPage.html", user=current_user, product=product, reviewform=reviewForm, cartform=cartForm, reviews=reviews)
+    return render_template("/views/productPage.html", user=current_user, product=product, reviewform=reviewForm, cartform=cartForm, reviews=reviews, selected_condition=selected_condition)
 
 @productPagination.route('/product/<int:product_id>/update-review=<int:review_id>', methods=['GET', 'POST'])
 @login_required
@@ -185,7 +193,14 @@ def update_review(product_id, review_id):
     per_page = 5
     reviews_query = Review.query.filter_by(product_id=product_id)
     reviews = reviews_query.order_by(Review.id).paginate(page=page, per_page=per_page)
-    
+
+    # Condition logic
+    selected_condition_name = request.args.get('condition')
+    if not selected_condition_name:
+        selected_condition = product.conditions[0]
+    else:
+        selected_condition = next((condition for condition in product.conditions if condition['condition'] == selected_condition_name), None)
+    print(selected_condition)    
 
     if current_user.id != review.user_id and current_user.role_id == 1:
         abort(401)
@@ -214,7 +229,7 @@ def update_review(product_id, review_id):
                 for error in errors:
                     flash(f"<strong>Error:</strong> {error}", "error")
 
-    return render_template("/views/updateReview.html", user=current_user, product=product, reviewform=reviewForm, cartform=cartForm, reviews=reviews, review=review)
+    return render_template("/views/updateReview.html", user=current_user, product=product, reviewform=reviewForm, cartform=cartForm, reviews=reviews, review=review, selected_condition=selected_condition)
 
 @productPagination.route('/product/<int:product_id>/delete-review=<int:review_id>', methods=['GET', 'POST'])
 @login_required
@@ -231,6 +246,14 @@ def delete_review(product_id, review_id):
     per_page = 5
     reviews_query = Review.query.filter_by(product_id=product_id)
     reviews = reviews_query.order_by(Review.id).paginate(page=page, per_page=per_page)
+
+    # Condition logic
+    selected_condition_name = request.args.get('condition')
+    if not selected_condition_name:
+        selected_condition = product.conditions[0]
+    else:
+        selected_condition = next((condition for condition in product.conditions if condition['condition'] == selected_condition_name), None)
+    print(selected_condition)
 
     if request.method == 'GET':
         if current_user.id != review.user_id and current_user.role_id == 1:
@@ -252,7 +275,7 @@ def delete_review(product_id, review_id):
                     print(error)
                     flash(f"<strong>Error:</strong> {error}", "error")
 
-    return render_template("/views/productPage.html", user=current_user, product=product, reviewform=reviewForm, cartform=cartForm, reviews=reviews, review=review, delete=True, deleteform=deleteForm)
+    return render_template("/views/productPage.html", user=current_user, product=product, reviewform=reviewForm, cartform=cartForm, reviews=reviews, review=review, delete=True, deleteform=deleteForm, selected_condition=selected_condition)
 
 @productPagination.route('/featured/specials')
 def product_specials():

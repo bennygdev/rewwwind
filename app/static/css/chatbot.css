@@ -1,3 +1,7 @@
+.chatbot__wrapper {
+  z-index: 3;
+}
+
 .chatbot-toggler {
   position: fixed;
   right: 40px;
@@ -14,7 +18,6 @@
   outline: none;
   cursor: pointer;
   transition: all 0.2s ease;
-  z-index: 3;
 }
 
 .show-chatbot .chatbot-toggler {

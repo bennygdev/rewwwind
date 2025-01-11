@@ -17,3 +17,12 @@ function adjustText() {
 
 window.addEventListener('resize', adjustText);
 adjustText();
+
+
+const WarningDiv = document.querySelector('.product__statistic.warning')
+WarningDiv.addEventListener('click', () => {
+    const params = new URLSearchParams(window.location.search);
+    params.set('page', 1)
+    params.set('stock', 'lowest first')
+    window.location.search = params.toString();
+})

@@ -81,7 +81,7 @@ class ImageHandler extends Form {
     constructor(fileInputName, formSelector, submitUrl, is_update) {
         super(formSelector, submitUrl);
         this.fileInputName = fileInputName;
-        this.fileInput = this.form.querySelector(`input[name="${this.fileInputName}"]`);
+        this.fileInput = document.getElementById(`productImages`);
         this.label = this.form.querySelector(`label[for="${this.fileInput.id}"]`);
         this.labelImg = null;
         this.fileList = [];
@@ -347,13 +347,13 @@ class ConditionHandler extends ImageHandler {
     }
 
     addCondition() {
+        const options = ['Brand New', 'Like New', 'Lightly Used', 'Well Used'];
         const newCondition = this.conditionList[0].cloneNode(true);
         newCondition.querySelectorAll('input, select').forEach(item => {
             item.value = '';
             item.id = item.id.replace(/-\d+-(?=\w+$)/, `-${this.conditionList.length}-`);
             item.name = item.id;
         });
-
         // Update delete button functionality
         const deleteBtn = newCondition.querySelector('.deleteCondition');
         if (deleteBtn) {
@@ -387,5 +387,5 @@ class ConditionHandler extends ImageHandler {
 document.getElementById('images').remove()
 
 window.location.href.includes('/manage-products/add-product') ?
-new ConditionHandler('productImages', 'form', '/dashboard/manage-products/add-product', false) :
-new ConditionHandler('productImages', 'form', `/dashboard/manage-products/update-product/${document.getElementById('getIdHere').innerText}`, true);
+new ConditionHandler('productImages', 'form.product__form', '/dashboard/manage-products/add-product', false) :
+new ConditionHandler('productImages', 'form.product__form', `/dashboard/manage-products/update-product/${document.getElementById('getIdHere').innerText}`, true);

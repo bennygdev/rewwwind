@@ -39,6 +39,15 @@
     flex-direction: column;
 }
 
+.statistic__box:has(.warning) {
+    cursor: pointer;
+    transition: 0.3s background-color;
+}
+
+.statistic__box:has(.warning):hover {
+    background-color: orange;
+}
+
 .statistic__label {
     margin: 0;
     font-family: "OpenSansSemibold";
@@ -55,6 +64,14 @@
 
 .statistic__box i , .statistic__label, .statistic__amount {
     color: #039752;
+}
+
+.statistic__box:has(.warning) i, .statistic__box:has(.warning) .statistic__label, .statistic__box:has(.warning) .statistic__amount {
+    transition: 0.1s color;
+}
+
+.statistic__box:has(.warning):hover i, .statistic__box:has(.warning):hover .statistic__label, .statistic__box:has(.warning):hover .statistic__amount {
+    color: white;
 }
 
 .extraPadding {

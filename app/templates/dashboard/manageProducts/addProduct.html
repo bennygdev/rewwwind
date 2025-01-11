@@ -41,7 +41,7 @@
         <div class="product__description">
             {{ form.productDescription.label }}
             {{ form.productDescription(class='form-control resizable', placeholder='Enter product description here...') }}
-        </div>aaa
+        </div>
         <div class="centralise-content">
             <div class="product__type">
                 {{ form.productType.label }}
@@ -79,7 +79,7 @@
             <label for="productIsFeaturedStaff">Feature product in &quot;<a href="/">Staff Picks</a>&quot; &quest;</label>
         </div>
         <div class="button__wrapper">
-            {{ form.submit() }}
+            <input id="submit" name="submit" type="submit" value="{%block submit_value%}Add Product{%endblock%}" fdprocessedid="6nkfut">
         </div>
         {% block images_hidden %}
         {% endblock %}

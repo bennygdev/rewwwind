@@ -1,9 +1,10 @@
+// rating star filling 
 class RatingStars {
     constructor(container, text) {
         this.container = document.querySelector(container);
         this.stars = Array.from(this.container.querySelectorAll('i.bi-star-fill'));
         // this.getRatingInputs = Array.from(document.querySelectorAll('.review__section .review .rating input'));
-        this.rating = parseFloat(document.getElementById('rating').getAttribute('get-rating-here'))
+        this.rating = parseFloat(document.getElementById('rating-score').getAttribute('get-rating-here'))
         isNaN(this.rating) ? this.rating = 0 : this.rating = this.rating.toFixed(1);
         this.rating0Text = text;
         this.ratingScore = this.container.querySelector('.ratingScore');
@@ -39,13 +40,13 @@ class RatingStars {
 new RatingStars(".product .rating", 'No reviews yet. Be the first one!');
 new RatingStars(".review__section .rating", '0');
 
+// image viewing seleciton
 class Images {
     constructor(container) {
         this.container = container;
         this.images = Array.from(this.container.querySelectorAll('.image__container img'));
         this.display = this.container.previousElementSibling.querySelector('img');
         this.imagePrev = this.images.find(image => image.src === this.display.src);
-        console.log(this.display.src, this.images)
 
         this.init();
     }
@@ -67,3 +68,15 @@ class Images {
 }
 
 new Images(document.querySelector('.image-list'));
+
+// condition assignment
+const conditions = Array.from(document.querySelectorAll('.conditionTypes div.enabled'));
+document.getElementById('condition').value = conditions.findIndex(condition => condition.classList.contains('active'))
+
+conditions.forEach((condition, index) => {
+    condition.addEventListener('click', () => {
+        const params = new URLSearchParams();
+        params.set('condition', condition.querySelector('span').innerText);
+        window.location.search = params.toString();
+    })
+})

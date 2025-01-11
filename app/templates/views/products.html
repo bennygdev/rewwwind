@@ -88,8 +88,14 @@
         <div class="image">
           <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}"/>
         </div>
-        <div class="cart">
-          <i class="fa-solid fa-cart-shopping fa-xl"></i>
+        <!-- <a href="{{ url_for('addToCart.add_to_cart', product_id=product.id)}}"> -->
+        <!-- </a> -->
+        <div class="cart" title="Add Product to Cart">
+          <form action="{{ url_for('addToCart.add_to_cart', product_id=product.id) }}" method="POST" class="cta-form">
+            {{ form.hidden_tag() }}
+            {{ form.condition() }}
+            <button type="submit"><i class="fa-solid fa-cart-shopping fa-xl"></i></button>
+          </form>
         </div>
       </div>
     </a>

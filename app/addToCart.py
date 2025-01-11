@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from .roleDecorator import role_required
 from .models import Cart, Product
+from .forms import AddToCartForm
 from . import db
 
 
@@ -43,11 +44,15 @@ def remove_from_cart(product_id):
 @addToCart.route('/add-to-cart/<int:product_id>', methods=['POST'])
 @login_required
 def add_to_cart(product_id):
-    existing_item = Cart.query.filter_by(user_id=current_user.id, product_id=product_id).first()
+    cartForm = AddToCartForm()
+    product = Product.query.filter_by(id=product_id).first() # query the related product
+    selected_condition = int(cartForm.condition.data) # index of selected condition from cta form
+
+    existing_item = Cart.query.filter_by(user_id=current_user.id, product_id=product_id, product_condition=product.conditions[selected_condition]).first()
     if existing_item:
         existing_item.quantity += 1
     else:
-        new_item = Cart(user_id=current_user.id, product_id=product_id, quantity=1)
+        new_item = Cart(user_id=current_user.id, product_id=product_id, product_condition=product.conditions[selected_condition], quantity=1)
         db.session.add(new_item)
     db.session.commit()
     flash("Item added to cart!")

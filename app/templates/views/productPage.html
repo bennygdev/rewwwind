@@ -43,11 +43,11 @@
     </div>
     <hr>
     <div class="middle">
-      <h3>&dollar;{{ '{:.2f}'.format(product.conditions[0].price) }}</h3>
+      <h3>&dollar;{{ '{:.2f}'.format(selected_condition.price) }}</h3>
       <div class="stock">
-        {% if product.conditions[0].stock <= 10 %}
+        {% if selected_condition.stock <= 10 %}
           <i class="bi bi-exclamation-circle-fill"></i>
-          <span>Only {{ product.conditions[0].stock }} left. Order soon!</span>
+          <span>Only {{ selected_condition.stock }} left. Order soon!</span>
         {% else %}
           <i class="bi bi-check-circle-fill"></i>
           <span>Plenty of stock to go around!</span>
@@ -58,11 +58,11 @@
     <div class="bottom">
       <div class="condition">
         <div class="header">
-          <h3>Condition</h3><i class="bi bi-question-circle-fill"></i>
+          <h3>Condition</h3><i class="bi bi-question-circle-fill" title="Conditions represent the quality of the product being sold."></i>
         </div>
         <div class="conditionTypes">
           {% for type in ['Brand New', 'Like New', 'Lightly Used', 'Well Used'] %}
-            <div>
+            <div class="{% if type in product.conditions|map(attribute='condition') %}enabled{% else %}disabled{% endif %} {% if type == selected_condition.condition %}active{% endif %}" title="{% if type not in product.conditions|map(attribute='condition') %}Stock for this has run out, sorry!{% endif %}">
               <span>{{ type }}</span>
             </div>
           {% endfor %}
@@ -85,20 +85,23 @@
         </span>
       </div>
       <hr>
-      <form action="/add-to-cart/{{ product.id }}" method="POST" class="cta-form">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <form action="{{ url_for('addToCart.add_to_cart', product_id=product.id) }}" method="POST" class="cta-form">
+          {{ cartform.hidden_tag() }}
+          {{ cartform.condition(value=selected_condition.condition) }}
           <button type="submit" class="filter">Add to Cart</button>
       </form>
       <form action="/check-out/{{ product.id }}" method="POST" class="cta-form">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <!-- {{ cartform.hidden_tag() }} please remember to add something like this, cartform can be any unique form class defined
+            in forms.py -->
           <button type="submit" class="filter">Buy Now</button>
       </form>
-      <hr>
-      <a href="/dashboard/manage-products" class="cta wishlist">
+      <!-- <hr> -->
+      <!-- <a href="/dashboard/manage-products" class="cta wishlist">
         <div>
           <span>Wishlist</span>
         </div>
-      </a>
+      </a> -->
+      <!-- removed wishlist, don't think there's much i can do with it for now. -->
     </div>
   </div>
 </div>
@@ -113,14 +116,14 @@
         <i class="bi bi-star-fill"></i>
         <i class="bi bi-star-fill"></i>
         <i class="bi bi-star-fill"></i>
-        <span class="ratingScore" id="rating" get-rating-here="{{ product.rating }}">{% if product.rating %}{{ product.rating }}{% else %}No reviews yet. Be the first one!{% endif %}</span>
+        <span class="ratingScore" id="rating-score" get-rating-here="{{ product.rating }}">{% if product.rating %}{{ product.rating }}{% else %}No reviews yet. Be the first one!{% endif %}</span>
       </div>
     </div>
     <div class="header__right">
       {% if user.role_id %}
       <div class="write"><span>Write a review</span>&nbsp;&nbsp;<i class="bi bi-pencil-square"></i></div>
       {% endif %}
-      {% if reviews %}
+      {% if reviews.items and product.reviews  %}
       <div class="filters">
         <div class="filter-container">
           <div class="filter {% if rating_filter %}activated{% endif %}" filter-for="rating" id="filter">
@@ -139,7 +142,7 @@
   </div>
   <div class="body">
     <div class="reviews">
-      {% if reviews.items %}
+      {% if reviews.items and product.reviews %}
       {% for review in reviews %}
       <div class="review">
         <div class="left">
@@ -161,9 +164,23 @@
           <p class="date"><i class="bi bi-calendar-plus-fill"></i>&nbsp;&nbsp;Reviewed on {{ review.created_at.strftime('%Y-%m-%d') }}</p>
           <p class="description">{{ review.description }}</p>
         </div>
+        {% if user.username == review.user.username or user.role_id in [2, 3] %}
+        <div class="mods">
+          <div class="mod-container update">
+            <form action="{{ url_for('productPagination.update_review', product_id=product.id, review_id=review.id) }}">
+              <button type="submit">Update Review</button>
+            </form>
+          </div>
+          <div class="mod-container delete">
+            <form action="{{ url_for('productPagination.delete_review', product_id=product.id, review_id=review.id) }}">
+              <button type="submit">Delete Review</button>
+            </form>
+          </div>
+        </div>
+        {% endif %}
       </div>
       {% endfor %}
-      {% else %}
+      {% elif product.reviews|length != 0 %}
       <div class="review">
         <h3>Sorry, no reviews were found with the given filter.</h3>
       </div>
@@ -172,11 +189,10 @@
   </div>
 </div>
 {% with messages = get_flashed_messages(with_categories=true) %}
-<div class="overlay" style="display: {{ 'block' if messages else 'none' }};"></div>
-<div class="review__modal" style="display: {{ 'block' if messages else 'none' }};">
+<div class="overlay" style="display: {{ 'block' if messages or review else 'none' }};"></div>
+<div class="review__modal" style="display: {{ 'block' if messages or review else 'none' }};">
   
   {% if messages and messages[0][0] == 'success' %}
-  <!-- Success Block -->
   <div class="success">
     <i class="bi bi-x-lg fa-2xl"></i>
     <i class="bi bi-check-circle fa-2xl"></i>
@@ -186,17 +202,69 @@
     </div>
   </div>
 
+  {% elif delete %}
+  <div class="delete">
+    <i class="bi bi-x-lg fa-2xl"></i>
+    <i class="bi bi-exclamation-circle"></i>
+    <div class="header ignore">
+      <h2>You are about to delete the following review.</h2>
+      <span>This action <strong>cannot be undone</strong> when performed.</span>
+    </div>
+    <div class="review ignore">
+      <div class="left">
+        <img src="{{ url_for('static',filename='profile_pics/' + review.user.image) }}">
+      </div>
+      <div class="right">
+        <div class="section">
+          <p class="name">{{ review.user.username if review.show_username else "Annonymous" }}</p>
+          <div class="rating">
+            {% for x in range(review.rating|int) %}
+            <i class="bi bi-star-fill" style="color: orange"></i>
+            {% endfor %}
+            {% for x in range(5-review.rating|int) %}
+            <i class="bi bi-star-fill" style="color: #d9d9d9"></i>
+            {% endfor %}
+            <input type="hidden" value="{{ review.rating }}">
+          </div>
+        </div>
+        <p class="date"><i class="bi bi-calendar-plus-fill"></i>&nbsp;&nbsp;Reviewed on {{ review.created_at.strftime('%Y-%m-%d') }}</p>
+        <p class="description">{{ review.description }}</p>
+      </div>
+    </div>
+    <form action="{{ url_for('productPagination.delete_review', product_id=product.id, review_id=review.id) }}" method="POST">
+      {{ deleteform.hidden_tag() }}
+      <div class="confirmation">
+        {{ deleteform.deleteConfirm.label }}
+        {{ deleteform.deleteConfirm(class="form-control", placeholder="CONFIRMDELETE") }}
+        {% if messages %}
+        <div class="alert alert-danger">
+          {% for category, message in messages %}
+            {% if category == 'error' %}
+            <span>{{ message | safe }}</span>
+            {% endif %}
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      <div class="buttons">
+        <div class="button-wrapper">
+          <input id="cancel" name="cancel" type="button" value="Cancel">
+        </div>
+        <div class="button-wrapper">
+          {{ deleteform.submit() }}
+        </div>
+      </div>
+    </form>
+  </div>
+
   {% else %}
-  <!-- Form Block -->
-  <form method="POST" action="{{ url_for('productPagination.add_review', product_id=product.id) }}">
-    {{ form.hidden_tag() }}
+  <form method="POST" action="{{ url_for('productPagination.add_review', product_id=product.id) }}" id="add-review">
+    {{ reviewform.hidden_tag() }}
     <div class="addReview">
       <div class="header">
-        <h1>Add a review for {{ product.name }}</h1>
+        <h1>{% block form_title %}Add a review for {{ product.name }}{% endblock %}</h1>
         <i class="bi bi-x-lg fa-2xl"></i>
       </div>
-
-      <!-- Display error messages -->
       {% if messages %}
       <div class="alert alert-danger">
         {% for category, message in messages %}
@@ -206,36 +274,28 @@
         {% endfor %}
       </div>
       {% endif %}
-      
-      <!-- Rating Field -->
       <div class="rating">
-        {{ form.rating.label }}
-        {{ form.rating() }}
+        {{ reviewform.rating.label }}
+        {{ reviewform.rating() }}
         <i class="bi bi-star-fill"></i>
         <i class="bi bi-star-fill"></i>
         <i class="bi bi-star-fill"></i>
         <i class="bi bi-star-fill"></i>
         <i class="bi bi-star-fill"></i>
       </div>
-
-      <!-- Username Field -->
       <div class="username">
-        {{ form.show_username.label }}
-        {{ form.show_username() }}
+        {{ reviewform.show_username.label }}
+        {{ reviewform.show_username() }}
       </div>
-
-      <!-- Description Field -->
       <div class="description">
-        {{ form.description(class="form-control", placeholder="Write your thoughts!", rows=10) }}
+        {{ reviewform.description(class="form-control", placeholder="Write your thoughts!", rows=10) }}
       </div>
-
-      <!-- Buttons -->
       <div class="buttons">
         <div class="button-wrapper">
           <input id="cancel" name="cancel" type="button" value="Cancel">
         </div>
         <div class="button-wrapper">
-          {{ form.submit() }}
+          <input id="submit" name="submit" type="submit" value="{% block submit_value %}Post Review{% endblock %}">
         </div>
       </div>
     </div>

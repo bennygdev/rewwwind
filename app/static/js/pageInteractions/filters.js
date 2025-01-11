@@ -120,8 +120,8 @@ class Filter {
         } else {
             params.set(filterKey, selectedOption.innerText.toLowerCase());
         }
-
-        window.location.search = params.toString(); // Update the URL
+        params.set('page', 1)
+        window.location.search = params.toString();
     }
 
     adjustLabelText() {

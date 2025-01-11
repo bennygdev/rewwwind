@@ -2,7 +2,6 @@
 {% set active_page = "home" %}
 {% block styles %}
 <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/views/home.css') }}">
-<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/chatbot.css') }}">
 {% endblock %}
 {% block title %}Home{% endblock %}
 
@@ -125,5 +124,4 @@
 
 {% block body_scripts %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/home.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
 {% endblock %}

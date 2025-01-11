@@ -1,5 +1,5 @@
 .content {
-    padding: 80px 90px; /* please do remove this if each page is to have custom padding or margin in base.css -nelson */
+    padding: 90px; /* please do remove this if each page is to have custom padding or margin in base.css -nelson */
 }
 
 /* CTA styles extending from filters */
@@ -290,38 +290,63 @@ hr.docSeparator {
     margin: 30px 0;
 }
 
-.review__section .review {
+.review {
     display: flex;
     flex-direction: row;
     gap: 10px;
 }
 
-.review__section .left img {
+.review .left img {
     max-width: 50px;
     max-height: 50px;
     border-radius: 100%;
 }
 
-.review__section .right {
+.review .right {
     display: flex;
     flex-direction: column;
     gap: 5px;
 }
 
-.review__section .right p {
+.review .right p {
     margin: 0;
 }
 
-.review__section .right .name {
+.review .right .name {
     font-weight: bold;
 }
 
-.review__section .right .date {
+.review .right .date {
     opacity: 60%;
 }
 
-.review__section .right .date i {
+.review .right .date i {
     opacity: 40%;
+}
+
+.review .mods .mod-container {
+    display: inline-block;
+    margin-right: 10px;
+    padding: 0.3em 0.5em;
+    border-radius: var(--bs-border-radius);
+    background-color: #efefef;
+    color: black;
+    transition: 0.3s background-color, 0.1s color;
+    cursor: pointer;
+}
+
+.review .mods .mod-container button {
+    all: unset;
+}
+
+.review .mods .mod-container.update:hover {
+    background-color: #039752;
+    color: white;
+}
+
+.review .mods .mod-container.delete:hover {
+    background-color: red;
+    color: white;
 }
 
 
@@ -378,12 +403,12 @@ hr.docSeparator {
 .review__modal form div > div, .review__modal div > div {
     display: flex;
     flex-direction: row;
-    align-items: center;
     gap: 8px;
 }
 
  /* addReview */
 .addReview .rating, .addReview .username  {
+    align-items: center;
     font-size: 1.4em;
 }
 
@@ -422,19 +447,19 @@ hr.docSeparator {
 }
 
 /* success */
-.review__modal .success {
+.review__modal .success, .review__modal .delete {
     position: relative;
     flex-direction: column;
     align-items: center;
 }
 
-.success i.bi-x-lg {
+.success i.bi-x-lg, .delete i.bi-x-lg {
     position: absolute;
     top: 20px;
     right: 20px;
 }
 
-.success h2 {
+.success h2, .delete h2 {
     font-weight: bold;
 }
 
@@ -443,7 +468,32 @@ hr.docSeparator {
     color: #039752;
 }
 
-.success .button-wrapper input#cancel {
+.success .button-wrapper input#cancel, .delete .button-wrapper input#cancel {
     background-color: #d9d9d9;
     color: black;
+}
+
+.delete i.bi-exclamation-circle {
+    font-size: 4.5em;
+    color: orange;
+}
+
+.delete .header {
+    flex-direction: column;
+    gap: 0;
+}
+
+.delete .header span {
+    font-size: 1.2em;
+}
+
+.delete div.confirmation {
+    padding: 10px;
+}
+
+.delete div.buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
 }

@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from sqlalchemy import cast, Float, Integer
 from .roleDecorator import role_required
 from .models import Product, Review, Category, SubCategory
-from .forms import AddReviewForm
+from .forms import AddReviewForm, AddToCartForm, DeleteReviewForm
 from . import db
 from math import ceil
 
@@ -60,7 +60,7 @@ def product_pagination():
     if not category_filter:
         subcategory_filter = ""
     
-    form = AddReviewForm()
+    form = AddToCartForm()
 
     # Render the template
     return render_template(
@@ -82,23 +82,17 @@ def product_pagination():
 
 @productPagination.route('/product/<int:product_id>', methods=['GET', 'POST'])
 def product_detail(product_id):
-    # Query the database for the product
     product = Product.query.get_or_404(product_id)
-    
-    # Query for reviews related to the product
     reviews_query = Review.query.filter_by(product_id=product_id)
     
     # Filter logic
     rating_filter = request.args.get('rating', '', type=str)
     if rating_filter and rating_filter != 'all':
         if 'star' in rating_filter:
-            # Filter reviews by exact rating (e.g., 4-star reviews)
             reviews_query = reviews_query.filter(cast(Review.rating, Integer) == int(rating_filter[0]))
         elif 'highest' in rating_filter:
-            # Sort reviews by highest rating
             reviews_query = reviews_query.order_by(Review.rating.desc())
         elif 'lowest' in rating_filter:
-            # Sort reviews by lowest rating
             reviews_query = reviews_query.order_by(Review.rating.asc())
     
     # Pagination logic
@@ -106,40 +100,43 @@ def product_detail(product_id):
     per_page = 5
     total_reviews = reviews_query.count()
 
-    if rating_filter:
-        page = 1  # Reset to page 1 when a filter is applied
-
     reviews = reviews_query.order_by(Review.id).paginate(page=page, per_page=per_page)
     total_pages = ceil(total_reviews / per_page)
     
-    # Ensure product exists
     if product is None:
         abort(404)
-    
-    # Review form instance
+
     reviewForm = AddReviewForm()
+    cartForm = AddToCartForm()
 
     # Render template
     return render_template(
         "/views/productPage.html",
         user=current_user,
         product=product,
-        form=reviewForm,
+        reviewform=reviewForm,
+        cartform=cartForm,
         reviews=reviews,
         total_pages=total_pages,
         current_page=page,
         rating_filter=rating_filter
     )
+
 @productPagination.route('/product/<int:product_id>/add-review', methods=['GET', 'POST'])
 @login_required
 @role_required(1, 2, 3)
 def add_review(product_id):
     product = Product.query.get_or_404(product_id)
     reviewForm = AddReviewForm()
-    reviews = product.reviews
+    cartForm = AddToCartForm()
+    
+    # To avoid no reviews being shown
+    page = request.args.get('page', 1, type=int)
+    per_page = 5
+    reviews_query = Review.query.filter_by(product_id=product_id)
+    reviews = reviews_query.order_by(Review.id).paginate(page=page, per_page=per_page)
 
     if reviewForm.validate_on_submit():
-        # Create a new review object and save it to the database
         new_review = Review(
             rating=reviewForm.rating.data,
             show_username = reviewForm.show_username.data,
@@ -157,36 +154,166 @@ def add_review(product_id):
         print(new_review.rating, new_review.show_username, new_review.description, new_review.product_id, new_review.user_id)
 
         flash("Your review was added successfully!", "success")
-        
-    
-    # Return an error response if validation fails
+
     if reviewForm.errors:
         for field, errors in reviewForm.errors.items():
             for error in errors:
                 flash(f"<strong>Error:</strong> {error}", "error")
 
-    return render_template("/views/productPage.html", user=current_user, product=product, form=reviewForm, reviews=reviews)
+    return render_template("/views/productPage.html", user=current_user, product=product, reviewform=reviewForm, cartform=cartForm, reviews=reviews)
+
+@productPagination.route('/product/<int:product_id>/update-review=<int:review_id>', methods=['GET', 'POST'])
+@login_required
+@role_required(1, 2, 3)
+def update_review(product_id, review_id):
+    product = Product.query.get_or_404(product_id)
+    reviewForm = AddReviewForm()
+    cartForm = AddToCartForm()
+    review = Review.query.get_or_404(review_id)
+
+    # To avoid no reviews being shown
+    page = request.args.get('page', 1, type=int)
+    per_page = 5
+    reviews_query = Review.query.filter_by(product_id=product_id)
+    reviews = reviews_query.order_by(Review.id).paginate(page=page, per_page=per_page)
+    
+
+    if current_user.id != review.user_id and current_user.role_id == 1:
+        abort(401)
+    if request.method == 'GET':
+        if review:
+            reviewForm.rating.data = review.rating
+            reviewForm.show_username.data = review.show_username
+            reviewForm.description.data = review.description
+    else:
+        if reviewForm.validate_on_submit():
+            review.rating = int(reviewForm.rating.data)
+            review.show_username = reviewForm.show_username.data
+            review.description = reviewForm.description.data
+
+            product.update_rating()
+
+            print(review.rating, review.show_username, review.description)
+            db.session.commit()
+
+            flash("Your review was updated successfully!", "success")
+            
+        
+        # Return an error response if validation fails
+        if reviewForm.errors:
+            for field, errors in reviewForm.errors.items():
+                for error in errors:
+                    flash(f"<strong>Error:</strong> {error}", "error")
+
+    return render_template("/views/updateReview.html", user=current_user, product=product, reviewform=reviewForm, cartform=cartForm, reviews=reviews, review=review)
+
+@productPagination.route('/product/<int:product_id>/delete-review=<int:review_id>', methods=['GET', 'POST'])
+@login_required
+@role_required(1, 2, 3)
+def delete_review(product_id, review_id):
+    product = Product.query.get_or_404(product_id)
+    reviewForm = AddReviewForm()
+    deleteForm = DeleteReviewForm()
+    cartForm = AddToCartForm()
+    review = Review.query.get_or_404(review_id)
+
+    # To avoid no reviews being shown
+    page = request.args.get('page', 1, type=int)
+    per_page = 5
+    reviews_query = Review.query.filter_by(product_id=product_id)
+    reviews = reviews_query.order_by(Review.id).paginate(page=page, per_page=per_page)
+
+    if request.method == 'GET':
+        if current_user.id != review.user_id and current_user.role_id == 1:
+            abort(401)
+    else:
+        if deleteForm.validate_on_submit():
+            db.session.delete(review)
+            db.session.commit()
+
+            product.update_rating()
+            db.session.commit()
+
+            flash("The review was successfully deleted.", "success")
+        
+        # Return an error response if validation fails
+        if deleteForm.errors:
+            for field, errors in deleteForm.errors.items():
+                for error in errors:
+                    print(error)
+                    flash(f"<strong>Error:</strong> {error}", "error")
+
+    return render_template("/views/productPage.html", user=current_user, product=product, reviewform=reviewForm, cartform=cartForm, reviews=reviews, review=review, delete=True, deleteform=deleteForm)
 
 @productPagination.route('/featured/specials')
 def product_specials():
-    page = request.args.get('page', 1, type=int)
-    per_page = 16
+    # Base query
+    products_query = Product.query.filter_by(is_featured_special = True)
 
+    # Search logic
     search_query = request.args.get('q', '', type=str)
-
-    products_query = Product.query.filter_by(is_featured_special=True)
-
     if search_query:
         products_query = products_query.filter(Product.name.ilike(f"%{search_query}%"))
 
-    total_products = products_query.count()
+    # Filter logic
+    category_filter = request.args.get('type', '', type=str).title()
+    subcategory_filter = request.args.get('genre', '', type=str).title()
+    price_filter = request.args.get('price', '', type=str)
+    rating_filter = request.args.get('rating', '', type=str)
 
+    if category_filter and category_filter != 'All':
+        products_query = products_query.join(Product.category).filter(Category.category_name == category_filter)
+    if subcategory_filter and subcategory_filter != 'All':
+        products_query = products_query.join(Product.subcategories).filter(SubCategory.subcategory_name == subcategory_filter)
+    if price_filter and price_filter != 'all':
+        if 'highest' in price_filter:
+            products_query = products_query.order_by(cast(Product.conditions[0]['price'], Float).desc())
+        else:
+            products_query = products_query.order_by(cast(Product.conditions[0]['price'], Float).asc())
+    if rating_filter and rating_filter != 'all':
+        if 'star' in rating_filter:
+            products_query = products_query.filter(cast(Product.rating, Integer) == int(rating_filter[0]))
+        else:
+            if 'highest' in rating_filter:
+                products_query = products_query.order_by(Product.rating.desc())
+            else:
+                products_query = products_query.order_by(Product.rating.asc())
+        
+
+    # Pagination logic
+    page = request.args.get('page', 1, type=int)
+    per_page = 16
+
+    total_products = products_query.count()
     products = products_query.order_by(Product.id).paginate(page=page, per_page=per_page)
+
 
     total_pages = ceil(total_products / per_page)
 
+    categories = Category.query.all()[:8]
+    subcategories = SubCategory.query.join(Category).filter(Category.category_name == category_filter)[:8]
 
-    return render_template("/views/productSpecials.html", user=current_user, products=products, total_products=total_products, total_pages=total_pages, current_page=page)
+    if not category_filter:
+        subcategory_filter = ""
+    
+    form = AddToCartForm()
+
+    return render_template(
+        "/views/products.html",
+        user=current_user,
+        products=products,
+        total_products=total_products,
+        total_pages=total_pages,
+        current_page=page,
+        search_query=search_query,
+        categories=categories,
+        subcategories=subcategories,
+        category_filter=category_filter,
+        subcategory_filter=subcategory_filter,
+        price_filter=price_filter,
+        rating_filter=rating_filter,
+        form=form
+    )
 
 @productPagination.route('/featured/staff_picks')
 def product_staff():
@@ -205,6 +332,7 @@ def product_staff():
     products = products_query.order_by(Product.id).paginate(page=page, per_page=per_page)
 
     total_pages = ceil(total_products / per_page)
+    
+    form = AddToCartForm()
 
-
-    return render_template("/views/productStaff.html", user=current_user, products=products, total_products=total_products, total_pages=total_pages, current_page=page)
+    return render_template("/views/productStaff.html", user=current_user, products=products, total_products=total_products, total_pages=total_pages, current_page=page, form=form)

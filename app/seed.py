@@ -53,10 +53,23 @@ def insert_users():
     role_id = 3
   )
 
+  customer = User(
+     first_name = "Customer",
+     last_name = "4",
+     username = "Customer",
+     email = "customer@gmail.com",
+     image = None,
+     google_account = False,
+     password = generate_password_hash("customer", method='pbkdf2:sha256'),
+     orderCount = 0,
+     role_id = 1
+  )
+
   users = [
     ("admin1@gmail.com", admin1),
     ("admin2@gmail.com", admin2),
-    ("owner@gmail.com", owner)
+    ("owner@gmail.com", owner),
+    ("customer@gmail.com", customer)
   ]
 
   for email, user in users:

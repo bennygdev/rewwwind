@@ -227,3 +227,15 @@ class AddReviewForm(FlaskForm):
   def validate_rating(self, field):
     if not field.data:
       raise ValidationError('Please select a rating to give this product.')
+
+class DeleteReviewForm(FlaskForm):
+  deleteConfirm = StringField('Please enter the text shown below to confirm deletion.', validators=[DataRequired()])
+  submit = SubmitField('Delete Review')
+
+  def validate_deleteConfirm(self, field):
+    if field.data != 'CONFIRMDELETE':
+       raise ValidationError('The confirmation input is invalid. Please type CONFIRMDELETE to confirm the deletion.')
+
+# Add to cart Forms
+class AddToCartForm(FlaskForm):
+  submit = SubmitField=('Add to Cart')

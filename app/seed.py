@@ -67,6 +67,19 @@ def insert_users():
   db.session.commit()
   print('Inserted Admin and Owner accounts!')
 
+def insert_payment_types():
+  from .models import PaymentType
+  payment_types = ['Visa', 'Mastercard', 'American Express']
+
+  for type in payment_types:
+    types_exists = PaymentType.query.filter_by(payment_type=type).first()
+    if not types_exists:
+      new_method = PaymentType(payment_type=type)
+      db.session.add(new_method)
+    
+  db.session.commit()
+  print('Inserted payment types into the database!')
+
 def insert_categories():
     categories = []
     category1 = Category(category_name="Vinyl")

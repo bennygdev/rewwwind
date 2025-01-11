@@ -59,8 +59,8 @@
   </div>
   <div class="profile__right">
     <div class="profile__buttons">
-      <a href="/dashboard/update-personal-information-form" class="back__button--darker"><i class="fa-solid fa-pen"></i>&nbsp; Update</a>
-      <a href="/dashboard/change-password" class="back__button--darker">Change Password</a>
+      <a href="{{ url_for('dashboard.update_personal_information_form') }}" class="back__button--darker"><i class="fa-solid fa-pen"></i>&nbsp; Update</a>
+      <a href="{{ url_for('dashboard.change_password') }}" class="back__button--darker">Change Password</a>
     </div>
   </div>
 </div>

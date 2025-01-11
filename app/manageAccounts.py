@@ -48,7 +48,7 @@ def accounts_listing():
 
   return render_template("dashboard/manageAccounts/accounts.html", user=current_user, totalUsers=totalUsers, newUsers=newUsers, onlineCount=onlineCount, accounts=accounts, total_pages=total_pages, current_page=page, search_query=search_query)
 
-@manageAccounts.route('/account-details/<int:id>')
+@manageAccounts.route('/manage-accounts/account-details/<int:id>')
 @login_required
 @role_required(2, 3)
 def account_details(id):
@@ -77,7 +77,7 @@ def account_details(id):
 
   return render_template("dashboard/manageAccounts/account_details.html", user=current_user, selectedUser=selectedUser, formatted_created_at=formatted_created_at, image_file=image_file)
 
-@manageAccounts.route('/delete-account/<int:id>', methods=['GET', 'POST'])
+@manageAccounts.route('/manage-accounts/delete-account/<int:id>', methods=['GET', 'POST'])
 @login_required
 @role_required(2, 3)
 def delete_account(id):
@@ -103,7 +103,7 @@ def delete_account(id):
   flash("Account successfully deleted.", "info")
   return redirect(url_for('manageAccounts.accounts_listing'))
 
-@manageAccounts.route('/edit-account/<int:id>', methods=['GET', 'POST'])
+@manageAccounts.route('/manage-accounts/edit-account/<int:id>', methods=['GET', 'POST'])
 @login_required
 @role_required(2, 3)
 def edit_account(id):
@@ -156,7 +156,7 @@ def edit_account(id):
 
   return render_template("dashboard/manageAccounts/edit_account.html", user=current_user, form=form, selectedUser=selectedUser)
 
-@manageAccounts.route('/change-account-password/<int:id>', methods=['GET', 'POST'])
+@manageAccounts.route('/manage-accounts/change-account-password/<int:id>', methods=['GET', 'POST'])
 @login_required
 @role_required(2, 3)
 def change_password(id):

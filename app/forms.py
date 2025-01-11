@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from flask import request, flash
 from werkzeug.utils import secure_filename
-from wtforms import StringField, TextAreaField, IntegerField, FloatField, FieldList, FormField, SelectField, BooleanField, FileField, MultipleFileField, EmailField, PasswordField, HiddenField, SubmitField
+from wtforms import StringField, TextAreaField, IntegerField, DateField, FloatField, FieldList, FormField, SelectField, BooleanField, FileField, MultipleFileField, EmailField, PasswordField, RadioField, HiddenField, SubmitField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, Optional, NumberRange, Regexp, ValidationError
 from PIL import Image # file object validator
 from mimetypes import guess_type # file extension validator
@@ -68,9 +68,86 @@ class BillingAddressForm(FlaskForm):
   address_one = StringField('Address One', validators=[DataRequired()])
   address_two = StringField('Address Two')
   unit_number = StringField('Unit Number', validators=[DataRequired(), Length(max=15)])
-  postal_code = IntegerField('Postal Code', validators=[DataRequired(), NumberRange(min=1, max=999999)])
+  postal_code = StringField('Postal Code', validators=[DataRequired(), Length(min=5, max=6), Regexp(r"^[0-9]*$", message="Postal code must be numbers only.")])
   phone_number = IntegerField('Phone Number', validators=[DataRequired(), NumberRange(min=60000000, max=99999999)])
   submit = SubmitField('Save')
+
+class PaymentMethodForm(FlaskForm):
+  paymentType_id = RadioField(
+    'Select Card Type',
+    choices=[
+      ('1', 'Visa'),
+      ('2', 'Mastercard'),
+      ('3', 'American Express')
+    ],
+    validators=[DataRequired()]
+  )
+  card_name = StringField('Card Name', validators=[DataRequired()])
+  card_number = StringField('Card Number', validators=[DataRequired(), Length(min=15, max=16), Regexp(r"^[0-9]*$", message="Card number must be numbers only.")])
+  expiry_date = StringField('Expiry Date (MM/YY)', validators=[DataRequired(), Length(max=5), Regexp(r'^(0[1-9]|1[0-2])\/\d{2}$', message="Expiry date must be in MM/YY format.")])
+  card_cvv = PasswordField('CVV', validators=[DataRequired(), Length(min=3, max=4), Regexp(r"^[0-9]*$", message="CVV must be numbers only.")])
+  submit = SubmitField('Save')
+
+  def get_card_type_from_number(self, card_number):
+    # Helper method to detect card type from number
+    if card_number.startswith('4'):
+      return '1'  # Visa
+    elif card_number.startswith(('51', '52', '53', '54', '55')):
+      return '2'  # Mastercard
+    elif card_number.startswith(('34', '37')):
+      return '3'  # Amex
+    return None
+
+  def validate_card_number(self, field):
+    card_number = field.data
+    selected_type = self.paymentType_id.data
+    detected_type = self.get_card_type_from_number(card_number)
+
+    # If the number could be valid for any card type, store that information
+    possible_types = []
+        
+    # Check Visa format
+    if card_number.startswith('4') and (len(card_number) in [13, 16]):
+      possible_types.append('Visa')
+            
+    # Check Mastercard format
+    if card_number.startswith(('51', '52', '53', '54', '55')) and len(card_number) == 16:
+      possible_types.append('Mastercard')
+            
+    # Check Amex format
+    if card_number.startswith(('34', '37')) and len(card_number) == 15:
+      possible_types.append('American Express')
+
+    # If the number matches the selected type's format, it's valid
+    if detected_type == selected_type:
+      return
+
+    # If the number doesn't match any valid format
+    if not possible_types:
+      if selected_type == '1':  # Visa
+        raise ValidationError('Invalid Visa card number. Must start with 4 and be 13 or 16 digits long.')
+      elif selected_type == '2':  # Mastercard
+        raise ValidationError('Invalid Mastercard number. Must start with 51-55 and be 16 digits long.')
+      elif selected_type == '3':  # Amex
+        raise ValidationError('Invalid American Express card number. Must start with 34 or 37 and be 15 digits long.')
+        
+    # If the number is valid for a different card type than selected
+    elif possible_types and detected_type != selected_type:
+      raise ValidationError(f'This appears to be a {", ".join(possible_types)} card number. Please select the correct card type or enter a different card number.')
+
+  def validate_card_cvv(self, field):
+    payment_type = self.paymentType_id.data
+    cvv = field.data
+
+    if payment_type == '3':  # American Express
+      if len(cvv) != 4:
+        raise ValidationError('American Express cards require a 4-digit CVV')
+    else:  # Visa and Mastercard
+      if len(cvv) != 3:
+        if len(cvv) == 4:
+          raise ValidationError('This appears to be an American Express CVV. Please enter a 3-digit CVV for this card type.')
+        else:
+          raise ValidationError('Please enter a valid 3-digit CVV')
 
 # New product forms
 class ConditionForm(FlaskForm): # specific conditions to be listed in the AddProductForm

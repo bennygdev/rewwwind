@@ -18,19 +18,19 @@
 {% block content %}
 
 <div class="settings__content">
-  <a href="/dashboard/update-personal-information" class="settings__container">
+  <a href="{{ url_for('dashboard.update_personal_information') }}" class="settings__container">
     <div>
       <h2 class="settings__title"><i class="fa-solid fa-user"></i> Personal Information</h2>
       <p class="settings__paragraph">Update your Personal Information here.</p>
     </div>
   </a>
-  <a href="/dashboard/update-billing-address" class="settings__container">
+  <a href="{{ url_for('dashboard.update_billing_address') }}" class="settings__container">
     <div>
       <h2 class="settings__title"><i class="fa-solid fa-envelopes-bulk"></i> Billing Address</h2>
       <p class="settings__paragraph">Update your Billing Address here.</p>
     </div>
   </a>
-  <a href="/dashboard/update-payment-information" class="settings__container">
+  <a href="{{ url_for('dashboard.update_payment_information') }}" class="settings__container">
     <div>
       <h2 class="settings__title"><i class="fa-solid fa-credit-card"></i> Payment Information</h2>
       <p class="settings__paragraph">Update your Payment Information here.</p>

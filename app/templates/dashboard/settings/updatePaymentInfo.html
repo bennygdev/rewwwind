@@ -2,14 +2,132 @@
 {% set active_page = "settings" %}
 
 {% block styles %}
-
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/settings/updatePaymentInfo.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard/accounts/deleteModal.css') }}">
 {% endblock %}
 
 {% block title %}Update Payment Information{% endblock %}
 
+{% block headerContent %}
+<div class="payment__header">
+  <h1 id="payment__title">Update Payment Methods</h1>
+  <p id="payment__subtitles">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</p>
+</div>
+{% endblock %}
+
 {% block content %}
 
-<h1>Update payment information</h1>
+<!-- Flash validation -->
+{% include "components/flashValidation.html" %}
+
 <a href="{{ url_for('dashboard.user_settings') }}" class="back__button--darker">Back</a>
 
+{% if payment_methods %}
+  {% for method in payment_methods %}
+  <div class="payment__content">
+    <div class="payment__left">
+      <h2>Payment Method #{{ loop.index }}</h2>
+
+      <!-- hide when editing -->
+      <div class="payment__details" id="details{{ method.id }}">
+        <div class="payment__paymentType">
+          <h3>Payment Type</h3>
+          {% if method.paymentType_id == 1 %}
+            Visa
+          {% elif method.paymentType_id == 2 %}
+            Mastercard
+          {% elif method.paymentType_id == 3 %}
+            American Express
+          {% endif %}
+        </div>
+        <div class="payment_cardName">
+          <h3>Card Name</h3>
+          {{ method.card_name }}
+        </div>
+        <div class="payment__cardNumber">
+          <h3>Card Number</h3>
+          {{ method.card_number }}
+        </div>
+        <div class="payment__expiryDate">
+          <h3>Expiry Date</h3>
+          {{ method.expiry_date }}
+        </div>
+      </div>
+
+      <!-- editable Form (hidden by Default) -->
+      <form method="POST" class="editPayment__form" id="editForm{{ method.id }}" style="display: none;">
+        {{ form.hidden_tag() }}
+        <input type="hidden" name="method_id" value="{{ method.id }}">
+        
+        <div class="payment-types">
+          {% for type in payment_types %}
+          <div class="payment-type">
+            <input type="radio" name="paymentType_id" id="type_{{ method.id }}_{{ type.id }}" value="{{ type.id }}" 
+                   {% if type.id == method.paymentType_id %}checked{% endif %}>
+            <label for="type_{{ method.id }}_{{ type.id }}">
+              <img src="{{ url_for('static', filename='media/card_logos/' ~ type.payment_type|lower ~ '.svg') }}" 
+                   alt="{{ type.payment_type }}" title="{{ type.payment_type }}">
+            </label>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="payment__editCardName">
+          {{ form.card_name.label }} 
+          {{ form.card_name(class="form-control", value=method.card_name) }}
+        </div>
+        <div class="payment__editCardNumber">
+          {{ form.card_number.label }} 
+          {{ form.card_number(class="form-control", value=method.card_number) }}
+        </div>
+        <div class="payment__editExpiryDate">
+          {{ form.expiry_date.label }} 
+          {{ form.expiry_date(class="form-control", value=method.expiry_date) }}
+        </div>
+        <div class="payment__editCardCVV">
+          {{ form.card_cvv.label }} 
+          {{ form.card_cvv(class="form-control") }}
+        </div>
+      </form>
+    </div>
+
+    <div class="payment__right">
+      <button class="payment__editButton" id="editButton{{ method.id }}" onclick="toggleEditForm({{ method.id }})"><i class="fa-solid fa-pen"></i>Edit</button>
+
+      <!-- hidden by default -->
+      <div class="button-group" id="buttonGroup{{ method.id }}" style="display: none;">
+        <button type="submit" class="payment__saveButton" form="editForm{{ method.id }}">Save</button>
+        <button type="button" class="payment__cancelButton" onclick="toggleEditForm({{ method.id }})">Cancel</button>
+      </div>
+
+      <form id="deleteForm-{{ method.id }}" action="{{ url_for('dashboard.delete_payment_method', id=method.id) }}" method="POST" onsubmit="event.preventDefault(); openDeleteModal({{ method.id }})">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="button" class="payment__deleteButton" id="deleteButton{{ method.id }}" onclick="openDeleteModal({{ method.id }})">Delete</button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <p>No Payment methods found.</p>
+{% endif %}
+
+<a href="{{ url_for('dashboard.add_payment_method') }}" class="payment__addButton"><i class="fa-solid fa-plus fa-lg"></i>Add</a>
+
+<!-- modal -->
+{% include "components/deleteModal.html" %}
+
+{% endblock %}
+
+{% block body_scripts %}
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/dashboard/settings/editPayment.js') }}"
+></script>
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/deleteModal.js') }}"
+></script>
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/dashboard/settings/paymentType.js') }}"
+></script>
 {% endblock %}

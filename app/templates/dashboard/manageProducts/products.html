@@ -17,9 +17,9 @@
                 <span class="statistic__amount">{{ total_products }}</span>
             </div>
         </div>
-        <div class="statistic__box">
+        <div class="statistic__box" title="Click to view products classified under &quot;Warnings&quot; first">
             <i class="bi bi-exclamation-circle-fill fa-xl"></i>
-            <div class="product__statistic">
+            <div class="product__statistic warning">
                 <p class="statistic__label">Warnings</p>
                 <span class="statistic__amount">{{ total_warnings }}</span>
             </div>
@@ -232,14 +232,14 @@
         {% endif %}
         {% for p in range(1, total_pages + 1) %}
             <li class="{% if p == current_page %}active{% endif %}">
-              <a class="page__button" href="{{ url_for('manageProducts.products_listing', page=p, q=search_query if search_query else None, type=category_filter if category_filter else None, subcategory=subcategory_filter if subcategory_filter else None, featured=featured_filter if featured_filter else None, stock=stock_rating if stock_rating else None) }}">
+              <a class="page__button" href="{{ url_for('manageProducts.products_listing', page=p, q=search_query if search_query else None, type=category_filter if category_filter else None, subcategory=subcategory_filter if subcategory_filter else None, featured=featured_filter if featured_filter else None, stock=stock_filter if stock_filter else None) }}">
               {{ p }}
               </a>
             </li>
         {% endfor %}
         {% if current_page < total_pages %}
             <li class="pageNext__button">
-              <a href="{{ url_for('manageProducts.products_listing', page=current_page+1, q=search_query if search_query else None, type=category_filter if category_filter else None, subcategory=subcategory_filter if subcategory_filter else None, featured=featured_filter if featured_filter else None, stock=stock_rating if stock_rating else None) }}">
+              <a href="{{ url_for('manageProducts.products_listing', page=current_page+1, q=search_query if search_query else None, type=category_filter if category_filter else None, subcategory=subcategory_filter if subcategory_filter else None, featured=featured_filter if featured_filter else None, stock=stock_filter if stock_filter else None) }}">
               Next
               </a>
             </li>

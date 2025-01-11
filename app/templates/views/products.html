@@ -92,7 +92,7 @@
         <!-- </a> -->
         <div class="cart">
           <form action="/add-to-cart/1" method="POST" class="cta-form">
-            <input type="hidden" name="csrf_token" value="IjA3ZWYxZDgxYmFhM2I5MmQ5ZjYwNGU1MTM0YmYzM2Q3MGExYTAxYjMi.Z4BvXg._bPpuigJum8PwFx3UdCY4trIPmc">
+            {{ form.hidden_tag() }}
             <button type="submit"><i class="fa-solid fa-cart-shopping fa-xl"></i></button>
           </form>
         </div>

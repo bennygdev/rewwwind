@@ -49,9 +49,6 @@ def pagination(products):
         else:
             products_query = products_query.filter(Product.is_featured_staff)
 
-    # if not stock_filter and session.get('first_time_opening', True):
-    #     session['first_time_opening'] = False  # Mark as no longer the first visit
-    #     stock_filter = 'Lowest first' will add this back on another day.
     if stock_filter and stock_filter != 'all':
         if 'limited' in stock_filter:
             products_query = products_query.filter(cast(Product.conditions[0]['stock'], Integer) <= 10)
@@ -89,20 +86,6 @@ def products_listing():
 
     categories = Category.query.all()[:8]
     subcategories = SubCategory.query.join(Category).filter(Category.category_name == category_filter)[:8]
-    
-    filters_changed = request.args.get('filters_changed', 'false').lower() == 'true'
-    if filters_changed:
-        page = 1
-        return redirect(url_for(
-            'manageProducts.products_listing', 
-            page=1, 
-            q=search_query if search_query else None, 
-            type=category_filter if category_filter else None, 
-            genre=subcategory_filter if subcategory_filter else None, 
-            featured=featured_filter if featured_filter else None, 
-            stock=stock_filter if stock_filter else None, 
-            filters_changed='false'
-            ))
 
     return render_template(
         "dashboard/manageProducts/products.html", 

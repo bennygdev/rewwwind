@@ -48,20 +48,6 @@ def product_pagination():
     page = request.args.get('page', 1, type=int)
     per_page = 16
 
-    filters_changed = request.args.get('filters_changed', 'false').lower() == 'true'
-    if filters_changed:
-        page = 1
-        return redirect(url_for(
-            'productPagination.product_pagination', 
-            page=1, 
-            q=search_query if search_query else None, 
-            type=category_filter if category_filter else None, 
-            genre=subcategory_filter if subcategory_filter else None, 
-            price=price_filter if price_filter else None, 
-            rating=rating_filter if rating_filter else None, 
-            filters_changed='false'
-            ))
-
     total_products = products_query.count()
     products = products_query.order_by(Product.id).paginate(page=page, per_page=per_page)
 
@@ -73,6 +59,8 @@ def product_pagination():
 
     if not category_filter:
         subcategory_filter = ""
+    
+    form = AddReviewForm()
 
     # Render the template
     return render_template(
@@ -88,7 +76,8 @@ def product_pagination():
         category_filter=category_filter,
         subcategory_filter=subcategory_filter,
         price_filter=price_filter,
-        rating_filter=rating_filter
+        rating_filter=rating_filter,
+        form=form
     )
 
 @productPagination.route('/product/<int:product_id>', methods=['GET', 'POST'])

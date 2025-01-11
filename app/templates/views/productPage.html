@@ -43,11 +43,11 @@
     </div>
     <hr>
     <div class="middle">
-      <h3>&dollar;{{ '{:.2f}'.format(product.conditions[0].price) }}</h3>
+      <h3>&dollar;{{ '{:.2f}'.format(selected_condition.price) }}</h3>
       <div class="stock">
-        {% if product.conditions[0].stock <= 10 %}
+        {% if selected_condition.stock <= 10 %}
           <i class="bi bi-exclamation-circle-fill"></i>
-          <span>Only {{ product.conditions[0].stock }} left. Order soon!</span>
+          <span>Only {{ selected_condition.stock }} left. Order soon!</span>
         {% else %}
           <i class="bi bi-check-circle-fill"></i>
           <span>Plenty of stock to go around!</span>
@@ -58,11 +58,11 @@
     <div class="bottom">
       <div class="condition">
         <div class="header">
-          <h3>Condition</h3><i class="bi bi-question-circle-fill"></i>
+          <h3>Condition</h3><i class="bi bi-question-circle-fill" title="Conditions represent the quality of the product being sold."></i>
         </div>
         <div class="conditionTypes">
           {% for type in ['Brand New', 'Like New', 'Lightly Used', 'Well Used'] %}
-            <div>
+            <div class="{% if type in product.conditions|map(attribute='condition') %}enabled{% else %}disabled{% endif %} {% if type == selected_condition.condition %}active{% endif %}" title="{% if type not in product.conditions|map(attribute='condition') %}Stock for this has run out, sorry!{% endif %}">
               <span>{{ type }}</span>
             </div>
           {% endfor %}
@@ -87,18 +87,21 @@
       <hr>
       <form action="{{ url_for('addToCart.add_to_cart', product_id=product.id) }}" method="POST" class="cta-form">
           {{ cartform.hidden_tag() }}
+          {{ cartform.condition(value=selected_condition.condition) }}
           <button type="submit" class="filter">Add to Cart</button>
       </form>
       <form action="/check-out/{{ product.id }}" method="POST" class="cta-form">
-          {{ cartform.hidden_tag() }}
+          <!-- {{ cartform.hidden_tag() }} please remember to add something like this, cartform can be any unique form class defined
+            in forms.py -->
           <button type="submit" class="filter">Buy Now</button>
       </form>
-      <hr>
-      <a href="/dashboard/manage-products" class="cta wishlist">
+      <!-- <hr> -->
+      <!-- <a href="/dashboard/manage-products" class="cta wishlist">
         <div>
           <span>Wishlist</span>
         </div>
-      </a>
+      </a> -->
+      <!-- removed wishlist, don't think there's much i can do with it for now. -->
     </div>
   </div>
 </div>
@@ -120,7 +123,7 @@
       {% if user.role_id %}
       <div class="write"><span>Write a review</span>&nbsp;&nbsp;<i class="bi bi-pencil-square"></i></div>
       {% endif %}
-      {% if reviews %}
+      {% if reviews.items and product.reviews  %}
       <div class="filters">
         <div class="filter-container">
           <div class="filter {% if rating_filter %}activated{% endif %}" filter-for="rating" id="filter">

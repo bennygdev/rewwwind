@@ -84,6 +84,14 @@ def product_pagination():
 def product_detail(product_id):
     product = Product.query.get_or_404(product_id)
     reviews_query = Review.query.filter_by(product_id=product_id)
+
+    # Condition logic
+    selected_condition_name = request.args.get('condition')
+    if not selected_condition_name:
+        selected_condition = product.conditions[0]
+    else:
+        selected_condition = next((condition for condition in product.conditions if condition['condition'] == selected_condition_name), None)
+    print(selected_condition)
     
     # Filter logic
     rating_filter = request.args.get('rating', '', type=str)
@@ -114,6 +122,7 @@ def product_detail(product_id):
         "/views/productPage.html",
         user=current_user,
         product=product,
+        selected_condition=selected_condition,
         reviewform=reviewForm,
         cartform=cartForm,
         reviews=reviews,

@@ -216,7 +216,28 @@ hr {
 .product__right .bottom .condition .conditionTypes div {
     padding: 0.5em 1em;
     border: 1px solid #d1d1d1;
-    border-radius: 12px;
+    border-radius: var(--bs-border-radius);
+    cursor: pointer;
+}
+
+.product__right .bottom .condition .conditionTypes div.disabled {
+    cursor: not-allowed;
+    user-select: none;
+    opacity: 40%;
+}
+
+.product__right .bottom .condition .conditionTypes div.enabled {
+    opacity: 100%;
+    transition: 0.3s background-color;
+}
+
+.product__right .bottom .condition .conditionTypes div.enabled.active {
+    color: white;
+    background-color: #039752;
+}
+
+.product__right .bottom .condition .conditionTypes div.enabled:not(.active):hover {
+    background-color: #dfdfdf;
 }
 
 .product__right .bottom a {

@@ -1,3 +1,4 @@
+// rating star filling 
 class RatingStars {
     constructor(container, text) {
         this.container = document.querySelector(container);
@@ -39,6 +40,7 @@ class RatingStars {
 new RatingStars(".product .rating", 'No reviews yet. Be the first one!');
 new RatingStars(".review__section .rating", '0');
 
+// image viewing seleciton
 class Images {
     constructor(container) {
         this.container = container;
@@ -66,3 +68,15 @@ class Images {
 }
 
 new Images(document.querySelector('.image-list'));
+
+// condition assignment
+const conditions = Array.from(document.querySelectorAll('.conditionTypes div.enabled'));
+document.getElementById('condition').value = conditions.findIndex(condition => condition.classList.contains('active'))
+
+conditions.forEach((condition, index) => {
+    condition.addEventListener('click', () => {
+        const params = new URLSearchParams();
+        params.set('condition', condition.querySelector('span').innerText);
+        window.location.search = params.toString();
+    })
+})

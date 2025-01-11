@@ -236,6 +236,7 @@ class DeleteReviewForm(FlaskForm):
     if field.data != 'CONFIRMDELETE':
        raise ValidationError('The confirmation input is invalid. Please type CONFIRMDELETE to confirm the deletion.')
 
-# Add to cart Forms
+# Cart-related Forms
 class AddToCartForm(FlaskForm):
-  submit = SubmitField=('Add to Cart')
+  condition = HiddenField(default=0)
+  submit = SubmitField('Add to Cart')

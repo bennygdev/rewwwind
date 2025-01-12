@@ -1,0 +1,61 @@
+{% extends "views/base.html" %}
+{% block title %} Trade-in {% endblock %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/tradein/onboarding.css')}}">
+{% endblock %}
+
+{% block content %}
+<div>
+    <h1>It's as easy as 1,2,3!</h1>
+</div>
+
+<div class="steps">
+    <div class="text">
+        <h1>Submit a trade-in request with us</h1>
+        <p>Upload pictures of the requested angles of your product, <br>
+            and provide us the requested information of your trade-in.
+        </p>
+    </div>
+    <img src="icon-document.png" alt="Document Icon" class="step-image">
+</div>
+
+<div class="steps">
+    <div class="text">
+        <h1>Drop your items off</h1>
+        <p>Once your request is approved, you'll have 48 hours to prepare and drop your items off by either:</p>
+        <ul class="options">
+            <li>
+                <img src="icon-mail.png" alt="Mail Icon" class="icon"> Mailing it to us
+            </li>
+            <li>
+                <img src="icon-store.png" alt="Store Icon" class="icon"> Dropping by our store
+            </li>
+            <li>
+                <img src="icon-truck.png" alt="Truck Icon" class="icon"> Opting for our courier service
+            </li>
+        </ul>
+    </div>
+    <img src="icon-box.png" alt="Box Icon" class="step-image">
+</div>
+
+<div class="steps">
+    <div class="text">
+        <h1>Get rewarded</h1>
+        <p>Once we receive your items, you can choose to either receive cash or<br>
+            in-store credit to spend in our store!
+        </p>
+    </div>
+    <img src="icon-document.png" alt="Document Icon" class="step-image">
+</div>
+
+<div>
+    <h1>Ready to refresh your selection?</h1>
+</div>
+
+<div class="cta">
+    <a href="{{ url_for('views.trade_form') if current_user.is_authenticated else url_for('auth.login') }}" class="btn">Get Started</a>
+</div>
+
+{% endblock %}
+

@@ -235,3 +235,15 @@
   font-style: italic;
   margin: 10px 0;
 }
+
+.back-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.back-btn:hover {
+  opacity: 0.8;
+}

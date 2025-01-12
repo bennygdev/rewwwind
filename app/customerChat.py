@@ -17,21 +17,37 @@ active_chats = {}
 @role_required(2, 3)  # Admin roles
 def customer_chat():
   # Get all active chat requests for admin view
-  waiting_chats = {room_id: data for room_id, data in active_chats.items() if data['status'] == 'waiting'}
+  all_chats = {room_id: data for room_id, data in active_chats.items() if data['status'] in ['waiting', 'active']}  # Include both waiting and active chats
   active_chat_users = []
     
-  for room_id, chat_data in waiting_chats.items():
+  for room_id, chat_data in all_chats.items():
     customer = User.query.get(chat_data['customer'])
     if customer:
       active_chat_users.append({
         'room_id': room_id,
         'customer_name': f"{customer.first_name} {customer.last_name}",
-        'start_time': chat_data.get('start_time', datetime.now().strftime('%H:%M'))
+        'start_time': chat_data.get('start_time', datetime.now().strftime('%H:%M')),
+        'status': chat_data['status']
       })
     
   return render_template("dashboard/customerChat/customerChat.html", user=current_user, active_chats=active_chat_users)
 
+@customerChat.route('/api/check-auth')
+def check_auth():
+  return jsonify({'authenticated': current_user.is_authenticated})
 
+@customerChat.route('/api/check-active-chat')
+@login_required
+def check_active_chat():
+  # Check if user has an active chat
+  for room_id, data in active_chats.items():
+    if data['customer'] == current_user.id:
+      return jsonify({
+        'hasActiveChat': True,
+        'roomId': room_id,
+        'messages': data['messages']
+      })
+  return jsonify({'hasActiveChat': False})
 
 # Socket.IO event handlers
 
@@ -41,24 +57,29 @@ def handle_support_request(data):
   if not current_user.is_authenticated:
     return
     
+  # Check if user already has an active chat
+  for room_id, data in active_chats.items():
+    if data['customer'] == current_user.id:
+      join_room(room_id)
+      return
+    
   room_id = f"chat_{current_user.id}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
   active_chats[room_id] = {
     'customer': current_user.id,
     'admin': None,
     'status': 'waiting',
-    'start_time': datetime.now().strftime('%H:%M')
+    'messages': [],
+    'last_activity': datetime.now()
   }
     
   join_room(room_id)
     
-  # Notify all admin users about new chat request
   emit('new_chat_request', {
     'room_id': room_id,
     'customer_name': f"{current_user.first_name} {current_user.last_name}",
-    'start_time': active_chats[room_id]['start_time']
+    'start_time': datetime.now().strftime('%H:%M')
   }, broadcast=True)
     
-  # Confirm to customer their request is received
   emit('support_request_acknowledged', {
     'room_id': room_id,
     'message': 'Please wait for a support representative to join.'
@@ -71,11 +92,16 @@ def handle_admin_join(data):
     return
     
   room_id = data['room_id']
-  if room_id in active_chats and active_chats[room_id]['status'] == 'waiting':
+  if room_id in active_chats:
     active_chats[room_id]['admin'] = current_user.id
     active_chats[room_id]['status'] = 'active'
         
     join_room(room_id)
+        
+    # Send message history to admin
+    emit('chat_history', {
+      'messages': active_chats[room_id].get('messages', [])
+    })
         
     # Notify the customer that admin has joined
     emit('admin_joined', {
@@ -91,7 +117,7 @@ def handle_admin_leave(data):
     
   room_id = data['room_id']
   if room_id in active_chats:
-    # Mark chat as waiting for new admin
+    # Mark chat as waiting for new admin but preserve messages
     active_chats[room_id]['admin'] = None
     active_chats[room_id]['status'] = 'waiting'
         
@@ -100,15 +126,13 @@ def handle_admin_leave(data):
       'message': 'Support representative has left the chat. Please wait for a new representative.',
     }, room=room_id)
         
-    # Notify admin of successful leave
-    emit('admin_left', {'success': True})
-        
-    # Broadcast new chat request to all admins
+    # Broadcast chat request to all admins
     customer = User.query.get(active_chats[room_id]['customer'])
     emit('new_chat_request', {
       'room_id': room_id,
       'customer_name': f"{customer.first_name} {customer.last_name}",
-      'start_time': active_chats[room_id]['start_time']
+      'start_time': datetime.now().strftime('%H:%M'),
+      'status': 'waiting'
     }, broadcast=True)
         
     leave_room(room_id)
@@ -117,19 +141,22 @@ def handle_admin_leave(data):
 @socketio.on('chat_message')
 def handle_message(data):
   if not current_user.is_authenticated:
-      return
+    return
     
   room_id = data['room_id']
   message = data['message']
     
   if room_id in active_chats:
-    # Determine if sender is customer or admin
-    is_admin = current_user.role_id in [2, 3]
-    sender_type = 'admin' if is_admin else 'customer'
+    active_chats[room_id]['last_activity'] = datetime.now()
+    active_chats[room_id]['messages'].append({
+      'message': message,
+      'type': 'outgoing' if current_user.role_id in [2, 3] else 'incoming',
+      'timestamp': datetime.now().strftime('%H:%M')
+    })
         
     emit('new_message', {
       'message': message,
-      'sender_type': sender_type,
+      'sender_type': 'admin' if current_user.role_id in [2, 3] else 'customer',
       'sender_name': current_user.first_name,
       'timestamp': datetime.now().strftime('%H:%M')
     }, room=room_id)

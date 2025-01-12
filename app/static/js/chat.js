@@ -4,6 +4,7 @@ const chatbox = document.querySelector('.chatbox');
 const chatbotToggler = document.querySelector('.chatbot-toggler');
 const chatbotWrapper = document.querySelector('.chatbot__wrapper');
 const chatbotHeaderCloseBtn = document.querySelector('.chatbot header span');
+const sendBtn = document.getElementById('send-btn');
 const socket = io();
 
 let currentRoom = null;
@@ -25,21 +26,73 @@ chatInput.addEventListener("input", () => {
   chatInput.style.height = `${chatInput.scrollHeight}px`;
 });
 
-document.getElementById('supportBtn').addEventListener('click', () => {
-  isSupportChat = true;
+document.getElementById('supportBtn').addEventListener('click', async () => {
+  // Check if user is authenticated
+  const response = await fetch('/dashboard/api/check-auth');
+  const data = await response.json();
+  
+  if (!data.authenticated) {
+    window.location.href = '/login';
+    return;
+  }
+
+  // Check if user already has an active chat
+  const chatResponse = await fetch('/dashboard/api/check-active-chat');
+  const chatData = await chatResponse.json();
+  
+  if (chatData.hasActiveChat) {
+    // Restore previous chat session
+    currentRoom = chatData.roomId;
+    isSupportChat = true;
+    showChatInterface();
+    // Load previous messages
+    const messages = chatData.messages;
+    messages.forEach(msg => {
+      const messageElement = createChatLi(msg.message, msg.type);
+      chatbox.appendChild(messageElement);
+    });
+  } else {
+    // Start new chat
+    isSupportChat = true;
+    showChatInterface();
+    initializeSupportChat();
+  }
+});
+
+function showChatInterface() {
   document.getElementById('chatChoice').style.display = 'none';
   document.querySelector('.chatbox').style.display = 'block';
   document.querySelector('.chat-input').style.display = 'flex';
-  
-  // Initialize socket connection for support chat
-  initializeSupportChat();
-});
+  backBtn.style.display = 'block';
+}
 
 document.getElementById('chatbotBtn').addEventListener('click', () => {
   isSupportChat = false;
   document.getElementById('chatChoice').style.display = 'none';
   document.querySelector('.chatbox').style.display = 'block';
   document.querySelector('.chat-input').style.display = 'flex';
+});
+
+const chatHeader = document.querySelector('.chatbot header');
+chatHeader.innerHTML = `
+  <button class="back-btn" style="position: absolute; left: 20px; display: none;">
+    <i class="fa-solid fa-arrow-left"></i>
+  </button>
+  <h2>Chat</h2>
+  <span><i class="fa-solid fa-xmark fa-lg"></i></span>
+`;
+
+const backBtn = document.querySelector('.back-btn');
+
+// Handle back button click
+backBtn.addEventListener('click', () => {
+  if (isSupportChat && currentRoom) {
+    socket.emit('end_chat', {
+      room_id: currentRoom,
+      ended_by: 'customer'
+    });
+  }
+  resetChat();
 });
 
 function initializeSupportChat() {
@@ -97,8 +150,10 @@ const handleChat = () => {
   userMessage = chatInput.value.trim();
   // console.log(userMessage)
   if (!userMessage) return;
+
+  // Clear input and reset height
   chatInput.value = "";
-  chatInput.style.height = `${inputInitHeight}px` // revert back to default height once msg sent
+  chatInput.style.height = `${inputInitHeight}px`
 
   // append user message to chatbox
   chatbox.appendChild(createChatLi(userMessage, "outgoing"));
@@ -121,6 +176,14 @@ const handleChat = () => {
   }
 }
 
+// Add reconnection logic when page loads
+window.addEventListener('load', () => {
+  if (isSupportChat) {
+      socket.emit('customer_reconnect');
+  }
+});
+
+sendBtn.addEventListener('click', handleChat);
 // resize textarea height based on content
 chatInput.addEventListener("input", () => {
   chatInput.style.height = `${inputInitHeight}px`
@@ -166,19 +229,29 @@ socket.on('new_message', (data) => {
   }
 });
 
-socket.on('chat_ended', (data) => {
-  const messageElement = createChatLi(data.message, 'incoming');
-  chatbox.appendChild(messageElement);
-  chatbox.scrollTo(0, chatbox.scrollHeight);
-  currentRoom = null;
+// socket.on('chat_ended', (data) => {
+//   const messageElement = createChatLi(data.message, 'incoming');
+//   chatbox.appendChild(messageElement);
+//   chatbox.scrollTo(0, chatbox.scrollHeight);
+//   currentRoom = null;
   
-  // Reset chat interface
-  setTimeout(() => {
-    document.getElementById('chatChoice').style.display = 'block';
-    document.querySelector('.chatbox').style.display = 'none';
-    document.querySelector('.chat-input').style.display = 'none';
-    chatbox.innerHTML = ''; // Clear chat history
-  }, 3000);
+//   // Reset chat interface
+//   setTimeout(() => {
+//     document.getElementById('chatChoice').style.display = 'block';
+//     document.querySelector('.chatbox').style.display = 'none';
+//     document.querySelector('.chat-input').style.display = 'none';
+//     chatbox.innerHTML = ''; // Clear chat history
+//   }, 3000);
+// });
+socket.on('chat_ended', (data) => {
+    const messageElement = createChatLi(data.message, 'incoming');
+    chatbox.appendChild(messageElement);
+    chatbox.scrollTo(0, chatbox.scrollHeight);
+    
+    // Reset chat after delay
+    setTimeout(() => {
+        resetChat();
+    }, 3000);
 });
 
 let connectionInterval;
@@ -229,10 +302,26 @@ socket.on('user_disconnected', (data) => {
   }
 });
 
+socket.on('chat_history', (data) => {
+  chatbox.innerHTML = ''; // Clear existing messages
+  currentRoom = data.room_id; // Set current room
+  
+  data.messages.forEach(msg => {
+    const messageElement = createChatLi(
+      msg.message, 
+      msg.type === 'outgoing' ? 'outgoing' : 'incoming'
+    );
+    chatbox.appendChild(messageElement);
+  });
+  chatbox.scrollTo(0, chatbox.scrollHeight);
+});
+
 function resetChat() {
   currentRoom = null;
+  isSupportChat = false;
   document.getElementById('chatChoice').style.display = 'block';
   document.querySelector('.chatbox').style.display = 'none';
   document.querySelector('.chat-input').style.display = 'none';
+  backBtn.style.display = 'none';
   chatbox.innerHTML = '';
 }

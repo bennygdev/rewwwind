@@ -22,56 +22,52 @@
 
     <h1>Item Information</h1>
 
-    <form action="/submit-trade" method="POST">
+    <form id="tradeForm" action="" method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+
         <div class="form-row">
             <div class="form-group">
-                <label for="item-type">Item Type</label>
-                <select id="item-type" name="item-type">
-                    <option value="book">Book</option>
-                    <option value="vinyl">Vinyl</option>
-                </select>
+                <label for="item_type">Item Type</label>
+                {{ form.item_type(class="form-control", id="item_type") }}
+                
             </div>
             <div class="form-group">
-                <label for="item-condition">Item Condition</label>
-                <select id="item-condition" name="item-condition">
-                    <option value="brandNew">Brand New</option>
-                    <option value="likeNew">Like New</option>
-                    <option value="lightlyUsed">Lightly Used</option>
-                    <option value="used">Used</option>
-                </select>
+                <label for="item_condition">Item Condition</label>
+                {{ form.item_condition(class="form-control", id="item_condition") }}
+                
             </div>
         </div>
 
         <div class="form-group">
             <label for="title">Title</label>
-            <input type="text" id="title" name="title" placeholder="Enter title">
+            {{ form.title(class="form-control", id="title") }}
+           
         </div>
 
         <div class="form-group">
             <label for="author">Author / Artist</label>
-            <input type="text" id="author" name="author" placeholder="Enter author or artist">
+            {{ form.author(class="form-control", id="author") }}
+
         </div>
 
         <div class="form-group">
             <label for="genre">Genre</label>
-            <input type="text" id="genre" name="genre" placeholder="Enter genre">
+            {{ form.genre(class="form-control", id="genre") }}
         </div>
 
         <div class="form-group">
             <label for="isbn">ISBN / Cat#</label>
-            <input type="text" id="isbn" name="isbn" placeholder="Enter ISBN or catalog number">
+            {{ form.isbn(class="form-control", id="isbn") }}
         </div>
 
         <div class="button-group">
             <button type="button" class="btnB">Back</button>
-            <button type="submit" class="btnS">Submit</button>
+            {{ form.submit(class_="btnS") }}
         </div>
     </form>
-
-    
+</div>
 {% endblock %}
 
 {% block scripts %}
     <script src="{{ url_for('static', filename='js/tradein/tradeForm.js') }}"></script>
 {% endblock %}
-

@@ -240,3 +240,25 @@ class DeleteReviewForm(FlaskForm):
 class AddToCartForm(FlaskForm):
   condition = HiddenField(default=0)
   submit = SubmitField('Add to Cart')
+
+
+class TradeItemForm(FlaskForm):
+    item_type = SelectField('Item Type', choices=[
+      ('book', 'Book'), ('vinyl', 'Vinyl')
+      ], validators=[DataRequired()])
+    
+    item_condition = SelectField('Item Condition', choices=[
+        ('brandNew', 'Brand New'),
+        ('likeNew', 'Like New'),
+        ('lightlyUsed', 'Lightly Used'),
+        ('used', 'Used')
+    ], validators=[DataRequired()])
+
+    images = FileField('Images', validators=[FileAllowed(['jpg', 'jpeg', 'png'], 'Only image files are allowed.')])
+    title = StringField('Title', validators=[DataRequired(), Length(min=1, max=255)])
+    author = StringField('Author / Artist', validators=[DataRequired(), Length(min=1, max=255)])
+    genre = StringField('Genre', validators=[DataRequired(), Length(min=1, max=255)])
+    isbn = StringField('ISBN / Cat#', validators=[DataRequired(), Length(min=1, max=255)])
+    
+    submit = SubmitField('Submit')
+    

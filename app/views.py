@@ -1,12 +1,14 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 import os
 import json
+from .forms import TradeItemForm
 from .models import Product, tradeDetail
 from . import db
 from datetime import timedelta
 from sqlalchemy import func
+
 
 views = Blueprint('views', __name__)
 
@@ -28,44 +30,46 @@ def home():
 def trade_Onboard(): 
     return render_template('views/tradeOnboarding.html')
 
-@views.route('/tradeForm')
+@views.route('/tradeForm', methods=['GET', 'POST'])
 @login_required  
 def trade_form():
-    return render_template('views/tradeForm.html')  
+    form = TradeItemForm()
 
-@views.route('/submitRequest', methods=['POST'])
-@login_required
-def submit_request():
-    item_type = request.form.get('item-type')
-    item_condition = request.form.get('item-condition')
-    title = request.form.get('title')
-    author_artist = request.form.get('author')
-    genre = request.form.get('genre')
-    isbn_or_cat = request.form.get('isbn')
+    if form.validate_on_submit():
 
-    images = request.files.getlist('images')
-    image_paths = []
-    for file in images:
-        if file and file.filename:
-            filename = secure_filename(file.filename)
-            file_path = os.path.join('static/uploads', filename)
-            file.save(file_path)
-            image_paths.append(file_path)
+        item_type = form.item_type.data
+        item_condition = form.item_condition.data
+        title = form.title.data
+        author = form.author.data
+        genre = form.genre.data
+        isbn = form.isbn.data
+        images = request.files.getlist('images')
 
-    images_json = json.dumps(image_paths)
-    new_item = tradeDetail(
-        item_type=item_type,
-        item_condition=item_condition,
-        title=title,
-        author_artist=author_artist,
-        genre=genre,
-        isbn_or_cat=isbn_or_cat,
-        images=images_json,
-        trade_number=current_user.id 
-    )
 
-    db.session.add(new_item)
-    db.session.commit()
+        image_paths = []
+        for file in images:
+            if file:
+                filename = secure_filename(file.filename)
+                file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+                file.save(file_path)
+                image_paths.append(file_path)
 
-    flash('Trade item submitted successfully!', 'success')
-    return redirect(url_for('views.trade_onboard'))
+        images_json = json.dumps(image_paths)
+
+        new_item = tradeDetail(
+            item_type=item_type,
+            item_condition=item_condition,
+            title=title,
+            author_artist=author,
+            genre=genre,
+            isbn_or_cat=isbn,
+            images=images_json,
+            trade_number=current_user.id
+        )
+        db.session.add(new_item)
+        db.session.commit()
+
+        flash('Trade item submitted successfully!', 'success')
+        return redirect(url_for('views.home'))
+
+    return render_template('views/tradeForm.html', form=form)

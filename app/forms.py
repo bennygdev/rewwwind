@@ -236,6 +236,11 @@ class DeleteReviewForm(FlaskForm):
     if field.data != 'CONFIRMDELETE':
        raise ValidationError('The confirmation input is invalid. Please type CONFIRMDELETE to confirm the deletion.')
 
+# Order-related Forms
+class UpdateOrderForm(FlaskForm):
+  approved = RadioField('Approve Order', choices=['Approved', 'Not Approved'], default='Not Approved')
+  submit = SubmitField('Update Approval')
+
 # Cart-related Forms
 class AddToCartForm(FlaskForm):
   condition = HiddenField(default=0)

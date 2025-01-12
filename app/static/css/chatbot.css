@@ -52,6 +52,7 @@
   overflow: hidden;
   transition: all 0.1s ease;
   transform-origin: bottom right;
+  z-index: 2;
 }
 
 .show-chatbot .chatbot {

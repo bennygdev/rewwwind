@@ -122,10 +122,26 @@ socket.on('new_message', (data) => {
 // Handle chat ending
 socket.on('chat_ended', (data) => {
   if (currentRoom) {
-    currentRoom = null;
-    document.getElementById('chatArea').classList.add('d-none');
-    document.getElementById('noChatSelected').classList.remove('d-none');
-    document.querySelector('.chat-messages').innerHTML = '';
+    // Show end message
+    const messageHtml = `
+      <div class="message system mb-3">
+        <div class="message-content bg-warning text-dark p-2 rounded">
+          ${data.message}
+        </div>
+      </div>
+    `;
+    document.querySelector('.chat-messages').insertAdjacentHTML('beforeend', messageHtml);
+    
+    // Remove chat request card if it exists
+    const requestCard = document.querySelector(`[data-room-id="${currentRoom}"]`);
+    if (requestCard) {
+      requestCard.remove();
+    }
+    
+    // Reset chat after delay
+    setTimeout(() => {
+      resetAdminChat();
+    }, 3000);
   }
 });
 
@@ -201,4 +217,22 @@ socket.on('chat_history', (data) => {
       `;
       chatMessages.insertAdjacentHTML('beforeend', messageHtml);
   });
+});
+
+socket.on('customer_left', (data) => {
+  // Show message that customer left
+  const messageHtml = `
+    <div class="message system mb-3">
+      <div class="message-content bg-warning text-dark p-2 rounded">
+        ${data.message}
+      </div>
+    </div>
+  `;
+  document.querySelector('.chat-messages').insertAdjacentHTML('beforeend', messageHtml);
+  
+  // Remove chat request card if it exists
+  const requestCard = document.querySelector(`[data-room-id="${data.room_id}"]`);
+  if (requestCard) {
+    requestCard.remove();
+  }
 });

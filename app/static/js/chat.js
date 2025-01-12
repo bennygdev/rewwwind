@@ -87,6 +87,12 @@ const backBtn = document.querySelector('.back-btn');
 // Handle back button click
 backBtn.addEventListener('click', () => {
   if (isSupportChat && currentRoom) {
+    // First emit that customer is leaving
+    socket.emit('customer_leave', {
+      room_id: currentRoom
+    });
+    
+    // Then end the chat
     socket.emit('end_chat', {
       room_id: currentRoom,
       ended_by: 'customer'
@@ -221,6 +227,12 @@ socket.on('admin_joined', (data) => {
   chatbox.scrollTo(0, chatbox.scrollHeight);
 });
 
+socket.on('admin_left_chat', (data) => {
+  const messageElement = createChatLi(data.message, 'incoming');
+  chatbox.appendChild(messageElement);
+  chatbox.scrollTo(0, chatbox.scrollHeight);
+});
+
 socket.on('new_message', (data) => {
   if (data.sender_type !== 'customer') {
     const messageElement = createChatLi(data.message, 'incoming');
@@ -244,14 +256,14 @@ socket.on('new_message', (data) => {
 //   }, 3000);
 // });
 socket.on('chat_ended', (data) => {
-    const messageElement = createChatLi(data.message, 'incoming');
-    chatbox.appendChild(messageElement);
-    chatbox.scrollTo(0, chatbox.scrollHeight);
+  const messageElement = createChatLi(data.message, 'incoming');
+  chatbox.appendChild(messageElement);
+  chatbox.scrollTo(0, chatbox.scrollHeight);
     
-    // Reset chat after delay
-    setTimeout(() => {
-        resetChat();
-    }, 3000);
+  // Reset chat after delay
+  setTimeout(() => {
+    resetChat();
+  }, 3000);
 });
 
 let connectionInterval;
@@ -319,9 +331,18 @@ socket.on('chat_history', (data) => {
 function resetChat() {
   currentRoom = null;
   isSupportChat = false;
-  document.getElementById('chatChoice').style.display = 'block';
+  const chatChoice = document.getElementById('chatChoice');
   document.querySelector('.chatbox').style.display = 'none';
   document.querySelector('.chat-input').style.display = 'none';
   backBtn.style.display = 'none';
+
+  // Reset display properties
+  chatChoice.style.display = 'flex';
+  chatChoice.style.flexDirection = 'column';
+  chatChoice.style.justifyContent = 'center';
+  chatChoice.style.alignItems = 'center';
+  chatChoice.style.gap = '10px';
+  chatChoice.style.padding = '20px 0';
+
   chatbox.innerHTML = '';
 }

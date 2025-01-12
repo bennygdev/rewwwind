@@ -117,6 +117,7 @@ def handle_admin_leave(data):
     
   room_id = data['room_id']
   if room_id in active_chats:
+    admin_name = current_user.first_name
     # Mark chat as waiting for new admin but preserve messages
     active_chats[room_id]['admin'] = None
     active_chats[room_id]['status'] = 'waiting'
@@ -124,6 +125,11 @@ def handle_admin_leave(data):
     # Notify customer
     emit('admin_left_chat', {
       'message': 'Support representative has left the chat. Please wait for a new representative.',
+    }, room=room_id)
+
+    # Notify customer with admin's name
+    emit('admin_left_chat', {
+      'message': f'Support representative {admin_name} has left the chat. Please wait for a new representative.',
     }, room=room_id)
         
     # Broadcast chat request to all admins
@@ -202,6 +208,22 @@ def handle_disconnect():
   # Clean up rooms
   for room_id in rooms_to_remove:
     del active_chats[room_id]
+
+@socketio.on('customer_leave')
+def handle_customer_leave(data):
+    if not current_user.is_authenticated:
+        return
+        
+    room_id = data['room_id']
+    if room_id in active_chats:
+        customer = User.query.get(active_chats[room_id]['customer'])
+        customer_name = f"{customer.first_name} {customer.last_name}"
+        
+        # Notify admin that customer left
+        emit('customer_left', {
+            'message': f'{customer_name} has left the chat.',
+            'room_id': room_id
+        }, room=room_id)
 
 # Handle socket error
 @socketio.on_error()

@@ -1,0 +1,142 @@
+const socket = io();
+let currentRoom = null;
+
+// Handle new chat requests
+socket.on('new_chat_request', (data) => {
+  const requestHtml = `
+    <div class="chat-request-card mb-3 p-3 border rounded" data-room-id="${data.room_id}">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="mb-1">${data.customer_name}</h5>
+        <small>${data.start_time}</small>
+      </div>
+      <button class="btn btn-primary btn-sm join-chat" data-room-id="${data.room_id}" data-customer="${data.customer_name}">
+        Join Chat
+      </button>
+    </div>
+  `;
+  document.querySelector('.chat-requests').insertAdjacentHTML('afterbegin', requestHtml);
+});
+
+// Join chat functionality
+document.querySelector('.chat-requests').addEventListener('click', (e) => {
+  if (e.target.classList.contains('join-chat')) {
+    const roomId = e.target.dataset.roomId;
+    const customerName = e.target.dataset.customer;
+            
+    socket.emit('admin_join_chat', { room_id: roomId });
+    currentRoom = roomId;
+            
+    // Update UI
+    document.getElementById('chatArea').classList.remove('d-none');
+    document.getElementById('noChatSelected').classList.add('d-none');
+    document.getElementById('currentCustomer').textContent = `Chat with ${customerName}`;
+            
+    // Remove the chat request card
+    e.target.closest('.chat-request-card').remove();
+  }
+});
+
+// Handle sending messages
+document.getElementById('sendMessage').addEventListener('click', () => {
+  const message = document.getElementById('adminChatInput').value.trim();
+  if (message && currentRoom) {
+    socket.emit('chat_message', {
+      room_id: currentRoom,
+      message: message
+    });
+            
+    // Add message to chat
+    const messageHtml = `
+      <div class="message outgoing mb-3">
+        <div class="message-content bg-primary text-white p-2 rounded">
+          ${message}
+        </div>
+      </div>
+    `;
+    document.querySelector('.chat-messages').insertAdjacentHTML('beforeend', messageHtml);
+            
+    // Clear input
+    document.getElementById('adminChatInput').value = '';
+  }
+});
+
+// Handle incoming messages
+socket.on('new_message', (data) => {
+  if (data.sender_type === 'customer') {
+    const messageHtml = `
+      <div class="message incoming mb-3">
+        <div class="message-content bg-light p-2 rounded">
+          ${data.message}
+        </div>
+        <small class="text-muted">${data.timestamp}</small>
+      </div>
+    `;
+    document.querySelector('.chat-messages').insertAdjacentHTML('beforeend', messageHtml);
+  }
+});
+
+// Handle chat ending
+socket.on('chat_ended', (data) => {
+  if (currentRoom) {
+    currentRoom = null;
+    document.getElementById('chatArea').classList.add('d-none');
+    document.getElementById('noChatSelected').classList.remove('d-none');
+    document.querySelector('.chat-messages').innerHTML = '';
+  }
+});
+
+let connectionInterval;
+let lastPong = Date.now();
+
+function startConnectionMonitor() {
+  connectionInterval = setInterval(() => {
+    // Check if we've received a pong in the last 10 seconds
+    if (Date.now() - lastPong > 10000) {
+      handleDisconnection();
+    }
+    socket.emit('ping_connection');
+  }, 5000);
+}
+
+function handleDisconnection() {
+  clearInterval(connectionInterval);
+    
+  // Show reconnection message
+  const messageElement = createChatLi('Connection lost. Attempting to reconnect...', 'system');
+  chatbox.appendChild(messageElement);
+    
+  // Attempt to reconnect
+  socket.connect();
+}
+
+socket.on('pong_connection', () => {
+  lastPong = Date.now();
+});
+
+socket.on('connect', () => {
+  startConnectionMonitor();
+  if (currentRoom) {
+    // Rejoin room if we were in one
+    socket.emit('rejoin_room', { room_id: currentRoom });
+  }
+});
+
+socket.on('user_disconnected', (data) => {
+  const messageElement = createChatLi(data.message, 'system');
+  chatbox.appendChild(messageElement);
+    
+  if (data.user_type === 'admin') {
+    // Reset chat for customer if admin disconnects
+    setTimeout(() => {
+      resetChat();
+    }, 3000);
+  }
+});
+
+function resetChat() {
+  currentRoom = null;
+  document.getElementById('chatChoice').style.display = 'block';
+  document.querySelector('.chatbox').style.display = 'none';
+  document.querySelector('.chat-input').style.display = 'none';
+  chatbox.innerHTML = '';
+}

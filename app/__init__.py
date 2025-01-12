@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 import os
 from authlib.integrations.flask_client import OAuth
 from flask_migrate import Migrate
+from flask_socketio import SocketIO
+socketio = SocketIO()
 
 migrate = Migrate()
 
@@ -61,6 +63,7 @@ def create_app():
     }
   )
 
+  socketio.init_app(app)
   # REMINDER: Only use camel casing, no hyphens etc. flask will flag an error if thats the case.
   # Initialise Routes
 
@@ -147,7 +150,7 @@ def create_database(app):
       print('Created Database!')
       # insert_categories()
 
-      from .seed import insert_categories, insert_products, insert_users, insert_payment_types, insert_default_roles, insert_subcategories, insert_orders 
+      from .seed import insert_categories, insert_products, insert_users, insert_payment_types, insert_default_roles, insert_subcategories 
 
       insert_default_roles()
       insert_payment_types()
@@ -155,4 +158,3 @@ def create_database(app):
       insert_categories()
       insert_subcategories()
       insert_products()
-      insert_orders()

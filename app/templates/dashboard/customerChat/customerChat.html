@@ -1,9 +1,59 @@
+<!-- customerChat.html -->
 {% extends "dashboard/base.html" %}
 {% set active_page = "customer_chat" %}
 {% block title %}Chat with Customer{% endblock %}
 
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/customerChat/customerChat.css') }}">
+{% endblock %}
 
 {% block content %}
-<h1>Chat with Customer</h1>
+<div class="container-fluid">
+  <div class="row">
+    <!-- Active Chats Sidebar -->
+    <div class="col-md-3 border-right">
+      <h4 class="mb-4">Active Requests</h4>
+      <div class="chat-requests">
+        {% for chat in active_chats %}
+        <div class="chat-request-card mb-3 p-3 border rounded" data-room-id="{{ chat.room_id }}">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-1">{{ chat.customer_name }}</h5>
+            <small>{{ chat.start_time }}</small>
+          </div>
+          <button class="btn btn-primary btn-sm join-chat" data-room-id="{{ chat.room_id }}" data-customer="{{ chat.customer_name }}">
+            Join Chat
+          </button>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
 
+    <!-- Chat Area -->
+    <div class="col-md-9">
+      <div id="chatArea" class="d-none">
+        <div class="chat-header border-bottom mb-3 p-3">
+          <h4 id="currentCustomer">Chat with Customer</h4>
+        </div>
+        <div class="chat-messages p-3" style="height: 60vh; overflow-y: auto;">
+                    
+        <!-- Messages insertion -->
+        </div>
+        <div class="chat-input-area p-3 border-top">
+          <div class="input-group">
+            <textarea class="form-control" id="adminChatInput" rows="2" placeholder="Type your message..."></textarea>
+            <button class="btn btn-primary" id="sendMessage">Send</button>
+          </div>
+        </div>
+      </div>
+      <div id="noChatSelected" class="text-center mt-5">
+        <h3>Select a chat request to begin</h3>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block body_scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/dashboard/customerChat/customerChat.js') }}"></script>
 {% endblock %}

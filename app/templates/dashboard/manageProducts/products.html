@@ -139,7 +139,7 @@
                 <div class="name"><p>{{ product.name }}</p><p>ID: {{ product.id }}</p></div>
             </td>
             <td class="productType">{{ product.category.category_name }}</td>
-            <td class="productGenre">{{ product.category.category_name }}</td>
+            <td class="productGenre">{{ product.subcategories[0].subcategory_name }}</td>
             <td class="productconditions">{{ product.conditions|length }}</td>
             <td class="productAvgPrice">&dollar;{{ '{:.2f}'.format(product.conditions[0].price) }}</td>
             {% if product.conditions[0].stock == 0 %}

@@ -107,7 +107,7 @@ def insert_subcategories():
   vinyl_subcategories = [
     "Rock",
     "Psychedelic", 
-    "Pop",
+    "pop",
     "Jazz",
     "Classical",
     "Hip Hop",

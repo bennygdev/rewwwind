@@ -102,7 +102,7 @@ class Product(db.Model):
 
   subcategories = db.relationship('SubCategory', secondary='product_subcategories', back_populates='products')
   
-  order_items = db.relationship('OrderItem', backref='product', lazy=True)  # otm orderItem
+  order_items = db.relationship('OrderItem', backref='product', lazy=True, cascade='all, delete-orphan')  # otm orderItem
 
   cart_entries = db.relationship('Cart', back_populates='product', lazy=True)
 

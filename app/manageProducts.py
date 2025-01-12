@@ -6,7 +6,7 @@ from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.dialects.postgresql import JSON
 from .roleDecorator import role_required
 from .forms import AddProductForm, DeleteProductForm #, EditProductForm
-from .models import Product, Category, SubCategory
+from .models import Product, Category, SubCategory, ProductSubCategory
 from . import db
 import os
 
@@ -282,6 +282,9 @@ def delete_product():
         id = deleteForm.productID.data
         product_to_delete = Product.query.get(id)
         if product_to_delete:
+            db.session.query(ProductSubCategory).filter_by(product_id=product_to_delete.id).delete()
+            db.session.commit()
+
             db.session.delete(product_to_delete)
             db.session.commit()
             flash("The product has been removed successfully.", "success")

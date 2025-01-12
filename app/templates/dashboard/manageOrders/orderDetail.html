@@ -20,7 +20,7 @@
             <i class="bi bi-calendar-check-fill fa-2xl"></i>
         </div>
         <div class="right">
-            <span>Approval</span>
+            <span>Arriving</span>
             <p><strong>
                 {% if order.approval_date %}
                 {{ (order.approval_date + timedelta(days=7)).strftime('%d %B') }} 
@@ -37,7 +37,7 @@
             <i class="bi bi-check-lg fa-2xl"></i>
         </div>
         <div class="right">
-            <span>Delivery</span>
+            <span>Approval</span>
             <p><strong>{{ order.status if order.status in ['Approved', 'Pending'] }}</strong></p>
         </div>
     </div>
@@ -46,7 +46,7 @@
             <i class="bi bi-truck fa-2xl"></i>
         </div>
         <div class="right">
-            <span>Arriving</span>
+            <span>Delivery</span>
             <p><strong>{{ order.status if order.status == 'Out for Delivery' else 'Pending' }}</strong></p>
         </div>
     </div>

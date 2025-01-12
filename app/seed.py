@@ -519,34 +519,35 @@ def insert_orders():
   )
   db.session.add(billing_info)
   db.session.commit()
-
-  order = Order(
-      user_id=4,
-      total_amount=0,
-      delivery='Standard',
-      payment_type_id=1,
-      payment_information_id=payment_info.id,
-      billing_id=billing_info.id
-  )
-  db.session.add(order)
-  db.session.commit()
   
-  products = Product.query.all()
-  from random import randint
-  for product in products[:4]:
-    i = randint(0,3)
-    item = OrderItem(
-      order_id=order.id,
-      product_id=product.id,
-      product_condition=product.conditions[i],
-      quantity=randint(1,10),
-      unit_price=product.conditions[i]['price']
+  for x in range(10):
+    order = Order(
+        user_id=4,
+        total_amount=0,
+        delivery='Standard',
+        payment_type_id=1,
+        payment_information_id=payment_info.id,
+        billing_id=billing_info.id
     )
-    db.session.add(item)
+    db.session.add(order)
     db.session.commit()
+    
+    products = Product.query.all()
+    from random import randint
+    for product in products[:randint(1,4)]:
+      i = randint(0,3)
+      item = OrderItem(
+        order_id=order.id,
+        product_id=product.id,
+        product_condition=product.conditions[i],
+        quantity=randint(1,10),
+        unit_price=product.conditions[i]['price']
+      )
+      db.session.add(item)
+      db.session.commit()
 
-  order.update_total()
-  db.session.commit()
+      order.update_total()
+      db.session.commit()
 
   # second
   payment_info = PaymentInformation(
@@ -570,32 +571,33 @@ def insert_orders():
   db.session.add(billing_info)
   db.session.commit()
   
-  from datetime import datetime,timedelta
-  order = Order(
-      user_id=3,
-      order_date=datetime.now()-timedelta(days=40),
-      total_amount=0,
-      delivery='Expedited',
-      payment_type_id=2,
-      payment_information_id=payment_info.id,
-      billing_id=billing_info.id
-  )
-  db.session.add(order)
-  db.session.commit()
-  
-  products = Product.query.all()
-  from random import randint
-  for product in products[4:10]:
-    i = randint(0,3)
-    item = OrderItem(
-      order_id=order.id,
-      product_id=product.id,
-      product_condition=product.conditions[i],
-      quantity=randint(1,10),
-      unit_price=product.conditions[i]['price']
+  for x in range(10):
+    from datetime import datetime,timedelta
+    order = Order(
+        user_id=3,
+        order_date=datetime.now()-timedelta(days=randint(20, 40)),
+        total_amount=0,
+        delivery='Expedited',
+        payment_type_id=2,
+        payment_information_id=payment_info.id,
+        billing_id=billing_info.id
     )
-    db.session.add(item)
+    db.session.add(order)
     db.session.commit()
+    
+    products = Product.query.all()
+    from random import randint
+    for product in products[4:randint(5,15)]:
+      i = randint(0,3)
+      item = OrderItem(
+        order_id=order.id,
+        product_id=product.id,
+        product_condition=product.conditions[i],
+        quantity=randint(1,10),
+        unit_price=product.conditions[i]['price']
+      )
+      db.session.add(item)
+      db.session.commit()
 
-  order.update_total()
-  db.session.commit()
+    order.update_total()
+    db.session.commit()

@@ -121,6 +121,8 @@ def add_product():
             productDescription = form.productDescription.data
             productType = form.productType.data
             productGenre = form.productGenre.data
+            subcategory = SubCategory.query.filter(SubCategory.id==productGenre).first()
+            print(subcategory)
             productThumbnail = int(form.productThumbnail.data)
             productConditions = form.productConditions.data
             is_featured_special = form.productIsFeaturedSpecial.data
@@ -144,11 +146,12 @@ def add_product():
                 creator=productCreator,
                 image_thumbnail=secure_filename(files[productThumbnail].filename),
                 images=uploaded_file_paths,
+                category_id=productType,
+                subcategories=[subcategory],
                 description=productDescription,
                 conditions=productConditions,
                 is_featured_special = is_featured_special,
-                is_featured_staff = is_featured_staff,
-                category_id=1
+                is_featured_staff = is_featured_staff
             )
 
             # Add the product to the database and commit
@@ -184,8 +187,8 @@ def update_product(product_id):
         form.productName.data = product.name
         form.productCreator.data = product.creator
         form.productDescription.data = product.description
-        form.productType.data = product.category_id
-        form.productGenre.data = product.category_id
+        form.productType.data = product.category.category_name
+        form.productGenre.data = product.subcategories[0].subcategory_name
         form.productThumbnail.data = product.image_thumbnail
         form.productIsFeaturedSpecial.data = product.is_featured_special
         form.productIsFeaturedStaff.data = product.is_featured_staff
@@ -220,6 +223,7 @@ def update_product(product_id):
             product.description = form.productDescription.data
             product.conditions = form.productConditions.data
             product.category_id = form.productType.data
+            product.subcategories = [SubCategory.query.filter(SubCategory.id==form.productGenre.data).first()]
             product.is_featured_special = form.productIsFeaturedSpecial.data
             product.is_featured_staff = form.productIsFeaturedStaff.data
 
@@ -267,10 +271,12 @@ def update_product(product_id):
 @role_required(2, 3)
 def delete_product():
     products = Product.query.all()
+
+    products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter = pagination(products)
+
     categories = Category.query.all()[:8]
     subcategories = SubCategory.query.join(Category).filter(Category.category_name == category_filter)[:8]
     deleteForm = DeleteProductForm()
-    products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter = pagination(products)
 
     if deleteForm.validate_on_submit():
         id = deleteForm.productID.data

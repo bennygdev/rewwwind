@@ -225,7 +225,7 @@
     <ul>
         {% if current_page > 1 %}
             <li class="pagePrevious__button">
-              <a href="{{ url_for('manageProducts.products_listing', page=current_page-1, q=search_query if search_query else None, type=category_filter if category_filter else None, subcategory=subcategory_filter if subcategory_filter else None, featured=featured_filter if featured_filter else None, stock=stock_rating if stock_rating else None) }}">
+              <a href="{{ url_for('manageProducts.products_listing', page=current_page-1, q=search_query if search_query else None, type=category_filter if category_filter else None, subcategory=subcategory_filter if subcategory_filter else None, featured=featured_filter if featured_filter else None, stock=stock_filter if stock_filter else None) }}">
               Previous
               </a>
             </li>

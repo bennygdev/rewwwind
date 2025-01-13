@@ -4,6 +4,7 @@
 {% block styles %}
 <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/settings/settings.css') }}">
 <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/settings/updatePersonalInfo.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard/accounts/deleteModal.css') }}">
 {% endblock %}
 
 {% block title %}Update Personal Information{% endblock %}
@@ -67,8 +68,21 @@
 
 <div class="profile__lowerButtons">
   <a href="{{ url_for('dashboard.change_email') }}" class="back__button--darker">Change Email</a>
-  <a href="" class="back__button--darker">Delete Account</a> <!-- modal needed -->
+  <form id="deleteForm-{{ user.id }}" action="{{ url_for('dashboard.delete_account', id=user.id) }}" method="POST" onsubmit="event.preventDefault(); openDeleteModal({{ user.id }})">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="button" id="account__deleteButton" onclick="openDeleteModal({{ user.id }})">Delete</button>
+  </form>
 </div>
 <!-- <img src="{{ image_file }}" alt=""> -->
 
+<!-- modal -->
+{% include "components/deleteModal.html" %}
+
+{% endblock %}
+
+{% block body_scripts %}
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/deleteModal.js') }}"
+></script>
 {% endblock %}

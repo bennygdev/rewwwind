@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
 from flask_login import login_required, current_user
-from .forms import UpdatePersonalInformation, ChangePasswordForm, BillingAddressForm, PaymentMethodForm
+from .forms import UpdatePersonalInformation, ChangePasswordForm, BillingAddressForm, PaymentMethodForm, ChangeEmailForm
 from .models import User, BillingAddress, PaymentInformation, PaymentType
 from .roleDecorator import role_required
 from . import db
@@ -55,6 +55,30 @@ def update_personal_information():
     image_file = url_for('static', filename='profile_pics/profile_image_default.jpg')
 
   return render_template("dashboard/settings/updatePersonalInfo.html", user=current_user, image_file=image_file)
+
+@dashboard.route('/settings/change-email', methods=['GET', 'POST'])
+@login_required
+@role_required(1, 2, 3)
+def change_email():
+  form = ChangeEmailForm()
+
+  if form.validate_on_submit():
+    email_exists = User.query.filter_by(email=form.email.data).first()
+
+    if form.email.data == current_user.email:
+      flash("New email cannot be the same as your email.", "error")
+      return render_template("dashboard/settings/changeEmail.html", user=current_user, form=form)
+
+    if email_exists:
+      flash("This email is already taken. Please try again.", "error")
+      return render_template("dashboard/settings/changeEmail.html", user=current_user, form=form)
+    
+    current_user.email = form.email.data
+    db.session.commit()
+    flash("Your email has been updated!", "success")
+    return redirect(url_for('dashboard.update_personal_information'))
+
+  return render_template("dashboard/settings/changeEmail.html", user=current_user, form=form)
 
 
 def save_picture(form_picture):

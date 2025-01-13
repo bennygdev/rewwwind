@@ -48,6 +48,10 @@ class ChangePasswordForm(FlaskForm):
   confirmPassword = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message="Passwords must match")])
   submit = SubmitField('Save')
 
+class ChangeEmailForm(FlaskForm):
+  email = EmailField('Email', validators=[DataRequired(), Email()])
+  submit = SubmitField('Save')
+
 class AdminChangeUserInfoForm(FlaskForm):
   firstName = StringField('First Name', validators=[DataRequired()])
   lastName = StringField('Last Name')

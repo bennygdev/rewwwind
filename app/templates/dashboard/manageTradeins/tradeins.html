@@ -2,22 +2,21 @@
 {% set active_page = "manage_tradeins" %}
 {% block title %}Manage Trade-ins{% endblock %}
 
-
 {% block content %}
-<!-- Need to add logic here, to check if the user is customer, admin or owner -->
+<!-- Logic to check if the user is a customer, admin, or owner -->
 
+<!-- Render content based on user role -->
 {% block userTradeins %}
-<!-- Probably have to do a include block. -->
-{% if user.role_id == 1 %}
-{% include "dashboard/manageTradeins/customer_tradeins.html" %}
-{% elif user.role_id in [2, 3] %}
-{% include "dashboard/manageTradeins/admin_tradeins.html" %}
-{% endif %}
-
+    {% if user.role_id == 1 %}
+        <!-- Include customer-specific trade-ins -->
+        {% include "dashboard/manageTradeins/customer_tradeins.html" %}
+    {% elif user.role_id in [2, 3] %}
+        <!-- Include admin/owner-specific trade-ins -->
+        {% include "dashboard/manageTradeins/admin_tradeins.html" %}
+    {% else %}
+        <p>Access Denied: You do not have permission to view this page.</p>
+    {% endif %}
 {% endblock %}
 
-<!-- method of checking here -->
-<!-- {{ user.role_id }} -->
-<h1>Manage Tradeins</h1>
-
+<h1>Manage Trade-ins</h1>
 {% endblock %}

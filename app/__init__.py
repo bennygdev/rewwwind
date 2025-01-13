@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import os
 from authlib.integrations.flask_client import OAuth
 from flask_migrate import Migrate
+import json
 
 migrate = Migrate()
 
@@ -137,6 +138,11 @@ def create_app():
   @app.errorhandler(401)
   def unauthorized(e):
     return render_template('401.html', user=current_user), 401
+  
+  #image rendering
+  @app.template_filter('fromjson')
+  def fromjson_filter(value):
+    return json.loads(value)
   
   return app
   

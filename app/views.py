@@ -45,7 +45,6 @@ def trade_form():
         isbn = form.isbn.data
         images = request.files.getlist('images')
 
-
         image_paths = []
         for file in images:
             if file:
@@ -73,3 +72,10 @@ def trade_form():
         return redirect(url_for('views.home'))
 
     return render_template('views/tradeForm.html', form=form)
+
+@views.route('/customer_tradeins', methods=['GET'])
+@login_required
+def customer_tradeins():
+    user_trade_items = tradeDetail.query.filter_by(trade_number=current_user.id).all()
+    return render_template('dashboard/manageTradeins/customer_tradeins.html', trade_items=user_trade_items)
+

@@ -1,0 +1,48 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 50px;
+  margin-top: 80px;
+}
+
+h1{
+  font-family: "CharisSILBold";
+  font-size: 3em;
+}
+
+p{
+  font-family: "OpenSansSemiBold";
+  font-size: 1.2em;
+  color: #4E4D4D;
+}
+
+.steps {
+  display: flex;  
+  justify-content: space-between; 
+  align-items: flex-start; 
+  gap: 7em; 
+}
+
+.step-image {
+  flex-shrink: 0; 
+  width: 100px; 
+  height: 100px; 
+  object-fit: contain; 
+}
+
+.btn{
+  font-family: "OpenSansSemiBold";
+  text-decoration: none;
+  color: white;
+  background-color: #039752;
+  padding: 0.8em 4em;
+  border-radius: 50px;
+}
+
+.btn:hover {
+  text-decoration: none;
+  color: white;
+  background-color: #039752; 
+}

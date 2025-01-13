@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 import os
 from authlib.integrations.flask_client import OAuth
 from flask_migrate import Migrate
+from flask_socketio import SocketIO
+socketio = SocketIO()
 
 migrate = Migrate()
 
@@ -61,6 +63,7 @@ def create_app():
     }
   )
 
+  socketio.init_app(app)
   # REMINDER: Only use camel casing, no hyphens etc. flask will flag an error if thats the case.
   # Initialise Routes
 

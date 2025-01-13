@@ -5,19 +5,29 @@
   </button>
   <div class="chatbot">
     <header>
-      <h2>Chatbot</h2>
+      <h2>Chat</h2>
       <span><i class="fa-solid fa-xmark fa-lg"></i></span>  
     </header>
-    <ul class="chatbox">
+    
+    <!-- Initial choice buttons -->
+    <div class="chat-choice" id="chatChoice">
+      <button class="choice-btn" id="chatbotBtn">
+        <i class="fa-solid fa-robot"></i>
+        Chat with Bot
+      </button>
+      <button class="choice-btn" id="supportBtn">
+        <i class="fa-solid fa-headset"></i>
+        Chat with Support
+      </button>
+    </div>
+
+    <ul class="chatbox" style="display: none;">
       <li class="chat incoming">
-        <span><i class="fa-solid fa-robot"></i></span>
+        <span><i class="fa-solid fa-robot chat-icon"></i></span>
         <p>Hi there 👋 <br> How can I help you today?</p>
       </li>
-      <!-- <li class="chat outgoing">
-         <p>Lorem ipsum</p> 
-      </li> -->
     </ul>
-    <div class="chat-input">
+    <div class="chat-input" style="display: none;">
       <textarea placeholder="Enter a message..." required></textarea>
       <span id="send-btn"><i class="fa-solid fa-comment"></i></span>
     </div>

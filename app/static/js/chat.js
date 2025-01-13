@@ -5,6 +5,7 @@ const chatbotToggler = document.querySelector('.chatbot-toggler');
 const chatbotWrapper = document.querySelector('.chatbot__wrapper');
 const chatbotHeaderCloseBtn = document.querySelector('.chatbot header span');
 const sendBtn = document.getElementById('send-btn');
+const switchToSupportLink = document.querySelector('.switch-to-support');
 const socket = io();
 
 let currentRoom = null;
@@ -30,6 +31,7 @@ document.getElementById('supportBtn').addEventListener('click', async () => {
   // Check if user is authenticated
   const response = await fetch('/dashboard/api/check-auth');
   const data = await response.json();
+  switchToSupportLink.style.display = 'none';
   
   if (!data.authenticated) {
     window.location.href = '/login';
@@ -71,6 +73,12 @@ document.getElementById('chatbotBtn').addEventListener('click', () => {
   document.getElementById('chatChoice').style.display = 'none';
   document.querySelector('.chatbox').style.display = 'block';
   document.querySelector('.chat-input').style.display = 'flex';
+  switchToSupportLink.style.display = 'block';
+  backBtn.style.display = 'block';
+
+  const greetingMessage = createChatLi('Hi there 👋\nHow can I help you today?', 'incoming');
+  chatbox.innerHTML = ''; // Clear any existing messages
+  chatbox.appendChild(greetingMessage);
 });
 
 const chatHeader = document.querySelector('.chatbot header');
@@ -213,6 +221,29 @@ chatbotToggler.addEventListener("click", () => {
   chatbotWrapper.classList.toggle("show-chatbot");
 });
 
+document.getElementById('switchToSupport').addEventListener('click', async (e) => {
+  e.preventDefault();
+  
+  // Check if user is authenticated
+  const response = await fetch('/dashboard/api/check-auth');
+  const data = await response.json();
+  
+  if (!data.authenticated) {
+    window.location.href = '/login';
+    return;
+  }
+
+  // Hide the support link since we're switching to support chat
+  switchToSupportLink.style.display = 'none';
+  
+  // Clear the AI chat history
+  chatbox.innerHTML = '';
+  
+  // Switch to support chat
+  isSupportChat = true;
+  initializeSupportChat();
+});
+
 // Socket event listeners
 socket.on('support_request_acknowledged', (data) => {
   currentRoom = data.room_id;
@@ -335,6 +366,7 @@ function resetChat() {
   document.querySelector('.chatbox').style.display = 'none';
   document.querySelector('.chat-input').style.display = 'none';
   backBtn.style.display = 'none';
+  switchToSupportLink.style.display = 'none';
 
   // Reset display properties
   chatChoice.style.display = 'flex';

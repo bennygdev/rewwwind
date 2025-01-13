@@ -103,11 +103,11 @@
   {% if not (current_user.role_id == 3 and selectedUser.role_id == 3) %}
     <a href="{{ url_for('manageAccounts.edit_account', id=selectedUser.id) }}" id="account__editButton">Edit</a>
     <a href="{{ url_for('manageAccounts.change_password', id=selectedUser.id) }}" id="account__changePassword">Change Password</a>
+    <form id="deleteForm-{{ selectedUser.id }}" action="{{ url_for('manageAccounts.delete_account', id=selectedUser.id) }}" method="POST" onsubmit="event.preventDefault(); openDeleteModal({{ selectedUser.id }})">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="button" id="account__deleteButton" onclick="openDeleteModal({{ selectedUser.id }})">Delete</button>
+    </form>
   {% endif %}
-  <form id="deleteForm-{{ selectedUser.id }}" action="{{ url_for('manageAccounts.delete_account', id=selectedUser.id) }}" method="POST" onsubmit="event.preventDefault(); openDeleteModal({{ selectedUser.id }})">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <button type="button" id="account__deleteButton" onclick="openDeleteModal({{ selectedUser.id }})">Delete</button>
-  </form>
 </div>
 
 <!-- modal -->

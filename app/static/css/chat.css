@@ -247,3 +247,19 @@
 .back-btn:hover {
   opacity: 0.8;
 }
+
+.switch-to-support {
+  text-align: center;
+  padding: 5px 0;
+  margin-bottom: 5px;
+}
+
+.switch-to-support a {
+  color: #2196F3;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.switch-to-support a:hover {
+  text-decoration: underline;
+}

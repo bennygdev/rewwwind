@@ -1,0 +1,120 @@
+.content {
+  gap: 50px;
+  margin-top: 100px;
+}
+
+h1 {
+  font-family: "CharisSILBold";
+  font-size: 3em;
+}
+
+p {
+  font-family: "OpenSansSemiBold";
+  font-size: 1.2em;
+  color: #4E4D4D;
+}
+
+label {
+  font-family: "OpenSansSemiBold";
+  font-size: 1.2em;
+  color: #4E4D4D;
+}
+
+.form-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: auto;
+}
+
+.image-upload {
+  border: 3px dashed #000;
+  text-align: center;
+  padding: 100px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+}
+
+.upload-button {
+  font-size: 1em;
+  background-color: #039752;
+  color: white;
+  padding: 0.4em 5em;
+  font-family: "OpenSansSemiBold";
+  text-align: center;
+  border-radius: 50px;
+  cursor: pointer;
+}
+
+#file-input {
+  display: none;
+}
+
+.image-upload p {
+  margin-top: 10px;
+  font-size: 0.9em;
+  color: gray;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.form-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 2em;
+}
+
+input, select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1em;
+  width: 100%;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+}
+
+.btnB {
+  font-family: "OpenSansSemiBold";
+  text-decoration: none;
+  color: black;
+  background-color: transparent;
+  padding: 0.5em 2.5em;
+  border-radius: 50px;
+  border: 2px solid black;
+}
+
+.btnS {
+  font-family: "OpenSansSemiBold";
+  text-decoration: none;
+  color: white;
+  background-color: #039752;
+  padding: 0.5em 1.5em; 
+  border-radius: 50px;
+  border: none;
+  font-size: 1em; 
+  display: inline-block; 
+  width: 6em;
+}
+.preview-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.preview-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+}
+

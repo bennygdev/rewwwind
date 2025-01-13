@@ -102,7 +102,7 @@ class Product(db.Model):
 
   subcategories = db.relationship('SubCategory', secondary='product_subcategories', back_populates='products')
   
-  order_items = db.relationship('OrderItem', backref='product', lazy=True)  # otm orderItem
+  order_items = db.relationship('OrderItem', backref='product', lazy=True, cascade='all, delete-orphan')  # otm orderItem
 
   cart_entries = db.relationship('Cart', back_populates='product', lazy=True)
 
@@ -216,6 +216,23 @@ class Cart(db.Model):
     user = db.relationship('User', back_populates='cart_items')  # Changed backref name to 'cart_entries'
     product = db.relationship('Product', back_populates='cart_entries')  # Product can appear in multiple carts
 
+class tradeDetail(db.Model):
+    __tablename__ = 'trade_details'
+
+    id = db.Column(db.Integer, primary_key=True)
+    images = db.Column(db.JSON, nullable=False)  
+    item_type = db.Column(db.String(100), nullable=False)
+    item_condition = db.Column(db.String(100), nullable=False)
+    title = db.Column(db.String(255), nullable=False)
+    author_artist = db.Column(db.String(255), nullable=True)
+    genre = db.Column(db.String(255), nullable=True)
+    isbn_or_cat = db.Column(db.String(100), nullable=True)
+    trade_number = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  
+
+    user = db.relationship('User', backref='trade_items', lazy=True)
+
+    created_at = db.Column(db.DateTime(timezone=True), default=func.now())
+    updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
 
 
 

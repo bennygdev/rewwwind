@@ -6,7 +6,7 @@ from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.dialects.postgresql import JSON
 from .roleDecorator import role_required
 from .forms import AddProductForm, DeleteProductForm #, EditProductForm
-from .models import Product, Category, SubCategory
+from .models import Product, Category, SubCategory, ProductSubCategory, OrderItem
 from . import db
 import os
 
@@ -278,10 +278,16 @@ def delete_product():
     subcategories = SubCategory.query.join(Category).filter(Category.category_name == category_filter)[:8]
     deleteForm = DeleteProductForm()
 
-    if deleteForm.validate_on_submit():
+    if OrderItem.query.filter(OrderItem.product_id==deleteForm.productID.data).first():
+        flash("Sorry, the product you're about to delete is bound to an order.\nPlease make sure that the order is fulfilled before deleting this product.", "error")
+
+    elif deleteForm.validate_on_submit():
         id = deleteForm.productID.data
         product_to_delete = Product.query.get(id)
         if product_to_delete:
+            db.session.query(ProductSubCategory).filter_by(product_id=product_to_delete.id).delete()
+            db.session.commit()
+
             db.session.delete(product_to_delete)
             db.session.commit()
             flash("The product has been removed successfully.", "success")
@@ -291,7 +297,6 @@ def delete_product():
         products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter = pagination(products)
 
         return redirect(url_for('manageProducts.products_listing'))
-        
 
     return render_template(
         "dashboard/manageProducts/products.html", 

@@ -21,6 +21,16 @@ oauth = OAuth()
 
 load_dotenv()
 
+def update_user_order_counts(app):
+  with app.app_context():
+    from .models import User, Order
+    users = User.query.all()
+    for user in users:
+      order_count = Order.query.filter_by(user_id=user.id).count()
+      user.orderCount = order_count
+    db.session.commit()
+    print('Updated order counts for all users!')
+
 def create_app():
   app = Flask(__name__)
   app.config['SECRET_KEY'] = '123456789'
@@ -114,6 +124,8 @@ def create_app():
   from .models import User, Product, Role, Order, OrderItem, Category, ProductSubCategory
 
   create_database(app)
+
+  update_user_order_counts(app)
 
   # User load
   login_manager = LoginManager()

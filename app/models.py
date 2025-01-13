@@ -17,7 +17,7 @@ class User(db.Model, UserMixin):
     image = db.Column(db.String(150), nullable=True, default='profile_image_default.jpg')
     google_account = db.Column(db.Boolean, nullable=False, default=False)
     password = db.Column(db.String(150), nullable=True)
-    orderCount = db.Column(db.Integer, nullable=False)
+    orderCount = db.Column(db.Integer, nullable=False, default=0)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)  # role table
     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
     updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())

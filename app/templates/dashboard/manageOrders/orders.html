@@ -1,23 +1,176 @@
 {% extends "dashboard/base.html" %}
 {% set active_page = "manage_orders" %}
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/pageInteractions/filters.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard/manageOrders/orderListing.css') }}">
+{% endblock %}
 {% block title %}Manage Orders{% endblock %}
 
-
-{% block content %}
-<!-- Need to add logic here, to check if the user is customer, admin or owner -->
-
-{% block userOrders %}
-<!-- Probably have to do a include block. -->
-{% if user.role_id == 1 %}
-{% include "dashboard/manageOrders/customer_orders.html" %}
-{% elif user.role_id in [2, 3] %}
-{% include "dashboard/manageOrders/admin_orders.html" %}
-{% endif %}
-
+{% block headerContent %}
+<div class="orders__header">
+    <h1 id="orders__title">Manange Orders</h1>
+    <div class="order__statistics">
+        <div class="statistic__box">
+            <i class="bi bi-bag-fill fa-xl"></i>
+            <div class="order__statistic">
+                <p class="statistic__label">Total Orders</p>
+                <span class="statistic__amount">{{ total_orders }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="extraPadding"></div>
+    <div class="search__wrapper">
+        <!-- <div class="search__container">
+          <input type="text" id="search__bar" class="search__bar" placeholder="Search by username..." autocomplete="off">
+          <i class="fa-solid fa-magnifying-glass search__button" id="search__button"></i>
+        </div> -->
+        <form method="get" action="{{ url_for('manageOrders.orders_listing') }}">
+            <div class="search__container">
+            <input
+              type="text"
+              name="q"
+              id="search__bar"
+              class="search__bar"
+              placeholder="Search by order number..."
+              value="{{ search_query }}"
+              autocomplete="off"
+            >
+            <button type="submit" class="search__button" id="search__button">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+            {% if search_query %}
+                <a href="{{ url_for('manageOrders.orders_listing') }}" class="clear__button">
+                    <i class="fa-solid fa-xmark fa-lg"></i>
+                </a>
+            {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}
 
-<!-- method of checking here -->
-<!-- {{ user.role_id }} -->
-<h1>Manage Orders</h1>
+{% block content %}
+{% if orders %}
+<div class="header">
+    <div class="header__left">
+        <div class="filters">
+            <div class="filter-container">
+                <label>Recency</label>
+                <div class="filter {% if recency_filter %}activated{% endif %}" filter-for="recency">
+                    <span class="selected">{% if recency_filter %}{{ recency_filter|title }}{% else %}All{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+                    <ul class="filter--options">
+                        <li class="{% if not recency_filter %}highlighted{% endif %}">All</li>
+                        {% for recency in ['Last 30 Days', 'Most Recent First', 'Most Recent Last'] %}
+                        <li class="{% if recency == recency_filter|title %}highlighted{% endif %}">{{ recency }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="filter-container">
+                <label>Cost</label>
+                <div class="filter {% if cost_filter %}activated{% endif %}" filter-for="cost">
+                    <span class="selected">{% if cost_filter %}{{ cost_filter|title }}{% else %}None{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
+                    <ul class="filter--options">
+                        <li class="{% if not cost_filter %}highlighted{% endif %}">None</li>
+                        {% for tag in ['Highest First', 'Lowest First'] %}
+                        <li class="{% if tag == cost_filter|title %}highlighted{% endif %}">{{ tag }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="orders">
+    <table>
+        <thead>
+            <tr>
+                <th class="orderName">Order</th>
+                <th class="orderDate">Date</th>
+                <th class="orderDelivery">Delivery Type</th>
+                <th class="orderPayment">Payment</th>
+                <th class="orderPrice">Total Cost</th>
+                <th class="orderStatus">Status</th>
+                <th class="controls"></th>
+            </tr>
+        </thead>
+        {% for order in orders %}
+        <tr order-id="{{ order.id }}">
+            <td class="orderName">
+                <div class="name"><p>Order #{{ order.id }}</p><p>{{ order.order_items|length }} Items</p></div>
+            </td>
+            <td class="orderDate">{{ order.order_date.strftime('%Y-%m-%d') }}</td>
+            <td class="orderDelivery">{{ order.delivery }}</td>
+            <td class="orderPayment">{{ order.payment_type.payment_type }}</td>
+            <td class="orderAvgPrice">&dollar;{{ '{:.2f}'.format(order.total_amount) }}</td>
+            <td class="orderStock {{ order.status }}">
+                <div>{{ order.status }}</div>
+            </td>
+            <td class="controls">
+                <div>
+                    <a href="{{ url_for('manageOrders.order_detail', order_id=order.id) }}">
+                        {% if user.role_id == 1 %}
+                        <i class="fa-solid fa-eye"></i>
+                        {% elif user.role_id in [2,3] %}
+                        <i class="fa-solid fa-pen"></i>
+                        {% endif %}
+                    </a>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
 
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    <div class="overlay" style="display: block;"></div>
+    <div class="modal" style="display: flex;">
+        {% for category, message in messages %}
+        <div class="success">
+            <i class="bi bi-x-lg fa-2xl"></i>
+            <i class="bi bi-check-circle fa-2xl"></i>
+            <h2>{{ message }}</h2>
+            <div class="button-wrapper">
+                <input id="cancel" name="cancel" type="button" value="Exit">
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endwith %}
+<div class="products__pagination">
+    <ul>
+        {% if current_page > 1 %}
+            <li class="pagePrevious__button">
+              <a href="{{ url_for('manageOrders.orders_listing', page=current_page-1, q=search_query if search_query else None, recency=recency_filter if recency_filter else None, cost=cost_filter if cost_filter else None) }}">
+              Previous
+              </a>
+            </li>
+        {% endif %}
+        {% for p in range(1, total_pages + 1) %}
+            <li class="{% if p == current_page %}active{% endif %}">
+              <a class="page__button" href="{{ url_for('manageOrders.orders_listing', page=p, q=search_query if search_query else None, recency=recency_filter if recency_filter else None, cost=cost_filter if cost_filter else None) }}">
+              {{ p }}
+              </a>
+            </li>
+        {% endfor %}
+        {% if current_page < total_pages %}
+            <li class="pageNext__button">
+              <a href="{{ url_for('manageOrders.orders_listing', page=current_page+1, q=search_query if search_query else None, recency=recency_filter if recency_filter else None, cost=cost_filter if cost_filter else None) }}">
+              Next
+              </a>
+            </li>
+        {% endif %}
+    </ul>
+</div>
+{% else %}
+<h1>You have not placed any orders yet!</h1>
+<a href="{{ url_for('productPagination.product_pagination') }}"><h3>Continue Shopping</h3></a>
+{% endif %}
+{% endblock %}
+
+{% block body_scripts %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/pageInteractions/filters.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/dashboard/manageOrders/ordersListing.js') }}"></script>
 {% endblock %}

@@ -139,7 +139,7 @@
                 <div class="name"><p>{{ product.name }}</p><p>ID: {{ product.id }}</p></div>
             </td>
             <td class="productType">{{ product.category.category_name }}</td>
-            <td class="productGenre">{{ product.category.category_name }}</td>
+            <td class="productGenre">{{ product.subcategories[0].subcategory_name }}</td>
             <td class="productconditions">{{ product.conditions|length }}</td>
             <td class="productAvgPrice">&dollar;{{ '{:.2f}'.format(product.conditions[0].price) }}</td>
             {% if product.conditions[0].stock == 0 %}
@@ -178,8 +178,15 @@
 
     <i class="bi bi-x-lg"></i>
     {% if message %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
         <div class="header">
+            {% if category == 'success' %}
             <i class="bi bi-check-circle"></i>
+            {% else %}
+            <i class="bi bi-plus-circle"></i>
+            {% endif %}
             <h2>
                 {{ message }}
             </h2>
@@ -187,6 +194,9 @@
         <div class="cancel_button button__wrapper">
             <input type="button" value="Exit">
         </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
     {% else %}
         <div class="header">
             <i class="bi bi-exclamation-circle"></i>
@@ -225,7 +235,7 @@
     <ul>
         {% if current_page > 1 %}
             <li class="pagePrevious__button">
-              <a href="{{ url_for('manageProducts.products_listing', page=current_page-1, q=search_query if search_query else None, type=category_filter if category_filter else None, subcategory=subcategory_filter if subcategory_filter else None, featured=featured_filter if featured_filter else None, stock=stock_rating if stock_rating else None) }}">
+              <a href="{{ url_for('manageProducts.products_listing', page=current_page-1, q=search_query if search_query else None, type=category_filter if category_filter else None, subcategory=subcategory_filter if subcategory_filter else None, featured=featured_filter if featured_filter else None, stock=stock_filter if stock_filter else None) }}">
               Previous
               </a>
             </li>

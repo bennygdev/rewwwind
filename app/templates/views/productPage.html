@@ -123,7 +123,7 @@
       {% if user.role_id %}
       <div class="write"><span>Write a review</span>&nbsp;&nbsp;<i class="bi bi-pencil-square"></i></div>
       {% endif %}
-      {% if reviews.items and product.reviews  %}
+      {% if product.reviews|length != 0  %}
       <div class="filters">
         <div class="filter-container">
           <div class="filter {% if rating_filter %}activated{% endif %}" filter-for="rating" id="filter">

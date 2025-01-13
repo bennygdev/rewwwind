@@ -1,23 +1,23 @@
-.products__header {
+.orders__header {
     background-color: #039752;
     color: #fff;
     padding: 30px 30px;
     position: relative;
 }
 
-#products__title {
+#orders__title {
     font-family: "OpenSansSemibold";
     font-size: 1.6em;
 }
 
-#products__subtitles {
+#orders__subtitles {
     font-family: "OpenSansRegular";
     font-size: 0.8em;
     margin-top: 10px;
     margin-bottom: 0;
 }
 
-.product__statistics {
+.order__statistics {
     display: flex;
     flex-direction: row;
     gap: 30px;
@@ -34,7 +34,7 @@
     border-radius: 15px;
 }
 
-.product__statistic {
+.order__statistic {
     display: flex;
     flex-direction: column;
 }
@@ -136,6 +136,10 @@
     justify-content: space-between;
 }
 
+.bodyContent {
+    margin-top: 30px;
+}
+
 /* filter styles extending from filters.css */
 .filter-container label {
     margin-bottom: 10px;
@@ -159,67 +163,8 @@
     background-color: #039752;
 }
 
-/* header right */
-
-.header__right {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow: hidden;
-}
-
-.header__right a {
-    text-decoration: none;
-    color: black;
-}
-
-.header__right h3, .header__right h5 {
-    margin: 0;
-}
-
-.header__right h3 {
-    padding: 1rem;
-    border-top: 0;
-    border-radius: 1em;
-    background-color: #e6e6e6;
-    transition: background-color 0.3s, color 0.5s;
-    display: flex;
-    font-weight: bolder;
-    align-items: center;
-    cursor: pointer;
-}
-
-.header__right h5 {
-    padding: 1rem 1rem 0.5rem 1rem;
-    border-radius: 1rem 1rem 0 0; 
-    border-bottom: 0;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    font-weight: bold;
-}
-
-.header__right h3:hover {
-    background-color: #039752;
-    color: white;
-}
-
-.header__right h3 i, .header__right h5 i {
-    font-size: 1.2em;
-    margin-right: 0.4em;
-}
-
-.extraPadding {
-    height: 14px;
-}
-
-.bodyContent {
-    margin-top: 30px;
-}
-
-/* products table */
-.products table {
+/* orders table */
+.orders table {
     width: 100%;
     /* box-shadow: inset 0 0 0 1px black; */
     border-collapse: collapse;
@@ -227,71 +172,60 @@
     margin-top: 30px;
 }
 
-.products th, .products td {
+.orders th, .orders td {
     padding: 15px 20px;
 }
 
-.products th {
+.orders th {
     resize: horizontal;
     background-color: #e6e6e6;
 }
 
-.products td {
+.orders td {
     padding: 30px 20px;
 }
 
-.products tr:first-child th:first-child {
+.orders tr:first-child th:first-child {
     border-top-left-radius: 10px;
     /* padding-left: 20px; */
 }
 
-.products tr:first-child th:last-child {
+.orders tr:first-child th:last-child {
     border-top-right-radius: 10px;
 }
 
-.products th, .products td:not(:first-child) {
+.orders th, .orders td {
     text-align: center;
 }
 
-td.productStock div {
+td.orderStock div {
     padding: 5px 0;
     border-radius: 10px;
     color: black;
 }
 
-td.noStock div {
-    background-color: red;
-    color: white;
-}
-
-td.lowStock div {
+td.Pending div {
     background-color: orange;
 }
 
-td.highStock div {
-    background-color: #039752;;
+td.Approved div {
     color: white;
+    background-color: #039752;
 }
 
-.products tr:not(:last-child) {
+.orders tr:not(:last-child) {
     border-bottom: 1px solid rgb(175, 175, 175);
 }
 
-.products tr:last-child td:last-child {
+.orders tr:last-child td:last-child {
     border-bottom-right-radius: 10px;
-
 }
 
-.products tr:last-child td:first-child {
+.orders tr:last-child td:first-child {
     border-bottom-left-radius: 10px;
 }
 
-.products td:first-child {
-    display: flex;
-    align-items: center;
-}
-
-.products td.controls i {
+.orders td.controls i {
     user-select: none;
     transition: color 0.3s;
     color: #6e6e6e;
@@ -300,35 +234,31 @@ td.highStock div {
     text-decoration: none;
 }
 
-.products td.controls div {
+.orders td.controls div {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
 }
 
-.products tbody td:last-child i.fa-pen:hover {
+.orders tbody td:last-child i.fa-pen:hover {
     color: #039752;
 }
 
-.products tbody td:last-child i.fa-eye:hover {
+.orders tbody td:last-child i.fa-eye:hover {
     color: rgb(0, 125, 184);
 }
 
-.products tbody td:last-child i.bi-trash-fill:hover {
-    color: rgb(214, 0, 0);
-}
-
-.products tbody tr {
+.orders tbody tr {
     background-color: #eee;
     color: #6e6e6e;
     transition: background-color 0.3s;
 }
 
-.products tbody tr:hover {
+.orders tbody tr:hover {
     background-color: rgb(204, 204, 204);
 }
 
-.products .thumbnail {
+.orders .thumbnail {
     width: 60px;
     height: 62px;
     border: 1px solid black;
@@ -339,24 +269,23 @@ td.highStock div {
     overflow: hidden;
 }
 
-.products img {
+.orders img {
     width: 60px;
     height: 62px;
     object-fit: cover;
     justify-self: center;
 }
 
-.products p {
+.orders p {
     margin:0;
 }
 
-.products p:first-child {
+.orders p:first-child {
     font-size: 1.2em;
     font-weight: bold;
 }
 
-
-/* delete form styles */
+/* messages modal */
 .overlay {
     display: none;
     width: 100%;
@@ -370,119 +299,54 @@ td.highStock div {
     z-index: 6;
 }
 
-.delete__form-container {
+.modal {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    padding: 20px 50px;
-    border-radius: 8px;
-    background-color: #f3f3f3;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    z-index: 10;
-    
-    text-align: center;
+    width: 60%;
+    max-height: 300px;
+    height: auto;
+    display: flex;
     flex-direction: column;
-    gap: 20px;
+    background-color: white;
+    border-radius: var(--bs-border-radius);
 }
 
-.delete__form-container i.bi-x-lg {
-    font-size: 1.3em;
+.modal .success {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 100%;
+}
+
+.success i.bi-x-lg, .delete i.bi-x-lg {
     position: absolute;
-    top: 15px;
-    right: 15px;
-    cursor: pointer;
+    top: 20px;
+    right: 20px;
 }
 
-.delete__form-container .header {
-    flex-direction: column;
+.success h2, .delete h2 {
+    font-weight: bold;
 }
 
-.delete__form-container i.bi-exclamation-circle {
-    font-size: 4em;
-    color: orange;
-}
-
-.delete__form-container i.bi-check-circle {
-    font-size: 4em;
+.success i.bi-check-circle {
+    font-size: 4.5em;
     color: #039752;
 }
 
-.delete__form-container i.bi-plus-circle {
-    font-size: 4em;
-    color: red;
-    transform: rotate(45deg);
-}
-
-.delete__form-container h2 {
-    font-weight: bold;
-    font-size: 1.5em;
-    margin-bottom: 5px;
-}
-
-.delete__form-container span {
-    display: block;
+.modal .button-wrapper input {
+    all: unset;
     font-size: 1.1em;
+    padding: 0.2em 0.7em;
+    background-color: #d9d9d9;
+    color: black;
+    border-radius: var(--bs-border-radius);
+    cursor: pointer;
 }
-
-.delete__form-container .product {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    text-align: left;
-    gap: 30px;
-}
-
-.delete__form-container .product .thumbnail {
-    border: 1px solid black;
-    border-radius: 6px;
-    width: 150px;
-    height: 150px;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-}
-
-.delete__form-container .product .thumbnail img {
-    width: 150px;
-    height: 150px;
-    object-fit: cover;
-}
-
-.delete__form-container .name p:first-child {
-    font-size: 1.3em;
-}
-
-.delete__form-container .name p {
-    margin: 0;
-    font-weight: bold;
-}
-
-.delete__form-container .delete__form .buttons {
-    margin-top: 10px;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    gap: 15px;
-}
-
-.delete__form-container .button__wrapper input {
-    padding: 0.3em 1em;
-    border: 1px solid black;
-    border-radius: 6px;
-    transition: background-color 0.3s, color 0.1s;
-}
-
-.delete__form-container .cancel_button input:hover {
-    background-color: #c4c4c4;
-}
-
-.delete__form-container .delete_button input:hover {
-    background-color: #ff0000;
-    color: white;
-}
-
 
 /* Pagination */
 .products__pagination {

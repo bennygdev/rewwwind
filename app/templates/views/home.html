@@ -10,7 +10,7 @@
   <img src="{{ url_for('static', filename='media/banner1.png') }}"> <!-- add more later, replace this with a new image later -->
 </div>
 <div class="products__special featured">
-  <h1>Specials</h1>
+  <h1 id="specials">Specials</h1>
   <div class="products">
     {% for product in max_special %}
     <div class="product">
@@ -64,9 +64,9 @@
   </div> 
 </div>
 <div class="products__special products__staff featured">
-  <h1>Staff Picks</h1>
+  <h1 id="staff_picks">Staff Picks</h1>
   <div class="products">
-    {% for product in max_special[:3] %} <!-- i'll add another condition for staff_picks later -->
+    {% for product in max_staff[:3] %}
     <div class="product">
       <a href="{{ url_for('productPagination.product_detail', product_id = product.id) }}">
         <div class="thumbnail">

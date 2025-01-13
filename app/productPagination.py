@@ -331,7 +331,7 @@ def product_specials():
     form = AddToCartForm()
 
     return render_template(
-        "/views/products.html",
+        "/views/productSpecials.html",
         user=current_user,
         products=products,
         total_products=total_products,

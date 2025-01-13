@@ -6,7 +6,7 @@ from wtforms import StringField, TextAreaField, IntegerField, DateField, FloatFi
 from wtforms.validators import DataRequired, Email, Length, EqualTo, Optional, NumberRange, Regexp, ValidationError
 from PIL import Image # file object validator
 from mimetypes import guess_type # file extension validator
-from .models import User, Category, Product
+from .models import User, Category, SubCategory, Product
 
 # Account-related forms
 class LoginForm(FlaskForm):
@@ -177,8 +177,9 @@ class AddProductForm(FlaskForm):
   
     # populating product select choices from sql.
     categories = Category.query.all()
+    subcategories = SubCategory.query.filter(SubCategory.category_id==1).all()
     self.productType.choices = [(category.id, category.category_name) for category in categories]
-    self.productGenre.choices = [(category.id, category.category_name) for category in categories]
+    self.productGenre.choices = [(subcategory.id, subcategory.subcategory_name) for subcategory in subcategories]
 
     # populating condition select choices
     condition_choices = [
@@ -235,6 +236,11 @@ class DeleteReviewForm(FlaskForm):
   def validate_deleteConfirm(self, field):
     if field.data != 'CONFIRMDELETE':
        raise ValidationError('The confirmation input is invalid. Please type CONFIRMDELETE to confirm the deletion.')
+
+# Order-related Forms
+class UpdateOrderForm(FlaskForm):
+  approved = RadioField('Approve Order', choices=['Approved', 'Not Approved'], default='Not Approved')
+  submit = SubmitField('Update Approval')
 
 # Cart-related Forms
 class AddToCartForm(FlaskForm):

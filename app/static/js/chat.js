@@ -11,6 +11,9 @@ const socket = io();
 let currentRoom = null;
 let isSupportChat = false;
 
+let isShowingWarning = false;
+let chatEndedByAdmin = false;
+
 let userMessage;
 let inputInitHeight;
 
@@ -93,20 +96,28 @@ chatHeader.innerHTML = `
 const backBtn = document.querySelector('.back-btn');
 
 // Handle back button click
-backBtn.addEventListener('click', () => {
-  if (isSupportChat && currentRoom) {
-    // First emit that customer is leaving
-    socket.emit('customer_leave', {
-      room_id: currentRoom
-    });
-    
-    // Then end the chat
-    socket.emit('end_chat', {
-      room_id: currentRoom,
-      ended_by: 'customer'
-    });
+backBtn.addEventListener('click', async () => {
+  if (isSupportChat && currentRoom && !chatEndedByAdmin) {
+    const shouldLeave = await showLeaveWarning();
+
+    if (shouldLeave) {
+      // First emit that customer is leaving
+      socket.emit('customer_leave', {
+        room_id: currentRoom
+      });
+      
+      // Then end the chat
+      socket.emit('end_chat', {
+        room_id: currentRoom,
+        ended_by: 'customer'
+      });
+      
+      resetChat();
+    }
+    // If shouldn't leave, do nothing and let them continue chatting
+  } else {
+    resetChat();
   }
-  resetChat();
 });
 
 function showSupportWarning() {
@@ -120,8 +131,8 @@ function showSupportWarning() {
   warningContainer.innerHTML = `
     <div class="warning-message">
       <h3>⚠️ Warning</h3>
-      <p>Please be advised that starting multiple support chat sessions without valid reasons may result in penalties.</p>
-      <p>Are you sure you want to proceed with a new support chat?</p>
+      <div class="warning-text">Please be advised that starting multiple support chat sessions without valid reasons may result in penalties.</div>
+      <div class="warning-text">Are you sure you want to proceed with a new support chat?</div>
       <div class="warning-buttons">
         <button class="warning-btn proceed-btn">Proceed</button>
         <button class="warning-btn goBack-btn">Go Back</button>
@@ -141,6 +152,59 @@ function showSupportWarning() {
   
   goBackBtn.addEventListener('click', () => {
     resetChat();
+  });
+}
+
+function showLeaveWarning() {
+  if (isShowingWarning) {
+    return Promise.resolve(false);
+  }
+
+  if (chatEndedByAdmin) {
+    return Promise.resolve(true);
+  }
+
+  isShowingWarning = true;
+
+  const warningMessage = document.createElement('li');
+  warningMessage.className = 'chat leave-warning';
+  warningMessage.innerHTML = `
+    <div class="warning-message">
+      <h3>⚠️ Warning</h3>
+      <div class="warning-text">Are you sure you want to leave this support chat?</div>
+      <div class="warning-text">This will end your current chat session.</div>
+      <div class="warning-buttons">
+        <button class="warning-btn leave-btn">Leave Chat</button>
+        <button class="warning-btn stay-btn">Stay in Chat</button>
+      </div>
+    </div>
+  `;
+  
+  chatbox.appendChild(warningMessage);
+  chatbox.scrollTo(0, chatbox.scrollHeight);
+  
+  // Disable chat while warning is shown
+  chatInput.disabled = true;
+  
+  return new Promise((resolve) => {
+    const leaveBtn = warningMessage.querySelector('.leave-btn');
+    const stayBtn = warningMessage.querySelector('.stay-btn');
+
+    const cleanup = () => {
+      warningMessage.remove();
+      chatInput.disabled = false;
+      isShowingWarning = false;
+    };
+    
+    leaveBtn.addEventListener('click', () => {
+      cleanup();
+      resolve(true); // User wants to leave
+    });
+    
+    stayBtn.addEventListener('click', () => {
+      cleanup();
+      resolve(false); // User wants to stay
+    });
   });
 }
 
@@ -325,15 +389,15 @@ socket.on('chat_ended', (data) => {
   chatbox.appendChild(messageElement);
   
   // Only reset if customer ended the chat
-  if (data.ended_by === 'customer') {
-    resetChat();
-  } else {
+  if (data.ended_by === 'admin') {
+    chatEndedByAdmin = true;
+
     // If admin ended the chat, show follow-up message and new chat option
     const followUpMessage = createChatLi("You're free to leave this chat. Thank you for using our support service!", 'incoming');
     chatbox.appendChild(followUpMessage);
-
-    chatInput.disabled = true;
     
+    chatInput.disabled = true;
+
     // Create and add the "Start New Chat" link below the chat messages
     const newChatMessage = document.createElement('li');
     newChatMessage.className = 'chat new-chat-prompt';
@@ -343,18 +407,15 @@ socket.on('chat_ended', (data) => {
       </div>
     `;
     chatbox.appendChild(newChatMessage);
-    
+
     // Add event listener for the new chat link
     newChatMessage.querySelector('.start-new-chat').addEventListener('click', (e) => {
       e.preventDefault();
+      chatEndedByAdmin = false;
       showSupportWarning();
-      
-      // chatbox.innerHTML = '';
-
-      // chatInput.disabled = false;
-      
-      // initializeSupportChat();
     });
+  } else {
+    resetChat();
   }
   
   chatbox.scrollTo(0, chatbox.scrollHeight);
@@ -426,6 +487,9 @@ function resetChat() {
   currentRoom = null;
   isSupportChat = false;
   chatInput.disabled = false;
+  chatEndedByAdmin = false;
+  isShowingWarning = false;
+
   const chatChoice = document.getElementById('chatChoice');
   document.querySelector('.chatbox').style.display = 'none';
   document.querySelector('.chat-input').style.display = 'none';

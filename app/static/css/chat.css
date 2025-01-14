@@ -354,3 +354,60 @@
 .goBack-btn:hover {
   background-color: #5a6268;
 }
+
+/* Leave support warning */
+.chat.leave-warning {
+  display: block !important;
+  background: none;
+  margin: 20px 0;
+}
+
+.leave-warning .warning-message {
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 10px;
+}
+
+.leave-warning .warning-message h3 {
+  color: #721c24;
+  margin-bottom: 15px;
+  font-size: 1.2em;
+}
+
+.leave-warning .warning-message p {
+  background: none;
+  color: inherit;
+  padding: 0;
+  border-radius: 0;
+  max-width: 100%;
+}
+
+.warning-message .warning-text {
+  background: none;
+  color: #666;
+  max-width: 100%;
+  white-space: normal;
+  padding: 0;
+  border-radius: 0;
+  margin-bottom: 15px;
+}
+
+.leave-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.leave-btn:hover {
+  background-color: #c82333;
+}
+
+.stay-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.stay-btn:hover {
+  background-color: #218838;
+}

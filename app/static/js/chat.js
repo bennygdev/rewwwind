@@ -57,7 +57,7 @@ document.getElementById('supportBtn').addEventListener('click', async () => {
     // Start new chat
     isSupportChat = true;
     showChatInterface();
-    initializeSupportChat();
+    showSupportWarning();
   }
 });
 
@@ -108,6 +108,41 @@ backBtn.addEventListener('click', () => {
   }
   resetChat();
 });
+
+function showSupportWarning() {
+  // Clear existing chat content temporarily
+  const existingContent = chatbox.innerHTML;
+  chatbox.innerHTML = '';
+  
+  // Create warning message with buttons
+  const warningContainer = document.createElement('div');
+  warningContainer.className = 'warning-container';
+  warningContainer.innerHTML = `
+    <div class="warning-message">
+      <h3>⚠️ Warning</h3>
+      <p>Please be advised that starting multiple support chat sessions without valid reasons may result in penalties.</p>
+      <p>Are you sure you want to proceed with a new support chat?</p>
+      <div class="warning-buttons">
+        <button class="warning-btn proceed-btn">Proceed</button>
+        <button class="warning-btn goBack-btn">Go Back</button>
+      </div>
+    </div>
+  `;
+  
+  chatbox.appendChild(warningContainer);
+  
+  const proceedBtn = warningContainer.querySelector('.proceed-btn');
+  const goBackBtn = warningContainer.querySelector('.goBack-btn');
+  
+  proceedBtn.addEventListener('click', () => {
+    chatbox.innerHTML = ''; // Clear warning
+    initializeSupportChat();
+  });
+  
+  goBackBtn.addEventListener('click', () => {
+    resetChat();
+  });
+}
 
 function initializeSupportChat() {
   chatInput.disabled = false;
@@ -312,12 +347,13 @@ socket.on('chat_ended', (data) => {
     // Add event listener for the new chat link
     newChatMessage.querySelector('.start-new-chat').addEventListener('click', (e) => {
       e.preventDefault();
+      showSupportWarning();
       
-      chatbox.innerHTML = '';
+      // chatbox.innerHTML = '';
 
-      chatInput.disabled = false;
+      // chatInput.disabled = false;
       
-      initializeSupportChat();
+      // initializeSupportChat();
     });
   }
   

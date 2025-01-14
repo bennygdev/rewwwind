@@ -292,3 +292,65 @@
 .start-new-chat:hover {
   text-decoration: underline;
 }
+
+/* Warning section */
+.warning-container {
+  padding: 20px;
+  text-align: center;
+}
+
+.warning-message {
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 90%;
+}
+
+.warning-message h3 {
+  color: #856404;
+  margin-bottom: 15px;
+  font-size: 1.2em;
+}
+
+.warning-message p {
+  color: #666;
+  margin-bottom: 15px;
+  font-size: 0.95em;
+  line-height: 1.4;
+}
+
+.warning-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.warning-btn {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.proceed-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.proceed-btn:hover {
+  background-color: #c82333;
+}
+
+.goBack-btn {
+  background-color: #6c757d;
+  color: white;
+}
+
+.goBack-btn:hover {
+  background-color: #5a6268;
+}

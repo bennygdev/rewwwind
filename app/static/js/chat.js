@@ -110,6 +110,8 @@ backBtn.addEventListener('click', () => {
 });
 
 function initializeSupportChat() {
+  chatInput.disabled = false;
+
   // Request customer support
   socket.emit('request_support', {});
   
@@ -276,25 +278,50 @@ socket.on('new_message', (data) => {
 //   const messageElement = createChatLi(data.message, 'incoming');
 //   chatbox.appendChild(messageElement);
 //   chatbox.scrollTo(0, chatbox.scrollHeight);
-//   currentRoom = null;
-  
-//   // Reset chat interface
+    
+//   // Reset chat after delay
 //   setTimeout(() => {
-//     document.getElementById('chatChoice').style.display = 'block';
-//     document.querySelector('.chatbox').style.display = 'none';
-//     document.querySelector('.chat-input').style.display = 'none';
-//     chatbox.innerHTML = ''; // Clear chat history
+//     resetChat();
 //   }, 3000);
 // });
 socket.on('chat_ended', (data) => {
+  // Add the end message
   const messageElement = createChatLi(data.message, 'incoming');
   chatbox.appendChild(messageElement);
-  chatbox.scrollTo(0, chatbox.scrollHeight);
-    
-  // Reset chat after delay
-  setTimeout(() => {
+  
+  // Only reset if customer ended the chat
+  if (data.ended_by === 'customer') {
     resetChat();
-  }, 3000);
+  } else {
+    // If admin ended the chat, show follow-up message and new chat option
+    const followUpMessage = createChatLi("You're free to leave this chat. Thank you for using our support service!", 'incoming');
+    chatbox.appendChild(followUpMessage);
+
+    chatInput.disabled = true;
+    
+    // Create and add the "Start New Chat" link below the chat messages
+    const newChatMessage = document.createElement('li');
+    newChatMessage.className = 'chat new-chat-prompt';
+    newChatMessage.innerHTML = `
+      <div class="new-chat-link">
+        <a href="#" class="start-new-chat">Start a New Chat Session</a>
+      </div>
+    `;
+    chatbox.appendChild(newChatMessage);
+    
+    // Add event listener for the new chat link
+    newChatMessage.querySelector('.start-new-chat').addEventListener('click', (e) => {
+      e.preventDefault();
+      
+      chatbox.innerHTML = '';
+
+      chatInput.disabled = false;
+      
+      initializeSupportChat();
+    });
+  }
+  
+  chatbox.scrollTo(0, chatbox.scrollHeight);
 });
 
 let connectionInterval;
@@ -362,6 +389,7 @@ socket.on('chat_history', (data) => {
 function resetChat() {
   currentRoom = null;
   isSupportChat = false;
+  chatInput.disabled = false;
   const chatChoice = document.getElementById('chatChoice');
   document.querySelector('.chatbox').style.display = 'none';
   document.querySelector('.chat-input').style.display = 'none';

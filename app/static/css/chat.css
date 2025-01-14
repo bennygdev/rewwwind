@@ -263,3 +263,32 @@
 .switch-to-support a:hover {
   text-decoration: underline;
 }
+
+.chat.new-chat-prompt {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+  background: none;
+}
+
+.new-chat-link {
+  padding: 10px 20px;
+  border-radius: 15px;
+  background-color: #f0f0f0;
+  transition: background-color 0.3s;
+}
+
+.new-chat-link:hover {
+  background-color: #e0e0e0;
+}
+
+.start-new-chat {
+  color: #2196F3;
+  text-decoration: none;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.start-new-chat:hover {
+  text-decoration: underline;
+}

@@ -52,6 +52,13 @@ socket.on('new_chat_request', (data) => {
   document.querySelector('.chat-requests').insertAdjacentHTML('afterbegin', requestHtml);
 });
 
+socket.on('remove_chat_request', (data) => {
+  const requestCard = document.querySelector(`.chat-request-card[data-room-id="${data.room_id}"]`);
+  if (requestCard) {
+      requestCard.remove();
+  }
+});
+
 // Join chat functionality
 document.querySelector('.chat-requests').addEventListener('click', (e) => {
   if (e.target.classList.contains('join-chat')) {

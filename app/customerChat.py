@@ -181,12 +181,19 @@ def handle_chat_end(data):
         
     # Notify both parties that chat has ended
     emit('chat_ended', {
-      'message': end_message
+      'message': end_message,
+      'ended_by': ended_by
     }, room=room_id)
         
     # Clean up
     leave_room(room_id)
     del active_chats[room_id]
+
+    # If ended by admin, broadcast removal of chat request
+    if ended_by == 'admin':
+      emit('remove_chat_request', {
+        'room_id': room_id
+      }, broadcast=True)
 
 # Handle user disconnection
 @socketio.on('disconnect')

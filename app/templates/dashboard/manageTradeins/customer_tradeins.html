@@ -1,36 +1,46 @@
 <h2>Your Trade-ins</h2>
+
 {% block styles %}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/tradein/custdashboardTrade.css') }}">
 {% endblock %}
-
 
 {% if trade_items %}
     <table>
         <thead>
             <tr>
-                <th>Item Type</th>
-                <th>Condition</th>
+                <th>Actions</th>
+                <th>Trade-in</th>
                 <th>Title</th>
-                <th>Author/Artist</th>
+                <th>Date</th>
+                <th>Type</th>
                 <th>Genre</th>
-                <th>ISBN / Cat No.</th>
-                <th>Images</th>
+                <th>ISBN</th>
+                <th>Condition</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody>
             {% for item in trade_items %}
                 <tr>
-                    <td>{{ item.item_type }}</td>
-                    <td>{{ item.item_condition }}</td>
+                    <td>
+                        <a href="{{ url_for('manageTradeins.delete_trade', trade_id=item.id) }}" class="btn btn-danger">Delete</a>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('manageTradeins.view_trade_details', trade_id=item.id) }}">
+                            <strong>Trade-In #{{ "%05d"|format(item.id) }}</strong><br>
+                            {{ "Drop-off" if item.item_condition in ["Brand New", "Like New"] else "Pick-up" }}
+                        </a>
+                    </td>
                     <td>{{ item.title }}</td>
-                    <td>{{ item.author_artist }}</td>
+                    <td>{{ item.created_at.strftime('%d %b %Y') }}</td>
+                    <td>{{ item.item_type }}</td>
                     <td>{{ item.genre }}</td>
                     <td>{{ item.isbn_or_cat }}</td>
+                    <td>{{ item.item_condition }}</td>
                     <td>
-                        {% set images = item.images | fromjson %}
-                        {% for image in images %}
-                            <img src="{{ url_for('static', filename=image.split('static/')[-1]) }}" alt="Trade Image" width="100">
-                        {% endfor %}
+                        <span class="status {{ "approved" if item.item_condition == "Brand New" else "pending" if item.item_condition == "Well Used" else "rejected" }}">
+                            {{ "Approved" if item.item_condition == "Brand New" else "Pending" if item.item_condition == "Well Used" else "Rejected" }}
+                        </span>
                     </td>
                 </tr>
             {% endfor %}

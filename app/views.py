@@ -48,7 +48,6 @@ def trade_form():
         isbn = form.isbn.data
         images = request.files.getlist('images')
 
-
         image_paths = []
         for file in images:
             if file:
@@ -73,6 +72,11 @@ def trade_form():
         db.session.commit()
 
         flash('Trade item submitted successfully!', 'success')
-        return redirect(url_for('views.home'))
+        return redirect(url_for('manageTradeins.manage_tradeins'))
 
     return render_template('views/tradeForm.html', form=form)
+
+
+    
+
+

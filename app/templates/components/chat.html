@@ -1,0 +1,37 @@
+<div class="chatbot__wrapper">
+  <button class="chatbot-toggler">
+    <span><i class="fa-solid fa-message"></i></span>
+    <span class="close-btn"><i class="fa-solid fa-xmark fa-lg"></i></span>
+  </button>
+  <div class="chatbot">
+    <header>
+      <button class="back-btn" style="position: absolute; left: 20px; display: none;">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h2>Chat</h2>
+      <span><i class="fa-solid fa-xmark fa-lg"></i></span>  
+    </header>
+    
+    <!-- Initial choice buttons -->
+    <div class="chat-choice" id="chatChoice">
+      <button class="choice-btn" id="chatbotBtn">
+        <i class="fa-solid fa-robot"></i>
+        Chat with Bot
+      </button>
+      <button class="choice-btn" id="supportBtn">
+        <i class="fa-solid fa-headset"></i>
+        Chat with Support
+      </button>
+    </div>
+
+    <div class="switch-to-support" style="display: none;">
+      <a href="#" id="switchToSupport">Not satisfied? Chat with Support</a>
+    </div>
+    <ul class="chatbox" style="display: none;">
+    </ul>
+    <div class="chat-input" style="display: none;">
+      <textarea placeholder="Enter a message..." required></textarea>
+      <span id="send-btn"><i class="fa-solid fa-comment"></i></span>
+    </div>
+  </div>
+</div>

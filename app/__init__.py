@@ -9,6 +9,8 @@ import os
 from authlib.integrations.flask_client import OAuth
 from flask_migrate import Migrate
 import json
+from flask_socketio import SocketIO
+socketio = SocketIO()
 
 migrate = Migrate()
 
@@ -19,6 +21,16 @@ mail = Mail()
 oauth = OAuth()
 
 load_dotenv()
+
+def update_user_order_counts(app):
+  with app.app_context():
+    from .models import User, Order
+    users = User.query.all()
+    for user in users:
+      order_count = Order.query.filter_by(user_id=user.id).count()
+      user.orderCount = order_count
+    db.session.commit()
+    print('Updated order counts for all users!')
 
 def create_app():
   app = Flask(__name__)
@@ -62,6 +74,7 @@ def create_app():
     }
   )
 
+  socketio.init_app(app)
   # REMINDER: Only use camel casing, no hyphens etc. flask will flag an error if thats the case.
   # Initialise Routes
 
@@ -113,6 +126,8 @@ def create_app():
 
   create_database(app)
 
+  update_user_order_counts(app)
+
   # User load
   login_manager = LoginManager()
   login_manager.login_view = 'auth.login'
@@ -153,7 +168,7 @@ def create_database(app):
       print('Created Database!')
       # insert_categories()
 
-      from .seed import insert_categories, insert_products, insert_users, insert_payment_types, insert_default_roles, insert_subcategories 
+      from .seed import insert_categories, insert_products, insert_users, insert_payment_types, insert_default_roles, insert_subcategories, insert_orders 
 
       insert_default_roles()
       insert_payment_types()
@@ -161,3 +176,4 @@ def create_database(app):
       insert_categories()
       insert_subcategories()
       insert_products()
+      insert_orders()

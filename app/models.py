@@ -17,13 +17,16 @@ class User(db.Model, UserMixin):
     image = db.Column(db.String(150), nullable=True, default='profile_image_default.jpg')
     google_account = db.Column(db.Boolean, nullable=False, default=False)
     password = db.Column(db.String(150), nullable=True)
-    orderCount = db.Column(db.Integer, nullable=False)
+    orderCount = db.Column(db.Integer, nullable=False, default=0)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)  # role table
     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
     updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
 
     # Relationship to Cart
     cart_items = db.relationship('Cart', back_populates='user', lazy=True)
+
+    # Relationship to Orders
+    orders = db.relationship('Order', back_populates='user', lazy=True)
 
     # Relationship to Reviews
     reviews = db.relationship('Review', back_populates='user', lazy=True)
@@ -46,7 +49,7 @@ class User(db.Model, UserMixin):
 
 class BillingAddress(db.Model):
   __tablename__ = 'billing_addresses'
-  id = db.Column(db.Integer, primary_key=True)
+  id = db.Column(db.Integer, primary_key=True, autoincrement=True)
   user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
   address_one = db.Column(db.String(255), nullable=False)
   address_two = db.Column(db.String(255), nullable=True)  # Optional
@@ -99,7 +102,7 @@ class Product(db.Model):
 
   subcategories = db.relationship('SubCategory', secondary='product_subcategories', back_populates='products')
   
-  order_items = db.relationship('OrderItem', backref='product', lazy=True)  # otm orderItem
+  order_items = db.relationship('OrderItem', backref='product', lazy=True, cascade='all, delete-orphan')  # otm orderItem
 
   cart_entries = db.relationship('Cart', back_populates='product', lazy=True)
 
@@ -155,18 +158,49 @@ class ProductSubCategory(db.Model):
 class Order(db.Model):
   __tablename__ = 'orders'
   id = db.Column(db.Integer, primary_key=True)
-  user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
   order_date = db.Column(db.DateTime(timezone=True), default=func.now())
+  approval_date = db.Column(db.DateTime(timezone=True))
+  delivery = db.Column(db.String(100), nullable=False)
   total_amount = db.Column(db.Numeric(10, 2), nullable=False)
   status = db.Column(db.String(50), default='Pending', nullable=False)
   
+  user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+  user = db.relationship('User', back_populates='orders', lazy=True)
+
+  payment_type_id = db.Column(db.Integer, db.ForeignKey('payment_types.id'), nullable=False)
+  payment_type = db.relationship('PaymentType', backref='orders', lazy=True)
+
+  payment_information_id = db.Column(db.Integer, db.ForeignKey('payment_information.id'), nullable=True)
+  payment_information = db.relationship('PaymentInformation', backref='orders', lazy=True)
+
+  billing_id = db.Column(db.Integer, db.ForeignKey('billing_addresses.id'), nullable=True)
+  billing = db.relationship('BillingAddress', backref='orders', lazy=True)
+
   order_items = db.relationship('OrderItem', backref='order', lazy=True) # otm orderitems
+
+  def update_total(self):
+    if self.order_items:
+      self.total_amount = sum(item.unit_price * item.quantity for item in self.order_items)
+    else:
+      self.total_amount = 0
+    session = Session.object_session(self)
+    session.commit()
+  
+  def update_approval(self):
+    if self.status == 'Approved':
+      self.approval_date = func.now()
+    elif self.status == 'Pending':
+      self.approval_date = None
+    
+    session = Session.object_session(self)
+    session.commit()
 
 class OrderItem(db.Model):
   __tablename__ = 'order_items'
-  id = db.Column(db.Integer, primary_key=True)
+  id = db.Column(db.Integer, primary_key=True, autoincrement=True)
   order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False) 
   product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
+  product_condition = db.Column(db.JSON, nullable=False)
   quantity = db.Column(db.Integer, nullable=False)
   unit_price = db.Column(db.Numeric(10, 2), nullable=False)
 

@@ -6,7 +6,7 @@ from wtforms import StringField, TextAreaField, IntegerField, DateField, FloatFi
 from wtforms.validators import DataRequired, Email, Length, EqualTo, Optional, NumberRange, Regexp, ValidationError
 from PIL import Image # file object validator
 from mimetypes import guess_type # file extension validator
-from .models import User, Category, Product
+from .models import User, Category, SubCategory, Product
 
 # Account-related forms
 class LoginForm(FlaskForm):
@@ -46,6 +46,10 @@ class UpdatePersonalInformation(FlaskForm):
 class ChangePasswordForm(FlaskForm):
   password = PasswordField('Password', validators=[DataRequired(), Length(min=8), Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", message="Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.")])
   confirmPassword = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message="Passwords must match")])
+  submit = SubmitField('Save')
+
+class ChangeEmailForm(FlaskForm):
+  email = EmailField('Email', validators=[DataRequired(), Email()])
   submit = SubmitField('Save')
 
 class AdminChangeUserInfoForm(FlaskForm):
@@ -177,8 +181,9 @@ class AddProductForm(FlaskForm):
   
     # populating product select choices from sql.
     categories = Category.query.all()
+    subcategories = SubCategory.query.filter(SubCategory.category_id==1).all()
     self.productType.choices = [(category.id, category.category_name) for category in categories]
-    self.productGenre.choices = [(category.id, category.category_name) for category in categories]
+    self.productGenre.choices = [(subcategory.id, subcategory.subcategory_name) for subcategory in subcategories]
 
     # populating condition select choices
     condition_choices = [
@@ -235,6 +240,11 @@ class DeleteReviewForm(FlaskForm):
   def validate_deleteConfirm(self, field):
     if field.data != 'CONFIRMDELETE':
        raise ValidationError('The confirmation input is invalid. Please type CONFIRMDELETE to confirm the deletion.')
+
+# Order-related Forms
+class UpdateOrderForm(FlaskForm):
+  approved = RadioField('Approve Order', choices=['Approved', 'Not Approved'], default='Not Approved')
+  submit = SubmitField('Update Approval')
 
 # Cart-related Forms
 class AddToCartForm(FlaskForm):

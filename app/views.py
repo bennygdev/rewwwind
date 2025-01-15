@@ -22,9 +22,12 @@ def home():
   new_products = Product.query.filter(Product.created_at >= max_days).all() # product should be less than 7 days old to be new
   home_new_products = new_products[:18]
 
+  staff_products = Product.query.filter_by(is_featured_staff=True).all() # staff (featured) products
+  home_staff_products = staff_products[:3]
+
   # staff_picks = Product.query.filter_by(is_featured_staff=True)
 
-  return render_template("views/home.html", user=current_user, special_products=special_products, max_special = home_special_products, max_new = home_new_products)
+  return render_template("views/home.html", user=current_user, special_products=special_products, max_special = home_special_products, max_new = home_new_products, max_staff = home_staff_products)
 
 @views.route('/trade-in')
 def trade_Onboard(): 
@@ -75,4 +78,5 @@ def trade_form():
 
 
     
+
 

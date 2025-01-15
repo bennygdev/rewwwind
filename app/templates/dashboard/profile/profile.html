@@ -21,7 +21,7 @@
     <p>{{ user.username }}</p>
   </div>
   <div class="profile__editButton">
-    <a href="/dashboard/update-personal-information">Update Information</a>
+    <a href="{{ url_for('dashboard.update_personal_information') }}">Update Information</a>
   </div>
 </div>
 {% endblock %}

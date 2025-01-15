@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
 from flask_login import login_required, current_user
-from .forms import UpdatePersonalInformation, ChangePasswordForm, BillingAddressForm, PaymentMethodForm
-from .models import User, BillingAddress, PaymentInformation, PaymentType
+from .forms import UpdatePersonalInformation, ChangePasswordForm, BillingAddressForm, PaymentMethodForm, ChangeEmailForm
+from .models import User, BillingAddress, PaymentInformation, PaymentType, Review, Cart
 from .roleDecorator import role_required
 from . import db
 import secrets
@@ -56,6 +56,53 @@ def update_personal_information():
 
   return render_template("dashboard/settings/updatePersonalInfo.html", user=current_user, image_file=image_file)
 
+@dashboard.route('/settings/change-email', methods=['GET', 'POST'])
+@login_required
+@role_required(1, 2, 3)
+def change_email():
+  form = ChangeEmailForm()
+
+  if form.validate_on_submit():
+    email_exists = User.query.filter_by(email=form.email.data).first()
+
+    if form.email.data == current_user.email:
+      flash("New email cannot be the same as your email.", "error")
+      return render_template("dashboard/settings/changeEmail.html", user=current_user, form=form)
+
+    if email_exists:
+      flash("This email is already taken. Please try again.", "error")
+      return render_template("dashboard/settings/changeEmail.html", user=current_user, form=form)
+    
+    current_user.email = form.email.data
+    db.session.commit()
+    flash("Your email has been updated!", "success")
+    return redirect(url_for('dashboard.update_personal_information'))
+
+  return render_template("dashboard/settings/changeEmail.html", user=current_user, form=form)
+
+@dashboard.route('/settings/delete-account', methods=['GET', 'POST'])
+@login_required
+@role_required(1, 2, 3)
+def delete_account():
+  selectedUser = User.query.get_or_404(current_user.id)
+
+  try:
+    # Delete all user related info
+    PaymentInformation.query.filter_by(user_id=selectedUser.id).delete()
+    BillingAddress.query.filter_by(user_id=selectedUser.id).delete()
+    Review.query.filter_by(user_id=selectedUser.id).delete()
+    Cart.query.filter_by(user_id=selectedUser.id).delete()
+
+    # No orders and tradeins since i think website should store them as safety
+        
+    db.session.delete(selectedUser)
+    db.session.commit()
+  except Exception as e:
+    db.session.rollback()
+    flash("An error occurred while deleting the account. Please try again.", "error")
+    print(f"Error deleting account: {str(e)}")
+
+  return redirect(url_for('views.home'))
 
 def save_picture(form_picture):
   random_hex = secrets.token_hex(8)

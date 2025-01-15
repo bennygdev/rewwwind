@@ -1,0 +1,316 @@
+/* header */
+.orders__header {
+    background-color: #039752;
+    color: #fff;
+    padding: 30px 30px 0 30px;
+    position: relative;
+}
+
+#orders__title {
+    font-family: "OpenSansSemibold";
+    font-size: 1.6em;
+}
+
+.orders__header a, .button__wrapper input, .addCondition {
+    text-decoration: none;
+    color: black;
+    transition: background-color 0.3s, color 0.5s;
+    border: 1px solid black;
+    border-radius: 12px;
+    display: inline-block;
+    padding: 0.3em 0.7em;
+    margin: 1.5em 0;
+}
+
+.orders__header a {
+    background-color: white;
+    margin-top: 0;
+}
+
+.orders__header a:hover {
+    background-color: rgb(204, 204, 204);
+}
+
+/* content */
+.bodyContent, .bodyContent > div {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+.bodyContent {
+    margin-bottom: 30px;
+}
+/* header */
+.content .header {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.header__item {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    align-items: center;
+    background-color: #e6e6e6;
+    padding: 5px 20px;
+    border: 1px solid #b4b4b4;
+    border-radius: var(--bs-border-radius);
+    font-size: 1.3em;
+}
+
+.header__item p {
+    margin: 0;
+}
+
+.header__item span {
+    font-size: 0.7em;
+}
+
+.header__item .right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* orders table */
+.orders table {
+    width: 100%;
+    /* box-shadow: inset 0 0 0 1px black; */
+    border-collapse: collapse;
+    border-radius: 10px;
+}
+
+.orders th, .orders td {
+    padding: 15px 20px;
+}
+
+.orders th {
+    resize: horizontal;
+    background-color: #e6e6e6;
+}
+
+.orders td {
+    padding: 30px 20px;
+}
+
+.orders tr:first-child th:first-child {
+    border-top-left-radius: 10px;
+    /* padding-left: 20px; */
+}
+
+.orders tr:first-child th:last-child {
+    border-top-right-radius: 10px;
+}
+
+.orders th, .orders td:not(:first-child) {
+    text-align: center;
+}
+
+td.orderStock div {
+    padding: 5px 0;
+    border-radius: 10px;
+    color: black;
+}
+
+.orders tr:not(:last-child) {
+    border-bottom: 1px solid rgb(175, 175, 175);
+}
+
+.orders tr:last-child td:last-child {
+    border-bottom-right-radius: 10px;
+}
+
+.orders tr:last-child td:first-child {
+    border-bottom-left-radius: 10px;
+}
+
+.orders td.controls i {
+    user-select: none;
+    transition: color 0.3s;
+    color: #6e6e6e;
+    font-size: 1.5em;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.orders td.controls div {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.orders tbody td:last-child i.fa-eye:hover {
+    color: rgb(0, 125, 184);
+}
+
+.orders tbody tr {
+    background-color: #eee;
+    color: #6e6e6e;
+    transition: background-color 0.3s;
+}
+
+.orders tbody tr:hover {
+    background-color: rgb(204, 204, 204);
+}
+
+.orders .orderName {
+    display: flex;
+    flex-direction: row;
+}
+
+.orders .thumbnail {
+    width: 60px;
+    height: 62px;
+    border: 1px solid black;
+    border-radius: 6px;
+    display: grid;
+    align-items: center;
+    margin-right: 14px;
+    overflow: hidden;
+}
+
+.orders img {
+    width: 60px;
+    height: 62px;
+    object-fit: cover;
+    justify-self: center;
+}
+
+.orders p {
+    margin:0;
+}
+
+.orders p:first-child {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+/* bottom */
+.bottom {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.bottom > div {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.bottom .body {
+    background-color: #e6e6e6;
+    border-radius: var(--bs-border-radius);
+    padding: 10px 20px;
+    flex-grow: 1
+}
+
+/* order summary */
+.order_summary, .order_admin {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.order_summary table {
+    width: 100%;
+    height: 100%;
+}
+
+.order_summary td:last-child {
+    text-align: end;
+}
+
+/* billing and payment info */
+
+/* user information when admin */
+
+/* order details viewable by admin only */
+.order_admin {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+.order_admin > div {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.order_admin .body form, .order_admin .body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.order_approval input[type="radio"] {
+    accent-color: #039752;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.order_approval p:nth-child(2) input[type="radio"] {
+    accent-color: red;
+}
+
+.order_approval p {
+    font-size: 1.5em;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.order_approval .button-wrapper {
+    display: grid;
+    justify-content: end;
+}
+
+.order_approval .button-wrapper input {
+    all: unset;
+    padding: 0.3em 0.5em;
+    border-radius: var(--bs-border-radius);
+    border: 1px solid black;
+    transition: 0.3s background-color, 0.1s color;
+    cursor: pointer;
+}
+
+.order_approval .button-wrapper input:hover {
+    background-color: #039752;
+    color: white;
+}
+
+.delivery_type .body {
+    align-items: center;
+    justify-content: center;
+}
+
+.delivery_type .body h2 {
+    width: 90px;
+    height: 90px;
+    background: #d6d6d6;
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.footer a.btn-primary {
+    color: black;
+    background-color: transparent;
+    border: 1px solid black;
+    transition: 0.3s background-color, 0.1s color;
+}
+
+.footer a.btn-primary:hover {
+    color: white;
+    background-color: #039752;
+}

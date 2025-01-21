@@ -224,7 +224,14 @@ const createChatLi = (message, className) => {
   const chatLi = document.createElement("li");
   chatLi.classList.add("chat", className);
 
-  let chatContent = className === "outgoing" ? `<p></p>` : `<span><i class="fa-solid fa-robot"></i></span><p></p>`;
+  let chatContent;
+  if (className === "outgoing") {
+    chatContent = `<p></p>`;
+  } else {
+    const icon = isSupportChat ? "fa-headset" : "fa-robot";
+    chatContent = `<span><i class="fa-solid ${icon}"></i></span><p></p>`;
+  }
+
   chatLi.innerHTML = chatContent;
   chatLi.querySelector("p").textContent = message
   return chatLi;

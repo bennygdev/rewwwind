@@ -1,0 +1,196 @@
+const socket = io();
+let currentRoom = null;
+
+// Add chat controls to header
+document.querySelector('.chat-header').innerHTML += `
+  <div class="chat-controls">
+    <button class="btn btn-secondary" id="backBtn">Back</button>
+    <button class="btn btn-danger" id="endChatBtn">End Chat</button>
+  </div>
+`;
+
+// Extract room ID from URL path instead of query params
+currentRoom = window.location.pathname.split('/').pop();
+
+// debug
+console.log('Connecting to room:', currentRoom);
+
+// Handle back button
+document.getElementById('backBtn').addEventListener('click', () => {
+  if (currentRoom) {
+    socket.emit('admin_leave_chat', {
+      room_id: currentRoom
+    });
+  }
+  window.location.href = '/dashboard/customer-chat';
+});
+
+// Handle end chat button
+document.getElementById('endChatBtn').addEventListener('click', () => {
+  if (currentRoom) {
+    socket.emit('end_chat', {
+      room_id: currentRoom,
+      ended_by: 'admin'
+    });
+  }
+});
+
+// Join chat room as soon as socket connects
+socket.on('connect', () => {
+  console.log('Socket connected');
+  if (currentRoom) {
+    console.log('Joining room:', currentRoom);
+    socket.emit('admin_join_chat', { room_id: currentRoom });
+  }
+  startConnectionMonitor();
+});
+
+// Confirm room join
+socket.on('admin_joined', (data) => {
+  console.log('Successfully joined room:', data);
+  const messageHtml = `
+    <div class="message system mb-3">
+      <div class="message-content bg-success text-white p-2 rounded">
+        ${data.message}
+      </div>
+    </div>
+  `;
+  document.querySelector('.chat-messages').insertAdjacentHTML('beforeend', messageHtml);
+});
+
+// Handle sending messages
+document.getElementById('sendMessage').addEventListener('click', sendMessage);
+document.getElementById('adminChatInput').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+function sendMessage() {
+  const messageInput = document.getElementById('adminChatInput');
+  const message = messageInput.value.trim();
+  if (message && currentRoom) {
+    console.log('Sending message to room:', currentRoom);
+    socket.emit('chat_message', {
+      room_id: currentRoom,
+      message: message
+    });
+      
+    // Add message to chat
+    const messageHtml = `
+      <div class="message outgoing mb-3">
+        <div class="message-content bg-primary text-white p-2 rounded">
+          ${message}
+        </div>
+        <small class="text-muted">${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</small>
+      </div>
+    `;
+    document.querySelector('.chat-messages').insertAdjacentHTML('beforeend', messageHtml);
+      
+    // Clear input
+    messageInput.value = '';
+    
+    // Scroll to bottom
+    const chatMessages = document.querySelector('.chat-messages');
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+}
+
+// Handle incoming messages
+socket.on('new_message', (data) => {
+  console.log('Received message:', data);
+  if (data.sender_type === 'customer') {
+    const messageHtml = `
+      <div class="message incoming mb-3">
+        <div class="message-content bg-light p-2 rounded">
+          ${data.message}
+        </div>
+        <small class="text-muted">${data.timestamp}</small>
+      </div>
+    `;
+    document.querySelector('.chat-messages').insertAdjacentHTML('beforeend', messageHtml);
+    
+    // Scroll to bottom
+    const chatMessages = document.querySelector('.chat-messages');
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+});
+
+// Handle chat history
+socket.on('chat_history', (data) => {
+  console.log('Received chat history:', data);
+  const chatMessages = document.querySelector('.chat-messages');
+  chatMessages.innerHTML = ''; // Clear existing messages
+  
+  if (data.messages && Array.isArray(data.messages)) {
+    data.messages.forEach(msg => {
+      const messageHtml = `
+        <div class="message ${msg.type === 'outgoing' ? 'outgoing' : 'incoming'} mb-3">
+          <div class="message-content ${msg.type === 'outgoing' ? 'bg-primary text-white' : 'bg-light'} p-2 rounded">
+            ${msg.message}
+          </div>
+          <small class="text-muted">${msg.timestamp}</small>
+        </div>
+      `;
+      chatMessages.insertAdjacentHTML('beforeend', messageHtml);
+    });
+    
+    // Scroll to bottom after loading history
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+});
+
+let connectionInterval;
+let lastPong = Date.now();
+
+const startConnectionMonitor = () => {
+  connectionInterval = setInterval(() => {
+    if (Date.now() - lastPong > 10000) {
+      handleDisconnection();
+    }
+    socket.emit('ping_connection');
+  }, 5000);
+}
+
+const handleDisconnection = () => {
+  clearInterval(connectionInterval);
+  const messageHtml = `
+    <div class="message system mb-3">
+      <div class="message-content bg-warning text-dark p-2 rounded">
+        Connection lost. Attempting to reconnect...
+      </div>
+    </div>
+  `;
+  document.querySelector('.chat-messages').insertAdjacentHTML('beforeend', messageHtml);
+  socket.connect();
+}
+
+socket.on('pong_connection', () => {
+  lastPong = Date.now();
+});
+
+socket.on('chat_ended', (data) => {
+  // Show end message
+  const messageHtml = `
+    <div class="message system mb-3">
+      <div class="message-content bg-warning text-dark p-2 rounded">
+        ${data.message}
+      </div>
+    </div>
+  `;
+  document.querySelector('.chat-messages').insertAdjacentHTML('beforeend', messageHtml);
+  
+  // For both customer and admin ended cases
+  // Redirect to main chat page after delay
+  setTimeout(() => {
+    window.location.href = '/dashboard/customer-chat';
+  }, 3000);
+
+  // Remove from active chats if admin ended it
+  if (data.ended_by === 'admin') {
+    socket.emit('remove_chat_request', {
+      room_id: currentRoom
+    });
+  }
+});

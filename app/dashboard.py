@@ -170,12 +170,6 @@ def update_personal_information_form():
         flash("That username is taken. Please choose another one.", "error")
         return render_template('dashboard/settings/updatePersonalInfoForm.html', user=current_user, form=form)
 
-    if form.email.data != current_user.email:
-      user = User.query.filter_by(email=form.email.data).first()
-      if user:
-        flash("That email is taken. Please choose another one.", "error")
-        return render_template('dashboard/settings/updatePersonalInfoForm.html', user=current_user, form=form)
-
     if form.picture.data:
       picture_file = save_picture(form.picture.data)
       current_user.image = picture_file
@@ -188,7 +182,6 @@ def update_personal_information_form():
     current_user.first_name = form.firstName.data
     current_user.last_name = form.lastName.data
     current_user.username = form.username.data
-    current_user.email = form.email.data
     db.session.commit()
     flash("Your account has been updated!", 'success')
     return redirect(url_for('dashboard.update_personal_information'))
@@ -197,7 +190,6 @@ def update_personal_information_form():
     form.firstName.data = current_user.first_name
     form.lastName.data = current_user.last_name
     form.username.data = current_user.username
-    form.email.data = current_user.email
 
   if form.picture.errors:
     flash("File does not have an approved extension: jpg, png", "error")

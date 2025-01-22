@@ -2,22 +2,90 @@
 {% set active_page = "overview" %}
 {% block title %}Overview{% endblock %}
 
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard/overview.css') }}">
+{% endblock %}
+
+{% block headerContent %}
+<div class="overview__header">
+  <div class="greeting__message">
+    <img src="{{ image_file }}" id="mini_profile_image" alt="Mini profile image">
+    <p>Welcome, {{ current_user.username }}!</p>
+  </div>
+  <div class="overview__statistics--header">
+    <div class="statistic__box--header">
+      <div class="overview__statistic--header">
+        <p class="statistic__label--header">Label1</p>
+        <span class="statistic__headerValue1">1</span>
+      </div>
+    </div>
+    <div class="statistic__box--header">
+      <div class="overview__statistic--header">
+        <p class="statistic__label--header">Label2</p>
+        <span class="statistic__headerValue2">2</span>
+      </div>
+    </div>
+    <div class="statistic__box--header">
+      <div class="overview__statistic--header">
+        <p class="statistic__label--header">Label3</p>
+        <span class="statistic__headerValue3">3</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
 
 {% block content %}
 <!-- Need to add logic here, to check if the user is customer, admin or owner -->
 
-{% block userOverview %}
-<!-- Probably have to do a include block. -->
+<!-- {% block userOverview %}
 {% if user.role_id == 1 %}
 {% include "dashboard/customer_overview.html" %}
 {% elif user.role_id in [2, 3] %}
 {% include "dashboard/admin_overview.html" %}
-{% endif %}
+{% endif %} -->
+<div class="statistics__wrapper">
+  <div class="statistics__top">
+    <div class="statistic__box">
+      <div class="overview__statistic">
+        <div class="statistic__label">h</div>
+        <!-- Chart canvas -->
+      </div>
+    </div>
+    <div class="statistic__box">
+      <div class="overview__statistic">
+        <div class="statistic__label"></div>
+        <!-- Chart canvas -->
+      </div>
+    </div>
+  </div>
+  <div class="statistics__bottom">
+    <div class="statistic__box">
+      <div class="overview__statistic">
+        <div class="statistic__label"></div>
+        <!-- Chart canvas -->
+      </div>
+    </div>
+    <div class="statistic__box">
+      <div class="overview__statistic">
+        <div class="statistic__label"></div>
+        <!-- Chart canvas -->
+      </div>
+    </div>
+    <div class="statistic__box">
+      <div class="overview__statistic">
+        <div class="statistic__label"></div>
+        <!-- Chart canvas -->
+      </div>
+    </div>
+  </div>
+</div>
 
-{% endblock %}
+
+<!-- {% endblock %} -->
 
 <!-- method of checking here -->
 <!-- {{ user.role_id }} -->
-<h1>Dashboard overview</h1>
+<!-- <h1>Dashboard overview</h1> -->
 
 {% endblock %}

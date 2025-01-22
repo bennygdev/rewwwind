@@ -394,7 +394,6 @@ new ConditionHandler('productImages', 'form.product__form', `/dashboard/manage-p
 // save form logic (class too crazy at this point of time lol)
 if (window.location.href.includes('add-product')) {
     window.addEventListener('beforeunload', (event) => {
-        event.preventDefault();
 
         const conditions = Array.from(document.querySelectorAll('.condition')).map(conditionDiv => ({
             condition: conditionDiv.querySelector('[name^="productConditions-"][name$="-condition"]').value,

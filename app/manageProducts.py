@@ -121,7 +121,7 @@ def add_product():
                 if user_id in db:
                     saved_data = db[user_id]
 
-                    print(saved_data.get_conditions())
+                    # print(saved_data.get_conditions())
                     
                     # Populate the form fields with the saved data
                     form.productName.data = saved_data.get_name()
@@ -166,7 +166,7 @@ def add_product():
                 productType = form.productType.data
                 productGenre = form.productGenre.data
                 subcategory = SubCategory.query.filter(SubCategory.id==productGenre).first()
-                print(subcategory)
+                # print(subcategory)
                 productThumbnail = int(form.productThumbnail.data)
                 productConditions = form.productConditions.data
                 is_featured_special = form.productIsFeaturedSpecial.data
@@ -244,7 +244,6 @@ def save_product_form():
             )
 
             db[user_id] = form_data
-            print(form_data.get_featured_special(), form_data.get_featured_staff())
         print('success')
         flash("The product data was saved successfully. It can be viewed again when revisiting the 'Add Product' form, as long as you do not log out.", "success")
         return jsonify({"message": "Product data saved successfully."}), 200
@@ -319,12 +318,12 @@ def update_product(product_id):
                     uploaded_file_paths.append(secure_filename(file.filename))
             
             product.images = [img for img in product.images if img in form.images.data.split(',')]
-            print(form.images.data)
+            # print(form.images.data)
 
             if uploaded_file_paths:
                 product.images.extend(uploaded_file_paths)
                 flag_modified(product, 'images')
-            print(product.images)
+            # print(product.images)
             
             product.image_thumbnail = product.images[int(form.productThumbnail.data)]
 

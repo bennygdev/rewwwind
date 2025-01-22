@@ -1,0 +1,52 @@
+{% extends "views/base.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tradein/custTradeDetails.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="trade-details-container">
+    <div class="trade-details-header">
+        <h1>Trade-in Request #{{ "TD%03d"|format(trade_item.id) }}</h1>
+        <span class="status {{ "approved" if trade_item.item_condition == "Brand New" else "pending" if trade_item.item_condition == "Well Used" else "rejected" }}">
+            {{ "Approved" if trade_item.item_condition == "Brand New" else "Pending" if trade_item.item_condition == "Well Used" else "Rejected" }}
+        </span>
+    </div>
+
+    <div class="trade-details-info">
+        <div class="info-box">
+            <p>Estimated Review</p>
+            <span>{{ (trade_item.created_at + timedelta(days=3)).strftime('%d %b %Y') }}</span>
+        </div>
+        <div class="info-box">
+            <p>Delivery Method</p>
+            <span>{{ "Drop-off" if trade_item.item_condition in ["Brand New", "Like New"] else "Pick-up" }}</span>
+        </div>
+    </div>
+
+    <div class="items-section">
+        <h2>Items</h2>
+        <div class="item-details">
+            <div class="item-image">
+                <p>No Image Available</p>
+            </div>
+            <div class="item-info">
+                <p><strong>Title:</strong> {{ trade_item.title }}</p>
+                <p><strong>Item Type:</strong> {{ trade_item.item_type }}</p>
+                <p><strong>Genre:</strong> {{ trade_item.genre }}</p>
+                <p><strong>Author:</strong> {{ trade_item.author_artist }}</p>
+                <p><strong>ISBN:</strong> {{ trade_item.isbn_or_cat }}</p>
+                <p><strong>Condition:</strong> {{ trade_item.item_condition }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="instructions-section">
+        <p>Please locate a popstation and drop it off by {{ (trade_item.created_at + timedelta(days=5)).strftime('%d %b %Y') }}</p>
+        <a href="#" class="btn">More detailed Instructions</a>
+    </div>
+
+    <a href="{{ url_for('manageTradeins.edit_trade', trade_id=trade_item.id) }}" class="btn btn-primary">Edit</a>
+<a href="{{ url_for('manageTradeins.manage_tradeins') }}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+{% endblock %}

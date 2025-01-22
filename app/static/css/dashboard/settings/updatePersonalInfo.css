@@ -151,3 +151,12 @@ h1 {
   margin-top: 20px;
   gap: 20px;
 }
+
+#account__deleteButton {
+  background-color: #ff4c24;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 0;
+  color: #fff;
+  font-family: "OpenSansSemibold";
+}

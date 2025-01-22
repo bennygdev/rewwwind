@@ -5,10 +5,14 @@ const chatbotToggler = document.querySelector('.chatbot-toggler');
 const chatbotWrapper = document.querySelector('.chatbot__wrapper');
 const chatbotHeaderCloseBtn = document.querySelector('.chatbot header span');
 const sendBtn = document.getElementById('send-btn');
+const switchToSupportLink = document.querySelector('.switch-to-support');
 const socket = io();
 
 let currentRoom = null;
 let isSupportChat = false;
+
+let isShowingWarning = false;
+let chatEndedByAdmin = false;
 
 let userMessage;
 let inputInitHeight;
@@ -30,6 +34,7 @@ document.getElementById('supportBtn').addEventListener('click', async () => {
   // Check if user is authenticated
   const response = await fetch('/dashboard/api/check-auth');
   const data = await response.json();
+  switchToSupportLink.style.display = 'none';
   
   if (!data.authenticated) {
     window.location.href = '/login';
@@ -55,7 +60,7 @@ document.getElementById('supportBtn').addEventListener('click', async () => {
     // Start new chat
     isSupportChat = true;
     showChatInterface();
-    initializeSupportChat();
+    showSupportWarning();
   }
 });
 
@@ -71,6 +76,12 @@ document.getElementById('chatbotBtn').addEventListener('click', () => {
   document.getElementById('chatChoice').style.display = 'none';
   document.querySelector('.chatbox').style.display = 'block';
   document.querySelector('.chat-input').style.display = 'flex';
+  switchToSupportLink.style.display = 'block';
+  backBtn.style.display = 'block';
+
+  const greetingMessage = createChatLi('Hi there 👋\nHow can I help you today?', 'incoming');
+  chatbox.innerHTML = ''; // Clear any existing messages
+  chatbox.appendChild(greetingMessage);
 });
 
 const chatHeader = document.querySelector('.chatbot header');
@@ -85,23 +96,121 @@ chatHeader.innerHTML = `
 const backBtn = document.querySelector('.back-btn');
 
 // Handle back button click
-backBtn.addEventListener('click', () => {
-  if (isSupportChat && currentRoom) {
-    // First emit that customer is leaving
-    socket.emit('customer_leave', {
-      room_id: currentRoom
-    });
-    
-    // Then end the chat
-    socket.emit('end_chat', {
-      room_id: currentRoom,
-      ended_by: 'customer'
-    });
+backBtn.addEventListener('click', async () => {
+  if (isSupportChat && currentRoom && !chatEndedByAdmin) {
+    const shouldLeave = await showLeaveWarning();
+
+    if (shouldLeave) {
+      // First emit that customer is leaving
+      socket.emit('customer_leave', {
+        room_id: currentRoom
+      });
+      
+      // Then end the chat
+      socket.emit('end_chat', {
+        room_id: currentRoom,
+        ended_by: 'customer'
+      });
+      
+      resetChat();
+    }
+    // If shouldn't leave, do nothing and let them continue chatting
+  } else {
+    resetChat();
   }
-  resetChat();
 });
 
+function showSupportWarning() {
+  // Clear existing chat content temporarily
+  const existingContent = chatbox.innerHTML;
+  chatbox.innerHTML = '';
+  
+  // Create warning message with buttons
+  const warningContainer = document.createElement('div');
+  warningContainer.className = 'warning-container';
+  warningContainer.innerHTML = `
+    <div class="warning-message">
+      <h3>⚠️ Warning</h3>
+      <div class="warning-text">Please be advised that starting multiple support chat sessions without valid reasons may result in penalties.</div>
+      <div class="warning-text">Are you sure you want to proceed with a new support chat?</div>
+      <div class="warning-buttons">
+        <button class="warning-btn proceed-btn">Proceed</button>
+        <button class="warning-btn goBack-btn">Go Back</button>
+      </div>
+    </div>
+  `;
+  
+  chatbox.appendChild(warningContainer);
+  
+  const proceedBtn = warningContainer.querySelector('.proceed-btn');
+  const goBackBtn = warningContainer.querySelector('.goBack-btn');
+  
+  proceedBtn.addEventListener('click', () => {
+    chatbox.innerHTML = ''; // Clear warning
+    initializeSupportChat();
+  });
+  
+  goBackBtn.addEventListener('click', () => {
+    resetChat();
+  });
+}
+
+function showLeaveWarning() {
+  if (isShowingWarning) {
+    return Promise.resolve(false);
+  }
+
+  if (chatEndedByAdmin) {
+    return Promise.resolve(true);
+  }
+
+  isShowingWarning = true;
+
+  const warningMessage = document.createElement('li');
+  warningMessage.className = 'chat leave-warning';
+  warningMessage.innerHTML = `
+    <div class="warning-message">
+      <h3>⚠️ Warning</h3>
+      <div class="warning-text">Are you sure you want to leave this support chat?</div>
+      <div class="warning-text">This will end your current chat session.</div>
+      <div class="warning-buttons">
+        <button class="warning-btn leave-btn">Leave Chat</button>
+        <button class="warning-btn stay-btn">Stay in Chat</button>
+      </div>
+    </div>
+  `;
+  
+  chatbox.appendChild(warningMessage);
+  chatbox.scrollTo(0, chatbox.scrollHeight);
+  
+  // Disable chat while warning is shown
+  chatInput.disabled = true;
+  
+  return new Promise((resolve) => {
+    const leaveBtn = warningMessage.querySelector('.leave-btn');
+    const stayBtn = warningMessage.querySelector('.stay-btn');
+
+    const cleanup = () => {
+      warningMessage.remove();
+      chatInput.disabled = false;
+      isShowingWarning = false;
+    };
+    
+    leaveBtn.addEventListener('click', () => {
+      cleanup();
+      resolve(true); // User wants to leave
+    });
+    
+    stayBtn.addEventListener('click', () => {
+      cleanup();
+      resolve(false); // User wants to stay
+    });
+  });
+}
+
 function initializeSupportChat() {
+  chatInput.disabled = false;
+
   // Request customer support
   socket.emit('request_support', {});
   
@@ -115,7 +224,14 @@ const createChatLi = (message, className) => {
   const chatLi = document.createElement("li");
   chatLi.classList.add("chat", className);
 
-  let chatContent = className === "outgoing" ? `<p></p>` : `<span><i class="fa-solid fa-robot"></i></span><p></p>`;
+  let chatContent;
+  if (className === "outgoing") {
+    chatContent = `<p></p>`;
+  } else {
+    const icon = isSupportChat ? "fa-headset" : "fa-robot";
+    chatContent = `<span><i class="fa-solid ${icon}"></i></span><p></p>`;
+  }
+
   chatLi.innerHTML = chatContent;
   chatLi.querySelector("p").textContent = message
   return chatLi;
@@ -213,6 +329,29 @@ chatbotToggler.addEventListener("click", () => {
   chatbotWrapper.classList.toggle("show-chatbot");
 });
 
+document.getElementById('switchToSupport').addEventListener('click', async (e) => {
+  e.preventDefault();
+  
+  // Check if user is authenticated
+  const response = await fetch('/dashboard/api/check-auth');
+  const data = await response.json();
+  
+  if (!data.authenticated) {
+    window.location.href = '/login';
+    return;
+  }
+
+  // Hide the support link since we're switching to support chat
+  switchToSupportLink.style.display = 'none';
+  
+  // Clear the AI chat history
+  chatbox.innerHTML = '';
+  
+  // Switch to support chat
+  isSupportChat = true;
+  initializeSupportChat();
+});
+
 // Socket event listeners
 socket.on('support_request_acknowledged', (data) => {
   currentRoom = data.room_id;
@@ -245,25 +384,48 @@ socket.on('new_message', (data) => {
 //   const messageElement = createChatLi(data.message, 'incoming');
 //   chatbox.appendChild(messageElement);
 //   chatbox.scrollTo(0, chatbox.scrollHeight);
-//   currentRoom = null;
-  
-//   // Reset chat interface
+    
+//   // Reset chat after delay
 //   setTimeout(() => {
-//     document.getElementById('chatChoice').style.display = 'block';
-//     document.querySelector('.chatbox').style.display = 'none';
-//     document.querySelector('.chat-input').style.display = 'none';
-//     chatbox.innerHTML = ''; // Clear chat history
+//     resetChat();
 //   }, 3000);
 // });
 socket.on('chat_ended', (data) => {
+  // Add the end message
   const messageElement = createChatLi(data.message, 'incoming');
   chatbox.appendChild(messageElement);
-  chatbox.scrollTo(0, chatbox.scrollHeight);
+  
+  // Only reset if customer ended the chat
+  if (data.ended_by === 'admin') {
+    chatEndedByAdmin = true;
+
+    // If admin ended the chat, show follow-up message and new chat option
+    const followUpMessage = createChatLi("You're free to leave this chat. Thank you for using our support service!", 'incoming');
+    chatbox.appendChild(followUpMessage);
     
-  // Reset chat after delay
-  setTimeout(() => {
+    chatInput.disabled = true;
+
+    // Create and add the "Start New Chat" link below the chat messages
+    const newChatMessage = document.createElement('li');
+    newChatMessage.className = 'chat new-chat-prompt';
+    newChatMessage.innerHTML = `
+      <div class="new-chat-link">
+        <a href="#" class="start-new-chat">Start a New Chat Session</a>
+      </div>
+    `;
+    chatbox.appendChild(newChatMessage);
+
+    // Add event listener for the new chat link
+    newChatMessage.querySelector('.start-new-chat').addEventListener('click', (e) => {
+      e.preventDefault();
+      chatEndedByAdmin = false;
+      showSupportWarning();
+    });
+  } else {
     resetChat();
-  }, 3000);
+  }
+  
+  chatbox.scrollTo(0, chatbox.scrollHeight);
 });
 
 let connectionInterval;
@@ -331,10 +493,15 @@ socket.on('chat_history', (data) => {
 function resetChat() {
   currentRoom = null;
   isSupportChat = false;
+  chatInput.disabled = false;
+  chatEndedByAdmin = false;
+  isShowingWarning = false;
+
   const chatChoice = document.getElementById('chatChoice');
   document.querySelector('.chatbox').style.display = 'none';
   document.querySelector('.chat-input').style.display = 'none';
   backBtn.style.display = 'none';
+  switchToSupportLink.style.display = 'none';
 
   // Reset display properties
   chatChoice.style.display = 'flex';

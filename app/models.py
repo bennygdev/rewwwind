@@ -8,7 +8,7 @@ from itsdangerous import URLSafeTimedSerializer as Serializer
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     first_name = db.Column(db.String(150), nullable=False)
     last_name = db.Column(db.String(150), nullable=False)
     username = db.Column(db.String(150), unique=True, nullable=False)
@@ -16,7 +16,7 @@ class User(db.Model, UserMixin):
     image = db.Column(db.String(150), nullable=True, default='profile_image_default.jpg')
     google_account = db.Column(db.Boolean, nullable=False, default=False)
     password = db.Column(db.String(150), nullable=True)
-    orderCount = db.Column(db.Integer, nullable=False)
+    orderCount = db.Column(db.Integer, nullable=False, default=0)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)  # role table
     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
     updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
@@ -60,7 +60,7 @@ class BillingAddress(db.Model):
 
 class PaymentInformation(db.Model):
   __tablename__ = 'payment_information'
-  id = db.Column(db.Integer, primary_key=True)
+  id = db.Column(db.Integer, primary_key=True, autoincrement=True)
   user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
   paymentType_id = db.Column(db.Integer, db.ForeignKey('payment_types.id'), nullable=False)  # payment method table
   card_number = db.Column(db.String(16), nullable=False) # store as string since leading zeros
@@ -72,13 +72,13 @@ class PaymentInformation(db.Model):
 
 class PaymentType(db.Model):
   __tablename__ = 'payment_types'
-  id = db.Column(db.Integer, primary_key=True)
+  id = db.Column(db.Integer, primary_key=True, autoincrement=True)
   payment_type = db.Column(db.String(50), unique=True, nullable=False)
   payment_information = db.relationship('PaymentInformation', backref='payment_types', lazy=True) # otm
 
 class Role(db.Model):
   __tablename__ = 'roles'
-  id = db.Column(db.Integer, primary_key=True)
+  id = db.Column(db.Integer, primary_key=True, autoincrement=True)
   role_name = db.Column(db.String(50), unique=True, nullable=False)
   users = db.relationship('User', backref='role', lazy=True)  # otm
 
@@ -142,7 +142,7 @@ class Category(db.Model):
 
 class SubCategory(db.Model):
   __tablename__ = 'subcategories'
-  id = db.Column(db.Integer, primary_key=True)
+  id = db.Column(db.Integer, primary_key=True, autoincrement=True)
   subcategory_name = db.Column(db.String(100), unique=True, nullable=False)
   category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
 
@@ -156,7 +156,7 @@ class ProductSubCategory(db.Model):
 
 class Order(db.Model):
   __tablename__ = 'orders'
-  id = db.Column(db.Integer, primary_key=True)
+  id = db.Column(db.Integer, primary_key=True, autoincrement=True)
   order_date = db.Column(db.DateTime(timezone=True), default=func.now())
   approval_date = db.Column(db.DateTime(timezone=True))
   delivery = db.Column(db.String(100), nullable=False)
@@ -207,7 +207,7 @@ class OrderItem(db.Model):
 
 class Cart(db.Model):
     __tablename__ = 'cart'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
     product_condition = db.Column(db.JSON, nullable=False)
@@ -219,7 +219,7 @@ class Cart(db.Model):
 class tradeDetail(db.Model):
     __tablename__ = 'trade_details'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     images = db.Column(db.JSON, nullable=False)  
     item_type = db.Column(db.String(100), nullable=False)
     item_condition = db.Column(db.String(100), nullable=False)

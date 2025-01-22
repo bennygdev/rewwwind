@@ -1,0 +1,52 @@
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+thead tr {
+    background-color: #f9f9f9;
+    border-bottom: 2px solid #ddd;
+}
+
+thead th {
+    text-align: left;
+    padding: 10px;
+    font-size: 14px;
+}
+
+tbody tr {
+    border-bottom: 1px solid #ddd;
+}
+
+tbody td {
+    padding: 10px;
+    vertical-align: middle;
+    font-size: 14px;
+}
+
+tbody td strong {
+    font-size: 16px;
+}
+
+.status {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: #fff;
+}
+
+.status.approved {
+    background-color: #28a745; /* Green */
+}
+
+.status.pending {
+    background-color: #ffc107; /* Yellow */
+    color: #000;
+}
+
+.status.rejected {
+    background-color: #dc3545; /* Red */
+}

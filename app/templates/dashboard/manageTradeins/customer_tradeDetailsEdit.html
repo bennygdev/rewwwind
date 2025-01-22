@@ -1,0 +1,41 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Edit Trade-in{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Edit Trade-in #TD{{ "%03d"|format(trade_item.id) }}</h2>
+    <form method="POST" action="{{ url_for('manageTradeins.edit_trade', trade_id=trade_item.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+            <label for="title">Title:</label>
+            <input type="text" class="form-control" id="title" name="title" value="{{ trade_item.title }}" required>
+        </div>
+        <div class="form-group">
+            <label for="item_type">Item Type:</label>
+            <input type="text" class="form-control" id="item_type" name="item_type" value="{{ trade_item.item_type }}" required>
+        </div>
+        <div class="form-group">
+            <label for="genre">Genre:</label>
+            <input type="text" class="form-control" id="genre" name="genre" value="{{ trade_item.genre }}" required>
+        </div>
+        <div class="form-group">
+            <label for="author_artist">Author/Artist:</label>
+            <input type="text" class="form-control" id="author_artist" name="author_artist" value="{{ trade_item.author_artist }}" required>
+        </div>
+        <div class="form-group">
+            <label for="isbn_or_cat">ISBN/Catalog No.:</label>
+            <input type="text" class="form-control" id="isbn_or_cat" name="isbn_or_cat" value="{{ trade_item.isbn_or_cat }}" required>
+        </div>
+        <div class="form-group">
+            <label for="item_condition">Condition:</label>
+            <select class="form-control" id="item_condition" name="item_condition">
+                <option value="Brand New" {% if trade_item.item_condition == 'Brand New' %}selected{% endif %}>Brand New</option>
+                <option value="Like New" {% if trade_item.item_condition == 'Like New' %}selected{% endif %}>Like New</option>
+                <option value="Well Used" {% if trade_item.item_condition == 'Well Used' %}selected{% endif %}>Well Used</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-success">Save Changes</button>
+        <a href="{{ url_for('manageTradeins.view_trade_details', trade_id=trade_item.id) }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

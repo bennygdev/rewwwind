@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import os
 from authlib.integrations.flask_client import OAuth
 from flask_migrate import Migrate
+import json
 from flask_socketio import SocketIO
 socketio = SocketIO()
 
@@ -20,6 +21,16 @@ mail = Mail()
 oauth = OAuth()
 
 load_dotenv()
+
+def update_user_order_counts(app):
+  with app.app_context():
+    from .models import User, Order
+    users = User.query.all()
+    for user in users:
+      order_count = Order.query.filter_by(user_id=user.id).count()
+      user.orderCount = order_count
+    db.session.commit()
+    print('Updated order counts for all users!')
 
 def create_app():
   app = Flask(__name__)
@@ -115,6 +126,8 @@ def create_app():
 
   create_database(app)
 
+  update_user_order_counts(app)
+
   # User load
   login_manager = LoginManager()
   login_manager.login_view = 'auth.login'
@@ -140,6 +153,11 @@ def create_app():
   @app.errorhandler(401)
   def unauthorized(e):
     return render_template('401.html', user=current_user), 401
+  
+  #image rendering
+  @app.template_filter('fromjson')
+  def fromjson_filter(value):
+    return json.loads(value)
   
   return app
   

@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash,
 from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from .roleDecorator import role_required
-from .models import User
+from .models import User, PaymentInformation, BillingAddress, Review, Cart
 from .forms import AdminChangeUserInfoForm, ChangePasswordForm, OwnerAddAccountForm
 from . import db
 from datetime import datetime, timedelta
@@ -97,10 +97,24 @@ def delete_account(id):
   if current_user.role_id == 1: # restrict customer functions
     abort(404)
 
-  db.session.delete(selectedUser)
-  db.session.commit()
+  try:
+    # Delete all user related info
+    PaymentInformation.query.filter_by(user_id=selectedUser.id).delete()
+    BillingAddress.query.filter_by(user_id=selectedUser.id).delete()
+    Review.query.filter_by(user_id=selectedUser.id).delete()
+    Cart.query.filter_by(user_id=selectedUser.id).delete()
 
-  flash("Account successfully deleted.", "info")
+    # No orders and tradeins since i think website should store them as safety
+        
+    db.session.delete(selectedUser)
+    db.session.commit()
+        
+    flash("Account and all associated data successfully deleted.", "info")
+  except Exception as e:
+    db.session.rollback()
+    flash("An error occurred while deleting the account. Please try again.", "error")
+    print(f"Error deleting account: {str(e)}")
+
   return redirect(url_for('manageAccounts.accounts_listing'))
 
 @manageAccounts.route('/manage-accounts/edit-account/<int:id>', methods=['GET', 'POST'])

@@ -1,1 +1,51 @@
-<h1>CUSTOMER</h1>
+<h2>Your Trade-ins</h2>
+
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/tradein/custdashboardTrade.css') }}">
+{% endblock %}
+
+{% if trade_items %}
+    <table>
+        <thead>
+            <tr>
+                <th>Actions</th>
+                <th>Trade-in</th>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Genre</th>
+                <th>ISBN</th>
+                <th>Condition</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in trade_items %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('manageTradeins.delete_trade', trade_id=item.id) }}" class="btn btn-danger">Delete</a>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('manageTradeins.view_trade_details', trade_id=item.id) }}">
+                            <strong>Trade-In #{{ "%05d"|format(item.id) }}</strong><br>
+                            {{ "Drop-off" if item.item_condition in ["Brand New", "Like New"] else "Pick-up" }}
+                        </a>
+                    </td>
+                    <td>{{ item.title }}</td>
+                    <td>{{ item.created_at.strftime('%d %b %Y') }}</td>
+                    <td>{{ item.item_type }}</td>
+                    <td>{{ item.genre }}</td>
+                    <td>{{ item.isbn_or_cat }}</td>
+                    <td>{{ item.item_condition }}</td>
+                    <td>
+                        <span class="status {{ "approved" if item.item_condition == "Brand New" else "pending" if item.item_condition == "Well Used" else "rejected" }}">
+                            {{ "Approved" if item.item_condition == "Brand New" else "Pending" if item.item_condition == "Well Used" else "Rejected" }}
+                        </span>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No trade-ins found.</p>
+{% endif %}

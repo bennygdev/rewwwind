@@ -32,6 +32,24 @@ def customer_chat():
     
   return render_template("dashboard/customerChat/customerChat.html", user=current_user, active_chats=active_chat_users)
 
+@customerChat.route('/chat-room/<room_id>')
+@login_required
+@role_required(2, 3)  # Admin roles
+def chat_room(room_id):
+    if room_id not in active_chats:
+        flash('Chat room not found', 'error')
+        return redirect(url_for('customerChat.customer_chat'))
+        
+    chat_data = active_chats[room_id]
+    customer = User.query.get(chat_data['customer'])
+    
+    return render_template(
+        "dashboard/customerChat/chatRoom.html",
+        room_id=room_id,
+        customer_name=f"{customer.first_name} {customer.last_name}",
+        start_time=chat_data.get('start_time', datetime.now().strftime('%H:%M'))
+    )
+
 @customerChat.route('/api/check-auth')
 def check_auth():
   return jsonify({'authenticated': current_user.is_authenticated})
@@ -120,16 +138,12 @@ def handle_admin_leave(data):
     admin_name = current_user.first_name
     # Mark chat as waiting for new admin but preserve messages
     active_chats[room_id]['admin'] = None
-    active_chats[room_id]['status'] = 'waiting'
-        
-    # Notify customer
-    emit('admin_left_chat', {
-      'message': 'Support representative has left the chat. Please wait for a new representative.',
-    }, room=room_id)
+    active_chats[room_id]['status'] = 'waiting' 
 
     # Notify customer with admin's name
     emit('admin_left_chat', {
       'message': f'Support representative {admin_name} has left the chat. Please wait for a new representative.',
+      'admin_name': admin_name
     }, room=room_id)
         
     # Broadcast chat request to all admins
@@ -181,12 +195,19 @@ def handle_chat_end(data):
         
     # Notify both parties that chat has ended
     emit('chat_ended', {
-      'message': end_message
+      'message': end_message,
+      'ended_by': ended_by
     }, room=room_id)
         
     # Clean up
     leave_room(room_id)
     del active_chats[room_id]
+
+    # If ended by admin, broadcast removal of chat request
+    if ended_by == 'admin':
+      emit('remove_chat_request', {
+        'room_id': room_id
+      }, broadcast=True)
 
 # Handle user disconnection
 @socketio.on('disconnect')

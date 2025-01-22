@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app
 from . import db, mail, oauth
 from .models import User
 from .forms import LoginForm, RegisterForm, UsernameForm, RequestResetForm, ResetPasswordForm
@@ -80,6 +80,18 @@ def login():
 @login_required
 def logout():
   logout_user()
+  try: # shelve removal (for addproductform)
+    shelve_path = os.path.join(current_app.instance_path, 'shelve.db')
+    # if os.path.exists(shelve_path):
+    #   os.remove(shelve_path)
+    #   print("Shelve db has been removed.")
+    for ext in ['.bak', '.dat', '.dir']:
+      aux = shelve_path + ext
+      if os.path.exists(aux):
+        os.remove(aux)
+        print(f"Shelve auxiliary file {aux} has been removed.")
+  except Exception as e:
+    print(f"Error removing shelve in auth.py: {e}")
   print("Logged out user")
   return redirect(url_for('views.home')) # switch to home
 

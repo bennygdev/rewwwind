@@ -389,3 +389,46 @@ document.getElementById('images').remove()
 window.location.href.includes('/manage-products/add-product') ?
 new ConditionHandler('productImages', 'form.product__form', '/dashboard/manage-products/add-product', false) :
 new ConditionHandler('productImages', 'form.product__form', `/dashboard/manage-products/update-product/${document.getElementById('getIdHere').innerText}`, true);
+
+
+// save form logic (class too crazy at this point of time lol)
+if (window.location.href.includes('add-product')) {
+    window.addEventListener('beforeunload', (event) => {
+
+        const conditions = Array.from(document.querySelectorAll('.condition')).map(conditionDiv => ({
+            condition: conditionDiv.querySelector('[name^="productConditions-"][name$="-condition"]').value,
+            stock: conditionDiv.querySelector('[name^="productConditions-"][name$="-stock"]').value,
+            price: conditionDiv.querySelector('[name^="productConditions-"][name$="-price"]').value
+        }));
+
+        const formData = {
+            productName: document.querySelector('[name="productName"]').value,
+            productCreator: document.querySelector('[name="productCreator"]').value,
+            productDescription: document.querySelector('[name="productDescription"]').value,
+            productType: document.querySelector('[name="productType"]').value,
+            productGenre: document.querySelector('[name="productGenre"]').value,
+            productConditions: conditions,
+            isFeaturedSpecial: document.querySelector('[name="productIsFeaturedSpecial"]').checked,
+            isFeaturedStaff: document.querySelector('[name="productIsFeaturedStaff"]').checked
+        };
+        console.log(document.querySelector('[name="productIsFeaturedSpecial"]').checked)
+        
+
+        const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+        console.log(csrfToken)
+
+        fetch('/dashboard/manage-products/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify(formData)
+        }).then(response => {
+            if (!response.ok) {
+                console.error('Error:', response.statusText);
+            }
+        }).catch(error => console.error('Error:', error));
+
+    });
+}

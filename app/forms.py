@@ -211,6 +211,70 @@ class AddProductForm(FlaskForm):
               image.verify()
           except (IOError, SyntaxError):
               raise ValidationError('The image file could not be submitted. Please check if the image file is corrupted, and submit a different file if so.')
+          
+
+# SHELVE FUNCTIONALITY PURELY FOR ADDPRODUCTFORM, other logic found in manageProducts.save_product_form route, and also the most bottom of addProduct.js
+class AddProductFormData:
+  def __init__(self, name, creator, description, type, genre, conditions, featured_special, featured_staff):
+    self.__name = name
+    self.__creator = creator
+    self.__description = description
+    self.__type = type
+    self.__genre = genre
+    self.__conditions = conditions
+    self.__featured_special = featured_special
+    self.__featured_staff = featured_staff
+  
+  def to_dict(self):
+    return {
+        "name": self.__name,
+        "creator": self.__creator,
+        "description": self.__description,
+        "type": self.__type,
+        "genre": self.__genre,
+        "featured_special": self.__featured_special,
+        "featured_staff": self.__featured_staff
+    }
+  
+  def get_name(self):
+    return self.__name
+  def set_name(self, name):
+    self.__name = name
+  
+  def get_creator(self):
+    return self.__creator
+  def set_creator(self, creator):
+    self.__creator = creator
+  
+  def get_description(self):
+    return self.__description
+  def set_description(self, description):
+    self.__description = description
+  
+  def get_type(self):
+    return self.__type
+  def set_type(self, type):
+    self.__type = type
+  
+  def get_genre(self):
+    return self.__genre
+  def set_genre(self, genre):
+    self.__genre = genre
+  
+  def get_conditions(self):
+    return self.__conditions
+  def set_conditions(self, conditions):
+    self.__conditions = conditions
+  
+  def get_featured_special(self):
+    return self.__featured_special
+  def set_featured_special(self, featured_special):
+    self.__featured_special = featured_special
+  
+  def get_featured_staff(self):
+    return self.__featured_staff
+  def set_featured_staff(self, featured_staff):
+    self.__featured_staff = featured_staff
 
 class DeleteProductForm(FlaskForm):
   productID = HiddenField()
@@ -248,6 +312,7 @@ class UpdateOrderForm(FlaskForm):
 # Cart-related Forms
 class AddToCartForm(FlaskForm):
   condition = HiddenField(default=0)
+  quantity = IntegerField('Quantity')
   submit = SubmitField('Add to Cart')
 
 

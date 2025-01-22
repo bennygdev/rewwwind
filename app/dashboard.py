@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
 from flask_login import login_required, current_user
 from .forms import UpdatePersonalInformation, ChangePasswordForm, BillingAddressForm, PaymentMethodForm, ChangeEmailForm
-from .models import User, BillingAddress, PaymentInformation, PaymentType, Review, Cart
+from .models import User, BillingAddress, PaymentInformation, PaymentType, Review, Cart, Order
 from .roleDecorator import role_required
 from . import db
 import secrets
@@ -26,7 +26,9 @@ def user_profile():
   else:
     image_file = url_for('static', filename='profile_pics/profile_image_default.jpg')
 
-  return render_template("dashboard/profile/profile.html", user=current_user, image_file=image_file)
+  orders = Order.query.filter_by(user_id=current_user.id).order_by(Order.order_date.desc()).limit(6).all()
+
+  return render_template("dashboard/profile/profile.html", user=current_user, image_file=image_file, orders=orders)
 
 @dashboard.route('/settings')
 @login_required

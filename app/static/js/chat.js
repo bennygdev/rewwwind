@@ -60,7 +60,7 @@ document.getElementById('supportBtn').addEventListener('click', async () => {
     // Start new chat
     isSupportChat = true;
     showChatInterface();
-    showSupportWarning();
+    showSupportForm();
   }
 });
 
@@ -120,34 +120,53 @@ backBtn.addEventListener('click', async () => {
   }
 });
 
-function showSupportWarning() {
-  // Clear existing chat content temporarily
+function showSupportForm() {
   const existingContent = chatbox.innerHTML;
   chatbox.innerHTML = '';
   
-  // Create warning message with buttons
-  const warningContainer = document.createElement('div');
-  warningContainer.className = 'warning-container';
-  warningContainer.innerHTML = `
-    <div class="warning-message">
-      <h3>⚠️ Warning</h3>
-      <div class="warning-text">Please be advised that starting multiple support chat sessions without valid reasons may result in penalties.</div>
-      <div class="warning-text">Are you sure you want to proceed with a new support chat?</div>
-      <div class="warning-buttons">
-        <button class="warning-btn proceed-btn">Proceed</button>
-        <button class="warning-btn goBack-btn">Go Back</button>
+  const supportContainer = document.createElement('div');
+  supportContainer.className = 'support-request-container';
+  supportContainer.innerHTML = `
+    <form class="support-request-form" id="supportRequestForm">
+      <h3>Start a Support Chat</h3>
+      <div class="form-group">
+        <select class="form-control" id="supportType" required>
+          <option value="">Select Support Type</option>
+          <option value="technical">Technical Support</option>
+          <option value="billing">Billing Support</option>
+          <option value="account">Account Support</option>
+          <option value="general">General Inquiry</option>
+        </select>
       </div>
-    </div>
+      <div class="form-group">
+        <textarea 
+          class="form-control" 
+          id="problemDescription" 
+          placeholder="Please describe your issue..."
+          required
+        ></textarea>
+      </div>
+      <div class="form-buttons">
+        <button type="submit" class="proceed-btn">Start Chat</button>
+        <button type="button" class="goBack-btn">Go Back</button>
+      </div>
+    </form>
   `;
   
-  chatbox.appendChild(warningContainer);
+  chatbox.appendChild(supportContainer);
   
-  const proceedBtn = warningContainer.querySelector('.proceed-btn');
-  const goBackBtn = warningContainer.querySelector('.goBack-btn');
+  const form = supportContainer.querySelector('#supportRequestForm');
+  const goBackBtn = supportContainer.querySelector('.goBack-btn');
   
-  proceedBtn.addEventListener('click', () => {
-    chatbox.innerHTML = ''; // Clear warning
-    initializeSupportChat();
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const supportType = document.getElementById('supportType').value;
+    const description = document.getElementById('problemDescription').value;
+    
+    if (supportType && description) {
+      chatbox.innerHTML = '';
+      initializeSupportChat(supportType, description);
+    }
   });
   
   goBackBtn.addEventListener('click', () => {
@@ -208,15 +227,22 @@ function showLeaveWarning() {
   });
 }
 
-function initializeSupportChat() {
+function initializeSupportChat(supportType, description) {
   chatInput.disabled = false;
 
   // Request customer support
-  socket.emit('request_support', {});
+  socket.emit('request_support', {
+    supportType: supportType,
+    description: description
+  });
   
   // Initial waiting message
   const waitingMessage = createChatLi('Requesting customer support...', 'incoming');
   chatbox.appendChild(waitingMessage);
+
+  // Add the customer's description as their first message
+  const descriptionMessage = createChatLi(description, 'outgoing');
+  chatbox.appendChild(descriptionMessage);
 }
 
 const createChatLi = (message, className) => {
@@ -364,7 +390,31 @@ socket.on('admin_joined', (data) => {
   const messageElement = createChatLi(data.message, 'incoming');
   chatbox.appendChild(messageElement);
   chatbox.scrollTo(0, chatbox.scrollHeight);
+
+  const chatHeader = document.querySelector('.chat-header');
+  if (chatHeader) {
+    const supportType = currentRoom ? active_chats[currentRoom].supportType : 'general';
+    const supportTypeLabel = getSupportTypeLabel(supportType);
+    
+    chatHeader.innerHTML = `
+      <div class="chat-header-container">
+        <h4>${data.message}</h4>
+        <span class="support-type-badge support-type-${supportType}">${supportTypeLabel}</span>
+      </div>
+    `;
+  }
 });
+
+// helper function
+function getSupportTypeLabel(type) {
+  const labels = {
+    'technical': 'Technical Support',
+    'billing': 'Billing Support',
+    'account': 'Account Support',
+    'general': 'General Inquiry'
+  };
+  return labels[type] || 'General Inquiry';
+}
 
 socket.on('admin_left_chat', (data) => {
   const messageElement = createChatLi(data.message, 'incoming');
@@ -419,7 +469,7 @@ socket.on('chat_ended', (data) => {
     newChatMessage.querySelector('.start-new-chat').addEventListener('click', (e) => {
       e.preventDefault();
       chatEndedByAdmin = false;
-      showSupportWarning();
+      showSupportForm();
     });
   } else {
     resetChat();

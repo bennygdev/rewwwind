@@ -13,6 +13,17 @@
     <div id="chatArea">
       <div class="chat-header border-bottom mb-3 p-3">
         <h4 id="currentCustomer">Chat with {{ customer_name }}</h4>
+        <span class="support-type-badge support-type-{{ support_type|default('general') }}">
+          {% if support_type == 'technical' %}
+            Technical Support
+          {% elif support_type == 'billing' %}
+            Billing Support
+          {% elif support_type == 'account' %}
+            Account Support
+          {% else %}
+            General Inquiry
+          {% endif %}
+        </span>
       </div>
       <div class="chat-messages p-3" style="height: 60vh; overflow-y: auto;">
         <!-- Messages will be inserted here -->

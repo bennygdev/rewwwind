@@ -82,11 +82,19 @@ def handle_support_request(data):
       return
     
   room_id = f"chat_{current_user.id}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+
+  first_message = {
+    'message': data.get('description', ''),
+    'type': 'incoming',
+    'timestamp': datetime.now().strftime('%H:%M')
+  }
+
   active_chats[room_id] = {
     'customer': current_user.id,
     'admin': None,
     'status': 'waiting',
-    'messages': [],
+    'messages': [first_message],
+    'supportType': data.get('supportType', 'general'),
     'last_activity': datetime.now()
   }
     
@@ -95,7 +103,8 @@ def handle_support_request(data):
   emit('new_chat_request', {
     'room_id': room_id,
     'customer_name': f"{current_user.first_name} {current_user.last_name}",
-    'start_time': datetime.now().strftime('%H:%M')
+    'start_time': datetime.now().strftime('%H:%M'),
+    'supportType': data.get('supportType', 'general')
   }, broadcast=True)
     
   emit('support_request_acknowledged', {

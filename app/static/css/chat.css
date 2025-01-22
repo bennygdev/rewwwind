@@ -294,56 +294,119 @@
 }
 
 /* Warning section */
-.warning-container {
+/* Support Request Form Styles */
+.support-request-container {
   padding: 20px;
+  width: 100%;
+}
+
+.support-request-form {
+  width: 100%;
+  padding: 20px 0;
+}
+
+.support-request-form h3 {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 1.4em;
   text-align: center;
 }
 
-.warning-message {
-  background-color: #fff3cd;
-  border: 1px solid #ffeeba;
+.support-request-form .form-group {
+  margin-bottom: 20px;
+}
+
+.support-request-form select,
+.support-request-form textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
-  padding: 20px;
-  margin: 20px auto;
-  max-width: 90%;
+  background-color: white;
+  transition: border-color 0.3s ease;
 }
 
-.warning-message h3 {
-  color: #856404;
-  margin-bottom: 15px;
-  font-size: 1.2em;
+.support-request-form select:focus,
+.support-request-form textarea:focus {
+  border-color: #039752;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(3, 151, 82, 0.1);
 }
 
-.warning-message p {
-  color: #666;
-  margin-bottom: 15px;
-  font-size: 0.95em;
-  line-height: 1.4;
+.support-request-form textarea {
+  resize: vertical;
+  min-height: 120px;
 }
 
-.warning-buttons {
+.support-request-form .form-buttons {
   display: flex;
   justify-content: center;
   gap: 15px;
-  margin-top: 20px;
+  margin-top: 25px;
 }
 
-.warning-btn {
-  padding: 8px 20px;
+.support-request-form button {
+  padding: 12px 30px;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
   transition: all 0.3s ease;
 }
 
 .proceed-btn {
-  background-color: #dc3545;
+  background-color: #039752;
   color: white;
 }
 
 .proceed-btn:hover {
-  background-color: #c82333;
+  background-color: #028547;
+}
+
+.goBack-btn {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.goBack-btn:hover {
+  background-color: #d0d0d0;
+}
+
+/* Support Type Badge Styles */
+.chat-header-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.support-type-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85em;
+  font-weight: 500;
+  background-color: #e8f5e9;
+  color: #039752;
+}
+
+.support-type-technical {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.support-type-billing {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.support-type-account {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.support-type-general {
+  background-color: #e8f5e9;
+  color: #039752;
 }
 
 .goBack-btn {

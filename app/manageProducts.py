@@ -5,13 +5,14 @@ from sqlalchemy import cast, Integer
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.dialects.postgresql import JSON
 from .roleDecorator import role_required
-from .forms import AddProductForm, DeleteProductForm #, EditProductForm
+from .forms import AddProductForm, DeleteProductForm, AddProductFormData #, EditProductForm
 from .models import Product, Category, SubCategory, ProductSubCategory, OrderItem
 from . import db
 import os
 
 from math import ceil
 # from datetime import datetime
+import shelve
 
 manageProducts = Blueprint('manageProducts', __name__)
 
@@ -112,61 +113,104 @@ def products_listing():
 def add_product():
     form = AddProductForm()
 
-    # Handle form submission
-    if form.validate_on_submit():
+    if request.method == 'GET':
         try:
-            # Extract form data
-            productName = form.productName.data
-            productCreator = form.productCreator.data
-            productDescription = form.productDescription.data
-            productType = form.productType.data
-            productGenre = form.productGenre.data
-            subcategory = SubCategory.query.filter(SubCategory.id==productGenre).first()
-            print(subcategory)
-            productThumbnail = int(form.productThumbnail.data)
-            productConditions = form.productConditions.data
-            is_featured_special = form.productIsFeaturedSpecial.data
-            is_featured_staff = form.productIsFeaturedStaff.data
+            shelve_path = os.path.join(current_app.instance_path, 'shelve.db')
+            with shelve.open(shelve_path) as db:
+                user_id = str(current_user.id)
+                if user_id in db:
+                    saved_data = db[user_id]
 
-            # Handle file upload
-            files = request.files.getlist('productImages')
-            upload_folder = current_app.config['UPLOAD_FOLDER']
-            uploaded_file_paths = []
+                    print(saved_data.get_conditions())
+                    
+                    # Populate the form fields with the saved data
+                    form.productName.data = saved_data.get_name()
+                    form.productCreator.data = saved_data.get_creator()
+                    form.productDescription.data = saved_data.get_description()
+                    form.productType.data = saved_data.get_type()
+                    form.productGenre.data = saved_data.get_genre()
+                    form.productThumbnail.data = saved_data.get_thumbnail()
+                    form.productIsFeaturedSpecial.data = saved_data.get_featured_special()
+                    form.productIsFeaturedStaff.data = saved_data.get_featured_staff()
 
-            for file in files:
-                if file:
-                    file.seek(0)  # Ensure we're at the start of the file
-                    file_path = os.path.join(upload_folder, secure_filename(file.filename))
-                    file.save(file_path)
-                    uploaded_file_paths.append(secure_filename(file.filename))
+                    condition_choices = [
+                    ('Brand New', 'Brand New'),
+                    ('Like New', 'Like New'),
+                    ('Lightly Used', 'Lightly Used'),
+                    ('Well Used', 'Well Used')
+                    ]
 
-            # Create the new product object
-            new_product = Product(
-                name=productName,
-                creator=productCreator,
-                image_thumbnail=secure_filename(files[productThumbnail].filename),
-                images=uploaded_file_paths,
-                category_id=productType,
-                subcategories=[subcategory],
-                description=productDescription,
-                conditions=productConditions,
-                is_featured_special = is_featured_special,
-                is_featured_staff = is_featured_staff
-            )
+                    if saved_data.get_conditions():
+                        condition = saved_data.get_conditions()[0]  # Take the first variant condition
+                        form.productConditions[0].condition.data = condition['condition']
+                        form.productConditions[0].stock.data = condition['stock']
+                        form.productConditions[0].price.data = condition['price']
 
-            # Add the product to the database and commit
-            db.session.add(new_product)
-            db.session.commit()
-
-            # Return a success response
-            flash("The product has been added successfully.", "success")
-            return jsonify({'success': True, 'message': 'Product added successfully!'})
-        
-        except ValueError:
-            return jsonify({'error': False, 'message': "No images were uploaded. Please upload at least one image."})
+                        for condition in saved_data.get_conditions()[1:]:  # Skip the first condition since it's already set
+                            entry = form.productConditions.append_entry({
+                                'stock': condition['stock'],
+                                'price': condition['price']
+                            })
+                            entry.condition.choices = condition_choices
+                            entry.condition.data = condition['condition']
+            print("Previously saved form data has been loaded.")
         except Exception as e:
-            # Return error response if anything goes wrong
-            return jsonify({'error': False, 'message': f"An error occurred: {str(e)}"})
+            print(f"Failed to load saved form data: {e}")
+    else:
+        if form.validate_on_submit():
+            try:
+                # Extract form data
+                productName = form.productName.data
+                productCreator = form.productCreator.data
+                productDescription = form.productDescription.data
+                productType = form.productType.data
+                productGenre = form.productGenre.data
+                subcategory = SubCategory.query.filter(SubCategory.id==productGenre).first()
+                print(subcategory)
+                productThumbnail = int(form.productThumbnail.data)
+                productConditions = form.productConditions.data
+                is_featured_special = form.productIsFeaturedSpecial.data
+                is_featured_staff = form.productIsFeaturedStaff.data
+
+                # Handle file upload
+                files = request.files.getlist('productImages')
+                upload_folder = current_app.config['UPLOAD_FOLDER']
+                uploaded_file_paths = []
+
+                for file in files:
+                    if file:
+                        file.seek(0)  # PLEASE REMEMBER, i keep on forgetting lol
+                        file_path = os.path.join(upload_folder, secure_filename(file.filename))
+                        file.save(file_path)
+                        uploaded_file_paths.append(secure_filename(file.filename))
+
+                # Create the new product object
+                new_product = Product(
+                    name=productName,
+                    creator=productCreator,
+                    image_thumbnail=secure_filename(files[productThumbnail].filename),
+                    images=uploaded_file_paths,
+                    category_id=productType,
+                    subcategories=[subcategory],
+                    description=productDescription,
+                    conditions=productConditions,
+                    is_featured_special = is_featured_special,
+                    is_featured_staff = is_featured_staff
+                )
+
+                # Add the product to the database and commit
+                db.session.add(new_product)
+                db.session.commit()
+
+                # Return a success response
+                flash("The product has been added successfully.", "success")
+                return jsonify({'success': True, 'message': 'Product added successfully!'})
+            
+            except ValueError:
+                return jsonify({'error': False, 'message': "No images were uploaded. Please upload at least one image."})
+            except Exception as e:
+                # Return error response if anything goes wrong
+                return jsonify({'error': False, 'message': f"An error occurred: {str(e)}"})
 
     # Handle form validation errors
     if form.errors:
@@ -175,6 +219,40 @@ def add_product():
 
     # Default return in case of GET request or no validation errors
     return render_template("dashboard/manageProducts/addProduct.html", user=current_user, form=form)
+
+@manageProducts.route('/manage-products/save', methods=['POST'])
+@login_required
+@role_required(2, 3)
+def save_product_form():
+    try:
+        shelve_path = os.path.join(current_app.instance_path, 'shelve.db')
+        
+        with shelve.open(shelve_path) as db:
+            user_id = str(current_user.id)
+            data = request.get_json()
+
+            form_data = AddProductFormData(
+                name = data.get('productName'),
+                creator = data.get('productCreator'),
+                description = data.get('productDescription'),
+                type = data.get('productType'),
+                genre = data.get('productGenre'),
+                thumbnail = data.get('productThumbnail'),
+                conditions = data.get('productConditions'),
+                featured_special = data.get('isFeaturedSpecial'),
+                featured_staff = data.get('isFeaturedStaff')
+            )
+
+            db[user_id] = form_data
+            print(form_data.get_featured_special(), form_data.get_featured_staff())
+        print('success')
+        flash("The product data was saved successfully. It can be viewed again when revisiting the 'Add Product' form, as long as you do not log out.", "success")
+        return jsonify({"message": "Product data saved successfully."}), 200
+    
+    except Exception as e:
+        flash("There was an error saving the form.", "error")
+        print('failure', e)
+        return jsonify({"error": "There was an error saving the form."}), 500
 
 @manageProducts.route('/manage-products/update-product/<int:product_id>', methods=['GET', 'POST'])
 @login_required
@@ -199,6 +277,8 @@ def update_product(product_id):
         ('Lightly Used', 'Lightly Used'),
         ('Well Used', 'Well Used')
         ]
+
+        # there's probably a better way but if it works it works
         if product.conditions:
             condition = product.conditions[0]  # Take the first variant condition
             form.productConditions[0].condition.data = condition['condition']

@@ -6,7 +6,6 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
 from itsdangerous import URLSafeTimedSerializer as Serializer
 
-
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -187,6 +186,7 @@ class Order(db.Model):
     session.commit()
   
   def update_approval(self):
+
     if self.status == 'Approved':
       self.approval_date = func.now()
     elif self.status == 'Pending':

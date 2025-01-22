@@ -216,13 +216,12 @@ class AddProductForm(FlaskForm):
 
 # SHELVE FUNCTIONALITY PURELY FOR ADDPRODUCTFORM, other logic found in manageProducts.save_product_form route, and also the most bottom of addProduct.js
 class AddProductFormData:
-  def __init__(self, name, creator, description, type, genre, thumbnail, conditions, featured_special, featured_staff):
+  def __init__(self, name, creator, description, type, genre, conditions, featured_special, featured_staff):
     self.__name = name
     self.__creator = creator
     self.__description = description
     self.__type = type
     self.__genre = genre
-    self.__thumbnail = thumbnail
     self.__conditions = conditions
     self.__featured_special = featured_special
     self.__featured_staff = featured_staff
@@ -234,7 +233,6 @@ class AddProductFormData:
         "description": self.__description,
         "type": self.__type,
         "genre": self.__genre,
-        "thumbnail": self.__thumbnail,
         "featured_special": self.__featured_special,
         "featured_staff": self.__featured_staff
     }
@@ -263,11 +261,6 @@ class AddProductFormData:
     return self.__genre
   def set_genre(self, genre):
     self.__genre = genre
-  
-  def get_thumbnail(self):
-    return self.__thumbnail
-  def set_thumbnail(self, thumbnail):
-    self.__thumbnail = thumbnail
   
   def get_conditions(self):
     return self.__conditions

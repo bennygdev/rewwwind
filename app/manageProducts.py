@@ -106,30 +106,48 @@ def products_listing():
         stock_filter=stock_filter
         ) #, datetime=datetime
 
+# uploads folder cleaning logic
+def clean_uploads_folder():
+    used_images = set()
+    products = Product.query.all()
+    for product in products:
+        if product.images:
+            used_images.update(product.images)
+
+    uploads_folder = os.path.join(current_app.static_folder, 'media', 'uploads')
+    all_files = set(os.listdir(uploads_folder))
+
+    unused_files = all_files - used_images
+
+    for filename in unused_files:
+        file_path = os.path.join(uploads_folder, filename)
+        try:
+            os.remove(file_path)
+            print(f"Deleted unused file: {filename}")
+        except Exception as e:
+            print(f"Error deleting file {filename}: {e}")
 
 @manageProducts.route('/manage-products/add-product', methods=['GET', 'POST'])
 @login_required
 @role_required(2, 3)
 def add_product():
     form = AddProductForm()
-
+    clean_uploads_folder()
     if request.method == 'GET':
         try:
             shelve_path = os.path.join(current_app.instance_path, 'shelve.db')
-            with shelve.open(shelve_path) as db:
+            with shelve.open(shelve_path) as shelve_db:
                 user_id = str(current_user.id)
-                if user_id in db:
-                    saved_data = db[user_id]
+                if user_id in shelve_db:
+                    saved_data = shelve_db[user_id]
 
                     # print(saved_data.get_conditions())
-                    
-                    # Populate the form fields with the saved data
+
                     form.productName.data = saved_data.get_name()
                     form.productCreator.data = saved_data.get_creator()
                     form.productDescription.data = saved_data.get_description()
                     form.productType.data = saved_data.get_type()
                     form.productGenre.data = saved_data.get_genre()
-                    form.productThumbnail.data = saved_data.get_thumbnail()
                     form.productIsFeaturedSpecial.data = saved_data.get_featured_special()
                     form.productIsFeaturedStaff.data = saved_data.get_featured_staff()
 
@@ -159,7 +177,6 @@ def add_product():
     else:
         if form.validate_on_submit():
             try:
-                # Extract form data
                 productName = form.productName.data
                 productCreator = form.productCreator.data
                 productDescription = form.productDescription.data
@@ -198,9 +215,20 @@ def add_product():
                     is_featured_staff = is_featured_staff
                 )
 
-                # Add the product to the database and commit
                 db.session.add(new_product)
                 db.session.commit()
+
+                try:
+                    shelve_path = os.path.join(current_app.instance_path, 'shelve.db')
+                    with shelve.open(shelve_path) as shelve_db:
+                        user_id = str(current_user.id)
+                        if user_id in shelve_db:
+                            del shelve_db[user_id]
+                except Exception as e:
+                    print(f"Error deleting saved form data: {e}")
+
+                # Set a session flag to prevent immediate re-saving
+                session['product_added'] = True
 
                 # Return a success response
                 flash("The product has been added successfully.", "success")
@@ -225,6 +253,11 @@ def add_product():
 @role_required(2, 3)
 def save_product_form():
     try:
+        if session.get('product_added'):
+            session.pop('product_added')
+            print(True)
+            return jsonify({'success': False, 'message': "Skipped after product addition."})
+        
         shelve_path = os.path.join(current_app.instance_path, 'shelve.db')
         
         with shelve.open(shelve_path) as db:
@@ -237,7 +270,6 @@ def save_product_form():
                 description = data.get('productDescription'),
                 type = data.get('productType'),
                 genre = data.get('productGenre'),
-                thumbnail = data.get('productThumbnail'),
                 conditions = data.get('productConditions'),
                 featured_special = data.get('isFeaturedSpecial'),
                 featured_staff = data.get('isFeaturedStaff')
@@ -245,13 +277,13 @@ def save_product_form():
 
             db[user_id] = form_data
         print('success')
-        flash("The product data was saved successfully. It can be viewed again when revisiting the 'Add Product' form, as long as you do not log out.", "success")
-        return jsonify({"message": "Product data saved successfully."}), 200
+        flash("The product data (except images) was saved successfully.<br>It can be viewed again when revisiting the 'Add Product' form, as long as you do not log out.", "success")
+        return redirect(url_for('manageProducts.products_listing'))
     
     except Exception as e:
-        flash("There was an error saving the form.", "error")
         print('failure', e)
-        return jsonify({"error": "There was an error saving the form."}), 500
+        flash("There was an error saving the form.", "error")
+        return jsonify({'error': False, 'message': "Error in saving form."})
 
 @manageProducts.route('/manage-products/update-product/<int:product_id>', methods=['GET', 'POST'])
 @login_required
@@ -259,6 +291,8 @@ def save_product_form():
 def update_product(product_id):
     product = Product.query.get_or_404(product_id)
     form = AddProductForm()
+    
+    clean_uploads_folder()
 
     if request.method == 'GET':  # Populate the form with product data for GET
         form.productName.data = product.name
@@ -350,6 +384,7 @@ def update_product(product_id):
 @role_required(2, 3)
 def delete_product():
     products = Product.query.all()
+    clean_uploads_folder()
 
     products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter = pagination(products)
 

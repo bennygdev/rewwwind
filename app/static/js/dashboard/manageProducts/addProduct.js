@@ -407,7 +407,6 @@ if (window.location.href.includes('add-product')) {
             productDescription: document.querySelector('[name="productDescription"]').value,
             productType: document.querySelector('[name="productType"]').value,
             productGenre: document.querySelector('[name="productGenre"]').value,
-            productThumbnail: document.querySelector('[name="productThumbnail"]').value,
             productConditions: conditions,
             isFeaturedSpecial: document.querySelector('[name="productIsFeaturedSpecial"]').checked,
             isFeaturedStaff: document.querySelector('[name="productIsFeaturedStaff"]').checked

@@ -38,6 +38,10 @@ def trade_Onboard():
 def trade_form():
     form = TradeItemForm()
 
+    if current_user.role_id in [2,3]:
+      flash("Admins and owners are not allowed to trade in items to avoid conflicts.\nPlease use a dummy customer account instead.", "info")
+      return redirect(url_for('auth.login'))
+
     if form.validate_on_submit():
 
         item_type = form.item_type.data

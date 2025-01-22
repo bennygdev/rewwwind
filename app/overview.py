@@ -41,14 +41,9 @@ def user_overview():
     headerValue3 = 0 # Total vouchers of customer
     # total_vouchers = current_user.vouchers.count() No vouchers yet
 
-    pending_orders = Order.query.filter_by(
-            user_id=current_user.id,
-            status='Pending'
-        ).order_by(Order.order_date.desc()).all()
+    pending_orders = Order.query.filter_by(user_id=current_user.id, status='Pending').order_by(Order.order_date.desc()).all()
         
-    pending_trades = tradeDetail.query.filter_by(
-            trade_number=current_user.id
-        ).order_by(tradeDetail.created_at.desc()).all()
+    pending_trades = tradeDetail.query.filter_by(trade_number=current_user.id).order_by(tradeDetail.created_at.desc()).all()
 
   elif current_user.role_id == 2 or current_user.role_id == 3:
     headerLabel1 = admin_label1

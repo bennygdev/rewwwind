@@ -2,8 +2,68 @@
 {% set active_page = "manage_vouchers" %}
 {% block title %}Manage Vouchers{% endblock %}
 
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/manageVouchers/vouchers.css') }}">
+{% endblock %}
+
+{% block headerContent %}
+<div class="vouchers__header">
+  <h1 id="vouchers__title">Manage Vouchers</h1>
+  <a href="{{ url_for('manageVouchers.add_voucher') }}" >Add New Voucher</a>
+</div>
+{% endblock %}
 
 {% block content %}
-<h1>Manage Vouchers</h1>
+<!-- Include flash validation -->
+{% include "components/flashValidation.html" %}
 
+<div class="vouchers">
+  <table>
+    <thead>
+      <tr>
+        <th class="voucherId">Voucher ID</th>
+        <th class="voucherCode">Code</th>
+        <th class="voucherType">Type</th>
+        <th class="voucherValue">Value</th>
+        <th class="voucherExpiry">Expiry</th>
+        <th class="voucherStatus">Status</th>
+        <th class="controls"></th>
+      </tr>
+    </thead>
+    {% for voucher in vouchers %}
+    <tr>
+      <td class="voucherId">{{ voucher.id }}</td>
+      <td class="voucherCode">{{ voucher.voucher_code }}</td>
+      <td class="voucherType">
+        {% if voucher.voucherType_id == 1 %}
+          Percentage
+        {% elif voucher.voucherType_id == 2 %}
+          Fixed Amount
+        {% else %}
+          Free Shipping
+        {% endif %}
+      </td>
+      <td class="voucherValue">
+        {% if voucher.voucherType_id == 1 %}
+          {{ voucher.discount_value }}%
+        {% elif voucher.voucherType_id == 2 %}
+          ${{ "%.2f"|format(voucher.discount_value) }}
+        {% else %}
+          Free Shipping
+        {% endif %}
+      </td>
+      <td class="voucherExpiry">{{ voucher.expiry_days }} days</td>
+      <td class="voucherStatus">
+        {{ 'Active' if voucher.is_active else 'Inactive' }}
+      </td>
+          
+      <td class="controls">
+        <a href="{{ url_for('manageVouchers.voucher_details', id=voucher.id) }}">
+          <i class="fa-solid fa-eye"></i>
+        </a>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
 {% endblock %}

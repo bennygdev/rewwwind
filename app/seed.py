@@ -1,5 +1,5 @@
 # seed.py
-from .models import Product, Category, SubCategory, Order, OrderItem, PaymentInformation, BillingAddress, db, User
+from .models import Product, Category, SubCategory, Order, OrderItem, PaymentInformation, BillingAddress, db, User, Voucher, VoucherType
 from werkzeug.security import generate_password_hash
 
 def insert_default_roles():
@@ -601,3 +601,18 @@ def insert_orders():
 
     order.update_total()
     db.session.commit()
+
+def insert_voucher_types():
+  types = [
+    VoucherType(voucher_type='percentage'),
+    VoucherType(voucher_type='fixed_amount'),
+    VoucherType(voucher_type='free_shipping')
+  ]
+    
+  for type in types:
+    existing = VoucherType.query.filter_by(voucher_type=type.voucher_type).first()
+    if not existing:
+      db.session.add(type)
+    
+  db.session.commit()
+  print("Inserted voucher types.")

@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from flask import request, flash
 from werkzeug.utils import secure_filename
-from wtforms import StringField, TextAreaField, IntegerField, DateField, FloatField, FieldList, FormField, SelectField, BooleanField, FileField, MultipleFileField, EmailField, PasswordField, RadioField, HiddenField, SubmitField
+from wtforms import StringField, TextAreaField, IntegerField, DateField, FloatField, FieldList, FormField, SelectField, BooleanField, FileField, MultipleFileField, EmailField, PasswordField, RadioField, SelectMultipleField, HiddenField, SubmitField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, Optional, NumberRange, Regexp, ValidationError
 from PIL import Image # file object validator
 from mimetypes import guess_type # file extension validator
@@ -336,3 +336,44 @@ class TradeItemForm(FlaskForm):
     
     submit = SubmitField('Submit')
     
+class VoucherForm(FlaskForm):
+  code = StringField('Voucher Code', validators=[DataRequired(), Length(min=3, max=50), Regexp(r'^[A-Za-z0-9_-]*$', message="Voucher code can only contain letters, numbers, underscores and dashes")])
+  description = TextAreaField('Description', validators=[DataRequired(), Length(max=1000)])
+  voucher_type = SelectField('Voucher Type', choices=[
+    ('percentage', 'Percentage Discount'),
+    ('fixed_amount', 'Fixed Amount Off'),
+    ('free_shipping', 'Free Shipping')
+  ], validators=[DataRequired()])
+  discount_value = FloatField('Discount Value', validators=[Optional(), NumberRange(min=0)])
+    
+  # Criteria fields
+  min_cart_amount = FloatField('Minimum Cart Amount', validators=[Optional(), NumberRange(min=0)])
+  min_cart_items = IntegerField('Minimum Cart Items', validators=[Optional(), NumberRange(min=1)])
+  first_purchase_only = BooleanField('First Purchase Only')
+  eligible_categories = SelectMultipleField('Eligible Categories', coerce=int)
+    
+  expiry_days = SelectField('Expiry Period', choices=[
+    (7, '7 Days'),
+    (14, '14 Days'),
+    (30, '30 Days'),
+    (60, '60 Days'),
+    (90, '90 Days')
+  ], coerce=int, validators=[DataRequired()])
+  submit = SubmitField('Create Voucher')
+    
+  def __init__(self, *args, **kwargs):
+    super(VoucherForm, self).__init__(*args, **kwargs)
+    # Populate categories dynamically
+    self.eligible_categories.choices = [
+      (c.id, c.category_name) for c in Category.query.all()
+    ]
+    
+  def validate_discount_value(self, field):
+    if self.voucher_type.data == 'percentage':
+      if not 0 <= field.data <= 100:
+        raise ValidationError('Percentage discount must be between 0 and 100')
+    elif self.voucher_type.data == 'fixed_amount':
+      if field.data <= 0:
+        raise ValidationError('Fixed amount discount must be greater than 0')
+    elif self.voucher_type.data == 'free_shipping':
+      field.data = 0  # No discount value needed for free shipping

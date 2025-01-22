@@ -1,0 +1,118 @@
+{% extends "dashboard/base.html" %}
+{% set active_page = "manage_vouchers" %}
+{% block title %}Add Voucher{% endblock %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/manageVouchers/voucherForm.css') }}">
+{% endblock %}
+
+{% block content %}
+<h1>Add Voucher</h1>
+
+<a href="{{ url_for('manageVouchers.vouchers_listing') }}", class="back__button--darker">Back</a>
+
+<form method="POST" class="addVoucher__Form">
+  {{ form.hidden_tag() }}
+
+  <!-- Include flash validation -->
+  {% include "components/flashValidation.html" %}
+
+  <div class="addVoucher__code">
+    {{ form.code.label }}
+    {{ form.code(class="form-control") }}
+  </div>
+  <div class="addVoucher__description">
+    {{ form.description.label }}
+    {{ form.description(class="form-control") }}
+  </div>
+  <div class="addVoucher__voucherType">
+    {{ form.voucher_type.label }}
+    {{ form.voucher_type(class="form-control") }}
+  </div>
+  <div class="addVoucher__discountValueField">
+    {{ form.discount_value.label }}
+    {{ form.discount_value(class="form-control") }}
+  </div>
+  <div class="addVoucher__criteriaSsection">
+    <h3>Voucher Criteria</h3>
+    
+    <div class="addVoucher__minCartAmount">
+        {{ form.min_cart_amount.label }}
+        {{ form.min_cart_amount() }}
+    </div>
+
+    <div class="addVoucher__minCartItems">
+        {{ form.min_cart_items.label }}
+        {{ form.min_cart_items() }}
+    </div>
+
+    <div class="addVoucher__firstPurchase">
+        {{ form.first_purchase_only() }}
+        {{ form.first_purchase_only.label }}
+    </div>
+
+    <div class="addVoucher__categoriesEligible">
+        {{ form.eligible_categories.label }}
+        {{ form.eligible_categories() }}
+        <small>Hold Ctrl/Cmd to select multiple categories</small>
+    </div>
+
+    <div class="addVoucher__expiryDays">
+      {{ form.expiry_days.label }}
+      {{ form.expiry_days() }}
+    </div>
+
+    <div class="button__wrapper">
+      {{ form.submit(class="addVoucher__button") }}
+    </div>
+</div>
+
+</form>
+{% endblock %}
+
+{% block body_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const voucherTypeSelect = document.querySelector('#voucher_type');
+    const discountValueField = document.querySelector('.addVoucher__discountValueField');
+    const discountValueInput = document.querySelector('#discount_value');
+    const discountValueLabel = discountValueField.querySelector('label');
+
+    function updateDiscountField() {
+      const selectedType = voucherTypeSelect.value;
+        
+      if (selectedType === 'free_shipping') {
+        discountValueField.style.display = 'none';
+        discountValueInput.value = '0';
+      } else {
+        discountValueField.style.display = 'block';
+        if (selectedType === 'percentage') {
+          discountValueLabel.textContent = 'Discount Percentage (%)';
+          discountValueInput.placeholder = 'Enter percentage (0-100)';
+        } else {
+          discountValueLabel.textContent = 'Discount Amount ($)';
+          discountValueInput.placeholder = 'Enter amount';
+        }
+      }
+    }
+
+    updateDiscountField();
+
+    voucherTypeSelect.addEventListener('change', updateDiscountField);
+
+    // form validation - will flash this later because too lazy to code backend
+    document.querySelector('form').addEventListener('submit', function(e) {
+      const selectedType = voucherTypeSelect.value;
+      const discountValue = parseFloat(discountValueInput.value);
+
+      if (selectedType === 'percentage' && (discountValue < 0 || discountValue > 100)) {
+        e.preventDefault();
+        alert('Percentage discount must be between 0 and 100');
+      } else if (selectedType === 'fixed_amount' && discountValue <= 0) {
+        e.preventDefault();
+        alert('Fixed amount discount must be greater than 0');
+      }
+    });
+});
+</script>
+{% endblock %}

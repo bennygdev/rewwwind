@@ -1,0 +1,31 @@
+h1 {
+  font-family: "OpenSansSemibold";
+  font-size: 1.5em;
+  margin-bottom: 30px;
+}
+
+.addVoucher__form {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.addVoucher__code {
+  width: 15vw;
+}
+
+.addVoucher__description {
+  width: 25vw;
+}
+
+.addVoucher__button {
+  width: 10vw;
+  height: 45px;
+  background-color: #039752;
+  border: 0;
+  font-family: "OpenSansSemibold";
+  color: #fff;
+  border-radius: 10px;
+  margin-top: 15px;
+}

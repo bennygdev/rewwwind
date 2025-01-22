@@ -45,7 +45,7 @@ class User(db.Model, UserMixin):
         return None
 
       return User.query.get(user_id)
-
+    
 class BillingAddress(db.Model):
   __tablename__ = 'billing_addresses'
   id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -204,6 +204,36 @@ class OrderItem(db.Model):
   quantity = db.Column(db.Integer, nullable=False)
   unit_price = db.Column(db.Numeric(10, 2), nullable=False)
 
+class Voucher(db.Model):
+  __tablename__ = 'vouchers'
+  id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+  voucher_code = db.Column(db.String(50), unique=True, nullable=False)
+  voucher_description = db.Column(db.String(1000), nullable=False)
+  voucherType_id = db.Column(db.Integer, db.ForeignKey('voucher_types.id'), nullable=False)
+  discount_value = db.Column(db.Float, nullable=False)
+  criteria = db.Column(db.JSON, nullable=False)
+  expiry_days = db.Column(db.Integer, nullable=False)  # Days until expiry after claiming
+  is_active = db.Column(db.Boolean, default=True)
+  created_at = db.Column(db.DateTime(timezone=True), default=func.now())
+  updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
+
+
+class VoucherType(db.Model):
+  __tablename__ = 'voucher_types'
+  id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+  voucher_type = db.Column(db.String(50), unique=True, nullable=False)
+  vouchers = db.relationship('Voucher', backref='voucher_types', lazy=True) # otm
+
+class UserVoucher(db.Model):
+  __tablename__ = 'user_vouchers'
+  id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+  user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+  voucher_id = db.Column(db.Integer, db.ForeignKey('vouchers.id'), nullable=False)
+  claimed_at = db.Column(db.DateTime(timezone=True), default=func.now())
+  expires_at = db.Column(db.DateTime(timezone=True), nullable=False)
+  is_used = db.Column(db.Boolean, default=False)
+  user = db.relationship('User', backref='vouchers', lazy=True)
+  voucher = db.relationship('Voucher', backref='claims', lazy=True)
 
 class Cart(db.Model):
     __tablename__ = 'cart'
@@ -234,6 +264,10 @@ class tradeDetail(db.Model):
     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
     updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
 
-
-
-
+class MailingList(db.Model):
+  __tablename__ = 'mailing_list'
+  id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+  user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+  email = db.Column(db.String(150), unique=True, nullable=False)
+  created_at = db.Column(db.DateTime(timezone=True), default=func.now())
+  updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())

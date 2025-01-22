@@ -101,6 +101,7 @@ def create_app():
   from .manageProducts import manageProducts
   from .manageVouchers import manageVouchers
   from .manageAccounts import manageAccounts
+  from .newsletter import newsletter
 
   app.register_blueprint(overview, url_prefix="/dashboard")
   app.register_blueprint(dashboard, url_prefix="/dashboard")
@@ -110,6 +111,7 @@ def create_app():
   app.register_blueprint(manageProducts, url_prefix="/dashboard")
   app.register_blueprint(manageVouchers, url_prefix="/dashboard")
   app.register_blueprint(manageAccounts, url_prefix="/dashboard")
+  app.register_blueprint(newsletter, url_prefix="/dashboard")
 
   # Product Pages
   from .productPagination import productPagination
@@ -170,7 +172,7 @@ def create_database(app):
       print('Created Database!')
       # insert_categories()
 
-      from .seed import insert_categories, insert_products, insert_users, insert_payment_types, insert_default_roles, insert_subcategories, insert_orders 
+      from .seed import insert_categories, insert_products, insert_users, insert_payment_types, insert_default_roles, insert_subcategories, insert_orders, insert_voucher_types
 
       insert_default_roles()
       insert_payment_types()
@@ -179,3 +181,4 @@ def create_database(app):
       insert_subcategories()
       insert_products()
       insert_orders()
+      insert_voucher_types()

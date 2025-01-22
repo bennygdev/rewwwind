@@ -1,0 +1,131 @@
+.vouchers__header {
+  background-color: #039752;
+  color: #fff;
+  padding: 30px 30px;
+  position: relative;
+}
+
+.vouchers__header a {
+  color: #fff;
+}
+
+.vouchers table {
+  width: 100%;
+  /* box-shadow: inset 0 0 0 1px black; */
+  border-collapse: collapse;
+  border-radius: 10px;
+  margin-top: 30px;
+}
+
+.vouchers th {
+  padding: 15px 20px;
+}
+
+.vouchers td {
+  padding: 30px 20px;
+}
+
+.vouchers td:first-child {
+  padding-left: 30px;
+}
+
+.vouchers th {
+  resize: horizontal;
+  background-color: #e6e6e6;
+}
+
+.vouchers th:first-child {
+  padding-left: 30px;
+}
+
+.vouchers tr:first-child th:first-child {
+  border-top-left-radius: 10px;
+  /* padding-left: 20px; */
+}
+
+.vouchers tr:first-child th:last-child {
+  border-top-right-radius: 10px;
+}
+
+.vouchers tr:not(:last-child) {
+  border-bottom: 1px solid rgb(175, 175, 175);
+}
+
+.vouchers td:last-child {
+  text-align: right;
+  padding-right: 30px;
+  /* border-bottom-left-radius: 10px; */
+}
+
+.vouchers tr:last-child td:last-child {
+  border-bottom-right-radius: 10px;
+
+}
+
+.vouchers tr:last-child td:first-child {
+  border-bottom-left-radius: 10px;
+}
+
+.vouchers td.controls {
+  user-select: none;
+}
+
+.vouchers td.controls i {
+  font-size: 1.2em;
+  cursor: pointer;
+}
+
+.vouchers td.controls i:not(:last-child) {
+  margin-right: 0.6em;
+}
+
+td.controls i {
+  color: #6e6e6e;
+}
+
+td.controls {
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+  align-items: center;
+}
+
+.vouchers tbody tr {
+  background-color: #eee;
+  transition: background-color 0.3s;
+  color: #6e6e6e;
+}
+
+.vouchers tbody tr:hover {
+  background-color: rgb(204, 204, 204);
+}
+
+.vouchers tbody tr:last-child:hover {
+  border-radius: 6px;
+}
+
+.vouchers tbody td:last-child i {
+  transition: color 0.3s
+}
+
+.vouchers tbody td:last-child i:first-child {
+  margin-right: 20px;
+}
+
+.vouchers tbody td:last-child i:hover {
+  color: #039752;
+  transform: color 0.3s;
+}
+
+.vouchers p {
+  margin:0;
+}
+
+.vouchers p:first-child {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.voucherId {
+  padding-left: 20px;
+}

@@ -15,20 +15,20 @@
   <div class="overview__statistics--header">
     <div class="statistic__box--header">
       <div class="overview__statistic--header">
-        <p class="statistic__label--header">Label1</p>
-        <span class="statistic__headerValue1">1</span>
+        <p class="statistic__label--header">{{ headerLabel1 }}</p>
+        <span class="statistic__headerValue1">{{ headerValue1 }}</span>
       </div>
     </div>
     <div class="statistic__box--header">
       <div class="overview__statistic--header">
-        <p class="statistic__label--header">Label2</p>
-        <span class="statistic__headerValue2">2</span>
+        <p class="statistic__label--header">{{ headerLabel2 }}</p>
+        <span class="statistic__headerValue2">{{ headerValue2 }}</span>
       </div>
     </div>
     <div class="statistic__box--header">
       <div class="overview__statistic--header">
-        <p class="statistic__label--header">Label3</p>
-        <span class="statistic__headerValue3">3</span>
+        <p class="statistic__label--header">{{ headerLabel3 }}</p>
+        <span class="statistic__headerValue3">{{ headerValue3 }}</span>
       </div>
     </div>
   </div>
@@ -36,28 +36,35 @@
 {% endblock %}
 
 {% block content %}
-<!-- Need to add logic here, to check if the user is customer, admin or owner -->
-
-<!-- {% block userOverview %}
-{% if user.role_id == 1 %}
-{% include "dashboard/customer_overview.html" %}
-{% elif user.role_id in [2, 3] %}
-{% include "dashboard/admin_overview.html" %}
-{% endif %} -->
 <div class="statistics__wrapper">
   <div class="statistics__top">
+    {% if current_user.role_id == 1 %}
     <div class="statistic__box">
       <div class="overview__statistic">
-        <div class="statistic__label">h</div>
-        <!-- Chart canvas -->
+        <div class="statistic__label">Trade-in Frequency</div>
+        <canvas id="tradeFrequencyChart"></canvas>
       </div>
     </div>
     <div class="statistic__box">
       <div class="overview__statistic">
-        <div class="statistic__label"></div>
-        <!-- Chart canvas -->
+        <div class="statistic__label">Buying Trend</div>
+        <canvas id="buyingTrendChart"></canvas>
       </div>
     </div>
+    {% elif current_user.role_id in [2, 3] %}
+    <div class="statistic__box">
+      <div class="overview__statistic">
+        <div class="statistic__label">Sales by Category</div>
+        <canvas id="categorySalesChart"></canvas>
+      </div>
+    </div>
+    <div class="statistic__box">
+      <div class="overview__statistic">
+        <div class="statistic__label">Product Sales Over Time</div>
+        <canvas id="productSalesChart"></canvas>
+      </div>
+    </div>
+    {% endif %}
   </div>
   <div class="statistics__bottom">
     <div class="statistic__box">
@@ -81,11 +88,14 @@
   </div>
 </div>
 
+{% endblock %}
 
-<!-- {% endblock %} -->
-
-<!-- method of checking here -->
-<!-- {{ user.role_id }} -->
-<!-- <h1>Dashboard overview</h1> -->
-
+{% block body_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/dashboard/overviewChart.js') }}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    window.initDashboardCharts({{ current_user.role_id }});
+  });
+</script>
 {% endblock %}

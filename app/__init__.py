@@ -93,6 +93,7 @@ def create_app():
   app.register_blueprint(chatbot, url_prefix="/")
 
   # Dashboard pages
+  from .overview import overview
   from .dashboard import dashboard
   from .manageOrders import manageOrders
   from .manageTradeins import manageTradeins
@@ -100,7 +101,8 @@ def create_app():
   from .manageProducts import manageProducts
   from .manageVouchers import manageVouchers
   from .manageAccounts import manageAccounts
-  
+
+  app.register_blueprint(overview, url_prefix="/dashboard")
   app.register_blueprint(dashboard, url_prefix="/dashboard")
   app.register_blueprint(manageOrders, url_prefix="/dashboard")
   app.register_blueprint(manageTradeins, url_prefix="/dashboard")

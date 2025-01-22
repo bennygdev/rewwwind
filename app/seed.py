@@ -562,7 +562,7 @@ def insert_orders():
   db.session.commit()
 
   billing_info = BillingAddress(
-    user_id=3,
+    user_id=4,
     address_one='123 Milky Way Drive, Arizona, #40-888, 39482',
     unit_number='1',
     postal_code='123456',
@@ -574,7 +574,7 @@ def insert_orders():
   for x in range(10):
     from datetime import datetime,timedelta
     order = Order(
-        user_id=3,
+        user_id=4,
         order_date=datetime.now()-timedelta(days=randint(20, 40)),
         total_amount=0,
         delivery='Expedited',

@@ -30,7 +30,7 @@
 .dashboard__right > .content {
   background-color: #f3f3f3;
   width: 85%;
-  min-height: 100vh;
+  min-height: calc(100vh - 80px);
   /* height: 200vh; */
   flex-direction: column;
 }

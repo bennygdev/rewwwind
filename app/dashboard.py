@@ -16,7 +16,31 @@ dashboard = Blueprint('dashboard', __name__)
 @login_required
 @role_required(1, 2, 3)
 def overview():
-  return render_template("dashboard/overview.html", user=current_user)
+  image_file = url_for('static', filename="profile_pics/" + current_user.image)
+
+  if current_user.image:
+    if current_user.image.startswith('http'):
+      image_file = current_user.image
+    else:
+      image_file = url_for('static', filename="profile_pics/" + current_user.image)
+  else:
+    image_file = url_for('static', filename='profile_pics/profile_image_default.jpg')
+
+  # Header statistics
+  customer_label1 = "Total Products Bought"
+  customer_label2 = "Total Money Spent"
+  customer_label3 = "Total Vouchers Available"
+  
+  admin_label1 = "Total Customers"
+  admin_label2 = "Total Revenue"
+  admin_label3 = "Total Orders"
+
+  # do an if statement to check role, to return the variable of the value of either admin or customer
+
+  # revenue - just sum the cost of all orders total paid
+  # but even that we're paying the trade-ins, but that wouldn't be practical since trade-ins are rewarded with store credits instead
+
+  return render_template("dashboard/overview.html", user=current_user, image_file=image_file)
 
 @dashboard.route('/profile')
 @login_required

@@ -196,8 +196,9 @@ def handle_chat_end(data):
     # Notify both parties that chat has ended
     emit('chat_ended', {
       'message': end_message,
-      'ended_by': ended_by
-    }, room=room_id)
+      'ended_by': ended_by,
+      'room_id': room_id
+    }, broadcast=True)
         
     # Clean up
     leave_room(room_id)

@@ -30,3 +30,21 @@ document.querySelector('.chat-requests').addEventListener('click', (e) => {
     window.location.href = `/dashboard/chat-room/${roomId}`;
   }
 });
+
+socket.on('connect', () => {
+  console.log('Socket connected on admin page');
+});
+
+socket.on('disconnect', () => {
+  console.log('Socket disconnected on admin page');
+});
+
+socket.on('chat_ended', (data) => {
+  console.log('Chat ended event received:', data);
+  if (data.ended_by === 'admin' || data.ended_by === 'customer') {
+      const requestCard = document.querySelector(`.chat-request-card[data-room-id="${data.room_id}"]`);
+      if (requestCard) {
+          requestCard.remove();
+      }
+  }
+});

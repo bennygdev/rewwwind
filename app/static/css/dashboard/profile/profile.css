@@ -84,8 +84,6 @@
 .orders__scroll {
   width: 100%;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
   padding-bottom: 10px; /* Space for scrollbar */
 }
 
@@ -175,23 +173,4 @@
   text-align: center;
   color: #666;
   padding: 40px 0;
-}
-
-/* Custom scrollbar styles */
-.orders__scroll::-webkit-scrollbar {
-  height: 6px;
-}
-
-.orders__scroll::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-.orders__scroll::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 3px;
-}
-
-.orders__scroll::-webkit-scrollbar-thumb:hover {
-  background: #666;
 }

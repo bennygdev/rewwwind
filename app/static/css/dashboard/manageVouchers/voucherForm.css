@@ -4,7 +4,7 @@ h1 {
   margin-bottom: 30px;
 }
 
-.addVoucher__form {
+.addVoucher__Form {
   display: flex;
   flex-direction: column;
   margin-top: 20px;
@@ -16,7 +16,31 @@ h1 {
 }
 
 .addVoucher__description {
-  width: 25vw;
+  width: 35vw;
+}
+
+.addVoucher__voucherType {
+  width: 20vw;
+}
+
+.addVoucher__discountValueField {
+  width: 15vw;
+}
+
+.addVoucher__criteriaSection {
+  margin-top: 20px;
+}
+
+.addVoucher__criteriaSection h3 {
+  font-family: "OpenSansSemibold";
+  font-size: 1.3em;
+  margin-bottom: 10px; 
+}
+
+.addVoucher__expiryDays {
+  display: flex;
+  flex-direction: column;
+  width: 15vw;
 }
 
 .addVoucher__button {

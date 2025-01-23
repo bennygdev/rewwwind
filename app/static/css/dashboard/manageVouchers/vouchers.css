@@ -9,6 +9,65 @@
   color: #fff;
 }
 
+/* Header search section */
+.extraPadding {
+  height: 14px;
+}
+
+.headerContent .search__wrapper {
+  position: absolute;
+  bottom: -24px;
+  width: 100%;
+  padding-right: 30px;
+  max-width: calc(100% - 30px);
+}
+
+.headerContent .search__container {
+  position: relative;
+  display: flex;
+  width: 100%;
+  /* max-width: calc(100% - 30px); */
+}
+
+.headerContent .search__bar {
+  width: 100%;
+  padding: 12px 40px 12px 15px;
+  border-radius: 10px;
+  background-color: #fff;
+  border: none;
+  /* border: 1px solid black; */
+}
+
+.headerContent .search__bar.focused {
+  border-radius: 8px 8px 0 0;
+  border-bottom: none;
+}
+
+.headerContent .search__button {
+  background-color: transparent;
+  padding: 12px;
+  color: #039572;
+  position: absolute;
+  right: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  border: 0;
+}
+
+.headerContent .clear__button {
+  background-color: transparent;
+  padding: 12px;
+  color: #039572;
+  position: absolute;
+  right: 25px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  border: 0;
+}
+
+/* Vouchers Table */
 .vouchers table {
   width: 100%;
   /* box-shadow: inset 0 0 0 1px black; */
@@ -128,4 +187,65 @@ td.controls {
 
 .voucherId {
   padding-left: 20px;
+}
+
+/* Pagination */
+/* Pagination */
+.vouchers__pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.vouchers__pagination ul {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  padding: 0;
+}
+
+.vouchers__pagination li {
+  display: inline-block;
+  font-family: "OpenSansSemibold";
+}
+
+.vouchers__pagination .page__button {
+  text-decoration: none;
+  padding: 8px 14px;
+  color: #039752;
+  border: 1px solid #039752;
+  border-radius: 100px;
+}
+
+.vouchers__pagination .active .page__button {
+  background-color: #039752;
+  padding: 12px 18px;
+  color: white;
+}
+
+.pageNext__button {
+  margin-left: 10px;
+}
+
+.pagePrevious__button {
+  margin-right: 10px;
+}
+
+.pageNext__button a {
+  background-color: #e6e6e6;
+  padding: 10px 20px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #000;
+}
+
+.pagePrevious__button a {
+  background-color: #e6e6e6;
+  padding: 10px 20px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #000;
 }

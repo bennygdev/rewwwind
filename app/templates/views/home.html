@@ -117,8 +117,23 @@
     </div>
   </div>
 </div>
+<div class="newsletter featured">
+  <h1>Stay Updated</h1>
+  <div class="newsletter__content">
+    <p>Subscribe to our newsletter and be the first to know about new arrivals, special offers, and exclusive deals!</p>
+    <form id="newsletter__form" method="POST" action="{{ url_for('views.home') }}" class="newsletter__form">
+      {{ mailing_list_form.hidden_tag() }}
+      <div class="form-group">
+        {{ mailing_list_form.email(id="newsletter__email", class="form-control", placeholder="Enter your email") }}
+        {{ mailing_list_form.submit(id="newsletter__submit") }}
+      </div>
+      <div id="newsletter__message" class="message"></div>
+    </form>
+  </div>
+</div>
 {% endblock %}
 
 {% block body_scripts %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/home.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/newsletter.js') }}"></script>
 {% endblock %}

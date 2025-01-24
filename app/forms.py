@@ -6,7 +6,7 @@ from wtforms import StringField, TextAreaField, IntegerField, DateField, FloatFi
 from wtforms.validators import DataRequired, Email, Length, EqualTo, Optional, NumberRange, Regexp, ValidationError
 from PIL import Image # file object validator
 from mimetypes import guess_type # file extension validator
-from .models import User, Category, SubCategory, Product
+from .models import User, Category, SubCategory, Product, MailingList
 
 # Account-related forms
 class LoginForm(FlaskForm):
@@ -392,3 +392,12 @@ class VoucherForm(FlaskForm):
   def validate_criteria_json(self, field):
     if not field.data or field.data == '[]':
       raise ValidationError('Please add at least one voucher criteria.')
+    
+class MailingListForm(FlaskForm):
+  email = EmailField('Email', validators=[DataRequired(), Email(message="Please enter a valid email address.")])
+  submit = SubmitField('Subscribe')
+
+  def validate_email(self, field):
+    existing_email = MailingList.query.filter_by(email=field.data).first()
+    if existing_email:
+      raise ValidationError('This email is already subscribed to our newsletter.')

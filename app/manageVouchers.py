@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify
+from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify, abort
 from flask_login import login_required, current_user
 from .roleDecorator import role_required
 from . import db
@@ -68,11 +68,11 @@ def add_voucher():
             
   return render_template("dashboard/manageVouchers/add_voucher.html", user=current_user, form=form)
 
-@manageVouchers.route('/manage-vouchers/view/<int:voucher_id>')
+@manageVouchers.route('/manage-vouchers/view/<int:id>')
 @login_required
 @role_required(2, 3)
-def view_voucher(voucher_id):
-  voucher = Voucher.query.get_or_404(voucher_id)
+def view_voucher(id):
+  voucher = Voucher.query.get_or_404(id)
 
   return jsonify({
     'id': voucher.id,
@@ -88,41 +88,59 @@ def view_voucher(voucher_id):
     'updated_at': voucher.updated_at.strftime('%Y-%m-%d %H:%M:%S')
   })
 
-@manageVouchers.route('/manage-vouchers/edit/<int:voucher_id>', methods=['GET', 'POST'])
+@manageVouchers.route('/manage-vouchers/edit-voucher/<int:id>', methods=['GET', 'POST'])
 @login_required
 @role_required(2, 3)
-def edit_voucher(voucher_id):
-    voucher = Voucher.query.get_or_404(voucher_id)
-    form = VoucherForm(obj=voucher)
+def edit_voucher(id):
+  voucher = Voucher.query.get_or_404(id)
+  form = VoucherForm(obj=voucher)
     
-    if form.validate_on_submit():
-        # Update voucher details
-        voucher.voucher_code = form.code.data
-        voucher.voucher_description = form.description.data
-        voucher.voucherType_id = VoucherType.query.filter_by(voucher_type=form.voucher_type.data).first().id
-        voucher.discount_value = form.discount_value.data
+  if form.validate_on_submit():
+    # Update voucher details
+    voucher.voucher_code = form.code.data
+    voucher.voucher_description = form.description.data
+    voucher.voucherType_id = VoucherType.query.filter_by(voucher_type=form.voucher_type.data).first().id
+    voucher.discount_value = form.discount_value.data
         
-        # Parse and save criteria
-        criteria = json.loads(form.criteria_json.data) if form.criteria_json.data else []
-        voucher.criteria = criteria
+    # Parse and save criteria
+    criteria = json.loads(form.criteria_json.data) if form.criteria_json.data else []
+    voucher.criteria = criteria
         
-        voucher.eligible_categories = form.eligible_categories.data
-        voucher.expiry_days = form.expiry_days.data
+    voucher.eligible_categories = form.eligible_categories.data
+    voucher.expiry_days = form.expiry_days.data
         
-        try:
-            db.session.commit()
-            flash('Voucher updated successfully!', 'success')
-            return redirect(url_for('manageVouchers.vouchers_listing'))
-        except Exception as e:
-            db.session.rollback()
-            print(e)
-            flash('An error occurred while updating the voucher.', 'error')
-    elif request.method == 'GET':
-      form.code.data = voucher.voucher_code
-      form.description.data = voucher.voucher_description
-      form.voucher_type.data = voucher.voucher_types.voucher_type
-      if voucher.eligible_categories:
-        form.eligible_categories.data = voucher.eligible_categories
+    try:
+      db.session.commit()
+      flash('Voucher updated successfully!', 'success')
+      return redirect(url_for('manageVouchers.vouchers_listing'))
+    except Exception as e:
+      db.session.rollback()
+      print(e)
+      flash('An error occurred while updating the voucher.', 'error')
+  elif request.method == 'GET':
+    form.code.data = voucher.voucher_code
+    form.description.data = voucher.voucher_description
+    form.voucher_type.data = voucher.voucher_types.voucher_type
+    if voucher.eligible_categories:
+      form.eligible_categories.data = voucher.eligible_categories
 
     
-    return render_template("dashboard/manageVouchers/edit_voucher.html", user=current_user, form=form, voucher=voucher)
+  return render_template("dashboard/manageVouchers/edit_voucher.html", user=current_user, form=form, voucher=voucher)
+
+@manageVouchers.route('/manage-vouchers/delete-voucher/<int:id>', methods=['GET', 'POST'])
+@login_required
+@role_required(2, 3)
+def delete_voucher(id):
+  selectedVoucher = Voucher.query.get_or_404(id)
+
+  if current_user.role_id == 1: # restrict customer functions
+    abort(404)
+
+  if selectedVoucher:
+    db.session.delete(selectedVoucher)
+    db.session.commit()
+    flash("Voucher deleted.", "success")
+    return redirect(url_for('manageVouchers.vouchers_listing'))
+  else:
+    flash("Invalid voucher or unauthorized access.", "error")
+    return redirect(url_for('manageVouchers.vouchers_listing'))

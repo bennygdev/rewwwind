@@ -4,6 +4,7 @@
 
 {% block styles %}
 <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/manageVouchers/vouchers.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard/accounts/deleteModal.css') }}">
 {% endblock %}
 
 {% block headerContent %}
@@ -85,9 +86,13 @@
         <a href="#">
           <i class="fa-solid fa-eye"></i>
         </a>
-        <a href="{{ url_for('manageVouchers.edit_voucher', voucher_id=voucher.id) }}">
+        <a href="{{ url_for('manageVouchers.edit_voucher', id=voucher.id) }}">
           <i class="fa-solid fa-pen"></i>
         </a>
+        <form id="deleteForm-{{ voucher.id }}" action="{{ url_for('manageVouchers.delete_voucher', id=voucher.id) }}" method="POST" onsubmit="event.preventDefault(); openDeleteModal({{ voucher.id }})">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <a id="deleteButton{{ voucher.id }}" onclick="openDeleteModal({{ voucher.id }})"><i class="fa-solid fa-trash"></i></button>
+        </form>
       </td>
     </tr>
     {% endfor %}
@@ -161,10 +166,17 @@
     </div>
   </div>
 </div>
+
+<!-- modal -->
+{% include "components/deleteModal.html" %}
 {% endblock %}
 
 <!-- js file later, since need to parse jinja variables when i do that -->
 {% block body_scripts %}
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/deleteModal.js') }}"
+></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const modal = document.getElementById('voucherDetailsModal');

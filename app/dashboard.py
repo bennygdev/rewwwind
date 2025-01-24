@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
 from flask_login import login_required, current_user
 from .forms import UpdatePersonalInformation, ChangePasswordForm, BillingAddressForm, PaymentMethodForm, ChangeEmailForm
-from .models import User, BillingAddress, PaymentInformation, PaymentType, Review, Cart, Order
+from .models import User, BillingAddress, PaymentInformation, PaymentType, Review, Cart, Order, UserVoucher
 from .roleDecorator import role_required
 from . import db
 import secrets
@@ -88,6 +88,7 @@ def delete_account():
     BillingAddress.query.filter_by(user_id=selectedUser.id).delete()
     Review.query.filter_by(user_id=selectedUser.id).delete()
     Cart.query.filter_by(user_id=selectedUser.id).delete()
+    UserVoucher.query.filter_by(user_id=selectedUser.id).delete()
 
     # No orders and tradeins since i think website should store them as safety
         

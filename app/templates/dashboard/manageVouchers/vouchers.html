@@ -82,7 +82,7 @@
       </td>
           
       <td class="controls">
-        <a href="{{ url_for('manageVouchers.voucher_details', id=voucher.id) }}">
+        <a href="#">
           <i class="fa-solid fa-eye"></i>
         </a>
       </td>
@@ -106,4 +106,140 @@
     {% endif %}
   </ul>
 </div>
+
+<!-- Voucher Details Modal -->
+<div id="voucherDetailsModal" class="voucherDetails__modal">
+  <div class="voucherModal__content">
+    <div class="voucher__header">
+      <h2>Voucher Details</h2>
+      <span class="close-modal">&times;</span>
+    </div>
+    <div class="voucherDetails__container">
+      <div class="voucher__detail">
+        <strong>Voucher ID:</strong>
+        <span id="modal__voucher--id"></span>
+      </div>
+      <div class="voucher__detail">
+        <strong>Voucher Code:</strong>
+        <span id="modal__voucher--code"></span>
+      </div>
+      <div class="voucher__detail">
+        <strong>Description:</strong>
+        <span id="modal__voucher--description"></span>
+      </div>
+      <div class="voucher__detail">
+        <strong>Type:</strong>
+        <span id="modal__voucher--type"></span>
+      </div>
+      <div class="voucher__detail">
+        <strong>Discount Value:</strong>
+        <span id="modal__voucher--value"></span>
+      </div>
+      <div class="voucher__detail">
+        <strong>Eligible Categories:</strong>
+        <span id="modal__voucher--categories"></span>
+      </div>
+      <div class="voucher__detail">
+        <strong>Expiry:</strong>
+        <span id="modal__voucher--expiry"></span>
+      </div>
+      <div class="voucher__detail">
+        <strong>Status:</strong>
+        <span id="modal__voucher--status"></span>
+      </div>
+      <div class="voucher__detail">
+        <strong>Created At:</strong>
+        <span id="modal__voucher--created"></span>
+      </div>
+      <div class="voucher__detail">
+        <strong>Criteria:</strong>
+        <pre id="modal__voucher--criteria"></pre  >
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+<!-- js file later, since need to parse jinja variables when i do that -->
+{% block body_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const modal = document.getElementById('voucherDetailsModal');
+  const closeModal = document.querySelector('.close-modal');
+  const viewButtons = document.querySelectorAll('.controls i.fa-eye');
+
+  const formatCriteria = (criteria) => {
+    if (!criteria || criteria.length === 0) return 'No specific criteria';
+    
+    const criteriaMap = {
+      'min_cart_amount': 'Minimum cart amount',
+      'min_cart_items': 'Minimum cart items',
+      'first_purchase_only': 'First purchase only'
+    };
+  
+    return criteria.map(criterion => {
+      const label = criteriaMap[criterion.type] || criterion.type;
+      
+      if (criterion.type === 'first_purchase_only') {
+        return `${label}: ${criterion.value ? 'Yes' : 'No'}`;
+      }
+      
+      return `${label}: ${criterion.value}`;
+    }).join('\n');
+  }
+
+  viewButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const voucherId = this.closest('tr').querySelector('.voucherId').textContent;
+      
+      fetch(`/dashboard/manage-vouchers/view/${voucherId}`)
+        .then(response => response.json())
+        .then(voucher => {
+          // Populate modal fields
+          document.getElementById('modal__voucher--id').textContent = voucher.id;
+          document.getElementById('modal__voucher--code').textContent = voucher.code;
+          document.getElementById('modal__voucher--description').textContent = voucher.description;
+          document.getElementById('modal__voucher--type').textContent = voucher.type;
+          
+          // Handle discount value display
+          const discountDisplay = voucher.type === 'Percentage' 
+            ? `${voucher.discount_value}%` 
+            : voucher.type === 'Fixed Amount' 
+            ? `$${voucher.discount_value}` 
+            : 'Free Shipping';
+          document.getElementById('modal__voucher--value').textContent = discountDisplay;
+          
+          document.getElementById('modal__voucher--categories').textContent = 
+            voucher.eligible_categories ? voucher.eligible_categories.join(', ') : 'N/A';
+          
+          document.getElementById('modal__voucher--expiry').textContent = `${voucher.expiry_days} days`;
+          document.getElementById('modal__voucher--status').textContent = 
+            voucher.is_active ? 'Active' : 'Inactive';
+          
+          document.getElementById('modal__voucher--created').textContent = voucher.created_at;
+          
+          // Format and display criteria
+          document.getElementById('modal__voucher--criteria').textContent = formatCriteria(voucher.criteria);
+          
+          modal.style.display = 'flex';
+        })
+        .catch(error => {
+          console.error('Error fetching voucher details:', error);
+          alert('Failed to fetch voucher details');
+        });
+    });
+  });
+
+  // Close modal when clicking on close button or outside the modal
+  closeModal.addEventListener('click', () => {
+    modal.style.display = 'none';
+  });
+
+  window.addEventListener('click', function(event) {
+    if (event.target == modal) {
+      modal.style.display = 'none';
+    }
+  });
+});
+</script>
 {% endblock %}

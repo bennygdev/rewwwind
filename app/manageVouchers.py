@@ -68,10 +68,22 @@ def add_voucher():
             
   return render_template("dashboard/manageVouchers/add_voucher.html", user=current_user, form=form)
 
-@manageVouchers.route('/manage-vouchers/voucher-details/<int:id>')
+@manageVouchers.route('/manage-vouchers/view/<int:voucher_id>')
 @login_required
 @role_required(2, 3)
-def voucher_details(id):
-  selectedVoucher = Voucher.query.get_or_404(id)
-
-  return render_template('dashboard/manageVouchers/voucher_details.html', user=current_user, selectedVoucher=selectedVoucher)
+def view_voucher(voucher_id):
+  voucher = Voucher.query.get_or_404(voucher_id)
+  
+  return jsonify({
+    'id': voucher.id,
+    'code': voucher.voucher_code,
+    'description': voucher.voucher_description,
+    'type': voucher.voucher_types.voucher_type,
+    'discount_value': str(voucher.discount_value),
+    'criteria': voucher.criteria,
+    'eligible_categories': voucher.eligible_categories,
+    'expiry_days': voucher.expiry_days,
+    'is_active': voucher.is_active,
+    'created_at': voucher.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+    'updated_at': voucher.updated_at.strftime('%Y-%m-%d %H:%M:%S')
+  })

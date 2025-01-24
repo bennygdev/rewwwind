@@ -49,6 +49,7 @@ def newsletter_page():
   subscribers = MailingList.query.all()
 
   posts_count = MailingPost.query.count()
+  recent_posts = MailingPost.query.order_by(MailingPost.created_at.desc()).limit(5).all()
     
   if form.validate_on_submit():
     if send_newsletter(form):
@@ -69,7 +70,7 @@ def newsletter_page():
 
       return redirect(url_for('newsletter.newsletter_page'))
 
-  return render_template("dashboard/newsletter/newsletter.html", user=current_user, form=form, subscribers=subscribers, posts_count=posts_count)
+  return render_template("dashboard/newsletter/newsletter.html", user=current_user, form=form, subscribers=subscribers, posts_count=posts_count, recent_posts=recent_posts)
 
 @newsletter.route('/newsletter/delete-subscriber/<int:id>', methods=['GET', 'POST'])
 @login_required

@@ -38,38 +38,38 @@
     {% include "components/flashValidation.html" %}
     
     <form method="POST" class="newsletter__form">
-        {{ form.csrf_token }}
+      {{ form.csrf_token }}
         
-        <div class="newsletter__field">
-            {{ form.title.label }}
-            {{ form.title(class="newsletter__input", placeholder="Enter newsletter title") }}
-            {% if form.title.errors %}
-                <div class="newsletter__error">
-                    {% for error in form.title.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        </div>
+      <div class="newsletter__field">
+        {{ form.title.label }}
+        {{ form.title(class="newsletter__input", placeholder="Enter newsletter title") }}
+        {% if form.title.errors %}
+          <div class="newsletter__error">
+            {% for error in form.title.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
         
-        <div class="newsletter__field">
-            {{ form.description.label }}
-            {{ form.description(class="newsletter__textarea", placeholder="Write your newsletter content here") }}
-            {% if form.description.errors %}
-                <div class="newsletter__error">
-                    {% for error in form.description.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        </div>
+      <div class="newsletter__field">
+        {{ form.description.label }}
+        {{ form.description(class="newsletter__textarea", placeholder="Write your newsletter content here") }}
+        {% if form.description.errors %}
+          <div class="newsletter__error">
+            {% for error in form.description.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
         
-        {{ form.submit(class="newsletter__submit") }}
+      {{ form.submit(class="newsletter__submit") }}
     </form>
   </div>
   <div class="newsletter__subscribers">
     <div class="newsletter__wrapper">
-      <h2 class="newsletter__subscribers--title">Subscription List</h2>
+      <p class="newsletter__subscribers--title">Subscription List</p>
       <ul class="newsletter__subscribers--list">
         {% for subscriber in subscribers %}
         <li class="newsletter__subscribers--item">
@@ -83,6 +83,32 @@
         </li>
         {% endfor %}
       </ul>
+    </div>
+  </div>
+</div>
+
+<!-- reminder: need to wrap each list tile as a link -->
+<div class="newsletter__posts">
+  <div class="posts__wrapper">
+    <div class="posts__header">
+      <p class="newsletter__posts--title">Recent Posts</p>
+      <a href="#">View All</a>
+    </div>
+    <div class="newsletter__posts--list">
+      {% for post in recent_posts %}
+      <div class="newsletter__posts--item">
+        <div class="newsletter__post--content">
+          <h3>{{ post.title }}</h3>
+          <p>{{ post.description|truncate(100) }}</p>
+          <span class="newsletter__post--date">{{ post.created_at.strftime('%B %d, %Y') }}</span>
+        </div>
+        <div class="newsletter__post--actions">
+          <a href="#" class="newsletter__post--delete">
+            <i class="fa-solid fa-trash"></i>
+          </a>
+        </div>
+      </div>
+      {% endfor %}
     </div>
   </div>
 </div>

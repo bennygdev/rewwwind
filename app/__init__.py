@@ -41,8 +41,6 @@ def create_app():
   app.config['MAIL_USE_SSL'] = True
   app.config['MAIL_USERNAME'] = os.getenv('EMAIL_USER')
   app.config['MAIL_PASSWORD'] = os.getenv('EMAIL_PASS') 
-  app.config['MAIL_USERNAME2'] = os.getenv('EMAIL_USER2')
-  app.config['MAIL_PASSWORD2'] = os.getenv('EMAIL_PASS2') 
 
   app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'media', 'uploads') # temporary image upload folder
   if not os.path.exists(app.config['UPLOAD_FOLDER']):

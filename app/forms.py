@@ -401,3 +401,8 @@ class MailingListForm(FlaskForm):
     existing_email = MailingList.query.filter_by(email=field.data).first()
     if existing_email:
       raise ValidationError('This email is already subscribed to our newsletter.')
+    
+class NewsletterForm(FlaskForm):
+  title = StringField('Newsletter Title', validators=[DataRequired(message='Title is required'), Length(min=5, max=100, message='Title must be between 5 and 100 characters')])
+  description = TextAreaField('Newsletter Content', validators=[DataRequired(message='Newsletter content is required'), Length(min=20, max=2000, message='Content must be between 20 and 2000 characters')])
+  submit = SubmitField('Send Newsletter')

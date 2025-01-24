@@ -1,0 +1,100 @@
+{% extends "dashboard/base.html" %}
+{% set active_page = "newsletter" %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/newsletter/newsletter.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard/accounts/deleteModal.css') }}">
+{% endblock %}
+
+{% block title %}Newsletter{% endblock %}
+
+{% block headerContent %}
+<div class="newsletter__header">
+  <h1 id="newsletter__title">Send Newsletter</h1>
+  <div class="newsletter__statistics">
+    <div class="statistic__box">
+      <i class="fa-solid fa-envelope fa-xl"></i>
+      <div class="newsletter__statistic">
+        <p class="statistic__label">Total Posts</p>
+        <span class="statistic__amount">{{ posts_count }}</span>
+      </div>
+    </div>
+    <div class="statistic__box">
+      <i class="fa-solid fa-users fa-xl"></i>
+      <div class="newsletter__statistic">
+        <p class="statistic__label">Total Subscribers</p>
+        <span class="statistic__amount">{{ subscribers|length }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="newsletter__container">
+  <div class="newsletter">
+    
+    <!-- Flash validation -->
+    {% include "components/flashValidation.html" %}
+    
+    <form method="POST" class="newsletter__form">
+        {{ form.csrf_token }}
+        
+        <div class="newsletter__field">
+            {{ form.title.label }}
+            {{ form.title(class="newsletter__input", placeholder="Enter newsletter title") }}
+            {% if form.title.errors %}
+                <div class="newsletter__error">
+                    {% for error in form.title.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="newsletter__field">
+            {{ form.description.label }}
+            {{ form.description(class="newsletter__textarea", placeholder="Write your newsletter content here") }}
+            {% if form.description.errors %}
+                <div class="newsletter__error">
+                    {% for error in form.description.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        {{ form.submit(class="newsletter__submit") }}
+    </form>
+  </div>
+  <div class="newsletter__subscribers">
+    <div class="newsletter__wrapper">
+      <h2 class="newsletter__subscribers--title">Subscription List</h2>
+      <ul class="newsletter__subscribers--list">
+        {% for subscriber in subscribers %}
+        <li class="newsletter__subscribers--item">
+          {{ subscriber.email }}
+          <form id="deleteForm-{{ subscriber.id }}" action="{{ url_for('newsletter.delete_subscriber', id=subscriber.id) }}" method="POST" onsubmit="event.preventDefault(); openDeleteModal({{ subscriber.id }})">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <a id="deleteButton{{ subscriber.id }}" onclick="openDeleteModal({{ subscriber.id }})"><span class="newsletter__subscribers--delete">
+              <i class="fa-solid fa-trash"></i>
+            </span></button>
+          </form>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- modal -->
+{% include "components/deleteModal.html" %}
+
+{% endblock %}
+
+{% block body_scripts %}
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/deleteModal.js') }}"
+></script>
+{% endblock %}

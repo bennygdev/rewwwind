@@ -271,3 +271,11 @@ class MailingList(db.Model):
   email = db.Column(db.String(150), unique=True, nullable=False)
   created_at = db.Column(db.DateTime(timezone=True), default=func.now())
   updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
+
+class MailingPost(db.Model):
+  __tablename__ = 'mailing_posts'
+  id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+  title = db.Column(db.String(200), nullable=False)
+  description = db.Column(db.Text, nullable=False)
+  created_at = db.Column(db.DateTime(timezone=True), default=func.now())
+  updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())

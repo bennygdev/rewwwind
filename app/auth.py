@@ -183,7 +183,7 @@ def register_step2():
 
 def send_reset_email(user):
   token = user.get_reset_token()
-  msg = Message('Password Reset Request', sender='rewwwindhelp@gmail.com', recipients=[user.email])
+  msg = Message('Password Reset Request', sender=current_app.config['MAIL_USERNAME'], recipients=[user.email])
   msg.body = f'''To reset your password, visit the following link:
   {url_for('auth.reset_token', token=token, _external=True)}
 

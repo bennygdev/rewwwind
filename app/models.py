@@ -268,7 +268,6 @@ class tradeDetail(db.Model):
 class MailingList(db.Model):
   __tablename__ = 'mailing_list'
   id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-  user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
   email = db.Column(db.String(150), unique=True, nullable=False)
   created_at = db.Column(db.DateTime(timezone=True), default=func.now())
   updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())

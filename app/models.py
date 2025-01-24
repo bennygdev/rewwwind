@@ -211,7 +211,8 @@ class Voucher(db.Model):
   voucher_description = db.Column(db.String(1000), nullable=False)
   voucherType_id = db.Column(db.Integer, db.ForeignKey('voucher_types.id'), nullable=False)
   discount_value = db.Column(db.Float, nullable=False)
-  criteria = db.Column(db.JSON, nullable=False)
+  criteria = db.Column(db.JSON, nullable=True)
+  eligible_categories = db.Column(db.JSON, nullable=True)
   expiry_days = db.Column(db.Integer, nullable=False)  # Days until expiry after claiming
   is_active = db.Column(db.Boolean, default=True)
   created_at = db.Column(db.DateTime(timezone=True), default=func.now())

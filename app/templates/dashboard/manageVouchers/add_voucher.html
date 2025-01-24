@@ -32,40 +32,50 @@
   <div class="addVoucher__discountValueField">
     {{ form.discount_value.label }}
     {{ form.discount_value(class="form-control") }}
+    {% if form.discount_value.errors %}
+      {% for error in form.discount_value.errors %}
+        <span class="text-danger">{{ error }}</span>
+      {% endfor %}
+    {% endif %}  
   </div>
   <div class="addVoucher__criteriaSection">
-    <h3>Voucher Criteria</h3>
+    <div class="criteria__header">
+      <h3>Voucher Criteria</h3>
+      <button type="button" id="addCriteriaBtn" class="addCriteria__button">+ Add Criteria</button>
+    </div>
     
-    <div class="addVoucher__minCartAmount">
-        {{ form.min_cart_amount.label }}
-        {{ form.min_cart_amount() }}
+    
+    <div id="criteriaList"></div>
+    {% if form.criteria_json.errors %}
+    <div class="text-danger">
+      {% for error in form.criteria_json.errors %}
+        <span>{{ error }}</span>
+      {% endfor %}
     </div>
+    {% endif %}
 
-    <div class="addVoucher__minCartItems">
-        {{ form.min_cart_items.label }}
-        {{ form.min_cart_items() }}
-    </div>
+  </div>
+  <div class="addVoucher__categoriesEligible">
+    {{ form.eligible_categories.label }}
+    {{ form.eligible_categories() }}
+    <small>Hold Ctrl/Cmd to select multiple categories</small>
+    {% if form.eligible_categories.errors %}
+      {% for error in form.eligible_categories.errors %}
+        <span class="text-danger">{{ error }}</span>
+      {% endfor %}
+    {% endif %}
+  </div>
 
-    <div class="addVoucher__firstPurchase">
-        {{ form.first_purchase_only() }}
-        {{ form.first_purchase_only.label }}
-    </div>
+  <div class="addVoucher__expiryDays">
+    {{ form.expiry_days.label }}
+    {{ form.expiry_days(class="form-control") }}
+  </div>
 
-    <div class="addVoucher__categoriesEligible">
-        {{ form.eligible_categories.label }}
-        {{ form.eligible_categories() }}
-        <small>Hold Ctrl/Cmd to select multiple categories</small>
-    </div>
+  <input type="hidden" id="criteria_json" name="criteria_json">
 
-    <div class="addVoucher__expiryDays">
-      {{ form.expiry_days.label }}
-      {{ form.expiry_days(class="form-control") }}
-    </div>
-
-    <div class="button__wrapper">
-      {{ form.submit(class="addVoucher__button") }}
-    </div>
-</div>
+  <div class="button__wrapper">
+    {{ form.submit(class="addVoucher__button") }}
+  </div>
 
 </form>
 {% endblock %}
@@ -73,6 +83,161 @@
 {% block body_scripts %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    const criteriaList = document.getElementById('criteriaList');
+    const addCriteriaBtn = document.getElementById('addCriteriaBtn');
+    const criteriaJsonInput = document.getElementById('criteria_json');
+
+    criteriaList.addEventListener('change', updateCriteriaJson);
+    criteriaList.addEventListener('input', updateCriteriaJson);
+      
+    // Criteria options that can be selected
+    const criteriaOptions = {
+      'min_cart_amount': 'Minimum Cart Amount',
+      'min_cart_items': 'Minimum Cart Items',
+      'first_purchase_only': 'First Purchase Only',
+    };
+
+    // Dynamic criteria field generators
+    const criteriaFieldGenerators = {
+      'min_cart_amount': () => `
+        <input type="number" step="0.01" min="0" class="form-control criteria-input" placeholder="Enter minimum cart amount">
+      `,
+      'min_cart_items': () => `
+        <input type="number" min="1" class="form-control criteria-input" placeholder="Enter minimum number of items">
+      `,
+      'first_purchase_only': () => `
+        <select class="form-control criteria-input">
+          <option value="true">Yes</option>
+          <option value="false">No</option>
+        </select>
+      `,
+    };
+
+    function generateCategoryOptions() {
+      return `
+        {% for id, name in form.category_choices %}
+          <option value="{{ id }}">{{ name }}</option>
+        {% endfor %}
+      `;
+    }
+
+    function createCriteriaDropdown(excludedOptions = []) {
+      let dropdown = '<select class="form-control criteria-type mr-2">';
+      dropdown += '<option value="">Select Criteria</option>';
+          
+      for (let [key, value] of Object.entries(criteriaOptions)) {
+        if (!excludedOptions.includes(key)) {
+           dropdown += `<option value="${key}">${value}</option>`;
+        }
+      }
+          
+      dropdown += '</select>';
+      return dropdown;
+    }
+
+    function updateCriteriaJson() {
+      const criteriaJsonInput = document.getElementById('criteria_json');
+      if (!criteriaJsonInput) return;
+    
+      const criteria = [];
+      document.querySelectorAll('.criteria-list-item').forEach(item => {
+        const type = item.querySelector('.criteria-type').value;
+        const input = item.querySelector('.criteria-input');
+            
+        // Modify condition to include empty values for non-boolean criteria
+        if (type) {
+          // Special handling for boolean criteria
+          if (type === 'first_purchase_only') {
+            if (input.value) {
+              criteria.push({
+                type: type,
+                value: input.value
+              });
+            }
+          } else {
+            // For cart amount and cart items, allow empty string
+            criteria.push({
+              type: type,
+              value: input.value
+            });
+          }
+        }
+      });
+        
+      criteriaJsonInput.value = JSON.stringify(criteria);
+    }
+
+    addCriteriaBtn.addEventListener('click', function() {
+      const existingCriteria = document.querySelectorAll('.criteria-list-item');
+    
+      if (existingCriteria.length >= 3) {
+        addCriteriaBtn.disabled = true;
+        addCriteriaBtn.classList.add('btn-disabled');
+        return;
+      }
+
+      const existingTypes = Array.from(document.querySelectorAll('.criteria-type'))
+        .map(select => select.value)
+        .filter(val => val !== '');
+
+      const listItem = document.createElement('div');
+      listItem.className = 'criteria-list-item';
+      listItem.innerHTML = `
+        ${createCriteriaDropdown(existingTypes)}
+        <div class="criteria-field-container"></div>
+        <button type="button" class="btn btn-sm btn-danger delete-criteria mr-2">Delete</button>
+        <button type="button" class="btn btn-sm btn-secondary edit-criteria">Edit</button>
+      `;
+
+      const criteriaTypeSelect = listItem.querySelector('.criteria-type');
+      const fieldContainer = listItem.querySelector('.criteria-field-container');
+      const deleteBtn = listItem.querySelector('.delete-criteria');
+      const editBtn = listItem.querySelector('.edit-criteria');
+
+      criteriaTypeSelect.addEventListener('change', function() {
+        const selectedType = this.value;
+        if (selectedType) {
+          fieldContainer.innerHTML = criteriaFieldGenerators[selectedType]();
+          updateCriteriaJson();
+        }
+      });
+
+      deleteBtn.addEventListener('click', function() {
+        listItem.remove();
+        updateCriteriaJson();
+
+        // Re-enable add criteria button when deleted
+        const remainingCriteria = document.querySelectorAll('.criteria-list-item');
+        if (remainingCriteria.length < 3) {
+          addCriteriaBtn.disabled = false;
+          addCriteriaBtn.classList.remove('btn-disabled');
+        }
+      });
+
+      criteriaList.appendChild(listItem);
+
+      editBtn.addEventListener('click', function() {
+        const currentType = criteriaTypeSelect.value;
+        const existingTypes = Array.from(document.querySelectorAll('.criteria-type'))
+          .map(select => select.value)
+          .filter(val => val !== currentType);
+
+        listItem.querySelector('.criteria-type').innerHTML = createCriteriaDropdown(existingTypes)
+          .replace('<option value="">Select Criteria</option>', '');
+        fieldContainer.innerHTML = '';
+      });
+
+      criteriaList.appendChild(listItem);
+
+      // Check if criteria count is now 3
+      const updatedCriteria = document.querySelectorAll('.criteria-list-item');
+      if (updatedCriteria.length >= 3) {
+        addCriteriaBtn.disabled = true;
+        addCriteriaBtn.classList.add('btn-disabled');
+      }
+    });
+
+    // Voucher type dynamic handling (from previous script)
     const voucherTypeSelect = document.querySelector('#voucher_type');
     const discountValueField = document.querySelector('.addVoucher__discountValueField');
     const discountValueInput = document.querySelector('#discount_value');
@@ -80,7 +245,7 @@
 
     function updateDiscountField() {
       const selectedType = voucherTypeSelect.value;
-        
+          
       if (selectedType === 'free_shipping') {
         discountValueField.style.display = 'none';
         discountValueInput.value = '0';
@@ -97,13 +262,21 @@
     }
 
     updateDiscountField();
-
     voucherTypeSelect.addEventListener('change', updateDiscountField);
 
-    // form validation - will flash this later because too lazy to code backend
+    // Form submission validation
     document.querySelector('form').addEventListener('submit', function(e) {
       const selectedType = voucherTypeSelect.value;
       const discountValue = parseFloat(discountValueInput.value);
+      const criteria = JSON.parse(criteriaJsonInput.value || '[]');
+
+      console.log(criteria)
+
+      if (criteria.length === 0) {
+        e.preventDefault();
+        alert('Please add at least one voucher criteria');
+        return;
+      }
 
       if (selectedType === 'percentage' && (discountValue < 0 || discountValue > 100)) {
         e.preventDefault();
@@ -113,6 +286,6 @@
         alert('Fixed amount discount must be greater than 0');
       }
     });
-});
+  });
 </script>
 {% endblock %}

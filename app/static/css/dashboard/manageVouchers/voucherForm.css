@@ -35,12 +35,45 @@ h1 {
   font-family: "OpenSansSemibold";
   font-size: 1.3em;
   margin-bottom: 10px; 
+  margin: 0;
+}
+
+.criteria__header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.criteria-type, .criteria-input {
+  width: 20vw;
+}
+
+.addVoucher__categoriesEligible {
+  display: flex;
+  flex-direction: column;
+  width: 10vw;
+  margin-top: 30px;
 }
 
 .addVoucher__expiryDays {
   display: flex;
   flex-direction: column;
   width: 15vw;
+}
+
+.addCriteria__button {
+  padding: 5px 10px;
+  font-size: 0.9em;
+  color: #fff;
+  background-color: #039752;
+  border: 0;
+  border-radius: 5px;
+}
+
+.btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .addVoucher__button {

@@ -347,10 +347,11 @@ class VoucherForm(FlaskForm):
   discount_value = FloatField('Discount Value', validators=[Optional(), NumberRange(min=0)])
     
   # Criteria fields
-  min_cart_amount = FloatField('Minimum Cart Amount', validators=[Optional(), NumberRange(min=0)])
-  min_cart_items = IntegerField('Minimum Cart Items', validators=[Optional(), NumberRange(min=1)])
-  first_purchase_only = BooleanField('First Purchase Only')
-  eligible_categories = SelectMultipleField('Eligible Categories', coerce=int)
+  criteria_json = StringField('Voucher Criteria')
+  # min_cart_amount = FloatField('Minimum Cart Amount', validators=[Optional(), NumberRange(min=0)])
+  # min_cart_items = IntegerField('Minimum Cart Items', validators=[Optional(), NumberRange(min=1)])
+  # first_purchase_only = BooleanField('First Purchase Only')
+  eligible_categories = SelectMultipleField('Eligible Categories')
     
   expiry_days = SelectField('Expiry Period', choices=[
     (7, '7 Days'),
@@ -365,10 +366,16 @@ class VoucherForm(FlaskForm):
     super(VoucherForm, self).__init__(*args, **kwargs)
     # Populate categories dynamically
     self.eligible_categories.choices = [
-      (c.id, c.category_name) for c in Category.query.all()
+      ('Vinyl', 'Vinyl'),
+      ('Book', 'Book')
     ]
     
   def validate_discount_value(self, field):
+    try:
+      value = float(field.data)
+    except (TypeError, ValueError):
+      raise ValidationError('Discount value must be a number')
+
     if self.voucher_type.data == 'percentage':
       if not 0 <= field.data <= 100:
         raise ValidationError('Percentage discount must be between 0 and 100')
@@ -377,3 +384,11 @@ class VoucherForm(FlaskForm):
         raise ValidationError('Fixed amount discount must be greater than 0')
     elif self.voucher_type.data == 'free_shipping':
       field.data = 0  # No discount value needed for free shipping
+
+  def validate_eligible_categories(self, field):
+    if not field.data:
+      raise ValidationError('Please select at least one eligible category.')
+
+  def validate_criteria_json(self, field):
+    if not field.data or field.data == '[]':
+      raise ValidationError('Please add at least one voucher criteria.')

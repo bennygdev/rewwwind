@@ -5,6 +5,7 @@ from . import db
 from .models import Voucher, VoucherType
 from .forms import VoucherForm
 from math import ceil
+import json
 
 manageVouchers = Blueprint('manageVouchers', __name__)
 
@@ -41,12 +42,9 @@ def add_voucher():
   form = VoucherForm()
     
   if form.validate_on_submit():
-    criteria = {
-      'min_cart_amount': form.min_cart_amount.data,
-      'min_cart_items': form.min_cart_items.data,
-      'first_purchase': form.first_purchase_only.data,
-      'eligible_categories': form.eligible_categories.data
-    }
+    print(form.criteria_json.data)
+    criteria = json.loads(form.criteria_json.data) if form.criteria_json.data else []
+    print(criteria)
         
     voucher = Voucher(
       voucher_code=form.code.data,
@@ -54,6 +52,7 @@ def add_voucher():
       voucherType_id=VoucherType.query.filter_by(voucher_type=form.voucher_type.data).first().id,
       discount_value=form.discount_value.data,
       criteria=criteria,
+      eligible_categories=form.eligible_categories.data,
       expiry_days=form.expiry_days.data
     )
         

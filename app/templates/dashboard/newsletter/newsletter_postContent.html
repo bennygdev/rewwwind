@@ -27,13 +27,14 @@
   </div>
 
   <div class="newsletter__post-actions">
-    <a href="{{ url_for('newsletter.newsletter_page') }}" class="back__button">
-      <i class="fa-solid fa-arrow-left"></i> Back to Newsletter
-    </a>
+    {% include "components/backButton.html" %}
   </div>
 </div>
 {% endblock %}
 
 {% block body_scripts %}
-
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/backButton.js') }}"
+></script>
 {% endblock %}

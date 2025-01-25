@@ -47,6 +47,7 @@ def send_newsletter(form):
 @role_required(2, 3)
 def newsletter_page():
   form = NewsletterForm()
+  subscribers_count = MailingList.query.count()
   
   # Pagination and search
   page = request.args.get('page', 1, type=int)
@@ -96,7 +97,7 @@ def newsletter_page():
     total_pages=total_pages, 
     current_page=page, 
     search_query=search_query,
-    total_subscribers=total_subscribers
+    subscribers_count=subscribers_count
   )
 
 @newsletter.route('/newsletter/delete-subscriber/<int:id>', methods=['GET', 'POST'])
@@ -126,6 +127,32 @@ def newsletter_post_content(id):
 
   return render_template("dashboard/newsletter/newsletter_postContent.html", user=current_user, post=post)
 
+@newsletter.route('/newsletter/all-posts', methods=['GET', 'POST'])
+@login_required
+@role_required(2, 3)
+def newsletter_all_posts():
+    posts = MailingPost.query.order_by(MailingPost.created_at.desc()).all()
+
+    # pagination
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+
+    # search logic
+    search_query = request.args.get('q', '', type=str)
+
+    if search_query:
+      posts_query = MailingPost.query.filter(MailingPost.title.ilike(f"%{search_query}%"))
+    else:
+      posts_query = MailingPost.query
+
+    # pagination logic
+    total_posts = posts_query.count()
+    posts = posts_query.order_by(MailingPost.created_at.desc()).paginate(page=page, per_page=per_page)
+
+    total_pages = ceil(total_posts / per_page)
+
+    return render_template("dashboard/newsletter/newsletter_posts.html", posts=posts, total_pages=total_pages, current_page=page, search_query=search_query)
+
 @newsletter.route('/newsletter/delete-post/<int:id>', methods=['GET', 'POST'])
 @login_required
 @role_required(2, 3)
@@ -139,7 +166,7 @@ def delete_post(id):
     db.session.delete(selected_post)
     db.session.commit()
     flash("Post deleted.", "success")
-    return redirect(url_for('newsletter.newsletter_page'))
+    return redirect(url_for('newsletter.newsletter_all_posts'))
   else:
     flash("Invalid subscriber or unauthorized access.", "error")
-    return redirect(url_for('newsletter.newsletter_page'))
+    return redirect(url_for('newsletter.newsletter_all_posts'))

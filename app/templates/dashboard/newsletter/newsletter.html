@@ -22,7 +22,7 @@
       <i class="fa-solid fa-users fa-xl"></i>
       <div class="newsletter__statistic">
         <p class="statistic__label">Total Subscribers</p>
-        <span class="statistic__amount">{{ total_subscribers }}</span>
+        <span class="statistic__amount">{{ subscribers_count }}</span>
       </div>
     </div>
   </div>
@@ -127,7 +127,7 @@
   <div class="posts__wrapper">
     <div class="posts__header">
       <p class="newsletter__posts--title">Recent Posts</p>
-      <a href="#">View All</a>
+      <a href="{{ url_for('newsletter.newsletter_all_posts') }}">View All</a>
     </div>
     <div class="newsletter__posts--list">
       {% for post in recent_posts %}

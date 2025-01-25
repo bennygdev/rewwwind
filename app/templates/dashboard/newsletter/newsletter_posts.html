@@ -1,9 +1,10 @@
 {% extends "dashboard/base.html" %}
 {% set active_page = "newsletter" %}
-{% block title %}Newsletter Posts{% endblock %}
+{% block title %}All Newsletter Posts{% endblock %}
 
 {% block styles %}
-<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/newsletter/newsletter.css') }}">
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/newsletter/newsletter_posts.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard/accounts/deleteModal.css') }}">
 {% endblock %}
 
 {% block headerContent %}
@@ -11,9 +12,88 @@
 {% endblock %}
 
 {% block content %}
+<h1 class="newsletter__title">All Posts</h1>
+
+<a href="{{ url_for('newsletter.newsletter_page') }}" class="back__button--darker">Back</a>
+
+<!-- Flash validation -->
+{% include "components/flashValidation.html" %}
+
+<div class="search__wrapper">
+  <form method="get" action="{{ url_for('newsletter.newsletter_all_posts') }}">
+    <div class="search__container">
+      <input
+        type="text"
+        name="q"
+        id="search__bar"
+        class="search__bar"
+        placeholder="Search by title..."
+        value="{{ search_query }}"
+        autocomplete="off"
+      >
+      <button type="submit" class="search__button" id="search__button">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </button>
+      {% if search_query %}
+        <a href="{{ url_for('newsletter.newsletter_all_posts') }}" class="clear__button">
+          <i class="fa-solid fa-xmark fa-lg"></i>
+        </a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+
+<div class="newsletter__posts">
+  <div class="posts__wrapper">
+    <div class="newsletter__posts--list">
+      {% for post in posts %}
+      <div class="newsletter__posts--item">
+        <div class="newsletter__post--content">
+          <a href="{{ url_for('newsletter.newsletter_post_content', id=post.id) }}">
+            <h3>{{ post.title }}</h3>
+          </a>
+          <p>{{ post.description|truncate(200) }}</p>
+          <span class="newsletter__post--date">{{ post.created_at.strftime('%B %d, %Y') }}</span>
+        </div>
+        <div class="newsletter__post--actions">
+          <form id="deleteForm-{{ post.id }}" action="{{ url_for('newsletter.delete_post', id=post.id) }}" method="POST" onsubmit="event.preventDefault(); openDeleteModal({{ post.id }})">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <a id="deleteButton{{ post.id }}" onclick="openDeleteModal({{ post.id }})"><span class="newsletter__post--delete">
+              <i class="fa-solid fa-trash"></i>
+            </span>
+            </a>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="posts__pagination">
+  <ul>
+    {% if current_page > 1 %}
+    <li class="pagePrevious__button"><a href="{{ url_for('newsletter.newsletter_all_posts', page=current_page-1, q=search_query) }}">Previous</a></li>
+    {% endif %}
+    {% for p in range(1, total_pages + 1) %}
+    <li class="{% if p == current_page %}active{% endif %}">
+      <a href="{{ url_for('newsletter.newsletter_all_posts', page=p, q=search_query) }}" class="page__button">{{ p }}</a>
+    </li>
+    {% endfor %}
+    {% if current_page < total_pages %}
+    <li class="pageNext__button"><a href="{{ url_for('newsletter.newsletter_all_posts', page=current_page+1, q=search_query) }}">Next</a></li>
+    {% endif %}
+  </ul>
+</div>
+
+<!-- modal -->
+{% include "components/deleteModal.html" %}
 
 {% endblock %}
 
 {% block body_scripts %}
-
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/deleteModal.js') }}"
+></script>
 {% endblock %}

@@ -39,8 +39,24 @@ def create_app():
   app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
   app.config['MAIL_PORT'] = 465
   app.config['MAIL_USE_SSL'] = True
-  app.config['MAIL_USERNAME'] = os.getenv('EMAIL_USER')
-  app.config['MAIL_PASSWORD'] = os.getenv('EMAIL_PASS') 
+  # app.config['MAIL_USERNAME'] = os.getenv('EMAIL_USER')
+  # app.config['MAIL_PASSWORD'] = os.getenv('EMAIL_PASS') 
+
+  def update_mail_config(email_type='default'):
+    if email_type == 'auth':
+      app.config['MAIL_USERNAME'] = os.getenv('EMAIL_USER')
+      app.config['MAIL_PASSWORD'] = os.getenv('EMAIL_PASS')
+    elif email_type == 'newsletter':
+      app.config['MAIL_USERNAME'] = os.getenv('EMAIL_USER2')
+      app.config['MAIL_PASSWORD'] = os.getenv('EMAIL_PASS2')
+    else:
+      # Default fallback
+      app.config['MAIL_USERNAME'] = os.getenv('EMAIL_USER')
+      app.config['MAIL_PASSWORD'] = os.getenv('EMAIL_PASS')
+
+    mail.init_app(app)
+
+  app.config['UPDATE_MAIL_CONFIG'] = update_mail_config
 
   app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'media', 'uploads') # temporary image upload folder
   if not os.path.exists(app.config['UPLOAD_FOLDER']):
@@ -55,7 +71,7 @@ def create_app():
 
   db.init_app(app)
   csrf.init_app(app)
-  mail.init_app(app)
+  # mail.init_app(app)
 
   migrate.init_app(app, db)  # Initialize Flask-Migrate
 

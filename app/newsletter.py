@@ -15,6 +15,8 @@ newsletter = Blueprint('newsletter', __name__)
 # Newsletter page
 
 def send_newsletter(form):
+  current_app.config['UPDATE_MAIL_CONFIG']('newsletter')
+
   mailing_list = MailingList.query.all()
   mailing_count = MailingList.query.count()
     
@@ -28,7 +30,7 @@ def send_newsletter(form):
     # Create message
     msg = Message(
       subject=form.title.data, 
-      sender=('Rewwwind', 'rewwwindmail@gmail.com'),
+      sender=('Rewwwind Mail', current_app.config['MAIL_USERNAME']),
       bcc=recipients,
       body=form.description.data
     )

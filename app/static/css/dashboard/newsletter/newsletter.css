@@ -168,6 +168,15 @@
 .newsletter__subscribers--item:hover {
   background-color: #f5f5f5;
 }
+
+.newsletter__posts--item .newsletter__post--content a {
+  font-family: "OpenSansSemibold";
+  color: #039752;
+}
+
+.newsletter__post--actions a {
+  margin-right: 10px;
+}
   
 .newsletter__subscribers--delete {
   color: #dc3545;

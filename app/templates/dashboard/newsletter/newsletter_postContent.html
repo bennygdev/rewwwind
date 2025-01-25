@@ -1,9 +1,9 @@
 {% extends "dashboard/base.html" %}
 {% set active_page = "newsletter" %}
-{% block title %}Newsletter Post Content{% endblock %}
+{% block title %}Newsletter Post{% endblock %}
 
 {% block styles %}
-<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/newsletter/newsletter.css') }}">
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/newsletter/newsletter_postContent.css') }}">
 {% endblock %}
 
 {% block headerContent %}
@@ -11,7 +11,27 @@
 {% endblock %}
 
 {% block content %}
+<div class="newsletter__post-full">
+  <div class="newsletter__post-header">
+    <h1 class="newsletter__post-title">{{ post.title }}</h1>
+    <div class="newsletter__post-meta">
+      <span class="newsletter__post-date">
+        <i class="fa-solid fa-calendar"></i> 
+        {{ post.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+      </span>
+    </div>
+  </div>
 
+  <div class="newsletter__post-content-full">
+    {{ post.description|safe }}
+  </div>
+
+  <div class="newsletter__post-actions">
+    <a href="{{ url_for('newsletter.newsletter_page') }}" class="back__button">
+      <i class="fa-solid fa-arrow-left"></i> Back to Newsletter
+    </a>
+  </div>
+</div>
 {% endblock %}
 
 {% block body_scripts %}

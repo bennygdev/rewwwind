@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
+from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app, abort
 from flask_login import login_required, current_user
 from flask_mail import Message
 from .models import MailingList, MailingPost
@@ -105,10 +105,40 @@ def newsletter_page():
 def delete_subscriber(id):
   selected_subscriber = MailingList.query.get_or_404(id)
 
+  if current_user.role_id == 1: # restrict customer functions
+    abort(404)
+
   if selected_subscriber:
     db.session.delete(selected_subscriber)
     db.session.commit()
     flash("Subscriber deleted.", "success")
+    return redirect(url_for('newsletter.newsletter_page'))
+  else:
+    flash("Invalid subscriber or unauthorized access.", "error")
+    return redirect(url_for('newsletter.newsletter_page'))
+  
+  
+@newsletter.route('/newsletter/post/<int:id>', methods=['GET'])
+@login_required
+@role_required(2, 3)
+def newsletter_post_content(id):
+  post = MailingPost.query.get_or_404(id)
+
+  return render_template("dashboard/newsletter/newsletter_postContent.html", user=current_user, post=post)
+
+@newsletter.route('/newsletter/delete-post/<int:id>', methods=['GET', 'POST'])
+@login_required
+@role_required(2, 3)
+def delete_post(id):
+  selected_post = MailingPost.query.get_or_404(id)
+
+  if current_user.role_id == 1: # restrict customer functions
+    abort(404)
+
+  if selected_post:
+    db.session.delete(selected_post)
+    db.session.commit()
+    flash("Post deleted.", "success")
     return redirect(url_for('newsletter.newsletter_page'))
   else:
     flash("Invalid subscriber or unauthorized access.", "error")

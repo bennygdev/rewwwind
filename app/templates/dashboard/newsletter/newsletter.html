@@ -133,14 +133,11 @@
       {% for post in recent_posts %}
       <div class="newsletter__posts--item">
         <div class="newsletter__post--content">
-          <h3>{{ post.title }}</h3>
+          <a href="{{ url_for('newsletter.newsletter_post_content', id=post.id) }}">
+            <h3>{{ post.title }}</h3>
+          </a>
           <p>{{ post.description|truncate(100) }}</p>
           <span class="newsletter__post--date">{{ post.created_at.strftime('%B %d, %Y') }}</span>
-        </div>
-        <div class="newsletter__post--actions">
-          <a href="#" class="newsletter__post--delete">
-            <i class="fa-solid fa-trash"></i>
-          </a>
         </div>
       </div>
       {% endfor %}

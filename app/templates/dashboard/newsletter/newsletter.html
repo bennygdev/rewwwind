@@ -1,12 +1,11 @@
 {% extends "dashboard/base.html" %}
 {% set active_page = "newsletter" %}
+{% block title %}Newsletter{% endblock %}
 
 {% block styles %}
 <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/newsletter/newsletter.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard/accounts/deleteModal.css') }}">
 {% endblock %}
-
-{% block title %}Newsletter{% endblock %}
 
 {% block headerContent %}
 <div class="newsletter__header">
@@ -23,7 +22,7 @@
       <i class="fa-solid fa-users fa-xl"></i>
       <div class="newsletter__statistic">
         <p class="statistic__label">Total Subscribers</p>
-        <span class="statistic__amount">{{ subscribers|length }}</span>
+        <span class="statistic__amount">{{ total_subscribers }}</span>
       </div>
     </div>
   </div>
@@ -69,7 +68,43 @@
   </div>
   <div class="newsletter__subscribers">
     <div class="newsletter__wrapper">
-      <p class="newsletter__subscribers--title">Subscription List</p>
+      <div class="subscriber__header">
+        <p class="newsletter__subscribers--title">Subscription List</p>
+        <div class="subscribers__pagination">
+          <ul>
+            {% if current_page > 1 %}
+            <li class="pagePrevious__button">
+              <a href="{{ url_for('newsletter.newsletter_page', page=current_page-1, q=search_query) }}">Previous</a>
+            </li>
+            {% endif %}
+            {% for p in range(1, total_pages + 1) %}
+            <li class="{% if p == current_page %}active{% endif %}">
+              <a href="{{ url_for('newsletter.newsletter_page', page=p, q=search_query) }}" class="page__button">{{ p }}</a>
+            </li>
+            {% endfor %}
+            {% if current_page < total_pages %}
+            <li class="pageNext__button">
+              <a href="{{ url_for('newsletter.newsletter_page', page=current_page+1, q=search_query) }}">Next</a>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+
+      <form method="get" action="{{ url_for('newsletter.newsletter_page') }}" class="newsletter__search">
+        <div class="search__container">
+          <input type="text" name="q" class="search__bar" placeholder="Search by email..." value="{{ search_query }}" autocomplete="off">
+          <button type="submit" class="search__button">
+            <i class="fa-solid fa-magnifying-glass fa-sm"></i>
+          </button>
+          {% if search_query %}
+            <a href="{{ url_for('newsletter.newsletter_page') }}" class="clear__button">
+              <i class="fa-solid fa-xmark fa-md"></i>
+            </a>
+          {% endif %}
+        </div>
+      </form>
+
       <ul class="newsletter__subscribers--list">
         {% for subscriber in subscribers %}
         <li class="newsletter__subscribers--item">

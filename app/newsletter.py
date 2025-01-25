@@ -5,6 +5,7 @@ from .models import MailingList, MailingPost
 from .forms import NewsletterForm
 from .roleDecorator import role_required
 from . import db, mail
+from math import ceil
 from dotenv import load_dotenv
 import os
 
@@ -46,7 +47,22 @@ def send_newsletter(form):
 @role_required(2, 3)
 def newsletter_page():
   form = NewsletterForm()
-  subscribers = MailingList.query.all()
+  
+  # Pagination and search
+  page = request.args.get('page', 1, type=int)
+  per_page = 10
+    
+  # Search logic
+  search_query = request.args.get('q', '', type=str)
+  if search_query:
+    subscribers_query = MailingList.query.filter(MailingList.email.ilike(f"%{search_query}%"))
+  else:
+    subscribers_query = MailingList.query
+    
+  # Pagination
+  total_subscribers = subscribers_query.count()
+  subscribers = subscribers_query.order_by(MailingList.id).paginate(page=page, per_page=per_page)
+  total_pages = ceil(total_subscribers / per_page)
 
   posts_count = MailingPost.query.count()
   recent_posts = MailingPost.query.order_by(MailingPost.created_at.desc()).limit(5).all()
@@ -70,7 +86,18 @@ def newsletter_page():
 
       return redirect(url_for('newsletter.newsletter_page'))
 
-  return render_template("dashboard/newsletter/newsletter.html", user=current_user, form=form, subscribers=subscribers, posts_count=posts_count, recent_posts=recent_posts)
+  return render_template(
+    "dashboard/newsletter/newsletter.html", 
+    user=current_user, 
+    form=form, 
+    subscribers=subscribers, 
+    posts_count=posts_count, 
+    recent_posts=recent_posts, 
+    total_pages=total_pages, 
+    current_page=page, 
+    search_query=search_query,
+    total_subscribers=total_subscribers
+  )
 
 @newsletter.route('/newsletter/delete-subscriber/<int:id>', methods=['GET', 'POST'])
 @login_required

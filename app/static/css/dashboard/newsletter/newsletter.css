@@ -77,7 +77,7 @@
   border: 1px solid #e0e0e0;
   border-radius: 10px;
   padding: 15px 20px;
-  height: 400px;
+  height: 460px;
   width: 30vw;
   /* overflow-y: auto; */
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -93,8 +93,56 @@
 .newsletter__subscribers--title {
   font-size: 1.2em;
   margin-bottom: 10px;
+  /* border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 15px; */
+}
+
+.subscriber__header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   border-bottom: 1px solid #e0e0e0;
-  padding-bottom: 15px;
+  /* padding-bottom: 15px; */
+  margin-bottom: 10px;
+}
+
+.newsletter__wrapper .search__container {
+  position: relative;
+  display: flex;
+  width: 100%;
+  margin-bottom: 10px;
+  /* border-bottom: 1px solid #e0e0e0; */
+}
+
+.newsletter__wrapper .search__bar {
+  width: 100%;
+  padding: 6px 40px 6px 15px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+.newsletter__wrapper .search__button {
+  background-color: transparent;
+  padding: 12px;
+  color: #039572;
+  position: absolute;
+  right: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  border: 0;
+}
+
+.newsletter__wrapper .clear__button {
+  background-color: transparent;
+  padding: 12px;
+  color: #039572;
+  position: absolute;
+  right: 25px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  border: 0;
 }
   
 .newsletter__subscribers--list {
@@ -113,6 +161,10 @@
   transition: background-color 0.2s;
 }
 
+.newsletter__subscribers--item:first-child {
+  border-top: 1px solid #f0f0f0;
+}
+
 .newsletter__subscribers--item:hover {
   background-color: #f5f5f5;
 }
@@ -129,6 +181,52 @@
   opacity: 1;
 }
 
+/* Subscribers pagination */
+.subscribers__pagination ul {
+  list-style: none;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.subscribers__pagination li {
+  display: inline-block;
+  font-family: "OpenSansSemibold";
+}
+
+.subscribers__pagination .page__button {
+  text-decoration: none;
+  font-size: 0.9em;
+  padding: 6px 11px;
+  color: #039752;
+  border: 1px solid #039752;
+  border-radius: 100px;
+}
+
+.subscribers__pagination .active .page__button {
+  background-color: #039752;
+  color: white;
+}
+
+.pageNext__button, .pagePrevious__button {
+  font-size: 0.9em;
+}
+
+.pageNext__button {
+  margin-left: 10px;
+}
+
+.pageNext__button a {
+  color: #039752;
+}
+
+.pagePrevious__button {
+  margin-right: 10px;
+}
+
+.pagePrevious__button a {
+  color: #039752;
+}
 
 /* Newsletter form */
 .newsletter__form {

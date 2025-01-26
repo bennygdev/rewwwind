@@ -222,6 +222,10 @@ img#mini_profile_img {
   opacity: 0.8;
 }
 
+.offcanvas__link--active {
+  color: #039752;
+}
+
 .offcanvas-nav__extra a {
   color: #039752;
 }

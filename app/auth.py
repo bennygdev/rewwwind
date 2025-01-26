@@ -185,14 +185,26 @@ def send_reset_email(user):
   current_app.config['UPDATE_MAIL_CONFIG']('auth')
 
   token = user.get_reset_token()
-  msg = Message('Password Reset Request', sender=('Rewwwind Help', current_app.config['MAIL_USERNAME']), recipients=[user.email])
-  msg.body = f'''To reset your password, visit the following link:
-  {url_for('auth.reset_token', token=token, _external=True)}
 
+  reset_link = url_for('auth.reset_token', token=token, _external=True)
+
+  personalized_body = f'''To reset your password, visit the following link:
+  <a href='{reset_link}'>Reset Password</a>
+
+  <br><br>
   The link will expire in 30 minutes.
 
+  <br><br>
   If you did not make this request then simply ignore this email and no changes will be made.
   '''
+
+  msg = Message(
+    'Password Reset Request', 
+    sender=('Rewwwind Help', current_app.config['MAIL_USERNAME']), 
+    recipients=[user.email],
+    body=personalized_body,
+    html=personalized_body
+  )
   mail.send(msg)
 
 @auth.route('/reset-password', methods=['GET', 'POST'])

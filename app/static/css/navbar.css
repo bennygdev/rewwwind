@@ -282,7 +282,7 @@ img#mini_profile_img {
   border-bottom-right-radius: 10px;
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1160px) {
   .nav__left--links {
     gap: 20px;
   }
@@ -292,7 +292,8 @@ img#mini_profile_img {
   }
 }
 
-@media (max-width: 1024px) {
+/* Around tablet sizing */
+@media (max-width: 1088px) {
   nav {
     width: auto;
     padding: 10px 30px;

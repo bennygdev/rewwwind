@@ -14,18 +14,21 @@
   </div>
   <div class="overview__statistics--header">
     <div class="statistic__box--header">
+      <i class="fa-solid fa-users fa-xl"></i>
       <div class="overview__statistic--header">
         <p class="statistic__label--header">{{ headerLabel1 }}</p>
         <span class="statistic__headerValue1">{{ headerValue1 }}</span>
       </div>
     </div>
     <div class="statistic__box--header">
+      <i class="fa-solid fa-money-bill fa-xl"></i>
       <div class="overview__statistic--header">
         <p class="statistic__label--header">{{ headerLabel2 }}</p>
         <span class="statistic__headerValue2">{{ headerValue2 }}</span>
       </div>
     </div>
     <div class="statistic__box--header">
+      <i class="fa-solid fa-box fa-xl"></i>
       <div class="overview__statistic--header">
         <p class="statistic__label--header">{{ headerLabel3 }}</p>
         <span class="statistic__headerValue3">{{ headerValue3 }}</span>
@@ -54,8 +57,9 @@
     {% elif current_user.role_id in [2, 3] %}
     <div class="statistic__box">
       <div class="overview__statistic">
-        <div class="statistic__label">Sales by Category</div>
-        <canvas id="categorySalesChart"></canvas>
+        <div class="statistic__label">Weekly Sign-ups</div>
+        <canvas id="weeklySignupsChart"></canvas>
+        <!-- <canvas id="categorySalesChart"></canvas> -->
       </div>
     </div>
     <div class="statistic__box">
@@ -147,7 +151,8 @@
     <!-- Empty for now, will add admin charts later -->
     <div class="statistic__box">
       <div class="overview__statistic">
-        <div class="statistic__label">Total vouchers used</div>
+        <div class="statistic__label">Sales By Category</div>
+        <canvas id="categorySalesChart"></canvas>
       </div>
     </div>
     {% endif %}

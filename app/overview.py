@@ -158,6 +158,24 @@ def get_product_sales():
     'data': [sale[1] for sale in sales] if sales else []
   }
 
+@overview.route('/api/admin/weekly-signups')
+@login_required
+@role_required(2, 3)
+def get_weekly_signups():
+  # Get user registrations grouped by week
+  signup_data = db.session.query(
+    func.strftime('%Y-%W', User.created_at).label('week'),
+    func.count(User.id).label('count')
+  ).group_by(
+    func.strftime('%Y-%W', User.created_at)
+  ).order_by(
+    func.strftime('%Y-%W', User.created_at)
+  ).all()
+    
+  return {
+    'labels': [signup[0] for signup in signup_data] if signup_data else [],
+    'data': [signup[1] for signup in signup_data] if signup_data else []
+  }
 
 @overview.route('/api/customer/top-categories')
 @login_required

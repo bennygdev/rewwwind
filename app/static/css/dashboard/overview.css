@@ -33,22 +33,42 @@
 .overview__statistics--header {
   position: absolute;
   width: calc(100% - 30px);
+  padding-right: 30px;
   display: flex;
   flex-direction: row;
-  gap: 80px;
+  gap: 40px;
   margin-top: 15px;
-  bottom: -38px;
+  bottom: -40px;
 }
 
 .statistic__box--header {
   display: flex;
-  width: 20%;
+  width: 33%;
   flex-direction: row;
   align-items: center;
   gap: 20px;
   background-color: #fff;
-  padding: 6px 20px;
+  padding: 15px 25px;
   border-radius: 15px;
+}
+
+.statistic__label--header {
+  margin: 0;
+  font-family: "OpenSansSemibold";
+  font-size: 0.9em;
+  color: #039752;
+}
+
+.overview__statistic--header span {
+  font-family: "OpenSansBold";
+  font-size: 1.5em;
+  margin: 0;
+  line-height: 28px;
+  color: #039752;
+}
+
+.statistic__box--header i {
+  color: #039752;
 }
 
 .statistics__top, .statistics__bottom {

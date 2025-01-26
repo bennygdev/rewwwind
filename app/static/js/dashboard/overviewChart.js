@@ -63,6 +63,7 @@ function initializeCharts(roleId) {
     createChart('buyingTrendChart', '/dashboard/api/customer/buying-trend', 'bar', 'Orders');
     createChart('topCategoriesChart', '/dashboard/api/customer/top-categories', 'pie', 'Purchase Categories');
   } else if (roleId === 2 || roleId === 3) {
+    createChart('weeklySignupsChart', '/dashboard/api/admin/weekly-signups', 'line', 'Weekly Sign-ups');
     createChart('categorySalesChart', '/dashboard/api/admin/category-sales', 'pie', 'Sales by Category');
     createChart('productSalesChart', '/dashboard/api/admin/product-sales', 'line', 'Monthly Sales');
   }

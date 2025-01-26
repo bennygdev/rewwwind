@@ -269,6 +269,7 @@ class MailingList(db.Model):
   __tablename__ = 'mailing_list'
   id = db.Column(db.Integer, primary_key=True, autoincrement=True)
   email = db.Column(db.String(150), unique=True, nullable=False)
+  unsubscribe_token = db.Column(db.String(100), unique=True, nullable=True)
   created_at = db.Column(db.DateTime(timezone=True), default=func.now())
   updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
 

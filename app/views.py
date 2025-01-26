@@ -8,9 +8,12 @@ from .models import Product, tradeDetail, MailingList
 from . import db
 from datetime import timedelta
 from sqlalchemy import func
-
+from secrets import token_urlsafe
 
 views = Blueprint('views', __name__)
+
+def generate_unsubscribe_token():
+  return token_urlsafe(16)
 
 @views.route('/', methods=['GET', 'POST'])
 def home():
@@ -33,7 +36,10 @@ def home():
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
       if mailing_list_form.validate():
         try:
-          new_subscriber = MailingList(email=mailing_list_form.email.data)
+          new_subscriber = MailingList(
+            email=mailing_list_form.email.data,
+            unsubscribe_token=generate_unsubscribe_token()
+          )
           db.session.add(new_subscriber)
           db.session.commit()
           return jsonify({'success': True})
@@ -49,7 +55,10 @@ def home():
       
     # fallback for non ajax
     if mailing_list_form.validate_on_submit():
-      new_subscriber = MailingList(email=mailing_list_form.email.data)
+      new_subscriber = MailingList(
+        email=mailing_list_form.email.data,
+        unsubscribe_token=generate_unsubscribe_token()
+      )
       db.session.add(new_subscriber)
       db.session.commit()
 

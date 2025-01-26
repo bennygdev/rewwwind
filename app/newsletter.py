@@ -1,10 +1,11 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app, abort
+from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app, abort, jsonify
 from flask_login import login_required, current_user
 from flask_mail import Message
 from .models import MailingList, MailingPost
 from .forms import NewsletterForm
 from .roleDecorator import role_required
 from . import db, mail
+from .views import generate_unsubscribe_token
 from math import ceil
 from dotenv import load_dotenv
 import os
@@ -27,16 +28,35 @@ def send_newsletter(form):
     return False
     
   try:
-    # Create message
-    msg = Message(
-      subject=form.title.data, 
-      sender=('Rewwwind Mail', current_app.config['MAIL_USERNAME']),
-      bcc=recipients,
-      body=form.description.data
-    )
+    for subscriber in mailing_list:
+      if not subscriber.unsubscribe_token:
+        subscriber.unsubscribe_token = generate_unsubscribe_token()
+      
+      unsubscribe_link = url_for('newsletter.unsubscribe_page', token=subscriber.unsubscribe_token, _external=True)
+      
+      # Personalized message with unsubscribe link
+      # personalized_body = f"{form.description.data}\n\n---\nTo unsubscribe from our newsletter, click here: {unsubscribe_link}"
+      personalized_body = f"""
+      {form.description.data}
+      
+      <br><br><br>
+      To unsubscribe from our newsletter, <a href='{unsubscribe_link}'>Unsubscribe</a>
+      """
 
-    # Send message
-    mail.send(msg)
+      # Create message for each subscriber
+      msg = Message(
+        subject=form.title.data, 
+        sender=('Rewwwind Mail', current_app.config['MAIL_USERNAME']),
+        recipients=[subscriber.email],
+        body=personalized_body,
+        html=personalized_body
+      )
+
+      mail.send(msg)
+
+    # Commit token changes to database
+    db.session.commit()
+
     flash('Newsletter sent successfully!', 'success')
     return True
   except Exception as e:
@@ -172,3 +192,23 @@ def delete_post(id):
   else:
     flash("Invalid subscriber or unauthorized access.", "error")
     return redirect(url_for('newsletter.newsletter_all_posts'))
+  
+@newsletter.route('/unsubscribe/', methods=['GET', 'POST'])
+def unsubscribe_page():
+  return render_template('dashboard/newsletter/unsubscribe.html')
+
+@newsletter.route('/unsubscribe/<token>', methods=['GET', 'POST'])
+def unsubscribe(token):
+  try:
+    # Find subscriber by unique token
+    subscriber = MailingList.query.filter_by(unsubscribe_token=token).first()
+        
+    if subscriber:
+      db.session.delete(subscriber)
+      db.session.commit()
+      return jsonify({"success": True})
+        
+    return jsonify({"success": False})
+  except Exception as e:
+    print(e)
+    return jsonify({"success": False})

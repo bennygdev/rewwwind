@@ -17,7 +17,7 @@ def vouchers_listing():
 
   # pagination
   page = request.args.get('page', 1, type=int)
-  per_page = 10
+  per_page = 12
 
   # filters
   expiry_filter = request.args.get('expiry', '')

@@ -129,128 +129,111 @@
 }
 
 /* Vouchers Table */
-.vouchers table {
-  width: 100%;
-  /* box-shadow: inset 0 0 0 1px black; */
-  border-collapse: collapse;
-  border-radius: 10px;
+.vouchers__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  padding: 20px 0px;
   margin-top: 30px;
 }
 
-.vouchers th {
-  padding: 15px 20px;
+/* Card Styles */
+.voucher__card {
+  position: relative;
+  height: 300px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.vouchers td {
-  padding: 30px 20px;
-}
-
-.vouchers td:first-child {
-  padding-left: 30px;
-}
-
-.vouchers th {
-  resize: horizontal;
-  background-color: #e6e6e6;
-}
-
-.vouchers th:first-child {
-  padding-left: 30px;
-}
-
-.vouchers tr:first-child th:first-child {
-  border-top-left-radius: 10px;
-  /* padding-left: 20px; */
-}
-
-.vouchers tr:first-child th:last-child {
-  border-top-right-radius: 10px;
-}
-
-.vouchers tr:not(:last-child) {
-  border-bottom: 1px solid rgb(175, 175, 175);
-}
-
-.vouchers td:last-child {
-  text-align: right;
-  padding-right: 30px;
-  /* border-bottom-left-radius: 10px; */
-}
-
-.vouchers tr:last-child td:last-child {
-  border-bottom-right-radius: 10px;
-
-}
-
-.vouchers tr:last-child td:first-child {
-  border-bottom-left-radius: 10px;
-}
-
-.vouchers td.controls {
-  user-select: none;
-}
-
-.vouchers td.controls i {
-  font-size: 1.2em;
-  cursor: pointer;
-}
-
-.vouchers td.controls i:not(:last-child) {
-  margin-right: 0.6em;
-}
-
-td.controls i {
-  color: #6e6e6e;
-}
-
-td.controls {
+.voucher__card--top {
+  height: calc(100% - 30%);
+  background-color: #f5f5f5;
+  padding: 20px;
   display: flex;
-  flex-direction: row;
-  justify-content: end;
+  justify-content: center;
   align-items: center;
 }
 
-.vouchers tbody tr {
-  background-color: #eee;
-  transition: background-color 0.3s;
-  color: #6e6e6e;
-}
-
-.vouchers tbody tr:hover {
-  background-color: rgb(204, 204, 204);
-}
-
-.vouchers tbody tr:last-child:hover {
-  border-radius: 6px;
-}
-
-.vouchers tbody td:last-child i {
-  transition: color 0.3s
-}
-
-.vouchers tbody td:last-child i:first-child {
-  margin-right: 20px;
-}
-
-.vouchers tbody td:last-child i:hover {
+.type-icon {
+  font-size: 4em;
   color: #039752;
-  transform: color 0.3s;
 }
 
-.vouchers p {
-  margin:0;
+.voucher__status {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-family: "OpenSansSemibold";
 }
 
-.vouchers p:first-child {
-  font-size: 1.2em;
+.voucher__status.active {
+  background-color: #e3f5eb;
+  color: #039752;
+}
+
+.voucher__status.inactive {
+  background-color: #f5e3e3;
+  color: #973939;
+}
+
+/* Card Bottom Section (Overlay) */
+.voucher__card--bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30%;
+  background-color: rgba(238, 238, 238, 0.95);
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Bottom Left Content */
+.voucher__info {
+  display: flex;
+  flex-direction: column;
+  column-gap: 10px;
+  row-gap: 10px;
+}
+
+.voucher__code {
   font-weight: bold;
+  color: #333;
+  font-size: 1.1em;
+  margin: 0;
 }
 
-.voucherId {
-  padding-left: 20px;
+.voucher__type {
+  color: #6e6e6e;
+  font-size: 0.9em;
+  margin: 0;
 }
 
-/* Pagination */
+
+.controls {
+  display: flex;
+  gap: 12px;
+  align-self: end;
+}
+
+.controls i {
+  color: #6e6e6e;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  font-size: 1.1em;
+}
+
+.controls i:hover {
+  color: #039752;
+}
+
 /* Pagination */
 .vouchers__pagination {
   display: flex;
@@ -381,4 +364,30 @@ td.controls {
 pre {
   font-family: "OpenSansRegular";
   font-size: 1em;
+}
+
+
+
+@media (max-width: 768px) {
+  .vouchers__grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .vouchers__grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 12px;
+  }
+}
+
+/* Keep existing header styles */
+.vouchers__header {
+  background-color: #039752;
+  color: #fff;
+  padding: 30px 30px;
+  position: relative;
 }

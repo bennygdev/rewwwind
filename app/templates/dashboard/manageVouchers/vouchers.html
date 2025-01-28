@@ -96,61 +96,55 @@
   </form>
 </div>
 
-<div class="vouchers">
-  <table>
-    <thead>
-      <tr>
-        <th class="voucherId">Voucher ID</th>
-        <th class="voucherCode">Code</th>
-        <th class="voucherType">Type</th>
-        <th class="voucherValue">Value</th>
-        <th class="voucherExpiry">Expiry</th>
-        <th class="voucherStatus">Status</th>
-        <th class="controls"></th>
-      </tr>
-    </thead>
-    {% for voucher in vouchers %}
-    <tr>
-      <td class="voucherId">{{ voucher.id }}</td>
-      <td class="voucherCode">{{ voucher.voucher_code }}</td>
-      <td class="voucherType">
+<div class="vouchers__grid">
+  {% for voucher in vouchers %}
+  <div class="voucher__card">
+    <div class="voucher__card--top">
+      <!-- Category Icon -->
+      <i class="fa-solid 
         {% if voucher.voucherType_id == 1 %}
-          Percentage
+          fa-percent
         {% elif voucher.voucherType_id == 2 %}
-          Fixed Amount
+          fa-dollar-sign
         {% else %}
-          Free Shipping
-        {% endif %}
-      </td>
-      <td class="voucherValue">
-        {% if voucher.voucherType_id == 1 %}
-          {{ voucher.discount_value }}%
-        {% elif voucher.voucherType_id == 2 %}
-          ${{ "%.2f"|format(voucher.discount_value) }}
-        {% else %}
-          Free Shipping
-        {% endif %}
-      </td>
-      <td class="voucherExpiry">{{ voucher.expiry_days }} days</td>
-      <td class="voucherStatus">
+          fa-truck-fast
+        {% endif %} 
+        type-icon">
+      </i>
+      <div class="voucher__status {{ 'active' if voucher.is_active else 'inactive' }}">
         {{ 'Active' if voucher.is_active else 'Inactive' }}
-      </td>
-          
-      <td class="controls">
-        <a href="#">
+      </div>
+    </div>
+    <div class="voucher__card--bottom">
+      <div class="voucher__info">
+        <p class="voucher__code">{{ voucher.voucher_code }}</p>
+        <p class="voucher__type">
+          {% if voucher.voucherType_id == 1 %}
+            Percentage
+          {% elif voucher.voucherType_id == 2 %}
+            Fixed Amount
+          {% else %}
+            Free Shipping
+          {% endif %}
+        </p>
+      </div>
+      <div class="controls">
+        <a href="#" onclick="viewVoucherDetails({{ voucher.id }}); return false;">
           <i class="fa-solid fa-eye"></i>
         </a>
         <a href="{{ url_for('manageVouchers.edit_voucher', id=voucher.id) }}">
           <i class="fa-solid fa-pen"></i>
         </a>
-        <form id="deleteForm-{{ voucher.id }}" action="{{ url_for('manageVouchers.delete_voucher', id=voucher.id) }}" method="POST" onsubmit="event.preventDefault(); openDeleteModal({{ voucher.id }})">
+        <form id="deleteForm-{{ voucher.id }}" action="{{ url_for('manageVouchers.delete_voucher', id=voucher.id) }}" method="POST" style="display: inline;" onsubmit="event.preventDefault(); openDeleteModal({{ voucher.id }})">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <a id="deleteButton{{ voucher.id }}" onclick="openDeleteModal({{ voucher.id }})"><i class="fa-solid fa-trash"></i></button>
+          <a id="deleteButton{{ voucher.id }}" onclick="openDeleteModal({{ voucher.id }})">
+            <i class="fa-solid fa-trash"></i>
+          </a>
         </form>
-      </td>
-    </tr>
-    {% endfor %}
-  </table>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
 </div>
 
 <div class="vouchers__pagination">
@@ -239,7 +233,6 @@
 document.addEventListener('DOMContentLoaded', function() {
   const modal = document.getElementById('voucherDetailsModal');
   const closeModal = document.querySelector('.close-modal');
-  const viewButtons = document.querySelectorAll('.controls i.fa-eye');
 
   const formatCriteria = (criteria) => {
     if (!criteria || criteria.length === 0) return 'No specific criteria';
@@ -261,47 +254,49 @@ document.addEventListener('DOMContentLoaded', function() {
     }).join('\n');
   }
 
-  viewButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      const voucherId = this.closest('tr').querySelector('.voucherId').textContent;
-      
-      fetch(`/dashboard/manage-vouchers/view/${voucherId}`)
-        .then(response => response.json())
-        .then(voucher => {
-          // Populate modal fields
-          document.getElementById('modal__voucher--id').textContent = voucher.id;
-          document.getElementById('modal__voucher--code').textContent = voucher.code;
-          document.getElementById('modal__voucher--description').textContent = voucher.description;
-          document.getElementById('modal__voucher--type').textContent = voucher.type;
-          
-          // Handle discount value display
-          const discountDisplay = voucher.type === 'Percentage' 
-            ? `${voucher.discount_value}%` 
-            : voucher.type === 'Fixed Amount' 
-            ? `$${voucher.discount_value}` 
-            : 'Free Shipping';
-          document.getElementById('modal__voucher--value').textContent = discountDisplay;
-          
-          document.getElementById('modal__voucher--categories').textContent = 
-            voucher.eligible_categories ? voucher.eligible_categories.join(', ') : 'N/A';
-          
-          document.getElementById('modal__voucher--expiry').textContent = `${voucher.expiry_days} days`;
-          document.getElementById('modal__voucher--status').textContent = 
-            voucher.is_active ? 'Active' : 'Inactive';
-          
-          document.getElementById('modal__voucher--created').textContent = voucher.created_at;
-          
-          // Format and display criteria
-          document.getElementById('modal__voucher--criteria').textContent = formatCriteria(voucher.criteria);
-          
-          modal.style.display = 'flex';
-        })
-        .catch(error => {
-          console.error('Error fetching voucher details:', error);
-          alert('Failed to fetch voucher details');
-        });
-    });
-  });
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Intl.DateTimeFormat('en-US', options).format(date);
+  };
+
+  window.viewVoucherDetails = (voucherId) => {
+    const modal = document.getElementById('voucherDetailsModal');
+    
+    fetch(`/dashboard/manage-vouchers/view/${voucherId}`)
+      .then(response => response.json())
+      .then(voucher => {
+        // Populate modal fields
+        document.getElementById('modal__voucher--id').textContent = voucher.id;
+        document.getElementById('modal__voucher--code').textContent = voucher.code;
+        document.getElementById('modal__voucher--description').textContent = voucher.description;
+        document.getElementById('modal__voucher--type').textContent = voucher.type;
+        
+        // Handle discount value display
+        const discountDisplay = voucher.type === 'Percentage' 
+          ? `${voucher.discount_value}%` 
+          : voucher.type === 'Fixed Amount' 
+          ? `$${voucher.discount_value}` 
+          : 'Free Shipping';
+        document.getElementById('modal__voucher--value').textContent = discountDisplay;
+        
+        document.getElementById('modal__voucher--categories').textContent = 
+          voucher.eligible_categories ? voucher.eligible_categories.join(', ') : 'N/A';
+        
+        document.getElementById('modal__voucher--expiry').textContent = `${voucher.expiry_days} days`;
+        document.getElementById('modal__voucher--status').textContent = voucher.is_active ? 'Active' : 'Inactive';
+        
+        document.getElementById('modal__voucher--created').textContent = formatDate(voucher.created_at);
+        
+        document.getElementById('modal__voucher--criteria').textContent = formatCriteria(voucher.criteria);
+        
+        modal.style.display = 'flex';
+      })
+      .catch(error => {
+        console.error('Error fetching voucher details:', error);
+        alert('Failed to fetch voucher details');
+      });
+  }
 
   // Close modal when clicking on close button or outside the modal
   closeModal.addEventListener('click', () => {

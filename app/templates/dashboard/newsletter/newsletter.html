@@ -36,7 +36,7 @@
     <!-- Flash validation -->
     {% include "components/flashValidation.html" %}
     
-    <form method="POST" class="newsletter__form">
+    <form method="POST" class="newsletter__form" id="newsletterForm">
       {{ form.csrf_token }}
         
       <div class="newsletter__field">
@@ -63,7 +63,10 @@
         {% endif %}
       </div>
         
-      {{ form.submit(class="newsletter__submit") }}
+      <button type="submit" class="newsletter__submit" id="submitButton">
+        <span>Send Newsletter</span>
+        <span id="spinnerContainer" class="spinner hidden"></span>
+      </button>
     </form>
   </div>
   <div class="newsletter__subscribers">
@@ -154,5 +157,9 @@
 <script
   type="text/javascript"
   src="{{ url_for('static', filename='js/deleteModal.js') }}"
+></script>
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/dashboard/newsletter/sendingIndicator.js') }}"
 ></script>
 {% endblock %}

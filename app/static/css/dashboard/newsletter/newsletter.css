@@ -261,6 +261,10 @@
 }
 
 .newsletter__submit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
   align-self: flex-start;
   padding: 0.75rem 1.5rem;
   background-color: #039752;
@@ -273,6 +277,29 @@
 
 .newsletter__submit:hover {
   background-color: #01753f;
+}
+
+.newsletter__submit--loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.newsletter__submit--loading:hover {
+  background-color: #039752;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ffffff;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  animation: rotation 1s linear infinite;
+}
+
+.hidden {
+  display: none;
 }
 
 .newsletter__error {
@@ -400,4 +427,14 @@
 
 .newsletter__post--delete {
   color: #dc3545;
+}
+
+/* Animations */
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

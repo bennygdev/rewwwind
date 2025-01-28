@@ -91,22 +91,32 @@ def newsletter_page():
   recent_posts = MailingPost.query.order_by(MailingPost.created_at.desc()).limit(5).all()
     
   if form.validate_on_submit():
-    if send_newsletter(form):
-
-      mailingPost = MailingPost(
-        title=form.title.data,
-        description=form.description.data
-      )
-
-      db.session.add(mailingPost)
-      try:
-        db.session.commit()
-        return redirect(url_for('newsletter.newsletter_page'))
-      except Exception as e: # debug
-        print(e)
-        db.session.rollback()
-        flash('An error occurred while creating the post.', 'error')
-
+    success = send_newsletter(form)
+        
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+      if success:
+        mailingPost = MailingPost(
+          title=form.title.data,
+          description=form.description.data
+        )
+                
+        try:
+          db.session.add(mailingPost)
+          db.session.commit()
+          return jsonify({'success': True})
+        except Exception as e:
+          db.session.rollback()
+          flash('An error occurred while creating the post.', 'error')
+          return jsonify({
+            'success': False, 
+            'message': 'An error occurred while creating the post.'
+          })
+      return jsonify({
+        'success': False, 
+        'message': 'Failed to send newsletter'
+      })
+            
+    if success:
       return redirect(url_for('newsletter.newsletter_page'))
 
   return render_template(

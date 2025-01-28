@@ -15,6 +15,17 @@
   <div class="search__wrapper">
     <form method="get" action="{{ url_for('manageVouchers.vouchers_listing') }}">
       <div class="search__container">
+        <!-- Preserve current filter values -->
+        {% if expiry_filter %}
+        <input type="hidden" name="expiry" value="{{ expiry_filter }}">
+        {% endif %}
+        {% if type_filter %}
+        <input type="hidden" name="type" value="{{ type_filter }}">
+        {% endif %}
+        {% if status_filter %}
+        <input type="hidden" name="status" value="{{ status_filter }}">
+        {% endif %}
+
         <input
           type="text"
           name="q"
@@ -28,7 +39,7 @@
           <i class="fa-solid fa-magnifying-glass"></i>
         </button>
         {% if search_query %}
-          <a href="{{ url_for('manageVouchers.vouchers_listing') }}" class="clear__button">
+          <a href="{{ url_for('manageVouchers.vouchers_listing', expiry=expiry_filter, type=type_filter, status=status_filter) }}" class="clear__button">
             <i class="fa-solid fa-xmark fa-lg"></i>
           </a>
         {% endif %}
@@ -145,15 +156,15 @@
 <div class="vouchers__pagination">
   <ul>
     {% if current_page > 1 %}
-    <li class="pagePrevious__button"><a href="{{ url_for('manageVouchers.vouchers_listing', page=current_page-1, q=search_query) }}">Previous</a></li>
+    <li class="pagePrevious__button"><a href="{{ url_for('manageVouchers.vouchers_listing', page=current_page-1, q=search_query, expiry=expiry_filter, type=type_filter, status=status_filter) }}">Previous</a></li>
     {% endif %}
     {% for p in range(1, total_pages + 1) %}
     <li class="{% if p == current_page %}active{% endif %}">
-      <a href="{{ url_for('manageVouchers.vouchers_listing', page=p, q=search_query) }}" class="page__button">{{ p }}</a>
+      <a href="{{ url_for('manageVouchers.vouchers_listing', page=p, q=search_query, expiry=expiry_filter, type=type_filter, status=status_filter) }}" class="page__button">{{ p }}</a>
     </li>
     {% endfor %}
     {% if current_page < total_pages %}
-    <li class="pageNext__button"><a href="{{ url_for('manageVouchers.vouchers_listing', page=current_page+1, q=search_query) }}">Next</a></li>
+    <li class="pageNext__button"><a href="{{ url_for('manageVouchers.vouchers_listing', page=current_page+1, q=search_query, expiry=expiry_filter, type=type_filter, status=status_filter) }}">Next</a></li>
     {% endif %}
   </ul>
 </div>

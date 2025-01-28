@@ -366,8 +366,7 @@ pre {
   font-size: 1em;
 }
 
-
-
+/* Media queries */
 @media (max-width: 768px) {
   .vouchers__grid {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -382,12 +381,4 @@ pre {
     gap: 16px;
     padding: 12px;
   }
-}
-
-/* Keep existing header styles */
-.vouchers__header {
-  background-color: #039752;
-  color: #fff;
-  padding: 30px 30px;
-  position: relative;
 }

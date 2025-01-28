@@ -132,11 +132,20 @@ def add_voucher():
 def view_voucher(id):
   voucher = Voucher.query.get_or_404(id)
 
+  type_mapping = {
+    'fixed_amount': 'Fixed Amount',
+    'free_shipping': 'Free Shipping',
+    'percentage': 'Percentage'
+  }
+
+  voucher_type = voucher.voucher_types.voucher_type
+  formatted_type = type_mapping.get(voucher_type, voucher_type)
+
   return jsonify({
     'id': voucher.id,
     'code': voucher.voucher_code,
     'description': voucher.voucher_description,
-    'type': voucher.voucher_types.voucher_type,
+    'type': formatted_type,
     'discount_value': str(voucher.discount_value),
     'criteria': voucher.criteria,
     'eligible_categories': voucher.eligible_categories,

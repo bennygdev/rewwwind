@@ -19,6 +19,14 @@ def vouchers_listing():
   page = request.args.get('page', 1, type=int)
   per_page = 10
 
+  # filters
+  expiry_filter = request.args.get('expiry', '')
+  type_filter = request.args.get('type', '')
+  status_filter = request.args.get('status', '')
+
+  # Start with base query
+  vouchers_query = Voucher.query
+
   # search logic
   search_query = request.args.get('q', '', type=str)
 
@@ -27,13 +35,62 @@ def vouchers_listing():
   else:
     vouchers_query = Voucher.query
 
+  if expiry_filter:
+    vouchers_query = vouchers_query.filter(Voucher.expiry_days == int(expiry_filter))
+
+  if type_filter:
+    type_id_map = {
+      'percentage': 1,
+      'fixed_amount': 2,
+      'free_shipping': 3
+    }
+    if type_filter.lower() in type_id_map:
+      vouchers_query = vouchers_query.filter(Voucher.voucherType_id == type_id_map[type_filter.lower()])
+
+  if status_filter:
+    is_active = status_filter.lower() == 'active'
+    vouchers_query = vouchers_query.filter(Voucher.is_active == is_active)
+
   # pagination logic
   total_vouchers = vouchers_query.count()
   vouchers = vouchers_query.order_by(Voucher.created_at.desc()).paginate(page=page, per_page=per_page)
 
   total_pages = ceil(total_vouchers / per_page)
 
-  return render_template("dashboard/manageVouchers/vouchers.html", user=current_user, vouchers=vouchers, total_pages=total_pages, current_page=page, search_query=search_query)
+  # Filter choices
+  expiry_choices = [
+    ('7', '7 Days'),
+    ('14', '14 Days'),
+    ('30', '30 Days'),
+    ('60', '60 Days'),
+    ('90', '90 Days')
+  ]
+
+  type_choices = [
+    ('percentage', 'Percentage'),
+    ('fixed_amount', 'Fixed Amount'),
+    ('free_shipping', 'Free Shipping')
+  ]
+
+  status_choices = [
+    ('active', 'Active'),
+    ('inactive', 'Inactive')
+  ]
+
+  return render_template(
+    "dashboard/manageVouchers/vouchers.html", 
+    user=current_user, 
+    vouchers=vouchers, 
+    total_pages=total_pages, 
+    current_page=page, 
+    search_query=search_query,
+    expiry_filter=expiry_filter,
+    type_filter=type_filter,
+    status_filter=status_filter,
+    expiry_choices=expiry_choices,
+    type_choices=type_choices,
+    status_choices=status_choices
+  )
 
 @manageVouchers.route('/manage-vouchers/add', methods=['GET', 'POST'])
 @login_required

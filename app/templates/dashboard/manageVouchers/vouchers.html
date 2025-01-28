@@ -42,6 +42,49 @@
 <!-- Include flash validation -->
 {% include "components/flashValidation.html" %}
 
+<div class="content__filters">
+  <form id="filterForm" method="get" action="{{ url_for('manageVouchers.vouchers_listing') }}" class="filters__form">
+    <!-- Preserve search query if exists -->
+    {% if search_query %}
+    <input type="hidden" name="q" value="{{ search_query }}">
+    {% endif %}
+    
+    <div class="filter__group">
+      <label for="expiry">Expiry:</label>
+      <select name="expiry" id="expiry" class="filter__select">
+        <option value="">All</option>
+        {% for value, label in expiry_choices %}
+        <option value="{{ value }}" {% if expiry_filter == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="filter__group">
+      <label for="type">Type:</label>
+      <select name="type" id="type" class="filter__select">
+        <option value="">All</option>
+        {% for value, label in type_choices %}
+        <option value="{{ value }}" {% if type_filter == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="filter__group">
+      <label for="status">Status:</label>
+      <select name="status" id="status" class="filter__select">
+        <option value="">All</option>
+        {% for value, label in status_choices %}
+        <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    {% if expiry_filter or type_filter or status_filter %}
+    <a href="{{ url_for('manageVouchers.vouchers_listing', q=search_query) }}" class="clear__filters">Clear Filters</a>
+    {% endif %}
+  </form>
+</div>
+
 <div class="vouchers">
   <table>
     <thead>
@@ -176,6 +219,10 @@
 <script
   type="text/javascript"
   src="{{ url_for('static', filename='js/deleteModal.js') }}"
+></script>
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/dashboardFilters.js') }}"
 ></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {

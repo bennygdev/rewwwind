@@ -17,7 +17,7 @@ manageAccounts = Blueprint('manageAccounts', __name__)
 @login_required
 @role_required(2, 3)
 def accounts_listing():
-  accounts = User.query.all()
+  accounts = User.query.order_by(User.created_at.desc()).all()
 
   totalUsers = User.query.count()
 
@@ -32,6 +32,9 @@ def accounts_listing():
   page = request.args.get('page', 1, type=int)
   per_page = 10
 
+  # filters
+  role_filter = request.args.get('role', '')
+
   # search logic
   search_query = request.args.get('q', '', type=str)
 
@@ -40,13 +43,40 @@ def accounts_listing():
   else:
     accounts_query = User.query
 
+  if role_filter:
+    role_id_map = {
+      'customer': 1,
+      'admin': 2,
+      'owner': 3
+    }
+    if role_filter.lower() in role_id_map:
+      accounts_query = accounts_query.filter(User.role_id == role_id_map[role_filter.lower()])
+
   # pagination logic
   total_accounts = accounts_query.count()
-  accounts = accounts_query.order_by(User.id).paginate(page=page, per_page=per_page)
+  accounts = accounts_query.order_by(User.created_at.desc()).paginate(page=page, per_page=per_page)
 
   total_pages = ceil(total_accounts / per_page)
 
-  return render_template("dashboard/manageAccounts/accounts.html", user=current_user, totalUsers=totalUsers, newUsers=newUsers, onlineCount=onlineCount, accounts=accounts, total_pages=total_pages, current_page=page, search_query=search_query)
+  role_choices = [
+    ('customer', 'Customer'),
+    ('admin', 'Admin'),
+    ('owner', 'Owner')
+  ]
+
+  return render_template(
+    "dashboard/manageAccounts/accounts.html", 
+    user=current_user, 
+    totalUsers=totalUsers, 
+    newUsers=newUsers, 
+    onlineCount=onlineCount, 
+    accounts=accounts, 
+    total_pages=total_pages, 
+    current_page=page, 
+    search_query=search_query,
+    role_filter=role_filter,
+    role_choices=role_choices
+  )
 
 @manageAccounts.route('/manage-accounts/account-details/<int:id>')
 @login_required

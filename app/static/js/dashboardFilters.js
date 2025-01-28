@@ -2,9 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const filterForm = document.getElementById("filterForm");
   const filterSelects = filterForm.querySelectorAll("select");
 
-  // Function to update filters
-  function updateFilters() {
-    // Get current URL and create URLSearchParams object
+  const updateFilters = () => {
     const currentUrl = new URL(window.location.href);
     const searchParams = new URLSearchParams(currentUrl.search);
 
@@ -23,12 +21,10 @@ document.addEventListener("DOMContentLoaded", function () {
       searchParams.set("q", searchQuery);
     }
 
-    // Update URL and reload page
     currentUrl.search = searchParams.toString();
     window.location.href = currentUrl.toString();
   }
-
-  // Add change event listeners to all select elements
+  
   filterSelects.forEach((select) => {
     select.addEventListener("change", updateFilters);
   });

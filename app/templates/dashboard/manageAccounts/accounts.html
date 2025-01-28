@@ -68,6 +68,29 @@
 <!-- Flash validation -->
 {% include "components/flashValidation.html" %}
 
+<div class="content__filters">
+  <form id="filterForm" method="get" action="{{ url_for('manageAccounts.accounts_listing') }}" class="filters__form">
+    <!-- Preserve search query if exists -->
+    {% if search_query %}
+    <input type="hidden" name="q" value="{{ search_query }}">
+    {% endif %}
+
+    <div class="filter__group">
+      <label for="role">Role:</label>
+      <select name="role" id="role" class="filter__select">
+        <option value="">All</option>
+        {% for value, label in role_choices %}
+        <option value="{{ value }}" {% if role_filter == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    {% if role_filter %}
+    <a href="{{ url_for('manageAccounts.accounts_listing', q=search_query) }}" class="clear__filters">Clear Filters</a>
+    {% endif %}
+  </form>
+</div>
+
 <div class="accounts">
   <table>
     <thead>
@@ -139,4 +162,11 @@
   </ul>
 </div>
 
+{% endblock %}
+
+{% block body_scripts %}
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/dashboardFilters.js') }}"
+></script>
 {% endblock %}

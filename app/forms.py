@@ -360,6 +360,12 @@ class VoucherForm(FlaskForm):
     (60, '60 Days'),
     (90, '90 Days')
   ], coerce=int, validators=[DataRequired()])
+
+  is_active = RadioField('Voucher Status', choices=[
+    ('True', 'Active'),
+    ('False', 'Not Active')
+  ], default='True', validators=[DataRequired()])
+
   submit = SubmitField('Create Voucher')
     
   def __init__(self, *args, **kwargs):

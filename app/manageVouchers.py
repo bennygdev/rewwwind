@@ -29,7 +29,7 @@ def vouchers_listing():
 
   # pagination logic
   total_vouchers = vouchers_query.count()
-  vouchers = vouchers_query.order_by(Voucher.id).paginate(page=page, per_page=per_page)
+  vouchers = vouchers_query.order_by(Voucher.created_at.desc()).paginate(page=page, per_page=per_page)
 
   total_pages = ceil(total_vouchers / per_page)
 
@@ -53,7 +53,8 @@ def add_voucher():
       discount_value=form.discount_value.data,
       criteria=criteria,
       eligible_categories=form.eligible_categories.data,
-      expiry_days=form.expiry_days.data
+      expiry_days=form.expiry_days.data,
+      is_active=form.is_active.data == 'True'
     )
         
     db.session.add(voucher)
@@ -101,6 +102,7 @@ def edit_voucher(id):
     voucher.voucher_description = form.description.data
     voucher.voucherType_id = VoucherType.query.filter_by(voucher_type=form.voucher_type.data).first().id
     voucher.discount_value = form.discount_value.data
+    voucher.is_active = form.is_active.data == 'True'
         
     # Parse and save criteria
     criteria = json.loads(form.criteria_json.data) if form.criteria_json.data else []
@@ -121,6 +123,7 @@ def edit_voucher(id):
     form.code.data = voucher.voucher_code
     form.description.data = voucher.voucher_description
     form.voucher_type.data = voucher.voucher_types.voucher_type
+    form.is_active.data = str(voucher.is_active)
     if voucher.eligible_categories:
       form.eligible_categories.data = voucher.eligible_categories
 

@@ -71,6 +71,18 @@
     {{ form.expiry_days(class="form-control") }}
   </div>
 
+  <div class="addVoucher__status">
+    {{ form.is_active.label }}
+    <div class="radio-group">
+      {% for subfield in form.is_active %}
+        <div class="radio-option">
+          {{ subfield }}
+          {{ subfield.label }}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
   <input type="hidden" id="criteria_json" name="criteria_json">
 
   <div class="button__wrapper">

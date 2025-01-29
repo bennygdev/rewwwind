@@ -1,11 +1,18 @@
 h1 {
   font-family: "OpenSansSemibold";
   font-size: 1.5em;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
+  margin-top: 30px;
+}
+
+.headerGradient {
+  height: 20vh;
+  background: rgb(238,174,174);
+  background: linear-gradient(90deg, rgba(238,174,174,1) 0%, rgba(238,222,174,1) 100%);
 }
 
 .payment__content .payment__left h2 {
-  font-size: 1.4em;
+  font-size: 1.3em;
   margin-bottom: 20px;
 }
 
@@ -31,10 +38,11 @@ h1 {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  background-color: #c4c4c4;
-  padding: 40px 40px;
+  background-color: #fff;
+  padding: 30px 30px;
   border-radius: 20px;
   margin-top: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .payment__content .payment__left h3 {
@@ -52,14 +60,13 @@ h1 {
 }
 
 .payment__addButton {
-  display: block;
-  width: 5vw;
-  background-color: #039752;
-  padding: 10px 20px;
-  text-decoration: none;
+  display: inline-block;
   color: #fff;
-  border-radius: 10px;
-  margin-top: 15px !important;
+  background-color: #039752;
+  padding: 7px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  margin-top: 20px;
 }
 
 .payment__addButton i {
@@ -67,10 +74,11 @@ h1 {
 }
 
 .payment__editButton, .payment__saveButton {
-  background-color: #039752;
-  padding: 10px 20px;
   color: #fff;
-  border-radius: 10px;
+  background-color: #039752;
+  padding: 7px 20px;
+  border-radius: 4px;
+  text-decoration: none;
   border: none;
 }
 
@@ -80,17 +88,9 @@ h1 {
 
 .payment__cancelButton {
   background-color: #ff4c24;
-  padding: 10px 20px;
+  padding: 7px 20px;
   color: #fff;
-  border-radius: 10px;
-  border: none;
-}
-
-.payment__cancelButton {
-  background-color: #ff4c24;
-  padding: 10px 20px;
-  color: #fff;
-  border-radius: 10px;
+  border-radius: 4px;
   border: none;
 }
 
@@ -98,15 +98,28 @@ h1 {
   display: flex;
   justify-self: end;
   background-color: #ff4c24;
-  padding: 10px 20px;
+  padding: 7px 20px;
   color: #fff;
-  border-radius: 10px;
+  border-radius: 4px;
   border: none;
   margin-top: 10px;
 }
 
 .payment__editButton i {
   margin-right: 10px;
+}
+
+.payment__details {
+  margin-bottom: 0;
+}
+
+.payment__left .payment__details {
+  margin: 0;
+}
+
+.payment__buttonContainer {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .editPayment__form {
@@ -121,6 +134,194 @@ h1 {
 
 .payment__editExpiryDate, .payment__editCardCVV {
   width: 10vw;
+}
+
+/* Media Queries */
+@media screen and (max-width: 1024px) {
+  .payment__editPaymentType, 
+  .payment__editCardName, 
+  .payment__editCardNumber {
+    width: 45vw;
+  }
+
+  .payment__editExpiryDate, 
+  .payment__editCardCVV {
+    width: 15vw;
+  }
+
+  .addPayment__cardName, 
+  .addPayment__cardNumber {
+    width: 60vw;
+  }
+
+  .addPayment__cardExpiryDate, 
+  .addPayment__cardCVV {
+    width: 20vw;
+  }
+
+  .addPayment__button {
+    width: 8vw;
+  }
+
+  .payment-types {
+    gap: 15px;
+  }
+
+  .payment-type label {
+    padding: 12px;
+  }
+
+  .payment-type img {
+    height: 25px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .payment__content {
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .payment__header {
+    padding: 20px;
+  }
+
+  #payment__title {
+    font-size: 1.3em;
+  }
+
+  .payment__editPaymentType, 
+  .payment__editCardName, 
+  .payment__editCardNumber {
+    width: 90vw;
+  }
+
+  .payment__editExpiryDate, 
+  .payment__editCardCVV {
+    width: 90vw;
+  }
+
+  .addPayment__cardName, 
+  .addPayment__cardNumber {
+    width: 90vw;
+  }
+
+  .addPayment__cardExpiryDate, 
+  .addPayment__cardCVV {
+    width: 90vw;
+  }
+
+  .addPayment__button {
+    width: 30vw;
+  }
+
+  .payment__buttonContainer {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .payment__editButton, 
+  .payment__saveButton, 
+  .payment__cancelButton, 
+  .payment__deleteButton {
+    width: 100%;
+    margin: 5px 0;
+    justify-content: center;
+  }
+
+  .payment__saveButton {
+    margin-right: 0;
+  }
+
+  .payment-types {
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  .payment-type {
+    flex: 0 0 calc(33.33% - 10px);
+  }
+
+  .payment-type label {
+    padding: 10px;
+  }
+
+  .payment-type img {
+    height: 20px;
+  }
+
+  .card-type-indicator {
+    width: 30px;
+    height: 20px;
+    right: 5px;
+  }
+
+  h1 {
+    font-size: 1.3em;
+  }
+
+  .payment__content .payment__left h2 {
+    font-size: 1.1em;
+  }
+
+  .payment__content .payment__left h3 {
+    font-size: 1em;
+  }
+
+  .button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .payment__content {
+    padding: 15px;
+  }
+
+  .payment__header {
+    padding: 15px;
+  }
+
+  .headerGradient {
+    height: 15vh;
+  }
+
+  .addPayment__button {
+    width: 40vw;
+  }
+
+  .payment__editButton, 
+  .payment__saveButton, 
+  .payment__cancelButton, 
+  .payment__deleteButton,
+  .payment__addButton {
+    padding: 7px 15px;
+  }
+
+  .payment-types {
+    gap: 8px;
+  }
+
+  .payment-type {
+    flex: 0 0 calc(50% - 8px);
+  }
+
+  .payment-type label {
+    padding: 8px;
+  }
+
+  #payment__title {
+    font-size: 1.2em;
+  }
+
+  #payment__subtitles {
+    font-size: 0.7em;
+  }
 }
 
 /* Add payment method form */
@@ -181,7 +382,7 @@ h1 {
 }
 
 .payment-type img {
-  height: 40px;
+  height: 30px;
   width: auto;
 }
 

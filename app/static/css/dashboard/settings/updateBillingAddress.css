@@ -1,40 +1,30 @@
 h1 {
   font-family: "OpenSansSemibold";
   font-size: 1.5em;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
+  margin-top: 30px;
+}
+
+.headerGradient {
+  height: 20vh;
+  background: rgb(194,174,238);
+  background: linear-gradient(90deg, rgba(194,174,238,1) 0%, rgba(238,222,174,1) 100%);
 }
 
 .billing__content .billing__left h2 {
-  font-size: 1.4em;
+  font-size: 1.3em;
   margin-bottom: 20px;
-}
-
-.billing__header {
-  background-color: #039752;
-  color: #fff;
-  padding: 30px 30px;
-}
-
-#billing__title {
-  font-family: "OpenSansSemibold";
-  font-size: 1.6em;
-}
-
-#billing__subtitles {
-  font-family: "OpenSansRegular";
-  font-size: 0.8em;
-  margin-top: 10px;
-  margin-bottom: 0;
 }
 
 .billing__content {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  background-color: #c4c4c4;
-  padding: 40px 40px;
+  background-color: #fff;
+  padding: 30px 30px;
   border-radius: 20px;
   margin-top: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .billing__content .billing__left h3 {
@@ -52,25 +42,22 @@ h1 {
 }
 
 .billing__addButton {
-  display: block;
-  width: 5vw;
-  background-color: #039752;
-  padding: 10px 20px;
-  text-decoration: none;
+  display: inline-block;
   color: #fff;
-  border-radius: 10px;
-  margin-top: 15px !important;
+  background-color: #039752;
+  padding: 7px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  margin-top: 20px;
 }
 
-.billing__addButton i {
-  margin-right: 5px;
-}
 
 .billing__editButton, .billing__saveButton {
-  background-color: #039752;
-  padding: 10px 20px;
   color: #fff;
-  border-radius: 10px;
+  background-color: #039752;
+  padding: 7px 20px;
+  border-radius: 4px;
+  text-decoration: none;
   border: none;
 }
 
@@ -80,9 +67,9 @@ h1 {
 
 .billing__cancelButton {
   background-color: #ff4c24;
-  padding: 10px 20px;
+  padding: 7px 20px;
   color: #fff;
-  border-radius: 10px;
+  border-radius: 4px;
   border: none;
 }
 
@@ -90,15 +77,28 @@ h1 {
   display: flex;
   justify-self: end;
   background-color: #ff4c24;
-  padding: 10px 20px;
+  padding: 7px 20px;
   color: #fff;
-  border-radius: 10px;
+  border-radius: 4px;
   border: none;
   margin-top: 10px;
 }
 
 .billing__editButton i {
   margin-right: 10px;
+}
+
+.billing__details .billing__addressRow {
+  margin-bottom: 0;
+}
+
+.billing__left .billing__details {
+  margin: 0;
+}
+
+.billing__buttonContainer {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .editBilling__form {
@@ -125,6 +125,143 @@ h1 {
 
 .billing__editPhoneNumber {
   width: 15vw;
+}
+
+/* Media Queries */
+@media screen and (max-width: 1024px) {
+  .billing__editAddressOne, 
+  .billing__editAddressTwo {
+    width: 45vw;
+  }
+
+  .billing__editUnitNumber, 
+  .billing__editPostalCode {
+    width: 15vw;
+  }
+
+  .billing__editPhoneNumber {
+    width: 25vw;
+  }
+
+  .addBilling__addressOne, 
+  .addBilling__addressTwo {
+    width: 60vw;
+  }
+
+  .addBilling__unitNumber, 
+  .addBilling__postalCode {
+    width: 20vw;
+  }
+
+  .addBilling__phoneNumber {
+    width: 25vw;
+  }
+
+  .addBilling__button {
+    width: 8vw;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .billing__content {
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .billing__editAddressOne, 
+  .billing__editAddressTwo {
+    width: 90vw;
+  }
+
+  .billing__addressRow {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .billing__editUnitNumber, 
+  .billing__editPostalCode {
+    width: 90vw;
+  }
+
+  .billing__editPhoneNumber {
+    width: 90vw;
+  }
+
+  .addBilling__addressOne, 
+  .addBilling__addressTwo {
+    width: 90vw;
+  }
+
+  .addBilling__addressRow {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .addBilling__unitNumber, 
+  .addBilling__postalCode {
+    width: 90vw;
+  }
+
+  .addBilling__phoneNumber {
+    width: 90vw;
+  }
+
+  .addBilling__button {
+    width: 30vw;
+  }
+
+  .billing__buttonContainer {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .billing__editButton, 
+  .billing__saveButton, 
+  .billing__cancelButton, 
+  .billing__deleteButton {
+    width: 100%;
+    margin: 5px 0;
+    justify-content: center;
+  }
+
+  .billing__saveButton {
+    margin-right: 0;
+  }
+
+  h1 {
+    font-size: 1.3em;
+  }
+
+  .billing__content .billing__left h2 {
+    font-size: 1.1em;
+  }
+
+  .billing__content .billing__left h3 {
+    font-size: 1em;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .billing__content {
+    padding: 15px;
+  }
+
+  .headerGradient {
+    height: 15vh;
+  }
+
+  .addBilling__button {
+    width: 40vw;
+  }
+
+  .billing__editButton, 
+  .billing__saveButton, 
+  .billing__cancelButton, 
+  .billing__deleteButton,
+  .billing__addButton {
+    padding: 7px 15px;
+  }
 }
 
 /* Add billing form */

@@ -9,10 +9,7 @@
 {% block title %}Update Payment Information{% endblock %}
 
 {% block headerContent %}
-<div class="payment__header">
-  <h1 id="payment__title">Update Payment Methods</h1>
-  <p id="payment__subtitles">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</p>
-</div>
+<div class="headerGradient"></div>
 {% endblock %}
 
 {% block content %}
@@ -20,7 +17,9 @@
 <!-- Flash validation -->
 {% include "components/flashValidation.html" %}
 
-<a href="{{ url_for('dashboard.user_settings') }}" class="back__button--darker">Back</a>
+<a href="{{ url_for('dashboard.user_settings') }}" class="back__link"><i class="fa-solid fa-chevron-left fa-sm"></i>Back</a>
+
+<h1>My Payment Methods</h1>
 
 {% if payment_methods %}
   {% for method in payment_methods %}
@@ -91,7 +90,9 @@
     </div>
 
     <div class="payment__right">
-      <button class="payment__editButton" id="editButton{{ method.id }}" onclick="toggleEditForm({{ method.id }})"><i class="fa-solid fa-pen"></i>Edit</button>
+      <div class="payment__buttonContainer">
+        <button class="payment__editButton" id="editButton{{ method.id }}" onclick="toggleEditForm({{ method.id }})">Edit</button>
+      </div>
 
       <!-- hidden by default -->
       <div class="button-group" id="buttonGroup{{ method.id }}" style="display: none;">
@@ -110,7 +111,7 @@
   <p>No Payment methods found.</p>
 {% endif %}
 
-<a href="{{ url_for('dashboard.add_payment_method') }}" class="payment__addButton"><i class="fa-solid fa-plus fa-lg"></i>Add</a>
+<a href="{{ url_for('dashboard.add_payment_method') }}" class="payment__addButton">Add</a>
 
 <!-- modal -->
 {% include "components/deleteModal.html" %}

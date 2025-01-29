@@ -4,22 +4,10 @@ h1 {
   margin-bottom: 30px;
 }
 
-.notifications__header {
-  background-color: #039752;
-  color: #fff;
-  padding: 30px 30px;
-}
-
-#notifications__title {
-  font-family: "OpenSansSemibold";
-  font-size: 1.6em;
-}
-
-#notifications__subtitles {
-  font-family: "OpenSansRegular";
-  font-size: 0.8em;
-  margin-top: 10px;
-  margin-bottom: 0;
+.headerGradient {
+  height: 20vh;
+  background: rgb(174,238,230);
+  background: linear-gradient(90deg, rgba(174,238,230,1) 0%, rgba(238,222,174,1) 100%);
 }
 
 .notifications__content {

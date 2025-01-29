@@ -429,3 +429,26 @@ def delete_product():
         featured_filter=featured_filter,
         stock_filter=stock_filter
         ) #, datetime=datetime
+
+@manageProducts.route('/manage-products/favourites')
+@login_required
+def favourites():
+    products = Product.query.filter(Product.id.in_(current_user.wishlisted_items)).all()
+    print(products)
+
+    return render_template('dashboard/manageProducts/favourites.html', user=current_user, products=products)
+
+@manageProducts.route('/manage-products/add-favourite/<int:product_id>', methods=['POST'])
+@login_required
+def add_favourite(product_id):
+
+    if request.method == 'POST':
+        if current_user.wishlisted_items is None:
+            print(False)
+            current_user.wishlisted_items = []
+        if product_id not in current_user.wishlisted_items:
+            current_user.wishlisted_items.append(product_id)
+            flag_modified(current_user, "wishlisted_items")
+            db.session.commit()
+        
+        return redirect(url_for('manageProducts.favourites'))

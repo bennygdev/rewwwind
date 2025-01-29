@@ -20,6 +20,9 @@ class User(db.Model, UserMixin):
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)  # role table
     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
     updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
+    
+    # favourites
+    wishlisted_items = db.Column(db.JSON, nullable=True)
 
     # Relationship to Cart
     cart_items = db.relationship('Cart', back_populates='user', lazy=True)

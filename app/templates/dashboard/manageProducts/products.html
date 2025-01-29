@@ -166,7 +166,6 @@
         {% endfor %}
     </table>
 </div>
-<h1>{{ get_flashed_messages() }}</h1>
 {% set message = get_flashed_messages()[0] if get_flashed_messages() else None %}
 {% if deleteForm.deleteConfirm.errors or message %}
     {% set display = 'flex' %}
@@ -174,7 +173,6 @@
     {% set display = 'none' %}
 {% endif %}
 <div class="overlay" style="display: {{ display }}"></div>
-<h1>{{ message }}</h1>
 <div class="delete__form-container" success="{{ 'true' if message else 'false' }}" id="{{ deleteForm.productID.data }}" style="display: {{ display }};">
     <!-- if you're getting an error for the above, don't mind it. vscode just assumes it as plain html rather than jinja, but when you run it the jinja template will still be processed -->
 

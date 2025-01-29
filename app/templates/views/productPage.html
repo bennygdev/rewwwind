@@ -90,7 +90,7 @@
           {{ cartform.condition(value=selected_condition.condition) }}
           <button type="submit" class="filter">Add to Cart</button>
       </form>
-      <form action="/check-out/{{ product.id }}" method="POST" class="cta-form">
+      <form action="/create-checkout-session" method="POST" class="cta-form">
           <!-- {{ cartform.hidden_tag() }} please remember to add something like this, cartform can be any unique form class defined
             in forms.py -->
           <button type="submit" class="filter">Buy Now</button>

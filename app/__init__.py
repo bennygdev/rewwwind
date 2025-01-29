@@ -10,6 +10,7 @@ from authlib.integrations.flask_client import OAuth
 from flask_migrate import Migrate
 import json
 from flask_socketio import SocketIO
+import stripe
 socketio = SocketIO()
 
 migrate = Migrate()
@@ -66,7 +67,9 @@ def create_app():
   app.config['OAUTH2_CLIENT_SECRET'] = os.getenv('GOOGLE_CLIENT_SECRET')
   app.config['OAUTH2_META_URL'] = 'https://accounts.google.com/.well-known/openid-configuration'
 
-
+  app.config['STRIPE_PUBLIC_KEY'] = 'pk_test_51QmXxn2ek3YdFHUUMQbFyd3dErR6IWygpR8Guw2PsrrYOmJtCGRTynrGxd4xedaccxk7oc5Ui7S0nZXk7IS8HFJA001pFDpoIZ'
+  app.config['STRIPE_SECRET_KEY'] = 'sk_test_51QmXxn2ek3YdFHUUxLvc72I7JYjRQrHxD9Sv16LYV8t6hwwYvGmywUuq72ysAIV1gZD9xX09pjvmV9TXDM2xlk0E00rvZnsAHL'
+  stripe.api_key = app.config['STRIPE_SECRET_KEY']
   mail = Mail(app)
 
   db.init_app(app)
@@ -105,8 +108,12 @@ def create_app():
 
   # Chatbot API
   from .chatbot import chatbot
-
   app.register_blueprint(chatbot, url_prefix="/")
+
+  # Stripe (payment) API
+  from .payment import payment
+  csrf.exempt(payment)
+  app.register_blueprint(payment, url_prefix="/")
 
   # Dashboard pages
   from .overview import overview

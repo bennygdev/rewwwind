@@ -3,6 +3,12 @@
   margin-bottom: 20px;
 } */
 
+.headerGradient {
+  height: 20vh;
+  background: rgb(174,238,179);
+  background: linear-gradient(90deg, rgba(174,238,179,1) 0%, rgba(238,222,174,1) 100%);
+}
+
 h1 {
   font-family: "OpenSansSemibold";
   font-size: 1.5em;
@@ -13,50 +19,226 @@ h1 {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  background-color: #c4c4c4;
-  padding: 40px 40px;
-  border-radius: 20px;
   margin-top: 20px;
 }
 
 .profile__left {
   display: flex;
+  flex-direction: column;
+}
+
+.profile__pictureBox {
+  margin-top: 20px;
+  display: flex;
   flex-direction: row;
   align-items: center;
 }
 
-.profile__pictureBox {
-  margin-right: 30px;
+.profile__pictureBox img {
+  width: 100px;
+  height: 100px;
 }
 
-.profile__pictureBox img {
-  width: 200px;
-  height: 200px;
+.profile__topInfo {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+}
+
+#profile__topName {
+  font-size: 1.2em;
+  font-family: "OpenSansSemibold";
+  margin-bottom: 10px;
+}
+
+#profile__topId {
+  color: #8a8a8a;
+  font-size: 0.9em;
 }
 
 .profile__row {
   display: flex;
   flex-direction: row;
-  gap: 30px;
+  gap: 130px;
+  margin-top: 20px;
+}
+
+.profile__informationBox {
+  margin-top: 20px;
+  margin-bottom: 5px;
 }
 
 .profile__informationBox h3 {
-  font-size: 1.1em;
+  font-size: 1.4em;
+  font-family: "OpenSansSemibold";
+  margin-top: 10px;
+}
+
+.profile__informationBox span {
+  color: #4a4a4a;
+}
+
+.profile__header {
+  font-size: 1.05em;
   font-family: "OpenSansSemibold";
   margin-bottom: 5px;
 }
 
-.profile__informationBox p {
-  font-size: 0.9em;
-}
-
 .profile__buttons {
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
+  flex-direction: row;
+  gap: 20px;
 }
 
+/* Media Queries */
+@media screen and (max-width: 1024px) {
+  .profile__content {
+    flex-direction: column;
+  }
+
+  .profile__row {
+    gap: 60px;
+  }
+
+  .profile__buttons {
+    margin-top: 30px;
+  }
+
+  .updateInfo__firstName, 
+  .updateInfo__lastName {
+    width: 30vw;
+  }
+
+  .updateInfo__username {
+    width: 40vw;
+  }
+
+  .image__preview {
+    width: 50vw;
+  }
+
+  .removeImage__button {
+    width: 15vw;
+  }
+
+  .updateInfo__button {
+    width: 12vw;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .headerGradient {
+    height: 15vh;
+  }
+
+  .profile__row {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .profile__pictureBox {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .profile__topInfo {
+    margin-left: 0;
+    margin-top: 15px;
+    align-items: center;
+  }
+
+  .updateInfo__name {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .updateInfo__firstName, 
+  .updateInfo__lastName,
+  .updateInfo__username {
+    width: 80vw;
+  }
+
+  .image__preview {
+    width: 80vw;
+  }
+
+  .removeImage__button {
+    width: 30vw;
+  }
+
+  .updateInfo__button {
+    width: 30vw;
+  }
+
+  .profile__lowerButtons {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .account__editButton,
+  .account__editButton2,
+  #account__deleteButton {
+    width: 80vw;
+    text-align: center;
+    display: block;
+    box-sizing: border-box;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .headerGradient {
+    height: 12vh;
+  }
+
+  #profile__topName {
+    font-size: 1.1em;
+  }
+
+  #profile__topId {
+    font-size: 0.8em;
+  }
+
+  .profile__informationBox h3 {
+    font-size: 1.2em;
+    text-align: center;
+  }
+
+  .profile__header {
+    font-size: 1em;
+  }
+
+  .profile__pictureBox img {
+    width: 80px;
+    height: 80px;
+  }
+
+  .updateInfo__firstName, 
+  .updateInfo__lastName,
+  .updateInfo__username {
+    width: 90vw;
+  }
+
+  .image__preview {
+    width: 90vw;
+  }
+
+  .removeImage__button {
+    width: 40vw;
+  }
+
+  .updateInfo__button {
+    width: 40vw;
+  }
+
+  .account__editButton,
+  .account__editButton2,
+  #account__deleteButton {
+    width: 90vw;
+  }
+}
+
+/* Update personal info form */
 .updateInfo__form {
   display: flex;
   flex-direction: column;
@@ -148,15 +330,31 @@ h1 {
 
 .profile__lowerButtons {
   display: flex;
-  margin-top: 20px;
-  gap: 20px;
+  margin-top: 30px;
+  gap: 30px;
+}
+
+.account__editButton {
+  color: #fff;
+  background-color: #039752;
+  padding: 7px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+}
+
+.account__editButton2 {
+  color: #fff;
+  background-color: #039752;
+  padding: 7px 20px;
+  border-radius: 4px;
+  text-decoration: none;
 }
 
 #account__deleteButton {
-  background-color: #ff4c24;
-  padding: 10px 20px;
-  border-radius: 10px;
-  border: 0;
-  color: #fff;
+  color: #ff4c24;
+  border: 1px solid #ff4c24;
+  background-color: transparent;
+  padding: 7px 20px;
+  border-radius: 4px;
   font-family: "OpenSansSemibold";
 }

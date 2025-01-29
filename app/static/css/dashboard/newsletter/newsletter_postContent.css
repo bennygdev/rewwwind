@@ -40,3 +40,45 @@
 .back__button i {
   margin-right: 10px;
 }
+
+/* Media Queries */
+@media screen and (max-width: 1200px) {
+  .newsletter__post-full {
+    max-width: 60vw;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .newsletter__post-full {
+    max-width: 80vw;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .newsletter__post-full {
+    max-width: 90vw;
+    padding: 20px;
+    margin-top: 15px;
+  }
+
+  .newsletter__post-title {
+    font-size: 1.5em;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .newsletter__post-full {
+    max-width: 100%;
+    padding: 15px;
+    margin-top: 10px;
+  }
+
+  .newsletter__post-title {
+    font-size: 1.3em;
+  }
+
+  .newsletter__post-header {
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+  }
+}

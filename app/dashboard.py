@@ -59,20 +59,14 @@ def change_email():
   form = ChangeEmailForm()
 
   if form.validate_on_submit():
-    email_exists = User.query.filter_by(email=form.email.data).first()
-
-    if form.email.data == current_user.email:
-      flash("New email cannot be the same as your email.", "error")
-      return render_template("dashboard/settings/changeEmail.html", user=current_user, form=form)
-
-    if email_exists:
-      flash("This email is already taken. Please try again.", "error")
-      return render_template("dashboard/settings/changeEmail.html", user=current_user, form=form)
-    
-    current_user.email = form.email.data
-    db.session.commit()
-    flash("Your email has been updated!", "success")
-    return redirect(url_for('dashboard.update_personal_information'))
+    try:
+      current_user.email = form.email.data
+      db.session.commit()
+      flash("Your email has been updated!", "success")
+      return redirect(url_for('dashboard.update_personal_information'))
+    except Exception as e:
+      db.session.rollback()
+      flash("An unexpected error occurred. Please try again.", "error")
 
   return render_template("dashboard/settings/changeEmail.html", user=current_user, form=form)
 
@@ -136,13 +130,6 @@ def update_personal_information_form():
 
   # current user because logged in user
   if form.validate_on_submit():
-
-    if form.username.data != current_user.username:
-      user = User.query.filter_by(username=form.username.data).first()
-      if user:
-        flash("That username is taken. Please choose another one.", "error")
-        return render_template('dashboard/settings/updatePersonalInfoForm.html', user=current_user, form=form)
-
     if form.picture.data:
       picture_file = save_picture(form.picture.data)
       current_user.image = picture_file
@@ -164,9 +151,6 @@ def update_personal_information_form():
     form.lastName.data = current_user.last_name
     form.username.data = current_user.username
 
-  if form.picture.errors:
-    flash("File does not have an approved extension: jpg, png", "error")
-
   return render_template("dashboard/settings/updatePersonalInfoForm.html", user=current_user, form=form, image_file=image_file)
 
 @dashboard.route('/settings/change-password', methods=['GET', 'POST'])
@@ -176,23 +160,14 @@ def change_password():
   form = ChangePasswordForm()
 
   if form.validate_on_submit():
-    if check_password_hash(current_user.password, form.password.data):
-      flash("New password cannot be the same as the previous password", "error")
-      return render_template('dashboard/settings/changePassword.html', user=current_user, form=form)
-    
-    # update
-    current_user.password = generate_password_hash(form.password.data, method='pbkdf2:sha256')
-    db.session.commit()
-    flash("Password updated successfully!", "success")
-    return redirect(url_for('dashboard.update_personal_information'))
-  
-  if form.confirmPassword.data != form.password.data:
-    flash("Both passwords must match.", "error")
-    return render_template('dashboard/settings/changePassword.html', user=current_user, form=form)
-  
-  if form.password.errors:
-    flash("Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.", "error")
-    return render_template('dashboard/settings/changePassword.html', user=current_user, form=form)
+    try:
+      current_user.password = generate_password_hash(form.password.data, method='pbkdf2:sha256')
+      db.session.commit()
+      flash("Password updated successfully!", "success")
+      return redirect(url_for('dashboard.update_personal_information'))
+    except Exception as e:
+      db.session.rollback()
+      flash("An unexpected error occurred. Please try again.", "error")
 
   return render_template('dashboard/settings/changePassword.html', user=current_user, form=form)
   

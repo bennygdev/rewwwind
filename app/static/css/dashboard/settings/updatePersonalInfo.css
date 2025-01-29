@@ -311,13 +311,12 @@ h1 {
 }
 
 .updateInfo__button {
-  width: 6vw;
-  height: 45px;
-  background-color: #039752;
-  border: 0;
-  font-family: "OpenSansSemibold";
   color: #fff;
-  border-radius: 10px;
+  background-color: #039752;
+  padding: 7px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  border: none;
   margin-top: 15px;
 }
 
@@ -357,4 +356,92 @@ h1 {
   padding: 7px 20px;
   border-radius: 4px;
   font-family: "OpenSansSemibold";
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.875em;
+  margin-top: 5px;
+  display: block;
+}
+
+/* Media Queries */
+@media screen and (max-width: 1024px) {
+  .updateInfo__name {
+    gap: 20px;
+  }
+  
+  .updateInfo__firstName, 
+  .updateInfo__lastName {
+    width: 35vw;
+  }
+  
+  .updateInfo__username {
+    width: 50vw;
+  }
+  
+  .image__preview {
+    width: 60vw;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .updateInfo__name {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .updateInfo__firstName, 
+  .updateInfo__lastName,
+  .updateInfo__username {
+    width: 85vw;
+  }
+  
+  .image__preview {
+    width: 85vw;
+    padding: 15px;
+  }
+  
+  .profile-picture-preview-img {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .removeImage__button {
+    width: 35vw;
+  }
+  
+  .updateInfo__button {
+    width: 35vw;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .updateInfo__firstName, 
+  .updateInfo__lastName,
+  .updateInfo__username {
+    width: 90vw;
+  }
+  
+  .image__preview {
+    width: 90vw;
+    padding: 10px;
+  }
+  
+  .image__file {
+    padding: 15px;
+  }
+  
+  .profile-picture-preview-img {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .removeImage__button {
+    width: 50vw;
+  }
+  
+  .updateInfo__button {
+    width: 50vw;
+  }
 }

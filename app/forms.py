@@ -1,7 +1,9 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from flask import request, flash
+from flask_login import current_user
 from werkzeug.utils import secure_filename
+from werkzeug.security import check_password_hash
 from wtforms import StringField, TextAreaField, IntegerField, DateField, FloatField, FieldList, FormField, SelectField, BooleanField, FileField, MultipleFileField, EmailField, PasswordField, RadioField, SelectMultipleField, HiddenField, SubmitField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, Optional, NumberRange, Regexp, ValidationError
 from PIL import Image # file object validator
@@ -36,20 +38,46 @@ class ResetPasswordForm(FlaskForm):
   submit = SubmitField('Reset Password')
 
 class UpdatePersonalInformation(FlaskForm):
-  firstName = StringField('First Name', validators=[DataRequired()])
-  lastName = StringField('Last Name') # most wesbites do not need last name
+  firstName = StringField('First Name', validators=[DataRequired(), Length(max=150, message="First name cannot exceed 150 characters.")])
+  lastName = StringField('Last Name', validators=[Length(max=150, message="Last name cannot exceed 150 characters.")]) # most wesbites do not need last name
   username = StringField('Username', validators=[DataRequired(), Length(max=15)])
-  picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
+  picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'], 'Only JPG and PNG images are allowed.')])
   submit = SubmitField('Update')
+
+  def validate_username(self, username):
+    if username.data != current_user.username:
+      user = User.query.filter_by(username=username.data).first()
+      if user:
+        raise ValidationError("That username is taken. Please choose another one.")
+
+  def validate_picture(self, picture):
+    if picture.data:
+      try:
+        # Attempt to open the image to verify it's valid
+        Image.open(picture.data)
+      except:
+        raise ValidationError("The uploaded file is not a valid image.")
 
 class ChangePasswordForm(FlaskForm):
   password = PasswordField('Password', validators=[DataRequired(), Length(min=8), Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", message="Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.")])
   confirmPassword = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message="Passwords must match")])
   submit = SubmitField('Save')
 
+  def validate_password(self, password):
+    if check_password_hash(current_user.password, password.data):
+      raise ValidationError("New password cannot be the same as your current password.")
+
 class ChangeEmailForm(FlaskForm):
   email = EmailField('Email', validators=[DataRequired(), Email()])
   submit = SubmitField('Save')
+
+  def validate_email(self, email):
+    if email.data == current_user.email:
+      raise ValidationError("New email cannot be the same as your current email.")
+            
+    user = User.query.filter_by(email=email.data).first()
+    if user:
+      raise ValidationError("This email is already taken. Please try again.")
 
 class AdminChangeUserInfoForm(FlaskForm):
   firstName = StringField('First Name', validators=[DataRequired()])

@@ -1,7 +1,7 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
+from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app, jsonify
 from flask_login import login_required, current_user
 from .forms import UpdatePersonalInformation, ChangePasswordForm, BillingAddressForm, PaymentMethodForm, ChangeEmailForm
-from .models import User, BillingAddress, PaymentInformation, PaymentType, Review, Cart, Order, UserVoucher
+from .models import User, BillingAddress, PaymentInformation, PaymentType, Review, Cart, Order, UserVoucher, MailingList
 from .roleDecorator import role_required
 from . import db
 import secrets
@@ -371,3 +371,36 @@ def delete_payment_method(id):
   else:
     flash("Invalid billing address or unauthorized access.", "error")
     return redirect(url_for('dashboard.update_payment_information'))
+  
+@dashboard.route('/settings/manage-notifications')
+@login_required
+@role_required(1, 2, 3)
+def manage_notifications():
+  mailing_list_entry = MailingList.query.filter_by(email=current_user.email).first()
+
+  return render_template("dashboard/settings/manageNotifications.html", user=current_user, mailing_list_entry=mailing_list_entry)
+
+@dashboard.route('/settings/toggle-marketing-emails', methods=['POST'])
+@login_required
+@role_required(1, 2, 3)
+def toggle_marketing_emails():
+  data = request.get_json()
+  subscribed = data.get('subscribed', False)
+    
+  try:
+    mailing_list_entry = MailingList.query.filter_by(email=current_user.email).first()
+        
+    if subscribed and not mailing_list_entry:
+      new_entry = MailingList(
+        email=current_user.email,
+        unsubscribe_token=secrets.token_urlsafe(32)
+      )
+      db.session.add(new_entry)
+    elif not subscribed and mailing_list_entry:
+      db.session.delete(mailing_list_entry)
+        
+    db.session.commit()
+    return jsonify({'success': True})
+  except Exception as e:
+    db.session.rollback()
+    return jsonify({'success': False, 'error': str(e)}), 500

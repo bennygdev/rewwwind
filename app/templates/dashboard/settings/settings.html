@@ -18,24 +18,26 @@
 {% block content %}
 
 <div class="settings__content">
-  <a href="{{ url_for('dashboard.update_personal_information') }}" class="settings__container">
-    <div>
-      <h2 class="settings__title"><i class="fa-solid fa-user"></i> Personal Information</h2>
-      <p class="settings__paragraph">Update your Personal Information here.</p>
-    </div>
-  </a>
-  <a href="{{ url_for('dashboard.update_billing_address') }}" class="settings__container">
-    <div>
-      <h2 class="settings__title"><i class="fa-solid fa-envelopes-bulk"></i> Billing Address</h2>
-      <p class="settings__paragraph">Update your Billing Address here.</p>
-    </div>
-  </a>
-  <a href="{{ url_for('dashboard.update_payment_information') }}" class="settings__container">
-    <div>
-      <h2 class="settings__title"><i class="fa-solid fa-credit-card"></i> Payment Information</h2>
-      <p class="settings__paragraph">Update your Payment Information here.</p>
-    </div>
-  </a>
+  <div class="settings__container">
+    <p class="settings__title">Personal Information</p>
+    <p class="settings__paragraph">Update your name, email, phone number, and other account details to help us better serve you.</p>
+    <a href="{{ url_for('dashboard.update_personal_information') }}" class="settings__button">View Personal Information</a>
+  </div>
+  <div class="settings__container">
+    <p class="settings__title">Billing Address</p>
+    <p class="settings__paragraph">Add or modify the address where you receive invoices and billing-related communications.</p>
+    <a href="{{ url_for('dashboard.update_billing_address') }}" class="settings__button">View Billing Addresses</a>
+  </div>
+  <div class="settings__container">
+    <p class="settings__title">Payment Information</p>
+    <p class="settings__paragraph">Securely manage your payment methods and update your credit card or bank account details.</p>
+    <a href="{{ url_for('dashboard.update_payment_information') }}" class="settings__button">View Payment Information</a>
+  </div>
+  <div class="settings__container">
+    <p class="settings__title">Notifications</p>
+    <p class="settings__paragraph">Choose which emails and alerts you want to receive to stay informed about account activity and updates.</p>
+    <a href="{{ url_for('dashboard.manage_notifications') }}" class="settings__button">View Notification Options</a>
+  </div>
 </div>
 
 {% endblock %}

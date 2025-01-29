@@ -115,6 +115,7 @@ def create_app():
   from .manageTradeins import manageTradeins
   from .customerChat import customerChat
   from .manageProducts import manageProducts
+  from .wishlist import wishlist
   from .manageVouchers import manageVouchers
   from .manageAccounts import manageAccounts
   from .newsletter import newsletter
@@ -125,6 +126,7 @@ def create_app():
   app.register_blueprint(manageTradeins, url_prefix="/dashboard")
   app.register_blueprint(customerChat, url_prefix="/dashboard")
   app.register_blueprint(manageProducts, url_prefix="/dashboard")
+  app.register_blueprint(wishlist, url_prefix="/dashboard")
   app.register_blueprint(manageVouchers, url_prefix="/dashboard")
   app.register_blueprint(manageAccounts, url_prefix="/dashboard")
   app.register_blueprint(newsletter, url_prefix="/dashboard")

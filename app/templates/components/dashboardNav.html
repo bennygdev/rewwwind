@@ -6,7 +6,7 @@
           <li><a href="/dashboard/manage-orders" class="dashboard__link {{ 'dashboard__link--active' if active_page == 'manage_orders' else '' }}"><i class="fa-solid fa-box"></i>Manage Orders</a></li>
           <li><a href="/dashboard/manage-tradeins" class="dashboard__link {{ 'dashboard__link--active' if active_page == 'manage_tradeins' else '' }}"><i class="fa-solid fa-shopping-bag"></i>Manage Trade-ins</a></li>
           {% if user.role_id == 1 %}
-          <li><a href="/dashboard/manage-tradeins" class="dashboard__link {{ 'dashboard__link--active' if active_page == 'manage_tradeins' else '' }}"><i class="fa-solid fa-heart"></i>Wishlist</a></li>
+          <li><a href="/dashboard/wishlist" class="dashboard__link {{ 'dashboard__link--active' if active_page == 'wishlist' else '' }}"><i class="fa-solid fa-heart"></i>Wishlist</a></li>
           {% endif %}
           {% if user.role_id in [2, 3] %}
           <li><a href="/dashboard/customer-chat" class="dashboard__link {{ 'dashboard__link--active' if active_page == 'customer_chat' else '' }}"><i class="fa-solid fa-comment"></i>Customer Chat</a></li>

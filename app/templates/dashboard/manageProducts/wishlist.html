@@ -1,0 +1,91 @@
+{% extends "dashboard/base.html" %}
+{% set active_page = "wishlist" %}
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/pageInteractions/filters.css') }}">
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/manageProducts/productListing.css') }}">
+{% endblock %}
+{% block title %}Add Product{% endblock %}
+
+{% block headerContent %}
+<div class="products__header">
+    <h1 id="products__title">Wishlist</h1>
+    <div class="product__statistics">
+        <div class="statistic__box">
+            <i class="bi bi-heart-fill fa-xl"></i>
+            <div class="product__statistic">
+                <p class="statistic__label">Total Items</p>
+                <span class="statistic__amount">{{ products|length }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="extraPadding"></div>
+    <div class="search__wrapper">
+        <!-- <div class="search__container">
+          <input type="text" id="search__bar" class="search__bar" placeholder="Search by username..." autocomplete="off">
+          <i class="fa-solid fa-magnifying-glass search__button" id="search__button"></i>
+        </div> -->
+        <form method="get" action="{{ url_for('manageProducts.products_listing') }}">
+            <div class="search__container">
+            <input
+              type="text"
+              name="q"
+              id="search__bar"
+              class="search__bar"
+              placeholder="Search by product name..."
+              value="{{ search_query }}"
+              autocomplete="off"
+            >
+            <button type="submit" class="search__button" id="search__button">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+            {% if search_query %}
+                <a href="{{ url_for('manageProducts.products_listing') }}" class="clear__button">
+                    <i class="fa-solid fa-xmark fa-lg"></i>
+                </a>
+            {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+{% if products %}
+<div class="products">
+    <table>
+        <thead>
+            <tr>
+                <th class="productName">Name</th>
+                <th class="productType">Type</th>
+                <th class="productGenre">Genre</th>
+                <th class="productAvgPrice">Price</th>
+                <th class="controls"></th>
+            </tr>
+        </thead>
+        {% for product in products %}
+        <tr product-id="{{ product.id }}">
+            <td class="productName">
+                <div class="thumbnail"><img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}"/></div>
+                <div class="name"><p>{{ product.name }}</p><p>ID: {{ product.id }}</p></div>
+            </td>
+            <td class="productType">{{ product.category.category_name }}</td>
+            <td class="productGenre">{{ product.subcategories[0].subcategory_name }}</td>
+            <td class="productAvgPrice">&dollar;{{ '{:.2f}'.format(product.conditions[0].price) }}</td>
+            <td class="controls">
+                <div>
+                    <a href="{{ url_for('productPagination.product_detail', product_id = product.id) }}" title="View item"><i class="fa-solid fa-eye"></i></a>
+                    <a href="{{ url_for('wishlist.remove_favourite', product_id = product.id) }}" title="Remove item from wishlist"><i class="bi bi-heart-fill"></i></a>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% else %}
+<h1>You have no wishlisted items yet.</h1>
+<a href="{{ url_for('productPagination.product_pagination') }}" style="color: green; font-size: 1.5em;">Continue shopping here!</a>
+{% endif %}
+{% endblock %}
+
+{% block body_scripts %}
+{% endblock %}

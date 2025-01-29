@@ -318,6 +318,10 @@ td.highStock div {
     color: rgb(214, 0, 0);
 }
 
+.products tbody td:last-child i.bi-heart-fill {
+    color: red
+}
+
 .products tbody tr {
     background-color: #eee;
     color: #6e6e6e;

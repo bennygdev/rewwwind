@@ -37,7 +37,7 @@ function createChart(canvasId, url, chartType, chartTitle) {
             maintainAspectRatio: false,
             plugins: {
               title: {
-                display: true,
+                display: false,
                 text: chartTitle
               }
             }

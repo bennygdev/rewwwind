@@ -195,3 +195,91 @@ canvas {
   text-align: center;
   padding: 20px;
 }
+
+/* Media quries */
+@media screen and (max-width: 1200px) {
+  .overview__statistics--header {
+    gap: 20px;
+  }
+
+  .statistics__bottom .statistic__box {
+    width: calc(50% - 15px);
+  }
+
+  .statistics__bottom {
+    flex-wrap: wrap;
+  }
+
+  .statistics__bottom .statistic__box:last-child {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .overview__header {
+    height: auto;
+    padding-bottom: 60px;
+  }
+
+  .overview__statistics--header {
+    flex-direction: column;
+    position: relative;
+    margin-top: 0;
+    width: 100%;
+    padding: 0;
+  }
+
+  .statistic__box--header {
+    width: 100%;
+  }
+
+  .statistics__top {
+    flex-direction: column;
+  }
+
+  .statistics__top .statistic__box {
+    width: 100%;
+  }
+
+  .statistics__bottom .statistic__box {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .overview__header {
+    padding: 10px 20px;
+    padding-bottom: 60px;
+  }
+
+  .overview__statistics--header {
+    padding-right: 20px;
+  }
+
+  .pending-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pending-date {
+    margin-top: 5px;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .statistic__box--header {
+    padding: 10px 15px;
+  }
+
+  .overview__statistic--header span {
+    font-size: 1.2em;
+  }
+
+  /* .pending-list {
+    max-height: 25vh;
+  } */
+
+  .pending-details {
+    flex-wrap: wrap;
+  }
+}

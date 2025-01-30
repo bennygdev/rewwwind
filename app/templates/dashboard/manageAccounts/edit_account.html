@@ -10,7 +10,7 @@
 {% block content %}
 
 <h1>Editing Account #{{ selectedUser.id }}</h1>
-{% include "components/backButton.html" %}
+{% include "components/backLink.html" %}
 
 <form method="POST" class="editInfo__form">
   {{ form.hidden_tag() }}
@@ -22,19 +22,39 @@
     <div class="editInfo__firstName">
       {{ form.firstName.label }}
       {{ form.firstName(class="form-control") }}
+      {% if form.firstName.errors %}
+        {% for error in form.firstName.errors %}
+          <span class="error-message">{{ error }}</span>
+        {% endfor %}
+      {% endif %}
     </div>
     <div class="editInfo__lastName">
       {{ form.lastName.label }}
       {{ form.lastName(class="form-control") }}
+      {% if form.lastName.errors %}
+        {% for error in form.lastName.errors %}
+          <span class="error-message">{{ error }}</span>
+        {% endfor %}
+      {% endif %}
     </div>
   </div>
   <div class="editInfo__username">
     {{ form.username.label }}
     {{ form.username(class="form-control") }}
+    {% if form.username.errors %}
+      {% for error in form.username.errors %}
+        <span class="error-message">{{ error }}</span>
+      {% endfor %}
+    {% endif %}
   </div>
   <div class="editInfo__email">
     {{ form.email.label }}
     {{ form.email(class="form-control") }}
+    {% if form.email.errors %}
+      {% for error in form.email.errors %}
+        <span class="error-message">{{ error }}</span>
+      {% endfor %}
+    {% endif %}
   </div>
   <div class="button__wrapper">
     {{ form.submit(class="editInfo__button") }}

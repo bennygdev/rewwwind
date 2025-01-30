@@ -62,24 +62,49 @@
         <div class="billing__editAddressOne">
           {{ form.address_one.label }} 
           {{ form.address_one(class="form-control", value=address.address_one) }}
+          {% if form.address_one.errors %}
+            {% for error in form.address_one.errors %}
+              <span class="error-message">{{ error }}</span>
+            {% endfor %}
+          {% endif %}
         </div>
         <div class="billing__editAddressTwo">
           {{ form.address_two.label }} 
           {{ form.address_two(class="form-control", value=address.address_two) }}
+          {% if form.address_two.errors %}
+            {% for error in form.address_two.errors %}
+              <span class="error-message">{{ error }}</span>
+            {% endfor %}
+          {% endif %}
         </div>
         <div class="billing__addressRow">
           <div class="billing__editUnitNumber">
             {{ form.unit_number.label }} 
             {{ form.unit_number(class="form-control", value=address.unit_number) }}
+            {% if form.unit_number.errors %}
+              {% for error in form.unit_number.errors %}
+                <span class="error-message">{{ error }}</span>
+              {% endfor %}
+            {% endif %}
           </div>
           <div class="billing__editPostalCode">
             {{ form.postal_code.label }} 
             {{ form.postal_code(class="form-control", value=address.postal_code) }}
+            {% if form.postal_code.errors %}
+              {% for error in form.postal_code.errors %}
+                <span class="error-message">{{ error }}</span>
+              {% endfor %}
+            {% endif %}
           </div>
         </div>
         <div class="billing__editPhoneNumber">
           {{ form.phone_number.label }} 
           {{ form.phone_number(class="form-control", value=address.phone_number) }}
+          {% if form.phone_number.errors %}
+            {% for error in form.phone_number.errors %}
+              <span class="error-message">{{ error }}</span>
+            {% endfor %}
+          {% endif %}
         </div>
       </form>
     </div>

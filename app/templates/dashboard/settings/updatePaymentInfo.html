@@ -69,22 +69,47 @@
             </label>
           </div>
           {% endfor %}
+          {% if form.paymentType_id.errors %}
+            {% for error in form.paymentType_id.errors %}
+              <span class="error-message">{{ error }}</span>
+            {% endfor %}
+          {% endif %}
         </div>
         <div class="payment__editCardName">
           {{ form.card_name.label }} 
           {{ form.card_name(class="form-control", value=method.card_name) }}
+          {% if form.card_name.errors %}
+            {% for error in form.card_name.errors %}
+              <span class="error-message">{{ error }}</span>
+            {% endfor %}
+          {% endif %}
         </div>
         <div class="payment__editCardNumber">
           {{ form.card_number.label }} 
           {{ form.card_number(class="form-control", value=method.card_number) }}
+          {% if form.card_number.errors %}
+            {% for error in form.card_number.errors %}
+              <span class="error-message">{{ error }}</span>
+            {% endfor %}
+          {% endif %}
         </div>
         <div class="payment__editExpiryDate">
           {{ form.expiry_date.label }} 
           {{ form.expiry_date(class="form-control", value=method.expiry_date) }}
+          {% if form.expiry_date.errors %}
+            {% for error in form.expiry_date.errors %}
+              <span class="error-message">{{ error }}</span>
+            {% endfor %}
+          {% endif %}
         </div>
         <div class="payment__editCardCVV">
           {{ form.card_cvv.label }} 
           {{ form.card_cvv(class="form-control") }}
+          {% if form.card_cvv.errors %}
+            {% for error in form.card_cvv.errors %}
+              <span class="error-message">{{ error }}</span>
+            {% endfor %}
+          {% endif %}
         </div>
       </form>
     </div>

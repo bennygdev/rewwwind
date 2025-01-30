@@ -26,12 +26,63 @@ h1 {
 }
 
 .editInfo__button {
-  width: 6vw;
-  height: 45px;
-  background-color: #039752;
-  border: 0;
-  font-family: "OpenSansSemibold";
   color: #fff;
-  border-radius: 10px;
+  background-color: #039752;
+  padding: 7px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  border: 0;
   margin-top: 15px;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.875em;
+  margin-top: 5px;
+  display: block;
+}
+
+/* Media Queries */
+@media screen and (max-width: 1024px) {
+  .editInfo__firstName, .editInfo__lastName {
+    width: 25vw;
+  }
+  
+  .editInfo__username, .editInfo__email {
+    width: 40vw;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .editInfo__name {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .editInfo__firstName, .editInfo__lastName {
+    width: 60vw;
+  }
+  
+  .editInfo__username, .editInfo__email {
+    width: 60vw;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .editInfo__firstName, .editInfo__lastName {
+    width: 90vw;
+  }
+  
+  .editInfo__username, .editInfo__email {
+    width: 90vw;
+  }
+  
+  h1 {
+    font-size: 1.2em;
+  }
+  
+  .editInfo__form {
+    margin-top: 15px;
+    gap: 8px;
+  }
 }

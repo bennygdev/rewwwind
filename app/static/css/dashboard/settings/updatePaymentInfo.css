@@ -399,3 +399,90 @@ h1 {
   width: 40px;
   height: 25px;
 }
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.875em;
+  margin-top: 5px;
+  display: block;
+}
+
+/* Media Queries */
+@media screen and (max-width: 1024px) {
+  .addPayment__form {
+    padding: 0 20px;
+  }
+  
+  .addPayment__cardName,
+  .addPayment__cardNumber {
+    width: 70vw;
+  }
+  
+  .addPayment__cardExpiryDate,
+  .addPayment__cardCVV {
+    width: 15vw;
+  }
+  
+  .addPayment__button {
+    width: 120px;
+  }
+  
+  .payment-types {
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .addPayment__form {
+    padding: 0 15px;
+  }
+  
+  .addPayment__cardName,
+  .addPayment__cardNumber,
+  .addPayment__cardExpiryDate,
+  .addPayment__cardCVV {
+    width: 100%;
+  }
+  
+  .button__wrapper {
+    width: 100%;
+  }
+  
+  .addPayment__button {
+    width: 100%;
+    margin-top: 20px;
+  }
+  
+  .payment-types {
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .payment-type {
+    flex: 0 0 calc(50% - 10px);
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .addPayment__form {
+    padding: 0 10px;
+    gap: 15px;
+  }
+  
+  .form-control {
+    padding: 8px;
+  }
+  
+  .addPayment__button {
+    height: 40px;
+  }
+  
+  .payment-type {
+    flex: 0 0 100%;
+  }
+  
+  .payment-types {
+    gap: 8px;
+  }
+}

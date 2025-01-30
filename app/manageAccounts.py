@@ -152,9 +152,12 @@ def delete_account(id):
 @login_required
 @role_required(2, 3)
 def edit_account(id):
-  form = AdminChangeUserInfoForm()
-
   selectedUser = User.query.get_or_404(id)
+  form = AdminChangeUserInfoForm(
+    original_username=selectedUser.username,
+    original_email=selectedUser.email
+  )
+
 
   # admin cannot edit admin and owner accounts, but owner can edit any
   if current_user.role_id == 2: 
@@ -171,26 +174,17 @@ def edit_account(id):
     abort(404)
 
   if form.validate_on_submit():
-    
-    if form.username.data != selectedUser.username:
-      user = User.query.filter_by(username=form.username.data).first()
-      if user:
-        flash("That username is taken. Please choose another one.", "error")
-        return render_template("dashboard/manageAccounts/edit_account.html", user=current_user, form=form, selectedUser=selectedUser)
-      
-    if form.email.data != selectedUser.email:
-      user = User.query.filter_by(email=form.email.data).first()
-      if user:
-        flash("That email is taken. Please choose another one.", "error")
-        return render_template("dashboard/manageAccounts/edit_account.html", user=current_user, form=form, selectedUser=selectedUser)
-      
-    selectedUser.first_name = form.firstName.data
-    selectedUser.last_name = form.lastName.data
-    selectedUser.username = form.username.data
-    selectedUser.email = form.email.data
-    db.session.commit()
-    flash("Account has been updated.", 'success')
-    return redirect(url_for('manageAccounts.accounts_listing'))
+    try:
+      selectedUser.first_name = form.firstName.data
+      selectedUser.last_name = form.lastName.data
+      selectedUser.username = form.username.data
+      selectedUser.email = form.email.data
+      db.session.commit()
+      flash("Account has been updated.", 'success')
+      return redirect(url_for('manageAccounts.accounts_listing'))
+    except Exception as e:
+      db.session.rollback()
+      flash('An unexpected error occurred. Please try again.', 'error')
 
   elif request.method == 'GET':
     form.firstName.data = selectedUser.first_name
@@ -224,23 +218,15 @@ def change_password(id):
     abort(404)
 
   if form.validate_on_submit():
-    if check_password_hash(selectedUser.password, form.password.data):
-      flash("New password cannot be the same as the previous password", "error")
-      return render_template("dashboard/manageAccounts/changePassword.html", user=current_user, form=form, selectedUser=selectedUser)
-    
-    # update
-    selectedUser.password = generate_password_hash(form.password.data, method='pbkdf2:sha256')
-    db.session.commit()
-    flash("Password updated successfully.", "success")
-    return redirect(url_for('manageAccounts.accounts_listing'))
-  
-  if form.confirmPassword.data != form.password.data:
-    flash("Both passwords must match.", "error")
-    return render_template("dashboard/manageAccounts/changePassword.html", user=current_user, form=form, selectedUser=selectedUser)
-  
-  if form.password.errors:
-    flash("Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.", "error")
-    return render_template("dashboard/manageAccounts/changePassword.html", user=current_user, form=form, selectedUser=selectedUser)
+    try:
+      # update
+      selectedUser.password = generate_password_hash(form.password.data, method='pbkdf2:sha256')
+      db.session.commit()
+      flash("Password updated successfully.", "success")
+      return redirect(url_for('manageAccounts.accounts_listing'))
+    except Exception as e:
+      db.session.rollback()
+      flash("An unexpected error occurred. Please try again.", "error")
 
   return render_template("dashboard/manageAccounts/changePassword.html", user=current_user, form=form, selectedUser=selectedUser)
 
@@ -251,49 +237,31 @@ def add_any_account():
   form = OwnerAddAccountForm()
 
   if form.validate_on_submit():
-    first_name = form.firstName.data
-    last_name = form.lastName.data
-    username = form.username.data
-    email = form.email.data
-    password = form.password.data
-    role_id = form.role_id.data
-
-    # Check if the email already exists
-    email_exists = User.query.filter_by(email=email).first()
-    if email_exists:
-      flash('An account with that email already exists.', 'error')
-      return render_template("dashboard/manageAccounts/add_any_account.html", user=current_user, form=form)
-        
-    # Additional validation checks (already handled by WTForms)
-    if not first_name or not last_name:
-      flash('All fields are required.', 'error')
-      return render_template("dashboard/manageAccounts/add_any_account.html", user=current_user, form=form)
-    
-    username_exists = User.query.filter_by(username=form.username.data).first()
-    if username_exists:
-      flash('An account with that username already exists.', 'error')
-      return render_template("dashboard/manageAccounts/add_any_account.html", user=current_user, form=form)
-    
-    # add user to database
-    new_user = User(
-      first_name = first_name, 
-      last_name = last_name,
-      username = username,
-      email = email,
-      image = None,
-      password = generate_password_hash(password, method='pbkdf2:sha256'),
-      orderCount = 0,
-      role_id = role_id
-    )
-    db.session.add(new_user)
-    db.session.commit()
-    flash("Account created successfully.", "success")
-    return redirect(url_for('manageAccounts.accounts_listing'))
-
-  if form.role_id.errors:
-    flash("Please select a category.", "error")
-
-  if form.password.errors:
-    flash("Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.", "error")
+    try:
+      first_name = form.firstName.data
+      last_name = form.lastName.data
+      username = form.username.data
+      email = form.email.data
+      password = form.password.data
+      role_id = form.role_id.data
+      
+      # add user to database
+      new_user = User(
+        first_name = first_name, 
+        last_name = last_name,
+        username = username,
+        email = email,
+        image = None,
+        password = generate_password_hash(password, method='pbkdf2:sha256'),
+        orderCount = 0,
+        role_id = role_id
+      )
+      db.session.add(new_user)
+      db.session.commit()
+      flash("Account created successfully.", "success")
+      return redirect(url_for('manageAccounts.accounts_listing'))
+    except Exception as e:
+      db.session.rollback()
+      flash('An unexpected error occurred. Please try again.', 'error')
 
   return render_template("dashboard/manageAccounts/add_any_account.html", user=current_user, form=form)

@@ -301,3 +301,85 @@ h1 {
   border-radius: 10px;
   margin-top: 15px;
 }
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.875em;
+  margin-top: 5px;
+  display: block;
+}
+
+/* Media Queries */
+@media screen and (max-width: 1024px) {
+  .addBilling__form {
+    padding: 0 20px;
+  }
+  
+  .addBilling__addressOne,
+  .addBilling__addressTwo {
+    width: 70vw;
+  }
+  
+  .addBilling__addressRow {
+    gap: 20px;
+  }
+  
+  .addBilling__unitNumber,
+  .addBilling__postalCode {
+    width: 15vw;
+  }
+  
+  .addBilling__phoneNumber {
+    width: 25vw;
+  }
+  
+  .addBilling__button {
+    width: 120px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .addBilling__form {
+    padding: 0 15px;
+  }
+  
+  .addBilling__addressOne,
+  .addBilling__addressTwo,
+  .addBilling__phoneNumber {
+    width: 100%;
+  }
+  
+  .addBilling__addressRow {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .addBilling__unitNumber,
+  .addBilling__postalCode {
+    width: 100%;
+  }
+  
+  .button__wrapper {
+    width: 100%;
+  }
+  
+  .addBilling__button {
+    width: 100%;
+    margin-top: 20px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .addBilling__form {
+    padding: 0 10px;
+    gap: 15px;
+  }
+  
+  .form-control {
+    padding: 8px;
+  }
+  
+  .addBilling__button {
+    height: 40px;
+  }
+}

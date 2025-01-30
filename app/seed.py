@@ -54,6 +54,7 @@ def insert_users():
   )
 
   customer = User(
+    stripe_id = 'cus_RgCvkhikneQdWk',
      first_name = "Customer",
      last_name = "4",
      username = "Customer",
@@ -520,20 +521,21 @@ def insert_orders():
   db.session.add(billing_info)
   db.session.commit()
 
-  import stripe
-  user = User.query.filter_by(id=4).first()
-  stripe.Customer.create(
-    name= f"{user.first_name} {user.last_name}",
-    email= user.email,
-    shipping={
-      'address': {
-        'line1': billing_info.address_one,
-        'postal_code': billing_info.postal_code
-      },
-      'name': f"{user.first_name} {user.last_name}",
-      'phone': billing_info.phone_number
-    }
-  )
+# uncomment only if needed, otherwise will create duplicate customer account.
+  # import stripe 
+  # user = User.query.filter_by(id=4).first()
+  # stripe.Customer.create(
+  #   name= f"{user.first_name} {user.last_name}",
+  #   email= user.email,
+  #   shipping={
+  #     'address': {
+  #       'line1': billing_info.address_one,
+  #       'postal_code': billing_info.postal_code
+  #     },
+  #     'name': f"{user.first_name} {user.last_name}",
+  #     'phone': billing_info.phone_number
+  #   }
+  # )
   
   for x in range(10):
     order = Order(

@@ -43,7 +43,7 @@ def checkout_product(product_id):
             success_url=url_for('payment.success', _external=True),
             cancel_url=url_for('productPagination.product_pagination', _external=True),
             adaptive_pricing={'enabled': True},
-            customer="cus_RgBV3oVHLuCVcL",
+            customer=current_user.stripe_id,
             payment_intent_data={
                 'setup_future_usage': 'on_session'
             },
@@ -51,6 +51,14 @@ def checkout_product(product_id):
                 'allow_redisplay': 'always'
             },
         )
+        if current_user.stripe_id is None:
+            customer = stripe.Customer.create(
+                name=f"{current_user.first_name} {current_user.last_name}",
+                email=current_user.email,
+            )
+
+            current_user.stripe_id = customer.id
+            db.session.commit()
     except Exception as e:
         return str(e)
 
@@ -61,6 +69,8 @@ def checkout_product(product_id):
 @role_required(1)
 def checkout_cart():
     cart = current_user.cart_items
+    if not cart:
+        abort(404)
     items = []
     for item in cart:
         product = Product.query.filter_by(id=item.product_id).first()
@@ -79,9 +89,25 @@ def checkout_cart():
         checkout_session = stripe.checkout.Session.create(
             line_items=items,
             mode='payment',
-            success_url=url_for('payment.success', user=f'{current_user.id}', _external=True),
+            success_url=url_for('payment.success', _external=True),
             cancel_url=url_for('productPagination.product_pagination', _external=True),
+            adaptive_pricing={'enabled': True},
+            customer=current_user.stripe_id,
+            payment_intent_data={
+                'setup_future_usage': 'on_session'
+            },
+            payment_method_data={
+                'allow_redisplay': 'always'
+            },
         )
+        if current_user.stripe_id is None:
+            customer = stripe.Customer.create(
+                name=f"{current_user.first_name} {current_user.last_name}",
+                email=current_user.email,
+            )
+
+            current_user.stripe_id = customer.id
+            db.session.commit()
     except Exception as e:
         return str(e)
 

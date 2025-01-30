@@ -15,7 +15,10 @@ wishlist = Blueprint('wishlist', __name__)
 @wishlist.route('/wishlist')
 @login_required
 def favourites():
-    products = Product.query.filter(Product.id.in_(current_user.wishlisted_items)).all()
+    if not current_user.wishlisted_items:
+        products = None
+    else:
+        products = Product.query.filter(Product.id.in_(current_user.wishlisted_items)).all()
 
     return render_template('dashboard/manageProducts/wishlist.html', user=current_user, products=products)
 

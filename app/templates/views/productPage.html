@@ -11,6 +11,7 @@
   <div class="product__left">
     <div class="image__container">
       <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}"/>
+      <!-- <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ product.image_thumbnail }}" alt="{{ product.name }}"/> -->
     </div>
     <div class="image-list">
       {% for image in product.images %}

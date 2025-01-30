@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for
 from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager, current_user
@@ -62,6 +62,17 @@ def create_app():
   app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'media', 'uploads') # temporary image upload folder
   if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
+  
+  # import cloudinary 
+  # from cloudinary.utils import cloudinary_url
+
+  # # Configuration       
+  # cloudinary.config( 
+  #     cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"), 
+  #     api_key = os.getenv("CLOUDINARY_PUBLIC_KEY"), 
+  #     api_secret = os.getenv("CLOUDINARY_SECRET_KEY"),
+  #     secure=True
+  # )
 
   app.config['OAUTH2_CLIENT_ID'] = os.getenv('GOOGLE_CLIENT_ID')
   app.config['OAUTH2_CLIENT_SECRET'] = os.getenv('GOOGLE_CLIENT_SECRET')

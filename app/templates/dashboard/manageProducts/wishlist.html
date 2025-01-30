@@ -14,7 +14,7 @@
             <i class="bi bi-heart-fill fa-xl"></i>
             <div class="product__statistic">
                 <p class="statistic__label">Total Items</p>
-                <span class="statistic__amount">{{ products|length }}</span>
+                <span class="statistic__amount">{{ products|length if products else 0 }}</span>
             </div>
         </div>
     </div>
@@ -65,7 +65,10 @@
         {% for product in products %}
         <tr product-id="{{ product.id }}">
             <td class="productName">
-                <div class="thumbnail"><img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}"/></div>
+                <div class="thumbnail">
+                    <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}"/>
+                    <!-- <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ product.image_thumbnail }}" alt="{{ product.name }}"/> -->
+                </div>
                 <div class="name"><p>{{ product.name }}</p><p>ID: {{ product.id }}</p></div>
             </td>
             <td class="productType">{{ product.category.category_name }}</td>

@@ -26,7 +26,7 @@
             {% for item in cart_items %}
                 <div class="cart-item" data-product-id="{{ item.product_id }}">
                     <img src="{{ url_for('static', filename='media/uploads/' + item.product.image_thumbnail) }}" alt="{{ item.product.name }}" class="product-image">
-                    <!-- <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ product.image_thumbnail }}" alt="{{ product.name }}"/> -->
+                    <!-- <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ item.product.image_thumbnail }}" alt="{{ item.product.name }}"/> -->
                     <div class="product-details">
                         <h3>{{ item.product.name }}</h3>
                         <p>Condition: <b>{{ item.product_condition['condition'] }}</b></p>

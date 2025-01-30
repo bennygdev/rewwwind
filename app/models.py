@@ -164,7 +164,7 @@ class Order(db.Model):
   order_date = db.Column(db.DateTime(timezone=True), default=func.now())
   approval_date = db.Column(db.DateTime(timezone=True))
   delivery = db.Column(db.String(100), nullable=False)
-  total_amount = db.Column(db.Numeric(10, 2), nullable=False)
+  total_amount = db.Column(db.Numeric(10, 2), nullable=False, default=0)
   status = db.Column(db.String(50), default='Pending', nullable=False)
   
   user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)

@@ -1,9 +1,11 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash, abort, jsonify, current_app
+from flask import Blueprint, render_template, redirect, url_for, request, flash, abort, jsonify, current_app, session
+import requests
 from flask_login import login_required, current_user
 from .__init__ import csrf
 from sqlalchemy import cast, Float, Integer
+from sqlalchemy.orm.attributes import flag_modified
 from .roleDecorator import role_required
-from .models import Product, Review, Category, SubCategory
+from .models import Product, Order, OrderItem, Cart
 from .forms import AddReviewForm, AddToCartForm, DeleteReviewForm
 from . import db
 from math import ceil
@@ -25,6 +27,8 @@ def checkout_product(product_id):
         abort(404)
     
     condition = [con for con in product.conditions if con.get('condition') == getcondition]
+    
+
     try:
         checkout_session = stripe.checkout.Session.create(
             line_items=[
@@ -59,8 +63,18 @@ def checkout_product(product_id):
 
             current_user.stripe_id = customer.id
             db.session.commit()
+
+        temp_cart = Cart(
+            user_id=current_user.id, 
+            product_id=product_id, 
+            product_condition=condition[0], 
+            quantity=1)
+        db.session.add(temp_cart)
+        db.session.commit()
+
     except Exception as e:
-        return str(e)
+        db.session.rollback()
+        print(str(e))
 
     return redirect(checkout_session.url, code=303)
 
@@ -117,4 +131,37 @@ def checkout_cart():
 @login_required
 @role_required(1)
 def success():
+    try:
+        order = Order(
+            user_id=current_user.id,
+            delivery='Standard',
+            payment_type_id=1,
+            payment_information_id=1,
+            billing_id=1
+        )
+        db.session.add(order)
+        db.session.commit()
+
+        if current_user.cart_items:
+            for item in current_user.cart_items:
+                orderitem = OrderItem(
+                    order_id=order.id,
+                    product_id=item.product_id,
+                    product_condition=item.product_condition,
+                    quantity=item.quantity,
+                    unit_price=item.product_condition['price']
+                )
+                db.session.add(orderitem)
+                db.session.commit()
+
+                order.update_total()
+                db.session.commit()
+                
+                db.session.delete(item)
+                db.session.commit()
+
+    except Exception as e:
+        db.session.rollback()
+        print(str(e))
+
     return render_template('views/payment_success.html')

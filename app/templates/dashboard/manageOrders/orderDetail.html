@@ -78,7 +78,7 @@
                         <td class="orderName">
                             <div class="thumbnail">
                                 <img src="{{ url_for('static', filename='media/uploads/' + item.product.image_thumbnail) }}" alt="{{ item.product.name }}"/>
-                                <!-- <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ product.image_thumbnail }}" alt="{{ product.name }}"/> -->
+                                <!-- <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ item.product.image_thumbnail }}" alt="{{ item.product.name }}"/> -->
                             </div>
                             <div class="name"><p>{{ item.product.name }}</p><p>ID: {{ item.product.id }}</p></div>
                         </td>

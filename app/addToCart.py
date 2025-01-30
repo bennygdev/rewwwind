@@ -67,7 +67,6 @@ def add_to_cart(product_id):
         return redirect(url_for("some_page"))
     # Get the selected condition
     selected_condition = product.conditions[int(request.form.get("condition"))]  # Fetch condition from form
-    print(selected_condition)
     # Check if the item with the same condition is already in the cart
     existing_item = Cart.query.filter_by(user_id=current_user.id,product_id=product_id,product_condition=selected_condition).first()
 
@@ -78,37 +77,4 @@ def add_to_cart(product_id):
         db.session.add(new_item)
     db.session.commit()
     #flash("Item added to cart!")
-    return redirect(url_for('addToCart.view_cart'))
-
-
-
-#favourites
-@addToCart.route('/favorites', methods=['GET'])
-@login_required
-def favorites_page():
-    #Fetch favorite items for the current user
-    favorite_items = Cart.query.filter_by(user_id=current_user.id, favorite=True).join(Product).all()
-    return render_template('addToCart/favorites.html', favorite_items=favorite_items)
-
-
-@addToCart.route('/add-to-favorites/<int:product_id>', methods=['POST'])
-@login_required
-def add_to_favorites(product_id):
-    cart_item = Cart.query.filter_by(user_id=current_user.id, product_id=product_id).first()
-    if cart_item:
-        cart_item.favorite = True  # Mark as favorite
-        db.session.commit()
-        flash("Item added to favorites!", "success")
-    else:
-        flash("Item not found in cart!", "error")
-    return redirect(url_for('addToCart.favorites_page'))
-
-
-@addToCart.route('/toggle-favorite/<int:product_id>', methods=['POST'])
-@login_required
-def toggle_favorite(product_id):
-    cart_item = Cart.query.filter_by(user_id=current_user.id, product_id=product_id).first()
-    if cart_item:
-        cart_item.favorite = not cart_item.favorite  # Toggle favorite status
-        db.session.commit()
     return redirect(url_for('addToCart.view_cart'))

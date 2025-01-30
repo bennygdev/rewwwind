@@ -12,17 +12,31 @@ import stripe
 
 payment = Blueprint('payment', __name__)
 
-@payment.route('/create-checkout-session', methods=['POST'])
+@payment.route('/checkout/product/<int:product_id>', methods=['POST'])
 @login_required
 @role_required(1)
-@csrf.exempt
-def create_checkout_session():
+def create_checkout_session(product_id):
+    product = Product.query.filter_by(id=product_id).first()
+    if not product:
+        abort(404)
+    
+    getcondition = request.form.get('condition')
+    if getcondition not in ['Brand New', 'Like New', 'Lightly Used', 'Well Used']:
+        abort(404)
+    
+    condition = [con for con in product.conditions if con.get('condition') == getcondition]
+    print(condition)
     try:
         checkout_session = stripe.checkout.Session.create(
             line_items=[
                 {
-                    # Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-                    'price': 'price_1QmYFF2ek3YdFHUUw0BGUHAW',
+                    'price_data': {
+                        'unit_amount': condition[0]['price'] * 100,
+                        'currency': 'sgd',
+                        'product_data': {
+                            'name': product.name
+                        }
+                    },
                     'quantity': 1,
                 },
             ],

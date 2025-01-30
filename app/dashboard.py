@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app, jsonify
+from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app, jsonify, abort
 from flask_login import login_required, current_user
 from .forms import UpdatePersonalInformation, ChangePasswordForm, BillingAddressForm, PaymentMethodForm, ChangeEmailForm
 from .models import User, BillingAddress, PaymentInformation, PaymentType, Review, Cart, Order, UserVoucher, MailingList
@@ -57,6 +57,9 @@ def update_personal_information():
 @role_required(1, 2, 3)
 def change_email():
   form = ChangeEmailForm()
+
+  if current_user.google_account:
+    abort(404)
 
   if form.validate_on_submit():
     try:
@@ -158,6 +161,9 @@ def update_personal_information_form():
 @role_required(1, 2, 3)
 def change_password():
   form = ChangePasswordForm()
+
+  if current_user.google_account:
+    abort(404)
 
   if form.validate_on_submit():
     try:

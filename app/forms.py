@@ -82,20 +82,47 @@ class ChangeEmailForm(FlaskForm):
       raise ValidationError("This email is already taken. Please try again.")
 
 class AdminChangeUserInfoForm(FlaskForm):
-  firstName = StringField('First Name', validators=[DataRequired()])
-  lastName = StringField('Last Name')
-  username = StringField('Username', validators=[DataRequired(), Length(max=15)])
-  email = EmailField('Email', validators=[DataRequired(), Email()])
+  firstName = StringField('First Name', validators=[DataRequired(message="First name is required."), Length(max=150, message="First name cannot exceed 150 characters.")])
+  lastName = StringField('Last Name', validators=[Length(max=150, message="Last name cannot exceed 150 characters.")])
+  username = StringField('Username', validators=[DataRequired(message="Username is required."), Length(max=15, message="Username cannot exceed 15 characters.")])
+  email = EmailField('Email', validators=[DataRequired(message="Email is required."), Email(message="Please enter a valid email address.")])
   submit = SubmitField('Update')
 
+  def __init__(self, original_username, original_email, *args, **kwargs):
+    super(AdminChangeUserInfoForm, self).__init__(*args, **kwargs)
+    self.original_username = original_username
+    self.original_email = original_email
+
+  def validate_username(self, username):
+    if username.data != self.original_username:
+      user = User.query.filter_by(username=username.data).first()
+      if user:
+        raise ValidationError("This username is already taken.")
+
+  def validate_email(self, email):
+    if email.data != self.original_email:
+      user = User.query.filter_by(email=email.data).first()
+      if user:
+        raise ValidationError("This email address is already registered.")
+
 class OwnerAddAccountForm(FlaskForm):
-  firstName = StringField('First Name', validators=[DataRequired()])
-  lastName = StringField('Last Name', validators=[DataRequired()])
-  username = StringField('Username', validators=[DataRequired(), Length(max=15)])
-  email = EmailField('Email', validators=[DataRequired(), Email()])
-  password = PasswordField('Password', validators=[DataRequired(), Length(min=8), Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", message="Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.")])
-  role_id = IntegerField('Role ID', validators=[DataRequired()])
+  firstName = StringField('First Name', validators=[DataRequired(message="First name is required."), Length(max=150, message="First name cannot exceed 150 characters.")])
+  lastName = StringField('Last Name', validators=[DataRequired(message="Last name is required."), Length(max=150, message="Last name cannot exceed 150 characters.")])
+  username = StringField('Username', validators=[DataRequired(message="Username is required."), Length(max=15, message="Username cannot exceed 15 characters.")])
+  email = EmailField('Email', validators=[DataRequired(message="Email is required."), Email(message="Please enter a valid email address.")])
+  password = PasswordField('Password', validators=[DataRequired(message="Password is required."), Length(min=8), Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", message="Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.")])
+  role_id = IntegerField('Role ID', validators=[DataRequired(message="Please select a role.")])
   submit = SubmitField('Create Account')
+
+  def validate_username(self, username):
+    user = User.query.filter_by(username=username.data).first()
+    if user:
+      raise ValidationError("This username is already taken.")
+
+  def validate_email(self, email):
+    user = User.query.filter_by(email=email.data).first()
+    if user:
+      raise ValidationError("This email address is already registered.")
 
 class BillingAddressForm(FlaskForm):
   address_one = StringField('Address One', validators=[DataRequired(message="Address is required"), Length(min=5, max=255, message="Address must be between 5 and 255 characters")])

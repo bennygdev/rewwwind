@@ -15,7 +15,7 @@ payment = Blueprint('payment', __name__)
 @payment.route('/checkout/product/<int:product_id>', methods=['POST'])
 @login_required
 @role_required(1)
-def create_checkout_session(product_id):
+def checkout_product(product_id):
     product = Product.query.filter_by(id=product_id).first()
     if not product:
         abort(404)
@@ -25,7 +25,6 @@ def create_checkout_session(product_id):
         abort(404)
     
     condition = [con for con in product.conditions if con.get('condition') == getcondition]
-    print(condition)
     try:
         checkout_session = stripe.checkout.Session.create(
             line_items=[
@@ -33,7 +32,7 @@ def create_checkout_session(product_id):
                     'price_data': {
                         'unit_amount': condition[0]['price'] * 100,
                         'currency': 'sgd',
-                        'product_data': {
+                        'product_data': { 
                             'name': product.name
                         }
                     },
@@ -42,6 +41,45 @@ def create_checkout_session(product_id):
             ],
             mode='payment',
             success_url=url_for('payment.success', _external=True),
+            cancel_url=url_for('productPagination.product_pagination', _external=True),
+            adaptive_pricing={'enabled': True},
+            customer="cus_RgBV3oVHLuCVcL",
+            payment_intent_data={
+                'setup_future_usage': 'on_session'
+            },
+            payment_method_data={
+                'allow_redisplay': 'always'
+            },
+        )
+    except Exception as e:
+        return str(e)
+
+    return redirect(checkout_session.url, code=303)
+
+@payment.route('/checkout/cart', methods=['POST'])
+@login_required
+@role_required(1)
+def checkout_cart():
+    cart = current_user.cart_items
+    items = []
+    for item in cart:
+        product = Product.query.filter_by(id=item.product_id).first()
+        additem = {
+                    'price_data': {
+                        'unit_amount': item.product_condition['price'] * 100,
+                        'currency': 'sgd',
+                        'product_data': { 
+                            'name': product.name
+                        }
+                    },
+                    'quantity': item.quantity,
+                }
+        items.append(additem)
+    try:
+        checkout_session = stripe.checkout.Session.create(
+            line_items=items,
+            mode='payment',
+            success_url=url_for('payment.success', user=f'{current_user.id}', _external=True),
             cancel_url=url_for('productPagination.product_pagination', _external=True),
         )
     except Exception as e:

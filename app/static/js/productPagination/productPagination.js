@@ -40,7 +40,7 @@ function adjustProductSpacing() {
     // Reset styles
     container.style.display = 'flex';
     container.style.flexWrap = 'wrap';
-    container.style.rowGap = '10'; // Vertical gaps
+    container.style.rowGap = '20'; // Vertical gaps
     container.style.columnGap = `${gap}px`; // Horizontal gaps only
 
     // Apply width to each product for consistent alignment

@@ -14,7 +14,7 @@
             <i class="bi bi-heart-fill fa-xl"></i>
             <div class="product__statistic">
                 <p class="statistic__label">Total Items</p>
-                <span class="statistic__amount">{{ products|length if products else 0 }}</span>
+                <span class="statistic__amount">{{ total_products }}</span>
             </div>
         </div>
     </div>
@@ -24,7 +24,7 @@
           <input type="text" id="search__bar" class="search__bar" placeholder="Search by username..." autocomplete="off">
           <i class="fa-solid fa-magnifying-glass search__button" id="search__button"></i>
         </div> -->
-        <form method="get" action="{{ url_for('manageProducts.products_listing') }}">
+        <form method="get" action="{{ url_for('wishlist.favourites') }}">
             <div class="search__container">
             <input
               type="text"
@@ -39,7 +39,7 @@
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
             {% if search_query %}
-                <a href="{{ url_for('manageProducts.products_listing') }}" class="clear__button">
+                <a href="{{ url_for('wishlist.favourites') }}" class="clear__button">
                     <i class="fa-solid fa-xmark fa-lg"></i>
                 </a>
             {% endif %}
@@ -52,6 +52,7 @@
 {% block content %}
 {% if products %}
 <div class="products">
+    {% if total_products > 0 %}
     <table>
         <thead>
             <tr>
@@ -83,6 +84,9 @@
         </tr>
         {% endfor %}
     </table>
+    {% else %}
+    <h1>Sorry, no items were found with the given search query.</h1>
+    {% endif %}
 </div>
 {% else %}
 <h1>You have no wishlisted items yet.</h1>

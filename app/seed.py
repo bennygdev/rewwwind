@@ -273,7 +273,7 @@ def insert_products():
       },
       {
         "name": "Electric Ladyland",
-        "creator": "The Jimi Hendrix Experience",
+        "creator": "Jimi Hendrix",
         "description": "Electric Ladyland is the third and final studio album by the Jimi Hendrix Experience, released on October 16, 1968. The album is often regarded as one of the greatest albums of all time, blending rock, blues, and psychedelia.",
         "image_thumbnail": "electric_ladyland.png",
         "images": ['electric_ladyland.png'],

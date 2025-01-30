@@ -5,6 +5,7 @@
 .content .listing__header {
     display: flex;
     justify-content: space-between;
+    gap: 50px;
 }
 
 .content .header__left h1 {
@@ -15,7 +16,7 @@
 .content .header__right {
     display: flex;
     flex-direction: row;
-    justify-content: space-evenly;
+    justify-content: flex-end;
     align-items: center;
 }
 
@@ -23,10 +24,6 @@
     display: flex;
     align-items: center;
     gap: 5px;
-}
-
-.filter-container:not(:last-child) {
-    margin-right: 1.5em;
 }
 
 /* product styles */

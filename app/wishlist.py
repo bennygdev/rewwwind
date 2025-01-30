@@ -15,12 +15,24 @@ wishlist = Blueprint('wishlist', __name__)
 @wishlist.route('/wishlist')
 @login_required
 def favourites():
-    if not current_user.wishlisted_items:
-        products = None
-    else:
-        products = Product.query.filter(Product.id.in_(current_user.wishlisted_items)).all()
+    products_query = Product.query
 
-    return render_template('dashboard/manageProducts/wishlist.html', user=current_user, products=products)
+    # Search logic
+    search_query = request.args.get('q', '', type=str)
+    if search_query != '':
+        products = products_query.filter(Product.name.ilike(f"%{search_query}%"))
+        total_products = products.count()
+    else:
+        products = []
+        if current_user.wishlisted_items:
+            products = Product.query.filter(Product.id.in_(current_user.wishlisted_items)).all()
+        total_products = products.__len__()
+
+    return render_template('dashboard/manageProducts/wishlist.html', 
+                           user=current_user, 
+                           products=products, 
+                           search_query=search_query, 
+                           total_products=total_products)
 
 @wishlist.route('/wishlist/add-item/<int:product_id>', methods=['POST'])
 @login_required

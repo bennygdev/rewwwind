@@ -14,30 +14,71 @@ import re
 
 # Account-related forms
 class LoginForm(FlaskForm):
-  emailUsername = StringField('Email/Username', validators=[DataRequired()])
-  password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
+  emailUsername = StringField('Email/Username', validators=[DataRequired(message="Email or username is required")])
+  password = PasswordField('Password', validators=[DataRequired(message="Password is required"), Length(min=6)])
   submit = SubmitField('Login')
 
+  def validate_emailUsername(self, field):
+    user = User.query.filter((User.email == field.data) | (User.username == field.data)).first()
+    if not user:
+      raise ValidationError('Invalid email or username')
+    elif user.google_account:
+      raise ValidationError('Please use Google Sign-In for this account')
+        
+    # Store the user for password validation
+    self.user = user
+
+  def validate_password(self, field):
+    if hasattr(self, 'user'):  # Only check if user exists (passed email validation)
+      if not check_password_hash(self.user.password, field.data):
+        raise ValidationError('Invalid password')
+
 class RegisterForm(FlaskForm):
-  firstName = StringField('First Name', validators=[DataRequired()])
-  lastName = StringField('Last Name', validators=[DataRequired()])
-  email = EmailField('Email', validators=[DataRequired(), Email()])
-  password = PasswordField('Password', validators=[DataRequired(), Length(min=8), Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", message="Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.")])
-  confirmPassword = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message="Passwords must match")])
+  firstName = StringField('First Name', validators=[DataRequired(message="First name is required")])
+  lastName = StringField('Last Name', validators=[DataRequired(message="Last name is required")])
+  email = EmailField('Email', validators=[DataRequired(message="Email is required"), Email(message="Please enter a valid email address")])
+  password = PasswordField('Password', validators=[DataRequired(message="Password is required"), Length(min=8), Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", message="Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.")])
+  confirmPassword = PasswordField('Confirm Password', validators=[DataRequired(message="Please confirm your password"), EqualTo('password', message="Passwords must match")])
   submit = SubmitField('Create Account')
 
+  def validate_email(self, field):
+    user = User.query.filter_by(email=field.data).first()
+    if user:
+      raise ValidationError('An account with that email already exists.')
+
 class UsernameForm(FlaskForm):
-  username = StringField('Username', validators=[DataRequired(), Length(max=15)])
+  username = StringField('Username', validators=[DataRequired(message="Username is required"), Length(max=15, message="Username must be less than 15 characters")])
   submit = SubmitField('Proceed')
 
+  def validate_username(self, field):
+    user = User.query.filter_by(username=field.data).first()
+    if user:
+      raise ValidationError('This username is already taken.')
+
 class RequestResetForm(FlaskForm):
-  email = EmailField('Email', validators=[DataRequired(), Email()])
+  email = EmailField('Email', validators=[DataRequired(message="Email is required"), Email(message="Please enter a valid email address")])
   submit = SubmitField('Request Password Reset')
 
+  def validate_email(self, field):
+    user = User.query.filter_by(email=field.data).first()
+    if not user:
+      raise ValidationError('There is no account with that email')
+    elif user.google_account:
+      raise ValidationError('This email is linked to a Google account. Please sign in with Google')
+    self.user = user
+
 class ResetPasswordForm(FlaskForm):
-  password = PasswordField('Password', validators=[DataRequired(), Length(min=8), Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", message="Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.")])
-  confirmPassword = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message="Passwords must match")])
+  password = PasswordField('Password', validators=[DataRequired(message="Password is required"), Length(min=8), Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", message="Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.")])
+  confirmPassword = PasswordField('Confirm Password', validators=[DataRequired(message="Please confirm your password"), EqualTo('password', message="Passwords must match")])
   submit = SubmitField('Reset Password')
+
+  def __init__(self, user, *args, **kwargs):
+    super(ResetPasswordForm, self).__init__(*args, **kwargs)
+    self.user = user
+
+  def validate_password(self, field):
+    if check_password_hash(self.user.password, field.data):
+      raise ValidationError("New password cannot be the same as the previous password")
 
 class UpdatePersonalInformation(FlaskForm):
   firstName = StringField('First Name', validators=[DataRequired(), Length(max=150, message="First name cannot exceed 150 characters.")])

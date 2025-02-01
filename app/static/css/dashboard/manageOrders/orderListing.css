@@ -166,6 +166,7 @@
 /* orders table */
 .orders table {
     width: 100%;
+    min-width: 900px;
     /* box-shadow: inset 0 0 0 1px black; */
     border-collapse: collapse;
     border-radius: 10px;
@@ -349,14 +350,14 @@ td.Approved div {
 }
 
 /* Pagination */
-.products__pagination {
+.orders__pagination {
     display: flex;
     justify-content: center;
     align-items: center;
     margin-top: 30px;
   }
   
-  .products__pagination ul {
+  .orders__pagination ul {
     list-style: none;
     display: flex;
     justify-content: center;
@@ -365,12 +366,12 @@ td.Approved div {
     padding: 0;
   }
   
-  .products__pagination li {
+  .orders__pagination li {
     display: inline-block;
     font-family: "OpenSansSemibold";
   }
   
-  .products__pagination .page__button {
+  .orders__pagination .page__button {
     text-decoration: none;
     padding: 8px 14px;
     color: #039752;
@@ -378,7 +379,7 @@ td.Approved div {
     border-radius: 100px;
   }
   
-  .products__pagination .active .page__button {
+  .orders__pagination .active .page__button {
     background-color: #039752;
     padding: 12px 18px;
     color: white;
@@ -408,7 +409,156 @@ td.Approved div {
     color: #000;
   }
 
-  /* if no products */
+  /* if no orders */
   h1.none {
     margin-top: 30px;
   }
+
+@media screen and (max-width: 1500px) {
+/* Table */
+.orders {
+    overflow-x: auto;
+    }
+
+    .orders td, .orders th {
+    padding: 12px 8px;
+    }
+
+    .orders__pagination ul {
+    gap: 8px;
+    flex-wrap: wrap;
+    }
+
+    .orders__pagination .page__button {
+    padding: 6px 12px;
+    }
+
+    .orders__pagination .active .page__button {
+    padding: 8px 14px;
+    }
+
+    .pageNext__button a,
+    .pagePrevious__button a {
+    padding: 8px 15px;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+.product__statistics {
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.statistic__box {
+    flex: 1;
+    min-width: 200px;
+    justify-content: center;
+}
+
+.bodyContent .header {
+    gap: 15px;
+}
+
+.filter__select {
+    min-width: 120px;
+}
+
+.orders td, .orders th {
+    padding: 15px 10px;
+}
+
+.orders td:first-child {
+    padding-left: 15px;
+}
+
+.orders td:last-child {
+    padding-right: 15px;
+}
+}
+
+@media screen and (max-width: 767px) {
+.orders__header {
+    padding: 20px 15px;
+}
+
+#orders__title {
+    font-size: 1.3em;
+}
+
+.product__statistics {
+    flex-direction: column;
+    gap: 10px;
+}
+
+.statistic__box {
+    width: 100%;
+    justify-content: flex-start;
+}
+
+.headerContent .search__wrapper {
+    padding-right: 15px;
+    max-width: calc(100% - 15px);
+}
+
+.bodyContent .header {
+    flex-direction: column;
+    gap: 10px;
+}
+
+.filter__group {
+    width: 100%;
+}
+
+.filter__select, .select2 {
+    width: 100% !important;
+}
+
+.clear__filters, .header__right a {
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.header__right h3 {
+    justify-content: center;
+}
+}
+
+@media screen and (max-width: 480px) {
+.orders__header {
+    padding: 15px 10px;
+}
+
+.statistic__box {
+    padding: 6px 15px;
+}
+
+.statistic__amount {
+    font-size: 1.2em;
+}
+
+.statistic__label {
+    font-size: 0.8em;
+}
+
+td.controls {
+    gap: 10px;
+}
+
+.orders tbody td:last-child i:first-child {
+    margin-right: 10px;
+}
+
+.orders__pagination .page__button {
+    padding: 5px 10px;
+}
+
+.orders__pagination .active .page__button {
+    padding: 6px 12px;
+}
+
+.pageNext__button a,
+.pagePrevious__button a {
+    padding: 6px 12px;
+}
+}

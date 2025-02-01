@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const currentUrl = new URL(window.location.href);
     const searchParams = new URLSearchParams(currentUrl.search);
 
+    searchParams.set('page', '1') // reset page to 1 to prevent errors
+
     // Update search params with current filter values
     filterSelects.forEach((select) => {
       if (select.value) {

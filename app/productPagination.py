@@ -154,7 +154,6 @@ def add_review(product_id):
         selected_condition = product.conditions[0]
     else:
         selected_condition = next((condition for condition in product.conditions if condition['condition'] == selected_condition_name), None)
-    print(selected_condition)
 
     if reviewForm.validate_on_submit():
         new_review = Review(

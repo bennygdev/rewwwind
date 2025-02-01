@@ -25,6 +25,15 @@
           <i class="fa-solid fa-magnifying-glass search__button" id="search__button"></i>
         </div> -->
         <form method="get" action="{{ url_for('manageOrders.orders_listing') }}">
+
+            <!-- Preserve current filter values -->
+            {% if recency_filter %}
+            <input type="hidden" name="recency" value="{{ recency_filter }}">
+            {% endif %}
+            {% if cost_filter %}
+            <input type="hidden" name="cost" value="{{ cost_filter }}">
+            {% endif %}
+
             <div class="search__container">
             <input
               type="text"
@@ -52,33 +61,39 @@
 {% block content %}
 {% if orders %}
 <div class="header">
-    <div class="header__left">
-        <div class="filters">
-            <div class="filter-container">
-                <label>Recency</label>
-                <div class="filter {% if recency_filter %}activated{% endif %}" filter-for="recency">
-                    <span class="selected">{% if recency_filter %}{{ recency_filter|title }}{% else %}All{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
-                    <ul class="filter--options">
-                        <li class="{% if not recency_filter %}highlighted{% endif %}">All</li>
-                        {% for recency in ['Last 30 Days', 'Most Recent First', 'Most Recent Last'] %}
-                        <li class="{% if recency == recency_filter|title %}highlighted{% endif %}">{{ recency }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
+    <div class="content__filters header__left">
+        <form id="filterForm" method="get" action="{{ url_for('manageProducts.products_listing') }}" class="filters__form">
+            <!-- Preserve search query if exists -->
+            {% if search_query %}
+            <input type="hidden" name="q" value="{{ search_query }}">
+            {% endif %}
+            
+            <div class="filter__group">
+                <label for="recency">Recency</label>
+                <select name="recency" id="recency" class="filter__select">
+                    <option value="">All</option>
+                    {% for value, label in recency_choices %}
+                    {{ value }}
+                    <option value="{{ value }}" {% if recency_filter == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
             </div>
-            <div class="filter-container">
-                <label>Cost</label>
-                <div class="filter {% if cost_filter %}activated{% endif %}" filter-for="cost">
-                    <span class="selected">{% if cost_filter %}{{ cost_filter|title }}{% else %}None{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
-                    <ul class="filter--options">
-                        <li class="{% if not cost_filter %}highlighted{% endif %}">None</li>
-                        {% for tag in ['Highest First', 'Lowest First'] %}
-                        <li class="{% if tag == cost_filter|title %}highlighted{% endif %}">{{ tag }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
+
+            <div class="filter__group">
+                <label for="cost">Cost</label>
+                <select name="cost" id="cost" class="filter__select">
+                    <option value="">All</option>
+                    {% for value, label in cost_choices %}
+                    {{ value }}
+                    <option value="{{ value }}" {% if cost_filter == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
             </div>
-        </div>
+        
+            {% if category_filter or subcategory_filter or featured_filter or stock_filter %}
+            <a href="{{ url_for('manageProducts.products_listing', q=search_query) }}" class="clear__filters">Clear Filters</a>
+            {% endif %}
+        </form>
     </div>
 </div>
 <div class="orders">
@@ -139,7 +154,7 @@
     </div>
 {% endif %}
 {% endwith %}
-<div class="products__pagination">
+<div class="orders__pagination">
     <ul>
         {% if current_page > 1 %}
             <li class="pagePrevious__button">
@@ -171,6 +186,6 @@
 {% endblock %}
 
 {% block body_scripts %}
-<script type="text/javascript" src="{{ url_for('static', filename='js/pageInteractions/filters.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/dashboardFilters.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/dashboard/manageOrders/ordersListing.js') }}"></script>
 {% endblock %}

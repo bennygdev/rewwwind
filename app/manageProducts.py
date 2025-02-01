@@ -35,22 +35,22 @@ def pagination(products):
         products_query = Product.query.filter(Product.name.ilike(f"%{search_query}%"))
     
     # filter logic
-    category_filter = request.args.get('type', '', type=str).title()
-    subcategory_filter = request.args.get('genre', '', type=str).title()
+    category_filter = request.args.get('type', '', type=str)
+    subcategory_filter = request.args.get('genre', '', type=str)
     featured_filter = request.args.get('featured', '', type=str)
     stock_filter = request.args.get('stock', '', type=str)
     
-    if category_filter and category_filter != 'All':
-        products_query = products_query.join(Product.category).filter(Category.category_name == category_filter)
-    if subcategory_filter and subcategory_filter != 'All':
-        products_query = products_query.join(Product.subcategories).filter(SubCategory.subcategory_name == subcategory_filter)
-    if featured_filter and featured_filter != 'none':
+    if category_filter:
+        products_query = products_query.join(Product.category).filter(Category.category_name == category_filter.title())
+    if subcategory_filter:
+        products_query = products_query.join(Product.subcategories).filter(SubCategory.subcategory_name == subcategory_filter.title())
+    if featured_filter:
         if 'special' in featured_filter:
             products_query = products_query.filter(Product.is_featured_special)
         else:
             products_query = products_query.filter(Product.is_featured_staff)
 
-    if stock_filter and stock_filter != 'all':
+    if stock_filter:
         if 'limited' in stock_filter:
             products_query = products_query.filter(cast(Product.conditions[0]['stock'], Integer) <= 10)
         elif 'plenty' in stock_filter:
@@ -74,7 +74,27 @@ def pagination(products):
 
     total_pages = ceil(total_products / per_page)
 
-    return products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter
+    # filter options
+    categories = Category.query.all()[:8]
+    category_choices = [(category.category_name.lower(), category.category_name) for category in categories]
+
+    subcategories = SubCategory.query.join(Category).filter(Category.category_name == category_filter.title())[:8]
+    subcategory_choices = [(subcategory.subcategory_name.lower(), subcategory.subcategory_name) for subcategory in subcategories]
+
+    featured_choices = [
+        ('special', 'Special'),
+        ('staff', 'Staff')
+    ]
+
+    stock_choices = [
+        ('plenty', 'Plenty in stock'),
+        ('limited', 'Limited stock'),
+        ('no', 'No stock'),
+        ('highest', 'Highest first'),
+        ('lowest', 'Lowest first')
+    ]
+
+    return products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter, category_choices, subcategory_choices, featured_choices, stock_choices
 
 @manageProducts.route('/manage-products')
 @login_required
@@ -83,10 +103,7 @@ def products_listing():
     products = Product.query.all()
     deleteForm = DeleteProductForm()
 
-    products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter = pagination(products)
-
-    categories = Category.query.all()[:8]
-    subcategories = SubCategory.query.join(Category).filter(Category.category_name == category_filter)[:8]
+    products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter, category_choices, subcategory_choices, featured_choices, stock_choices = pagination(products)
 
     return render_template(
         "dashboard/manageProducts/products.html", 
@@ -98,12 +115,14 @@ def products_listing():
         total_pages=total_pages, 
         current_page=page, 
         search_query=search_query,
-        categories=categories,
-        subcategories=subcategories,
         category_filter=category_filter,
+        category_choices=category_choices,
         subcategory_filter=subcategory_filter,
+        subcategory_choices=subcategory_choices,
         featured_filter=featured_filter,
-        stock_filter=stock_filter
+        featured_choices=featured_choices,
+        stock_filter=stock_filter,
+        stock_choices=stock_choices
         ) #, datetime=datetime
 
 # uploads folder cleaning logic
@@ -386,10 +405,7 @@ def delete_product():
     products = Product.query.all()
     clean_uploads_folder()
 
-    products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter = pagination(products)
-
-    categories = Category.query.all()[:8]
-    subcategories = SubCategory.query.join(Category).filter(Category.category_name == category_filter)[:8]
+    products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter, category_choices, subcategory_choices, featured_choices, stock_choices = pagination(products)
     deleteForm = DeleteProductForm()
 
     if OrderItem.query.filter(OrderItem.product_id==deleteForm.productID.data).first():
@@ -406,10 +422,6 @@ def delete_product():
             db.session.commit()
             flash("The product has been removed successfully.", "success")
 
-        # Refresh the products list
-        products = Product.query.all()
-        products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter = pagination(products)
-
         return redirect(url_for('manageProducts.products_listing'))
 
     return render_template(
@@ -422,10 +434,12 @@ def delete_product():
         total_pages=total_pages, 
         current_page=page, 
         search_query=search_query,
-        categories=categories,
-        subcategories=subcategories,
         category_filter=category_filter,
+        category_choices=category_choices,
         subcategory_filter=subcategory_filter,
+        subcategory_choices=subcategory_choices,
         featured_filter=featured_filter,
-        stock_filter=stock_filter
+        featured_choices=featured_choices,
+        stock_filter=stock_filter,
+        stock_choices=stock_choices
         ) #, datetime=datetime

@@ -365,20 +365,19 @@ h1 {
   border-bottom-left-radius: 0;
 }
 
-/* Responsive adjustments for smaller screens */
-@media (max-width: 1440px) {
+@media (max-width: 1300px) {
     .products__special .thumbnail,
     .products__special .thumbnail img,
     .products__new .thumbnail,
     .products__new .thumbnail img,
     .products__staff .thumbnail,
     .products__staff .thumbnail img {
-        width: 150px;
-        height: 150px;
+        width: 180px;
+        height: 180px;
     }
 
     .products__special .info p.name, .products__special .info p.price {
-        font-size: 0.9rem;
+        font-size: 1.0rem;
     }
 
     .products__special .info p.creator, .products__special .info p.type {

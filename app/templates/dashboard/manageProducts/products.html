@@ -1,6 +1,7 @@
 {% extends "dashboard/base.html" %}
 {% set active_page = "manage_products" %}
 {% block styles %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/pageInteractions/filters.css') }}">
 <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/manageProducts/productListing.css') }}">
 {% endblock %}
@@ -32,6 +33,16 @@
           <i class="fa-solid fa-magnifying-glass search__button" id="search__button"></i>
         </div> -->
         <form method="get" action="{{ url_for('manageProducts.products_listing') }}">
+            <!-- Preserve current filter values -->
+            {% if category_filter %}
+            <input type="hidden" name="category" value="{{ category_filter }}">
+            {% endif %}
+            {% if subcategory_filter %}
+            <input type="hidden" name="subcategory" value="{{ subcategory_filter }}">
+            {% endif %}
+            {% if status_filter %}
+            <input type="hidden" name="status" value="{{ status_filter }}">
+            {% endif %}
             <div class="search__container">
             <input
               type="text"
@@ -58,61 +69,58 @@
 
 {% block content %}
 <div class="header">
-    <div class="header__left">
-        <div class="filters">
-            <div class="filter-container">
-                <label>Type</label>
-                <div class="filter {% if category_filter %}activated{% endif %}" filter-for="type">
-                    <span class="selected">{% if category_filter %}{{ category_filter|title }}{% else %}All{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
-                    <ul class="filter--options">
-                        <li class="{% if not category_filter %}highlighted{% endif %}">All</li>
-                        {% for category in categories %}
-                        <li class="{% if category.category_name == category_filter|title %}highlighted{% endif %}">{{ category.category_name }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
+    <div class="content__filters header__left">
+        <form id="filterForm" method="get" action="{{ url_for('manageProducts.products_listing') }}" class="filters__form">
+            <!-- Preserve search query if exists -->
+            {% if search_query %}
+            <input type="hidden" name="q" value="{{ search_query }}">
+            {% endif %}
+            
+            <div class="filter__group">
+                <label for="type">Type</label>
+                <select name="type" id="type" class="filter__select">
+                    <option value="">All</option>
+                    {% for value, label in category_choices %}
+                    {{ value }}
+                    <option value="{{ value }}" {% if category_filter == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
             </div>
-            <div class="filter-container">
-                <label>Genre</label>
-                <div class="filter {% if subcategory_filter %}activated{% endif %}" filter-for="genre">
-                    <span class="selected">{% if subcategory_filter %}{{ subcategory_filter|title }}{% else %}All{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
-                    <ul class="filter--options">
-                    {% if category_filter %}
-                        <li class="{% if not subcategory_filter %}highlighted{% endif %}">All</li>
-                        {% for subcategory in subcategories %}
-                        <li class="{% if subcategory.subcategory_name == subcategory_filter|title %}highlighted{% endif %}">{{ subcategory.subcategory_name }}</li>
-                        {% endfor %}
-                    {% else %}
-                        <li class="disabled" style="background-color: red; color: white;">Please select a type first!</li>
-                    {% endif %}
-                    </ul>
-                </div>
+
+            <div class="filter__group">
+                <label for="genre">Genre</label>
+                <select name="genre[]" id="genre" class="filter__select" multiple>
+                    <option value="">All</option>
+                    {% for value, label in subcategory_choices %}
+                    <option value="{{ value }}" {% if value in subcategory_filter %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
             </div>
-            <div class="filter-container">
-                <label>Featured</label>
-                <div class="filter {% if featured_filter %}activated{% endif %}" filter-for="featured">
-                    <span class="selected">{% if featured_filter %}{{ featured_filter|title }}{% else %}None{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
-                    <ul class="filter--options">
-                        <li class="{% if not featured_filter %}highlighted{% endif %}">None</li>
-                        {% for tag in ['Special', 'Staff Picks'] %}
-                        <li class="{% if tag == featured_filter|title %}highlighted{% endif %}">{{ tag }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
+        
+            <div class="filter__group">
+                <label for="featured">Featured</label>
+                <select name="featured" id="featured" class="filter__select">
+                    <option value="">All</option>
+                    {% for value, label in featured_choices %}
+                    <option value="{{ value }}" {% if featured_filter == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
             </div>
-            <div class="filter-container">
-                <label>Stock</label>
-                <div class="filter {% if stock_filter %}activated{% endif %}" filter-for="stock">
-                    <span class="selected">{% if stock_filter %}{{ stock_filter|title }}{% else %}All{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
-                    <ul class="filter--options">
-                        <li class="{% if not stock_filter %}highlighted{% endif %}">All</li>
-                        {% for tag in ['Plenty in stock', 'Limited stock', 'No stock', 'Highest first', 'Lowest first'] %}
-                        <li class="{% if tag|lower == stock_filter|lower %}highlighted{% endif %}">{{ tag }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
+
+            <div class="filter__group">
+                <label for="stock">Stock</label>
+                <select name="stock" id="stock" class="filter__select">
+                    <option value="">All</option>
+                    {% for value, label in stock_choices %}
+                    <option value="{{ value }}" {% if stock_filter == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
             </div>
-          </div>
+        
+            {% if category_filter or subcategory_filter or featured_filter or stock_filter %}
+            <a href="{{ url_for('manageProducts.products_listing', q=search_query) }}" class="clear__filters">Clear Filters</a>
+            {% endif %}
+        </form>
     </div>
     <div class="header__right">
         <a href="{{ url_for('manageProducts.add_product') }}"><h3><i class="fa-solid fa-plus"></i>Add Product</h3></a>
@@ -266,7 +274,18 @@
 {% endblock %}
 
 {% block body_scripts %}
-<script type="text/javascript" src="{{ url_for('static', filename='js/pageInteractions/filters.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/dashboardFilters.js') }}"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/dashboard/manageProducts/deleteProduct.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/dashboard/manageProducts/productListing.js') }}"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#genre').select2({
+            placeholder: "Select genres",
+            allowClear: true
+        });
+    });
+</script>
 {% endblock %}

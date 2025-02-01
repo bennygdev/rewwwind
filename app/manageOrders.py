@@ -28,7 +28,7 @@ def orders_listing():
   
   # filter logic
   recency_filter = request.args.get('recency', '', type=str)
-  if recency_filter and recency_filter != 'all':
+  if recency_filter:
     if '30' in recency_filter:
       orders_query = Order.query.filter(Order.order_date >= datetime.now() - timedelta(days=30))
     elif 'first' in recency_filter:
@@ -37,7 +37,7 @@ def orders_listing():
       orders_query = orders_query.order_by(asc(Order.order_date))
   
   cost_filter = request.args.get('cost', '', type=str)
-  if cost_filter and cost_filter != 'none':
+  if cost_filter:
     if 'highest' in cost_filter:
       orders_query = Order.query.order_by(cast(Order.total_amount, Float).desc())
     else:
@@ -51,6 +51,18 @@ def orders_listing():
   total_orders = orders_query.count()
 
   total_pages = ceil(total_orders / per_page)
+
+  # filter choices
+  recency_choices = [
+    ('30', 'Last 30 Days'),
+    ('first', 'Most Recent First'),
+    ('last', 'Oldest First')
+  ]
+
+  cost_choices = [
+    ('highest', 'Highest First'),
+    ('lowest', 'Lowest First')
+  ]
     
   return render_template(
     'dashboard/manageOrders/orders.html', 
@@ -61,7 +73,9 @@ def orders_listing():
     total_pages=total_pages,
     search_query=search_query,
     recency_filter=recency_filter,
-    cost_filter=cost_filter
+    recency_choices=recency_choices,
+    cost_filter=cost_filter,
+    cost_choices=cost_choices
     )
 
 @manageOrders.route('/manage-order/order-detail=<int:order_id>')

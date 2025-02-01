@@ -419,3 +419,159 @@ td.controls {
   text-decoration: none;
   color: #000;
 }
+
+/* Media Queries */
+@media screen and (max-width: 1024px) {
+  .account__statistics {
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .statistic__box {
+    flex: 1;
+    min-width: 200px;
+    justify-content: center;
+  }
+
+  .filters__form {
+    gap: 15px;
+  }
+
+  .filter__select {
+    min-width: 120px;
+  }
+
+  .accounts td, .accounts th {
+    padding: 15px 10px;
+  }
+
+  .accounts td:first-child {
+    padding-left: 15px;
+  }
+
+  .accounts td:last-child {
+    padding-right: 15px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .accounts__header {
+    padding: 20px 15px;
+  }
+
+  #accounts__title {
+    font-size: 1.3em;
+  }
+
+  .account__statistics {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .statistic__box {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .headerContent .search__wrapper {
+    padding-right: 15px;
+    max-width: calc(100% - 15px);
+  }
+
+  .filters__form {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .filter__group {
+    width: 100%;
+  }
+
+  .filter__select {
+    width: 100%;
+  }
+
+  .clear__filters {
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+  }
+
+  /* Table */
+  .accounts {
+    overflow-x: auto;
+  }
+
+  .accounts table {
+    min-width: 600px; /* Minimum width to prevent crushing */
+  }
+
+  .accounts td, .accounts th {
+    padding: 12px 8px;
+  }
+
+  .customer__badge,
+  .admin__badge,
+  .owner__badge {
+    width: auto;
+    min-width: 70px;
+    padding: 5px 10px;
+  }
+
+  .accounts__pagination ul {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .accounts__pagination .page__button {
+    padding: 6px 12px;
+  }
+
+  .accounts__pagination .active .page__button {
+    padding: 8px 14px;
+  }
+
+  .pageNext__button a,
+  .pagePrevious__button a {
+    padding: 8px 15px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .accounts__header {
+    padding: 15px 10px;
+  }
+
+  .statistic__box {
+    padding: 6px 15px;
+  }
+
+  .statistic__amount {
+    font-size: 1.2em;
+  }
+
+  .statistic__label {
+    font-size: 0.8em;
+  }
+
+  td.controls {
+    gap: 10px;
+  }
+
+  .accounts tbody td:last-child i:first-child {
+    margin-right: 10px;
+  }
+
+  .accounts__pagination .page__button {
+    padding: 5px 10px;
+  }
+
+  .accounts__pagination .active .page__button {
+    padding: 6px 12px;
+  }
+
+  .pageNext__button a,
+  .pagePrevious__button a {
+    padding: 6px 12px;
+  }
+}

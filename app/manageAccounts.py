@@ -2,9 +2,10 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash,
 from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from .roleDecorator import role_required
-from .models import User, PaymentInformation, BillingAddress, Review, Cart, UserVoucher
+from .models import User, PaymentInformation, BillingAddress, Review, Cart, UserVoucher, Order, Voucher, VoucherType
 from .forms import AdminChangeUserInfoForm, ChangePasswordForm, OwnerAddAccountForm
 from . import db
+from sqlalchemy import func
 from datetime import datetime, timedelta
 from math import ceil
 from flask import request
@@ -93,6 +94,10 @@ def account_details(id):
   if current_user.role_id == 1: # restrict customer functions
     abort(404)
 
+  billing_addresses = BillingAddress.query.filter_by(user_id=selectedUser.id).all()
+
+  payment_informations = PaymentInformation.query.filter_by(user_id=selectedUser.id).all()
+
   formatted_created_at = selectedUser.created_at.strftime("%d %B %Y")
 
   image_file = url_for('static', filename="profile_pics/" + selectedUser.image)
@@ -105,7 +110,26 @@ def account_details(id):
   else:
     image_file = url_for('static', filename='profile_pics/profile_image_default.jpg')
 
-  return render_template("dashboard/manageAccounts/account_details.html", user=current_user, selectedUser=selectedUser, formatted_created_at=formatted_created_at, image_file=image_file)
+  # Only show charts for customers
+  if selectedUser.role_id == 1:
+    total_orders = Order.query.filter_by(user_id=selectedUser.id, status='Approved').count()
+    total_vouchers = UserVoucher.query.filter_by(user_id=selectedUser.id).count()
+    total_reviews = Review.query.filter_by(user_id=selectedUser.id).count()
+  else:
+    total_orders = total_vouchers = total_reviews = 0
+
+  return render_template(
+    "dashboard/manageAccounts/account_details.html", 
+    user=current_user, 
+    selectedUser=selectedUser, 
+    formatted_created_at=formatted_created_at, 
+    image_file=image_file, 
+    billing_addresses=billing_addresses, 
+    payment_informations=payment_informations,
+    total_orders=total_orders,
+    total_vouchers=total_vouchers,
+    total_reviews=total_reviews
+  )
 
 @manageAccounts.route('/manage-accounts/delete-account/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -265,3 +289,65 @@ def add_any_account():
       flash('An unexpected error occurred. Please try again.', 'error')
 
   return render_template("dashboard/manageAccounts/add_any_account.html", user=current_user, form=form)
+
+
+# Account details charts
+@manageAccounts.route('/api/customer/order-trend/<int:user_id>')
+@login_required
+def get_user_order_trend(user_id):
+  orders = db.session.query(
+    func.strftime('%Y-%m', Order.approval_date).label('month'),
+    func.count(Order.id).label('count')
+  ).filter(
+    Order.user_id == user_id,
+    Order.status == 'Approved'
+  ).group_by(
+    func.strftime('%Y-%m', Order.approval_date)
+  ).order_by(
+    func.strftime('%Y-%m', Order.approval_date)
+  ).all()
+    
+  return {
+    'labels': [order[0] for order in orders] if orders else [],
+    'data': [order[1] for order in orders] if orders else []
+  }
+
+@manageAccounts.route('/api/customer/voucher-types/<int:user_id>')
+@login_required
+def get_user_voucher_types(user_id):
+  voucher_types = db.session.query(
+    VoucherType.voucher_type,
+    func.count(UserVoucher.id).label('count')
+  ).join(
+    Voucher, Voucher.id == UserVoucher.voucher_id
+  ).join(
+    VoucherType, VoucherType.id == Voucher.voucherType_id 
+  ).filter(
+    UserVoucher.user_id == user_id
+  ).group_by(
+    VoucherType.voucher_type
+  ).all()
+        
+  return {
+    'labels': [vt[0] for vt in voucher_types] if voucher_types else [],
+    'data': [vt[1] for vt in voucher_types] if voucher_types else []
+  }
+
+@manageAccounts.route('/api/customer/review-trend/<int:user_id>')
+@login_required
+def get_user_review_trend(user_id):
+  reviews = db.session.query(
+    func.strftime('%Y-%m', Review.created_at).label('month'),
+    func.count(Review.id).label('count')
+  ).filter(
+    Review.user_id == user_id
+  ).group_by(
+    func.strftime('%Y-%m', Review.created_at)
+  ).order_by(
+    func.strftime('%Y-%m', Review.created_at)
+  ).all()
+    
+  return {
+    'labels': [review[0] for review in reviews] if reviews else [],
+    'data': [review[1] for review in reviews] if reviews else []
+  }

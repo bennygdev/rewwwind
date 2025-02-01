@@ -1,18 +1,19 @@
-#personal__header {
+#account__header {
   margin-top: 20px;
-  font-size: 1.5em;
+  font-size: 1.4em;
   font-family: "OpenSansSemibold";
+}
+
+.personal__wrapper {
+  margin-top: 40px;
 }
 
 .personal__information {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  background-color: #c4c4c4;
   /* height: 30px; */
   width: 100%;
-  border-radius: 15px;
-  padding: 30px 30px;
 }
 
 .personal__left {
@@ -26,6 +27,10 @@
   justify-content: center;
   gap: 20px;
   margin-left: 20px;
+}
+
+.personal__data span {
+  color: #4a4a4a;
 }
 
 .personal__name {
@@ -42,15 +47,16 @@
 
 .personal__right {
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  flex-direction: row;
+  align-self: flex-start;
+  gap: 15px;
 }
 
 #mini_profile_image {
   max-width: 100%;
   max-height: 100%;
-  height: 150px;
-  width: 150px;
+  height: 120px;
+  width: 120px;
   border-radius: 100px;
   margin-right: 10px;
 }
@@ -61,12 +67,17 @@
   margin-bottom: 5px;
 }
 
-.personal__email {
-  font-family: "OpenSansBold";
+.personal__totalOrders {
+  display: inline-block;
+  background-color: #039752;
+  padding: 10px 20px;
+  border-radius: 4px;
+  /* font-family: "OpenSansBold"; */
+  color: #fff;
 }
 
-.personal__totalOrders {
-  font-family: "OpenSansBold";
+.personal__totalOrders i {
+  margin-right: 10px;
 }
 
 .personal__right {
@@ -92,25 +103,222 @@
 }
 
 #account__editButton {
+  color: #fff;
   background-color: #039752;
-  padding: 10px 20px;
-  border-radius: 10px;
+  padding: 7px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  border: none;
+  font-family: "OpenSansRegular";
 }
 
 #account__deleteButton {
-  background-color: #ff4c24;
-  padding: 10px 20px;
-  border-radius: 10px;
-  border: 0;
   color: #fff;
-  font-family: "OpenSansSemibold";
+  background-color: #ff4c24;
+  padding: 7px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  border: none;
 }
 
 #account__changePassword {
-  background-color: #039752;
-  padding: 10px 20px;
-  border-radius: 10px;
-  border: 0;
   color: #fff;
+  background-color: #039752;
+  padding: 7px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  border: none;
+  font-family: "OpenSansRegular";
+}
+
+.card__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 15px;
+}
+
+.card__title {
+  font-size: 1.25em;
+}
+
+.card__item {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.billing__details h3,
+.payment__header h3 {
+  margin-bottom: 15px;
   font-family: "OpenSansSemibold";
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.payment__logo {
+  width: 40px;
+  height: 40px;
+}
+
+.billing__details p,
+.payment__details p {
+  margin-bottom: 10px;
+  color: #4a4a4a;
+}
+
+/* Charts */
+.personal__charts {
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+}
+
+.personal__charts .statistic__box {
+  background-color: #fff;
+  width: 33%;
+  height: 35vh;
+  border-radius: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.statistic__label {
+  color: #333;
+  font-size: 1em;
+}
+
+.statistics__bottom {
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+}
+.account__statistic {
+  padding: 10px;
+  height: 100%;
+  position: relative;
+  width: 100%;
+}
+
+.personal__charts canvas {
+  width: 100% !important;
+  height: calc(100% - 40px) !important;
+}
+
+/* Media Queries */
+@media screen and (max-width: 1024px) {
+  .personal__charts {
+    flex-wrap: wrap;
+  }
+
+  .personal__charts .statistic__box {
+    width: calc(50% - 15px);
+    height: 40vh;
+  }
+
+  .personal__charts .statistic__box:last-child {
+    width: 100%;
+  }
+
+  .personal__data {
+    gap: 15px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .personal__information {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .personal__left {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .personal__data {
+    margin-left: 0;
+    margin-top: 20px;
+  }
+
+  .personal__name,
+  .personal__extra {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .personal__right {
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  .personal__charts {
+    flex-direction: column;
+  }
+
+  .personal__charts .statistic__box {
+    width: 100%;
+    height: 45vh;
+  }
+
+  .account__buttons {
+    flex-direction: column;
+  }
+
+  #account__editButton,
+  #account__changePassword,
+  #account__deleteButton {
+    width: 100%;
+    text-align: center;
+    padding: 10px 20px;
+  }
+
+  .card__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .accounts__header {
+    padding: 15px;
+  }
+
+  .account__statistics {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .account__statistics .statistic__box {
+    width: 100%;
+  }
+
+  .card__item {
+    margin: 10px 0;
+  }
+
+  .payment__header h3,
+  .billing__details h3 {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+}
+
+@media screen and (max-width: 374px) {
+  .personal__charts .statistic__box {
+    height: 40vh;
+  }
+
+  .personal__data h3 {
+    font-size: 1em;
+  }
+
+  .card__title {
+    font-size: 1.1em;
+  }
+
+  #account__header {
+    font-size: 1.2em;
+  }
 }

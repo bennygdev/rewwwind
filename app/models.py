@@ -247,9 +247,15 @@ class Cart(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
     product_condition = db.Column(db.JSON, nullable=False)
     quantity = db.Column(db.Integer, default=1, nullable=False)
+    conditions = db.Column(db.JSON, nullable=True)  # store conditions (name, stock, price)
+    favorite = db.Column(db.Boolean, default=False)  # Add this column to mark items as favorites (for later part)
 
     user = db.relationship('User', back_populates='cart_items')  # Changed backref name to 'cart_entries'
     product = db.relationship('Product', back_populates='cart_entries')  # Product can appear in multiple carts
+
+
+
+
 
 class tradeDetail(db.Model):
     __tablename__ = 'trade_details'

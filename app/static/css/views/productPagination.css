@@ -6,6 +6,7 @@
     display: flex;
     justify-content: space-between;
     gap: 50px;
+    margin-bottom: 20px;
 }
 
 .content .header__left h1 {
@@ -20,10 +21,13 @@
     align-items: center;
 }
 
-.filter-container {
-    display: flex;
-    align-items: center;
-    gap: 5px;
+.filter__group:has(a) {
+    border: 1px solid #ddd;
+    border-radius: 8px
+}
+
+.filter__group a {
+    background-color: #e6e6e6;
 }
 
 /* product styles */

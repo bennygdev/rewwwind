@@ -1,7 +1,7 @@
 {% extends "dashboard/base.html" %}
 {% set active_page = "manage_products" %}
 {% block styles %}
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/pageInteractions/multiFilter.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/pageInteractions/filters.css') }}">
 <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/manageProducts/productListing.css') }}">
 {% endblock %}
@@ -86,11 +86,14 @@
                     {% endfor %}
                 </select>
             </div>
-
+            
             <div class="filter__group">
                 <label for="genre">Genre</label>
                 <select name="genre[]" id="genre" class="filter__select" multiple>
-                    <option value="">All</option>
+                    <option value="or{% if 'or' in match_req %}@{% endif %}" {% if 'or' in match_req %}selected 1{% endif %}>Match Any</option>
+                    {% if subcategory_filter %}
+                    <option value="and{% if 'and' in match_req %}@{% endif %}" {% if 'and' in match_req %}selected 1{% endif %}>Match All</option>
+                    {% endif %}
                     {% for value, label in subcategory_choices %}
                     <option value="{{ value }}" {% if value in subcategory_filter %}selected{% endif %}>{{ label }}</option>
                     {% endfor %}
@@ -116,10 +119,12 @@
                     {% endfor %}
                 </select>
             </div>
-        
+            
+            <div class="filter__group">
             {% if category_filter or subcategory_filter or featured_filter or stock_filter %}
             <a href="{{ url_for('manageProducts.products_listing', q=search_query) }}" class="clear__filters">Clear Filters</a>
             {% endif %}
+            </div>
         </form>
     </div>
     <div class="header__right">
@@ -246,21 +251,21 @@
     <ul>
         {% if current_page > 1 %}
             <li class="pagePrevious__button">
-              <a href="{{ url_for('manageProducts.products_listing', page=current_page-1, q=search_query if search_query else None, type=category_filter if category_filter else None, subcategory=subcategory_filter if subcategory_filter else None, featured=featured_filter if featured_filter else None, stock=stock_filter if stock_filter else None) }}">
+              <a href="{{ url_for('manageProducts.products_listing', page=current_page-1, q=search_query if search_query else None, type=category_filter if category_filter else None, genre=subcategory_filter if subcategory_filter else None, featured=featured_filter if featured_filter else None, stock=stock_filter if stock_filter else None) }}">
               Previous
               </a>
             </li>
         {% endif %}
         {% for p in range(1, total_pages + 1) %}
             <li class="{% if p == current_page %}active{% endif %}">
-              <a class="page__button" href="{{ url_for('manageProducts.products_listing', page=p, q=search_query if search_query else None, type=category_filter if category_filter else None, subcategory=subcategory_filter if subcategory_filter else None, featured=featured_filter if featured_filter else None, stock=stock_filter if stock_filter else None) }}">
+              <a class="page__button" href="{{ url_for('manageProducts.products_listing', page=p, q=search_query if search_query else None, type=category_filter if category_filter else None, genre=subcategory_filter if subcategory_filter else None, featured=featured_filter if featured_filter else None, stock=stock_filter if stock_filter else None) }}">
               {{ p }}
               </a>
             </li>
         {% endfor %}
         {% if current_page < total_pages %}
             <li class="pageNext__button">
-              <a href="{{ url_for('manageProducts.products_listing', page=current_page+1, q=search_query if search_query else None, type=category_filter if category_filter else None, subcategory=subcategory_filter if subcategory_filter else None, featured=featured_filter if featured_filter else None, stock=stock_filter if stock_filter else None) }}">
+              <a href="{{ url_for('manageProducts.products_listing', page=current_page+1, q=search_query if search_query else None, type=category_filter if category_filter else None, genre=subcategory_filter if subcategory_filter else None, featured=featured_filter if featured_filter else None, stock=stock_filter if stock_filter else None) }}">
               Next
               </a>
             </li>
@@ -275,17 +280,7 @@
 
 {% block body_scripts %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/dashboardFilters.js') }}"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/pageInteractions/multiFilter.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/dashboard/manageProducts/deleteProduct.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/dashboard/manageProducts/productListing.js') }}"></script>
-
-<script>
-    $(document).ready(function() {
-        $('#genre').select2({
-            placeholder: "Select genres",
-            allowClear: true
-        });
-    });
-</script>
 {% endblock %}

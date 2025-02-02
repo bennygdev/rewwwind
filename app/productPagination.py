@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, abort, jsonify
 from flask_login import login_required, current_user
-from sqlalchemy import cast, Float, Integer
+from sqlalchemy import cast, Float, Integer, func
 from .roleDecorator import role_required
 from .models import Product, Review, Category, SubCategory
 from .forms import AddReviewForm, AddToCartForm, DeleteReviewForm
@@ -20,22 +20,38 @@ def product_pagination():
         products_query = products_query.filter(Product.name.ilike(f"%{search_query}%"))
 
     # Filter logic
-    category_filter = request.args.get('type', '', type=str).title()
-    subcategory_filter = request.args.get('genre', '', type=str).title()
+    category_filter = request.args.get('type', '', type=str)
+    subcategory_filter = request.args.get('genre', '', type=str)
+    if ',' in subcategory_filter:
+        subcategory_filter = subcategory_filter.split(',')
+    else:
+        subcategory_filter = [subcategory_filter]
+    match_req = request.args.get('match', '', type=str)
+    if not match_req:
+        match_req = 'or'
     price_filter = request.args.get('price', '', type=str)
     rating_filter = request.args.get('rating', '', type=str)
 
-    if category_filter and category_filter != 'All':
-        products_query = products_query.join(Product.category).filter(Category.category_name == category_filter)
-    if subcategory_filter and subcategory_filter != 'All':
-        products_query = products_query.join(Product.subcategories).filter(SubCategory.subcategory_name == subcategory_filter)
-    if price_filter and price_filter != 'all':
+    if category_filter:
+        products_query = products_query.join(Product.category).filter(Category.category_name == category_filter.title())
+    if subcategory_filter and len(subcategory_filter) != 1:
+        if 'or' in match_req:
+            products_query = products_query.join(Product.subcategories).filter(
+                SubCategory.subcategory_name.in_([entry.title() for entry in subcategory_filter])
+            )
+        elif 'and' in match_req:
+            products_query = products_query.join(Product.subcategories).filter( 
+                SubCategory.subcategory_name.in_([entry.title() for entry in subcategory_filter])
+            ).group_by(Product.id).having(
+                func.count(Product.id) == len(subcategory_filter)
+            )
+    if price_filter:
         if 'highest' in price_filter:
             products_query = products_query.order_by(cast(Product.conditions[0]['price'], Float).desc())
         else:
             products_query = products_query.order_by(cast(Product.conditions[0]['price'], Float).asc())
-    if rating_filter and rating_filter != 'all':
-        if 'star' in rating_filter:
+    if rating_filter:
+        if type(rating_filter) is Integer:
             products_query = products_query.filter(cast(Product.rating, Integer) == int(rating_filter[0]))
         else:
             if 'highest' in rating_filter:
@@ -55,10 +71,30 @@ def product_pagination():
     total_pages = ceil(total_products / per_page)
 
     categories = Category.query.all()[:8]
-    subcategories = SubCategory.query.join(Category).filter(Category.category_name == category_filter)[:8]
+    subcategories = SubCategory.query.all()
+    if category_filter:
+        subcategories = SubCategory.query.join(Category).filter(Category.category_name == category_filter.title())
 
-    if not category_filter:
-        subcategory_filter = ""
+    # filter choices
+    category_choices = [(category.category_name.lower(), category.category_name) for category in categories]
+
+    subcategory_choices = [(subcategory.subcategory_name.lower(), subcategory.subcategory_name) for subcategory in subcategories]
+        
+
+    price_choices = [
+        ('highest', 'Highest first'),
+        ('lowest', 'Lowest first')
+    ]
+
+    rating_choices = [
+        ('highest', 'Highest first'),
+        ('lowest', 'Lowest first'),
+        ('1', '1 star'),
+        ('2', '2 star'),
+        ('3', '3 star'),
+        ('4', '4 star'),
+        ('5', '5 star')
+    ]
     
     form = AddToCartForm()
 
@@ -74,9 +110,14 @@ def product_pagination():
         categories=categories,
         subcategories=subcategories,
         category_filter=category_filter,
+        category_choices=category_choices,
         subcategory_filter=subcategory_filter,
+        match_req=match_req,
+        subcategory_choices=subcategory_choices,
         price_filter=price_filter,
+        price_choices=price_choices,
         rating_filter=rating_filter,
+        rating_choices=rating_choices,
         form=form
     )
 

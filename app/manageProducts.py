@@ -1,7 +1,7 @@
 from werkzeug.utils import secure_filename
 from flask import Blueprint, render_template, redirect, url_for, request, jsonify, flash, current_app, session
 from flask_login import login_required, current_user
-from sqlalchemy import cast, Integer
+from sqlalchemy import cast, Integer, func
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.dialects.postgresql import JSON
 from .roleDecorator import role_required
@@ -37,13 +37,30 @@ def pagination(products):
     # filter logic
     category_filter = request.args.get('type', '', type=str)
     subcategory_filter = request.args.get('genre', '', type=str)
+    if ',' in subcategory_filter:
+        subcategory_filter = subcategory_filter.split(',')
+    else:
+        subcategory_filter = [subcategory_filter]
+    match_req = request.args.get('match', '', type=str)
+    if not match_req:
+        match_req = 'or'
     featured_filter = request.args.get('featured', '', type=str)
     stock_filter = request.args.get('stock', '', type=str)
     
     if category_filter:
         products_query = products_query.join(Product.category).filter(Category.category_name == category_filter.title())
-    if subcategory_filter:
-        products_query = products_query.join(Product.subcategories).filter(SubCategory.subcategory_name == subcategory_filter.title())
+
+    if subcategory_filter and len(subcategory_filter) != 1:
+        if 'or' in match_req:
+            products_query = products_query.join(Product.subcategories).filter(
+                SubCategory.subcategory_name.in_([entry.title() for entry in subcategory_filter])
+            )
+        elif 'and' in match_req:
+            products_query = products_query.join(Product.subcategories).filter( 
+                SubCategory.subcategory_name.in_([entry.title() for entry in subcategory_filter])
+            ).group_by(Product.id).having(
+                func.count(Product.id) == len(subcategory_filter)
+            )
     if featured_filter:
         if 'special' in featured_filter:
             products_query = products_query.filter(Product.is_featured_special)
@@ -61,9 +78,6 @@ def pagination(products):
             products_query = products_query.order_by(cast(Product.conditions[0]['stock'], Integer).asc())
         else:
             products_query = products_query.order_by(cast(Product.conditions[0]['stock'], Integer).desc())
-    
-    if not category_filter:
-        subcategory_filter = ""
 
     # pagination logic
     page = request.args.get('page', 1, type=int)
@@ -78,7 +92,9 @@ def pagination(products):
     categories = Category.query.all()[:8]
     category_choices = [(category.category_name.lower(), category.category_name) for category in categories]
 
-    subcategories = SubCategory.query.join(Category).filter(Category.category_name == category_filter.title())[:8]
+    subcategories = SubCategory.query.all()
+    if category_filter:
+        subcategories = SubCategory.query.join(Category).filter(Category.category_name == category_filter.title())
     subcategory_choices = [(subcategory.subcategory_name.lower(), subcategory.subcategory_name) for subcategory in subcategories]
 
     featured_choices = [
@@ -94,7 +110,7 @@ def pagination(products):
         ('lowest', 'Lowest first')
     ]
 
-    return products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter, category_choices, subcategory_choices, featured_choices, stock_choices
+    return products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter, category_choices, subcategory_choices, match_req, featured_choices, stock_choices
 
 @manageProducts.route('/manage-products')
 @login_required
@@ -103,8 +119,8 @@ def products_listing():
     products = Product.query.all()
     deleteForm = DeleteProductForm()
 
-    products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter, category_choices, subcategory_choices, featured_choices, stock_choices = pagination(products)
-
+    products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter, category_choices, subcategory_choices, match_req, featured_choices, stock_choices = pagination(products)
+    
     return render_template(
         "dashboard/manageProducts/products.html", 
         user=current_user, 
@@ -119,6 +135,7 @@ def products_listing():
         category_choices=category_choices,
         subcategory_filter=subcategory_filter,
         subcategory_choices=subcategory_choices,
+        match_req=match_req,
         featured_filter=featured_filter,
         featured_choices=featured_choices,
         stock_filter=stock_filter,
@@ -405,7 +422,7 @@ def delete_product():
     products = Product.query.all()
     clean_uploads_folder()
 
-    products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter, category_choices, subcategory_choices, featured_choices, stock_choices = pagination(products)
+    products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter, category_choices, subcategory_choices, match_req, featured_choices, stock_choices = pagination(products)
     deleteForm = DeleteProductForm()
 
     if OrderItem.query.filter(OrderItem.product_id==deleteForm.productID.data).first():
@@ -437,6 +454,7 @@ def delete_product():
         category_filter=category_filter,
         category_choices=category_choices,
         subcategory_filter=subcategory_filter,
+        match_req=match_req,
         subcategory_choices=subcategory_choices,
         featured_filter=featured_filter,
         featured_choices=featured_choices,

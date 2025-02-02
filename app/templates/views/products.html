@@ -1,12 +1,23 @@
 {% extends "views/base.html" %}
 {% set active_page = "products" %}
 {% block styles %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/pageInteractions/multiFilter.css') }}">
 <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/views/productPagination.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/pageInteractions/filters.css') }}">
 {% endblock %}
 {% block title %}Products{% endblock %}
 {% block content %}
 <div class="listing__header">
+  <!-- Preserve current filter values -->
+  {% if category_filter %}
+  <input type="hidden" name="category" value="{{ category_filter }}">
+  {% endif %}
+  {% if subcategory_filter %}
+  <input type="hidden" name="subcategory" value="{{ subcategory_filter }}">
+  {% endif %}
+  {% if status_filter %}
+  <input type="hidden" name="status" value="{{ status_filter }}">
+  {% endif %}
   <div class="header__left">
       <h1>{% block h1 %}Products{% endblock %}</h1>
       {% if products.items %}
@@ -14,60 +25,61 @@
       {% endif %}
   </div>
   <div class="header__right">
-    <div class="filters">
-      <div class="filter-container">
-        <label>Type</label>
-        <div class="filter {% if category_filter %}activated{% endif %}" filter-for="type">
-          <span class="selected">{% if category_filter %}{{ category_filter|title }}{% else %}All{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
-          <ul class="filter--options">
-            <li class="{% if not category_filter %}highlighted{% endif %}">All</li>
-            {% for category in categories %}
-            <li class="{% if category.category_name == category_filter|title %}highlighted{% endif %}">{{ category.category_name }}</li>
-            {% endfor %}
-          </ul>
-        </div>
+    <form id="filterForm" method="get" action="{{ url_for('productPagination.product_pagination') }}" class="filters__form">
+      <!-- Preserve search query if exists -->
+      {% if search_query %}
+      <input type="hidden" name="q" value="{{ search_query }}">
+      {% endif %}
+      
+      <div class="filter__group">
+          <label for="type">Type</label>
+          <select name="type" id="type" class="filter__select">
+              <option value="">All</option>
+              {% for value, label in category_choices %}
+              <option value="{{ value }}" {% if category_filter == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+          </select>
       </div>
-      <div class="filter-container">
-        <label>Genre</label>
-        <div class="filter {% if subcategory_filter %}activated{% endif %}" filter-for="genre">
-          <span class="selected">{% if subcategory_filter %}{{ subcategory_filter|title }}{% else %}All{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
-          <ul class="filter--options">
-          {% if category_filter %}
-            <li class="{% if not subcategory_filter %}highlighted{% endif %}">All</li>
-            {% for subcategory in subcategories %}
-            <li class="{% if subcategory.subcategory_name == subcategory_filter|title %}highlighted{% endif %}">{{ subcategory.subcategory_name }}</li>
+
+      <div class="filter__group">
+        <label for="genre">Genre</label>
+        <select name="genre[]" id="genre" class="filter__select" multiple>
+            <option value="or{% if 'or' in match_req %}@{% endif %}" {% if 'or' in match_req %}selected 1{% endif %}>Match Any</option>
+            {% if subcategory_filter %}
+            <option value="and{% if 'and' in match_req %}@{% endif %}" {% if 'and' in match_req %}selected 1{% endif %}>Match All</option>
+            {% endif %}
+            {% for value, label in subcategory_choices %}
+            <option value="{{ value }}" {% if value in subcategory_filter %}selected{% endif %}>{{ label }}</option>
             {% endfor %}
-          {% else %}
-            <li class="disabled" style="background-color: red; color: white;">Please select a type first!</li>
-          {% endif %}
-          </ul>
-        </div>
+        </select>
       </div>
-      <div class="filter-container">
-        <label>Price</label>
-        <div class="filter {% if price_filter %}activated{% endif %}" filter-for="price">
-          <span class="selected {% if not price_filter %}highlighted{% endif %}">{% if price_filter %}{{ price_filter | title }}{% else %}All{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
-          <ul class="filter--options">
-            <li class="highlighted">All</li>
-            {% for tag in ['Highest first', 'Lowest first'] %}
-            <li class="{% if tag | lower == price_filter | lower %}highlighted{% endif %}">{{ tag }}</li>
-            {% endfor %}
-          </ul>
-        </div>
+  
+      <div class="filter__group">
+          <label for="price">Price</label>
+          <select name="price" id="price" class="filter__select">
+              <option value="">All</option>
+              {% for value, label in price_choices %}
+              <option value="{{ value }}" {% if price_filter == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+          </select>
       </div>
-      <div class="filter-container">
-        <label>Rating</label>
-        <div class="filter {% if rating_filter %}activated{% endif %}" filter-for="rating">
-          <span class="selected {% if not rating_filter %}highlighted{% endif %}">{% if rating_filter %}{{ rating_filter|title }}{% else %}All{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
-          <ul class="filter--options">
-            <li class="highlighted">All</li>
-            {% for tag in ['Highest first', 'Lowest first', '1 star', '2 star', '3 star', '4 star', '5 star'] %}
-            <li class="{% if tag == rating_filter %}highlighted{% endif %}">{{ tag }}</li>
-            {% endfor %}
-          </ul>
-        </div>
+
+      <div class="filter__group">
+          <label for="rating">Rating</label>
+          <select name="rating" id="rating" class="filter__select">
+              <option value="">All</option>
+              {% for value, label in rating_choices %}
+              <option value="{{ value }}" {% if rating_filter == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+          </select>
       </div>
-    </div>
+      
+      {% if category_filter or subcategory_filter or price_filter or rating_filter %}
+      <div class="filter__group">
+      <a href="{{ url_for('productPagination.product_pagination', q=search_query) }}" class="clear__filters">Clear Filters</a>
+      {% endif %}
+      </div>
+  </form>
   </div>
 </div>
 {% if products.items %}
@@ -157,6 +169,7 @@
 {% endblock %}
 
 {% block body_scripts %}
-<script type="text/javascript" src="{{ url_for('static', filename='js/pageInteractions/filters.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/dashboardFilters.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/pageInteractions/multiFilter.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/productPagination/productPagination.js') }}"></script>
 {% endblock %}

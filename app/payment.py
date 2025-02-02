@@ -16,8 +16,11 @@ payment = Blueprint('payment', __name__)
 
 @payment.route('/checkout/product/<int:product_id>', methods=['POST'])
 @login_required
-@role_required(1)
 def checkout_product(product_id):
+    if current_user.role_id in [2,3]:
+        flash("Admins and owners are not allowed to purchase in order to avoid conflicts.\n\nPlease use a dummy customer account instead.", "info")
+        return redirect(url_for('productPagination.product_detail', product_id=product_id, not_customer=True))
+    
     product = Product.query.filter_by(id=product_id).first()
     if not product:
         abort(404)
@@ -80,8 +83,12 @@ def checkout_product(product_id):
 
 @payment.route('/checkout/cart', methods=['POST'])
 @login_required
-@role_required(1)
 def checkout_cart():
+    if current_user.role_id in [2,3]:
+        print(True)
+        flash("Admins and owners are not allowed to purchase in order to avoid conflicts.\n\nPlease use a dummy customer account instead.", "info")
+        return redirect(url_for('productPagination.product_detail', product_id=1, not_customer=True))
+    
     cart = current_user.cart_items
     if not cart:
         abort(404)

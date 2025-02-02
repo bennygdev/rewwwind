@@ -50,9 +50,8 @@ def remove_from_cart(product_id):
 @addToCart.route('/add-to-cart/<int:product_id>', methods=['POST'])
 @login_required
 def add_to_cart(product_id):
-    print(product_id)
     if current_user.role_id in [2,3]:
-        flash("Admins and owners are not allowed to add products to their cart to avoid conflicts.\nPlease use a dummy customer account instead.", "info")
+        flash("Admins and owners are not allowed to add products to their cart to avoid conflicts.\n\nPlease use a dummy customer account instead.", "info")
         return redirect(url_for('productPagination.product_detail', product_id=product_id, not_customer=True))
     #cartForm = AddToCartForm()
     product = Product.query.filter_by(id=product_id).first() # query the related product

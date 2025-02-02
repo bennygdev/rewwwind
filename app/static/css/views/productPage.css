@@ -96,22 +96,6 @@
     height: 100px;
 }
 
-@media (max-width: 1400px) {
-    .image__container, .image__container img {
-        width: 300px;
-        height: 300px;
-    }
-
-    .image-list {
-        gap: 30px;
-    }
-
-    .image-list .image__container, .image-list .image__container img {
-        width: 80px;
-        height: 80px;
-    }
-}
-
 .product__right {
     display: flex;
     flex-direction: column;
@@ -279,7 +263,7 @@ hr.docSeparator {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 30px;
 }
 
 
@@ -517,4 +501,72 @@ hr.docSeparator {
     flex-direction: row;
     justify-content: center;
     gap: 10px;
+}
+
+@media (max-width: 1400px) {
+    .image__container, .image__container img {
+        width: 300px;
+        height: 300px;
+    }
+
+    .image-list {
+        justify-content: space-between;
+    }
+
+    .image-list .image__container, .image-list .image__container img {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+@media (max-width: 1100px) {
+    .product {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .product__left, .image-list {
+        width: 500px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .product .image__container:not(.ignore), .image__container:not(.ignore) img {
+        width: 500px;
+        height: 500px;
+    }
+
+    .product .image-list {
+        flex-direction: row;
+    }
+}
+
+@media (max-width: 900px) {
+    .content {
+        padding: 90px 20px;
+    }
+
+    .review__section .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 40px;
+    }
+
+    .review__section .header__right {
+        width: 100%;
+    }
+
+    .review__section .header__right .write, .filter__group {
+        width: 80%;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .filter__group {
+        text-align: start;
+        padding: 0;
+    }
 }

@@ -50,3 +50,35 @@ tbody td strong {
 .status.rejected {
     background-color: #dc3545; /* Red */
 }
+
+.disabled-btn {
+    background-color: #ccc !important;
+    color: #666 !important;
+    cursor: not-allowed !important;
+    border-color: #aaa !important;
+    pointer-events: none; 
+}
+
+/* Not working might ditch this */
+/* SUCCESS POPUP */
+.popup-message {
+    position: fixed;
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #28a745;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transition: top 0.5s ease-in-out, opacity 0.5s ease-in-out;
+    z-index: 1000;
+}
+
+/* Show popup */
+.popup-message.show {
+    top: 20px;
+    opacity: 1;
+}

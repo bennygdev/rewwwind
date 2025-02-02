@@ -12,9 +12,7 @@
 <div class="form-container">
     <h1>Image Upload</h1>
     <div class="image-upload">
-        <label for="file-input" class="upload-button">
-            Select from Files
-        </label>
+        <label for="file-input" class="upload-button">Select from Files</label>
         <input id="file-input" type="file" name="images" multiple style="display: none;">
         <p>(or drag and drop your images here)</p>
     </div>
@@ -22,41 +20,77 @@
 
     <h1>Item Information</h1>
 
-    <form id="tradeForm" action="" method="POST" enctype="multipart/form-data">
+    <form id="tradeForm" action="" method="POST" enctype="multipart/form-data" novalidate> 
         {{ form.hidden_tag() }}
 
         <div class="form-row">
             <div class="form-group">
                 <label for="item_type">Item Type</label>
                 {{ form.item_type(class="form-control", id="item_type") }}
-                
             </div>
             <div class="form-group">
                 <label for="item_condition">Item Condition</label>
                 {{ form.item_condition(class="form-control", id="item_condition") }}
-                
             </div>
         </div>
 
+        <!-- TITLE FIELD -->
         <div class="form-group">
-            <label for="title">Title</label>
+            <div class="label-container">
+                <label for="title">Title</label>
+                {% if form.title.errors %}
+                    <span class="form-error">
+                        {% for error in form.title.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </span>
+                {% endif %}
+            </div>
             {{ form.title(class="form-control", id="title") }}
-           
         </div>
 
+        <!-- AUTHOR FIELD -->
         <div class="form-group">
-            <label for="author">Author / Artist</label>
+            <div class="label-container">
+                <label for="author">Author / Artist</label>
+                {% if form.author.errors %}
+                    <span class="form-error">
+                        {% for error in form.author.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </span>
+                {% endif %}
+            </div>
             {{ form.author(class="form-control", id="author") }}
-
         </div>
 
+        <!-- GENRE FIELD -->
         <div class="form-group">
-            <label for="genre">Genre</label>
+            <div class="label-container">
+                <label for="genre">Genre</label>
+                {% if form.genre.errors %}
+                    <span class="form-error">
+                        {% for error in form.genre.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </span>
+                {% endif %}
+            </div>
             {{ form.genre(class="form-control", id="genre") }}
         </div>
 
+        <!-- ISBN FIELD -->
         <div class="form-group">
-            <label for="isbn">ISBN / Cat#</label>
+            <div class="label-container">
+                <label for="isbn">ISBN / Cat#</label>
+                {% if form.isbn.errors %}
+                    <span class="form-error">
+                        {% for error in form.isbn.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </span>
+                {% endif %}
+            </div>
             {{ form.isbn(class="form-control", id="isbn") }}
         </div>
 

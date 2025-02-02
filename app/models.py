@@ -186,19 +186,33 @@ class tradeDetail(db.Model):
     __tablename__ = 'trade_details'
 
     id = db.Column(db.Integer, primary_key=True)
-    images = db.Column(db.JSON, nullable=False)  
+    images = db.Column(db.JSON, nullable=False)
     item_type = db.Column(db.String(100), nullable=False)
     item_condition = db.Column(db.String(100), nullable=False)
     title = db.Column(db.String(255), nullable=False)
     author_artist = db.Column(db.String(255), nullable=True)
     genre = db.Column(db.String(255), nullable=True)
     isbn_or_cat = db.Column(db.String(100), nullable=True)
-    trade_number = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  
+    trade_number = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    status = db.Column(db.String(50), nullable=False, default="Pending")
 
     user = db.relationship('User', backref='trade_items', lazy=True)
 
     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
     updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
+
+    # For shipping and payment NEW!!
+    shipping_option = db.Column(db.String(50))
+    street_address = db.Column(db.String(255))
+    house_block = db.Column(db.String(50))
+    zip_code = db.Column(db.String(20))
+    contact_number = db.Column(db.String(20))
+
+    card_number = db.Column(db.String(4))  
+    card_expiry = db.Column(db.String(10))
+    card_name = db.Column(db.String(255))
+
+
 
 
 

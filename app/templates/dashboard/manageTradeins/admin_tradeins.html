@@ -1,1 +1,62 @@
-<h1>ADMIN</h1>
+{% extends "views/base.html" %}
+
+{% block title %}Admin Trade Requests{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/tradein/admindashboardTrade.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Admin Trade Requests</h2>
+    <p>Debugging: Trade Requests Count = {{ trade_requests | length }}</p>
+
+    {% if trade_requests %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>User</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Genre</th>
+                    <th>ISBN</th>
+                    <th>Condition</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for trade in trade_requests %}
+                    <tr>
+                        <td>{{ trade.id }}</td>
+                        <td>{{ trade.title }}</td>
+                        <td>{{ trade.user.username if trade.user else "Unknown" }}</td>
+                        <td>{{ trade.created_at.strftime('%d %b %Y') }}</td>
+                        <td>{{ trade.item_type }}</td>
+                        <td>{{ trade.genre }}</td>
+                        <td>{{ trade.isbn_or_cat }}</td>
+                        <td>{{ trade.item_condition }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('manageTradeins.update_status', trade_id=trade.id) }}">
+                                <select name="status">
+                                    <option value="Pending" {% if trade.status == "Pending" %}selected{% endif %}>Pending</option>
+                                    <option value="Approved" {% if trade.status == "Approved" %}selected{% endif %}>Approved</option>
+                                    <option value="Rejected" {% if trade.status == "Rejected" %}selected{% endif %}>Rejected</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </form>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('manageTradeins.delete_trade', trade_id=trade.id) }}" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No trade-in requests found.</p>
+    {% endif %}
+</div>
+{% endblock %}

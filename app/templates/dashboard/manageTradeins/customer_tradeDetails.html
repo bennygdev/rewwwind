@@ -7,9 +7,9 @@
 {% block content %}
 <div class="trade-details-container">
     <div class="trade-details-header">
-        <h1>Trade-in Request #{{ "TD%03d"|format(trade_item.id) }}</h1>
-        <span class="status {{ "approved" if trade_item.item_condition == "Brand New" else "pending" if trade_item.item_condition == "Well Used" else "rejected" }}">
-            {{ "Approved" if trade_item.item_condition == "Brand New" else "Pending" if trade_item.item_condition == "Well Used" else "Rejected" }}
+        <h1>Trade-in Request #{{ "%03d"|format(trade_item.id) }}</h1>
+        <span class="status {{ trade_item.status.lower() }}">
+            {{ trade_item.status }}
         </span>
     </div>
 
@@ -41,12 +41,42 @@
         </div>
     </div>
 
-    <div class="instructions-section">
-        <p>Please locate a popstation and drop it off by {{ (trade_item.created_at + timedelta(days=5)).strftime('%d %b %Y') }}</p>
-        <a href="#" class="btn">More detailed Instructions</a>
-    </div>
+    <!-- Show shipping & payment form only if status is Approved -->
+    {% if trade_item.status == "Approved" %}
+    <div class="shipping-payment-section">
+        <h2>Shipping & Payment</h2>
+        <form action="{{ url_for('manageTradeins.save_shipping_payment', trade_id=trade_item.id) }}" method="POST">
+            <h3>Drop-off option</h3>
+            <div class="radio-group">
+                <label><input type="radio" name="shipping_option" value="Mail-in"> Mail-in</label>
+                <label><input type="radio" name="shipping_option" value="In-Store"> In-Store drop-off</label>
+                <label><input type="radio" name="shipping_option" value="Pick-up"> Pick-Up Service (Shipping: $5.00)</label>
+            </div>
 
-    <a href="{{ url_for('manageTradeins.edit_trade', trade_id=trade_item.id) }}" class="btn btn-primary">Edit</a>
-<a href="{{ url_for('manageTradeins.manage_tradeins') }}" class="btn btn-secondary">Back to Dashboard</a>
+            <h3>Shipping Address</h3>
+            <input type="text" name="street_address" placeholder="Street Address" required>
+            <input type="text" name="house_block" placeholder="House / Block No." required>
+            <input type="text" name="zip_code" placeholder="Zip or Postal Code" required>
+            <input type="text" name="contact_number" placeholder="Contact Number" required>
+
+            <h3>Payment Option</h3>
+            <div class="payment-group">
+                <input type="text" name="card_number" placeholder="Card Number" required>
+                <input type="text" name="card_expiry" placeholder="Expiration Date (MM/YY)" required>
+                <input type="text" name="card_name" placeholder="Name on Card" required>
+                
+                <div class="checkbox-container">
+                    <input type="checkbox" name="save_payment" id="save-payment">
+                    <label for="save-payment">Save my payment information</label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-success">Save Details</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Back button -->
+    <a href="{{ url_for('manageTradeins.manage_tradeins') }}" class="btn btn-secondary">Back to Dashboard</a>
 </div>
 {% endblock %}

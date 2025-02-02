@@ -18,7 +18,7 @@
   margin-bottom: 20px;
 }
 
-.headerContent .search__wrapper {
+.headerContent .voucherSearch__wrapper {
   position: absolute;
   bottom: -24px;
   width: 100%;
@@ -367,7 +367,7 @@ pre {
 }
 
 /* Media queries */
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .vouchers__grid {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 16px;
@@ -380,5 +380,110 @@ pre {
     grid-template-columns: 1fr;
     gap: 16px;
     padding: 12px;
+  }
+} */
+
+@media (max-width: 1024px) {
+  .vouchers__grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 15px;
+  }
+
+  .filters__form {
+    gap: 15px;
+  }
+
+  .filter__select {
+    min-width: 130px;
+  }
+}
+
+@media (max-width: 768px) {
+  .vouchers__header {
+    padding: 20px;
+  }
+
+  .headerContent .search__wrapper {
+    padding-right: 20px;
+  }
+
+  .filters__form {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .filter__group {
+    width: 100%;
+  }
+
+  .filter__select {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .clear__filters {
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+  }
+
+  .vouchers__pagination ul {
+    gap: 8px;
+  }
+
+  .vouchers__pagination .page__button {
+    padding: 6px 12px;
+  }
+
+  .vouchers__pagination .active .page__button {
+    padding: 8px 14px;
+  }
+
+  .voucherModal__content {
+    width: 90%;
+    margin: 20px;
+  }
+
+  .voucher__detail {
+    flex-direction: column;
+  }
+
+  .voucher__detail strong {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+
+  .headerContent .voucherSearch__wrapper {
+    padding: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .vouchers__header {
+    padding: 15px;
+  }
+
+  .voucher__card {
+    height: 250px;
+  }
+
+  .type-icon {
+    font-size: 3em;
+  }
+
+  .voucher__status {
+    font-size: 0.75em;
+    padding: 4px 8px;
+  }
+
+  .controls {
+    gap: 8px;
+  }
+
+  .vouchers__pagination .pagePrevious__button a,
+  .vouchers__pagination .pageNext__button a {
+    padding: 8px 15px;
   }
 }

@@ -8,9 +8,10 @@ from wtforms import StringField, TextAreaField, IntegerField, DateField, FloatFi
 from wtforms.validators import DataRequired, Email, Length, EqualTo, Optional, NumberRange, Regexp, ValidationError
 from PIL import Image # file object validator
 from mimetypes import guess_type # file extension validator
-from .models import User, Category, SubCategory, Product, MailingList
+from .models import User, Category, SubCategory, Product, MailingList, Voucher
 from datetime import datetime
 import re
+import json
 
 # Account-related forms
 class LoginForm(FlaskForm):
@@ -486,7 +487,13 @@ class VoucherForm(FlaskForm):
   # min_cart_amount = FloatField('Minimum Cart Amount', validators=[Optional(), NumberRange(min=0)])
   # min_cart_items = IntegerField('Minimum Cart Items', validators=[Optional(), NumberRange(min=1)])
   # first_purchase_only = BooleanField('First Purchase Only')
-  eligible_categories = SelectMultipleField('Eligible Categories')
+  eligible_categories = SelectMultipleField('Eligible Categories', 
+    choices=[
+      ('Vinyl', 'Vinyl'),
+      ('Book', 'Book')
+    ],
+    validators=[DataRequired(message="Please select at least one category")]
+  )
     
   expiry_days = SelectField('Expiry Period', choices=[
     (7, '7 Days'),
@@ -494,12 +501,12 @@ class VoucherForm(FlaskForm):
     (30, '30 Days'),
     (60, '60 Days'),
     (90, '90 Days')
-  ], coerce=int, validators=[DataRequired()])
+  ], coerce=int, validators=[DataRequired(message="Expiry day is required")])
 
   is_active = RadioField('Voucher Status', choices=[
     ('True', 'Active'),
     ('False', 'Not Active')
-  ], default='True', validators=[DataRequired()])
+  ], default='True', validators=[DataRequired(message="Please select one voucher status")])
 
   submit = SubmitField('Create Voucher')
     
@@ -511,6 +518,99 @@ class VoucherForm(FlaskForm):
       ('Book', 'Book')
     ]
     
+  def validate_code(self, field):
+    if Voucher.query.filter_by(voucher_code=field.data).first():
+      raise ValidationError('This voucher code is already in use.')
+    
+    if not re.match(r'^[A-Za-z0-9_-]*$', field.data):
+      raise ValidationError('Voucher code can only contain letters, numbers, underscores and dashes')
+
+  def validate_description(self, field):
+    if len(field.data) > 1000:
+        raise ValidationError('Description cannot exceed 1000 characters.')
+
+  def validate_discount_value(self, field):
+    try:
+      value = float(field.data)
+    except (TypeError, ValueError):
+      raise ValidationError('Discount value must be a number')
+
+    if self.voucher_type.data == 'percentage':
+      if not 0 <= field.data <= 100:
+        raise ValidationError('Percentage discount must be between 0 and 100')
+    elif self.voucher_type.data == 'fixed_amount':
+      if field.data <= 0:
+        raise ValidationError('Fixed amount discount must be greater than 0')
+    elif self.voucher_type.data == 'free_shipping':
+      field.data = 0  # No discount value needed for free shipping
+
+  def validate_eligible_categories(self, field):
+    if not field.data:
+      raise ValidationError('Please select at least one eligible category.')
+
+  def validate_criteria_json(self, field):
+    if not field.data or field.data == '[]':
+      raise ValidationError('Please add at least one voucher criteria.')
+
+class EditVoucherForm(FlaskForm):
+  code = StringField('Voucher Code', validators=[DataRequired(), Length(min=3, max=50), Regexp(r'^[A-Za-z0-9_-]*$', message="Voucher code can only contain letters, numbers, underscores and dashes")])
+  description = TextAreaField('Description', validators=[DataRequired(), Length(max=1000)])
+  voucher_type = SelectField('Voucher Type', choices=[
+    ('percentage', 'Percentage Discount'),
+    ('fixed_amount', 'Fixed Amount Off'),
+    ('free_shipping', 'Free Shipping')
+  ], validators=[DataRequired()])
+  discount_value = FloatField('Discount Value', validators=[Optional(), NumberRange(min=0)])
+    
+  # Criteria fields
+  criteria_json = StringField('Voucher Criteria')
+  # min_cart_amount = FloatField('Minimum Cart Amount', validators=[Optional(), NumberRange(min=0)])
+  # min_cart_items = IntegerField('Minimum Cart Items', validators=[Optional(), NumberRange(min=1)])
+  # first_purchase_only = BooleanField('First Purchase Only')
+  eligible_categories = SelectMultipleField('Eligible Categories', 
+    choices=[
+      ('Vinyl', 'Vinyl'),
+      ('Book', 'Book')
+    ],
+    validators=[DataRequired(message="Please select at least one category")]
+  )
+    
+  expiry_days = SelectField('Expiry Period', choices=[
+    (7, '7 Days'),
+    (14, '14 Days'),
+    (30, '30 Days'),
+    (60, '60 Days'),
+    (90, '90 Days')
+  ], coerce=int, validators=[DataRequired(message="Expiry day is required")])
+
+  is_active = RadioField('Voucher Status', choices=[
+    ('True', 'Active'),
+    ('False', 'Not Active')
+  ], default='True', validators=[DataRequired(message="Please select one voucher status")])
+
+  submit = SubmitField('Create Voucher')
+    
+  def __init__(self, voucher_id, *args, **kwargs):
+    super(EditVoucherForm, self).__init__(*args, **kwargs)
+    # Populate categories dynamically
+    self.eligible_categories.choices = [
+      ('Vinyl', 'Vinyl'),
+      ('Book', 'Book')
+    ]
+    self.voucher_id = voucher_id
+    
+  def validate_code(self, field):
+    existing_voucher = Voucher.query.filter_by(voucher_code=field.data).first()
+    if existing_voucher and existing_voucher.id != self.voucher_id:
+      raise ValidationError('This voucher code is already in use.')
+        
+    if not re.match(r'^[A-Za-z0-9_-]*$', field.data):
+      raise ValidationError('Voucher code can only contain letters, numbers, underscores and dashes')
+
+  def validate_description(self, field):
+    if len(field.data) > 1000:
+        raise ValidationError('Description cannot exceed 1000 characters.')
+
   def validate_discount_value(self, field):
     try:
       value = float(field.data)

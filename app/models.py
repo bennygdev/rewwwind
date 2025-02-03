@@ -258,12 +258,26 @@ class tradeDetail(db.Model):
     author_artist = db.Column(db.String(255), nullable=True)
     genre = db.Column(db.String(255), nullable=True)
     isbn_or_cat = db.Column(db.String(100), nullable=True)
-    trade_number = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  
+    trade_number = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    status = db.Column(db.String(50), nullable=False, default="Pending")
 
     user = db.relationship('User', backref='trade_items', lazy=True)
 
     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
     updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
+
+    # For shipping and payment NEW!!
+    shipping_option = db.Column(db.String(50))
+    street_address = db.Column(db.String(255))
+    house_block = db.Column(db.String(50))
+    zip_code = db.Column(db.String(20))
+    contact_number = db.Column(db.String(20))
+
+    card_number = db.Column(db.String(4))  
+    card_expiry = db.Column(db.String(10))
+    card_name = db.Column(db.String(255))
+
+
 
 class MailingList(db.Model):
   __tablename__ = 'mailing_list'
@@ -271,7 +285,7 @@ class MailingList(db.Model):
   email = db.Column(db.String(150), unique=True, nullable=False)
   unsubscribe_token = db.Column(db.String(100), unique=True, nullable=True)
   created_at = db.Column(db.DateTime(timezone=True), default=func.now())
-  updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
+  updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now()) 
 
 class MailingPost(db.Model):
   __tablename__ = 'mailing_posts'

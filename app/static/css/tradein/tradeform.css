@@ -118,3 +118,14 @@ input, select {
   border-radius: 8px;
 }
 
+.label-container {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Space between label and error */
+}
+
+.form-error {
+  color: rgb(204, 8, 8);
+  font-size: 14px;
+  font-weight: bold;
+}

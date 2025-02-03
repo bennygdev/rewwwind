@@ -8,6 +8,7 @@ from wtforms import StringField, TextAreaField, IntegerField, DateField, FloatFi
 from wtforms.validators import DataRequired, Email, Length, EqualTo, Optional, NumberRange, Regexp, ValidationError
 from PIL import Image # file object validator
 from mimetypes import guess_type # file extension validator
+from wtforms.validators import Regexp
 from .models import User, Category, SubCategory, Product, MailingList, Voucher
 from datetime import datetime
 import re
@@ -451,7 +452,7 @@ class AddToCartForm(FlaskForm):
   quantity = IntegerField('Quantity')
   submit = SubmitField('Add to Cart')
 
-
+#Trade-in form stuff
 class TradeItemForm(FlaskForm):
     item_type = SelectField('Item Type', choices=[
       ('book', 'Book'), ('vinyl', 'Vinyl')
@@ -465,10 +466,14 @@ class TradeItemForm(FlaskForm):
     ], validators=[DataRequired()])
 
     images = FileField('Images', validators=[FileAllowed(['jpg', 'jpeg', 'png'], 'Only image files are allowed.')])
-    title = StringField('Title', validators=[DataRequired(), Length(min=1, max=255)])
-    author = StringField('Author / Artist', validators=[DataRequired(), Length(min=1, max=255)])
-    genre = StringField('Genre', validators=[DataRequired(), Length(min=1, max=255)])
-    isbn = StringField('ISBN / Cat#', validators=[DataRequired(), Length(min=1, max=255)])
+    title = StringField('Title', validators=[DataRequired(), Length(min=3, max=255, message="Title must be at least 3 characters.")])
+    author = StringField('Author / Artist', validators=[DataRequired(), Length(min=3, max=255, message="Author must be at least 3 characters.")])
+    genre = StringField('Genre', validators=[DataRequired(), Length(min=3, max=255, message="Genre must be at least 3 characters.")])
+
+    isbn = StringField('ISBN / Cat#', validators=[
+        DataRequired(),
+        Regexp(r"^\d{13}$", message="ISBN must be exactly 13 digits (numbers only).")  
+    ])
     
     submit = SubmitField('Submit')
     

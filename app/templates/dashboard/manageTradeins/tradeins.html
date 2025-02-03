@@ -1,21 +1,74 @@
 {% extends "dashboard/base.html" %}
-{% set active_page = "manage_tradeins" %}
-{% block title %}Manage Trade-ins{% endblock %}
 
-{% block content %}
-<!-- Logic to check if the user is a customer, admin, or owner -->
-
-<!-- Render content based on user role -->
-{% block userTradeins %}
-    {% if user.role_id == 1 %}
-        <!-- Include customer-specific trade-ins -->
-        {% include "dashboard/manageTradeins/customer_tradeins.html" %}
-    {% elif user.role_id in [2, 3] %}
-        <!-- Include admin/owner-specific trade-ins -->
-        {% include "dashboard/manageTradeins/admin_tradeins.html" %}
-    {% else %}
-        <p>Access Denied: You do not have permission to view this page.</p>
-    {% endif %}
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/tradein/dashboardTrade.css') }}">
 {% endblock %}
 
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/tradein/manageTradeins.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div id="successPopup" class="popup-message">
+            {{ messages[0][1] }}
+        </div>
+    {% endif %}
+{% endwith %}
+
+    <h2>Manage Trade-ins</h2>
+    
+
+    {% if trade_items %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Actions</th>
+                    <th>Trade-in</th>
+                    <th>Title</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Genre</th>
+                    <th>ISBN</th>
+                    <th>Condition</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in trade_items %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('manageTradeins.delete_trade', trade_id=item.id) }}" 
+                               class="btn btn-danger {% if item.status in ['Approved', 'Rejected'] %} disabled-btn {% endif %}" 
+                               {% if item.status in ['Approved', 'Rejected'] %} aria-disabled="true" tabindex="-1" onclick="return false;" {% endif %}>
+                                Delete
+                            </a>
+                        </td>
+                        
+                        <td>
+                            <a href="{{ url_for('manageTradeins.view_trade_details', trade_id=item.id) }}">
+                                <strong>Trade-In #{{ "%05d"|format(item.id) }}</strong><br>
+                                {{ "Drop-off" if item.item_condition in ["Brand New", "Like New"] else "Pick-up" }}
+                            </a>
+                        </td>
+                        <td>{{ item.title or "N/A" }}</td>
+                        <td>{{ item.created_at.strftime('%d %b %Y') }}</td>
+                        <td>{{ item.item_type or "N/A" }}</td>
+                        <td>{{ item.genre or "N/A" }}</td>
+                        <td>{{ item.isbn_or_cat or "N/A" }}</td>
+                        <td>{{ item.item_condition or "N/A" }}</td>
+                        <td>
+                            <span class="status {{ item.status.lower() }}">{{ item.status }}</span>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No trade-ins found.</p>
+    {% endif %}
+</div>
 {% endblock %}

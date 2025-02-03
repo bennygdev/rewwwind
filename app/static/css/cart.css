@@ -1,0 +1,302 @@
+.empty-cart {
+    text-align: center;
+    padding: 40px 20px;
+    font-family: Arial, sans-serif;
+}
+
+.suggested-products {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.suggested-products h2 {
+    font-size: 2em;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.products-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 20px 0;
+}
+
+.product-card {
+    flex: 0 0 calc(20% - 10px); /* Adjust width for larger cards */
+    max-width: 220px; /* Set a maximum width */
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.product-card img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.product-card h3 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    color: #333;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.product-card .price {
+    font-size: 1em;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.product-card .price .original-price {
+    text-decoration: line-through;
+    color: #888;
+    margin-right: 5px;
+}
+
+.product-card .price .original-price {
+    color: #039752;
+    font-weight: bold;
+}
+
+.btn-add-to-cart {
+    padding: 10px 15px;
+    background-color: #039752;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    width: 100%;
+}
+
+.btn-add-to-cart:hover {
+    background-color: #02693e;
+    transition: 0.3s ease;
+}
+.content {
+
+    font-family: Arial, sans-serif;
+    padding: 80px 90px;
+}
+
+h1 {
+    text-align: center;
+    color: #039752;
+}
+
+.cart-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.cart-item {
+    display: flex;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 10px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.product-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 15px;
+}
+
+.product-details {
+    flex: 1;
+    padding: 0 15px;
+}
+
+.product-details h3 {
+    margin: 0;
+    color: #333;
+}
+
+.product-details p {
+    margin: 5px 0;
+    color: #555;
+}
+
+.update-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.update-btn, .remove-btn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.update-btn {
+    background-color: #039752;
+    color: white;
+    font-weight: bold;
+}
+
+.update-btn:hover {
+    background-color: #02693e;
+    transition: 0.3s;
+}
+
+.remove-icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 10px;
+    color: #ff0000; /* Red color for delete icon */
+    font-size: 1.5em; /* Adjust size */
+    transition: color 0.3s ease;
+}
+
+.remove-icon-btn:hover {
+    color: darkred; /* Darker red on hover */
+}
+
+.discount {
+    color: #039752;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.item-total {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #555;
+}
+
+.cart-summary {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.cart-summary h3 {
+    color: #039752;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.btn-primary {
+    padding: 12px 24px;
+    background-color: #039752;
+    color: white;
+    text-decoration: none;
+    font-size: 1.2em;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.btn-primary:hover {
+    background-color: #02693e;
+    transition: 0.3s;
+}
+
+.flash-messages {
+    color: #039752;
+    text-align: center;
+    list-style: none;
+    padding: 0;
+}
+
+.favorite-btn {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    color: red;
+    cursor: pointer;
+}
+
+.favorite-btn:hover {
+    color: darkred;
+}
+
+/* Style for Add to Cart and Condition Buttons */
+.btn-add,
+.btn-condition {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-top: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    color: white;
+    background-color: #039752; /* Green Theme */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    text-decoration: none; /* Remove underline for anchor tags */
+}
+
+/* Hover Effects for Buttons */
+.btn-add:hover,
+.btn-condition:hover {
+    background-color: #02693e; /* Darker Green */
+    transform: translateY(-2px); /* Slight lift on hover */
+}
+
+/* Active Effect for Buttons */
+.btn-add:active,
+.btn-condition:active {
+    transform: translateY(1px); /* Pressed effect */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Style for the Condition Dropdown */
+.condition-dropdown {
+    margin-top: 10px;
+    font-size: 1rem;
+    padding: 8px 16px;
+    background-color: white;
+    border: 2px solid #039752;
+    border-radius: 8px;
+    color: #039752; /* Text color matches the green theme */
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+/* Hover Effect for Dropdown */
+.condition-dropdown:hover {
+    border-color: #02693e; /* Darker Green */
+    background-color: #f9f9f9;
+}
+
+/* Responsive Styling */
+@media (max-width: 768px) {
+    .btn-add,
+    .btn-condition {
+        font-size: 0.9rem;
+        padding: 8px 16px;
+    }
+
+    .condition-dropdown {
+        font-size: 0.9rem;
+        padding: 6px 12px;
+    }
+}

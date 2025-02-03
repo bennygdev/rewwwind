@@ -15,7 +15,7 @@
 
 {% block content %}
 <div class="body">
-    <form method="POST" class="product__form" enctype="multipart/form-data">
+    <form method="POST" class="product__form" enctype="multipart/form-data" novalidate>
         <div class="flash-messages"></div> <!-- Container for flash messages -->
         {{ form.hidden_tag() }}
 
@@ -23,10 +23,12 @@
         <div class="product__name">
             {{ form.productName.label }}
             {{ form.productName(class='form-control', placeholder='Enter product name here...') }}
+            <span class="error"></span>
         </div>
         <div class="product__creator">
             {{ form.productCreator.label }}
             {{ form.productCreator(class='form-control', placeholder='Enter product creator name here...') }}
+            <span class="error"></span>
         </div>
         <div class="product__images">
             <label>Product Image Upload</label>
@@ -36,7 +38,8 @@
                 <button class="carousel-button left" type="button" style="display: none;"><i class="bi bi-caret-left-fill"></i></button>
                 <div class="file-list"></div>
                 <button class="carousel-button right" type="button" style="display: none;"><i class="bi bi-caret-right-fill"></i></button>
-            </div>            
+            </div>
+            <span class="error"></span>       
         </div>
         <div class="product__description">
             {{ form.productDescription.label }}
@@ -46,10 +49,12 @@
             <div class="product__type">
                 {{ form.productType.label }}
                 {{ form.productType(class='form-select') }}
+                <span class="error"></span>
             </div>
             <div class="product__genre">
                 {{ form.productGenre.label }}
                 {{ form.productGenre(class='form-select') }}
+                <span class="error"></span>
             </div>
         </div>
         <div class="product__conditions">
@@ -67,6 +72,7 @@
 
                 <button type="button" class="deleteCondition"><i class="bi bi-x-lg"></i></button>
             </div>
+            <span class="error condition-error"></span>
             {% endfor %}
             <button type="button" class="addCondition"><i class="fa-solid fa-plus"></i>&nbsp;Add Condition</button>
         </div>

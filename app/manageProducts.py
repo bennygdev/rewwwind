@@ -8,6 +8,8 @@ from .roleDecorator import role_required
 from .forms import AddProductForm, DeleteProductForm, AddProductFormData #, EditProductForm
 from .models import Product, Category, SubCategory, ProductSubCategory, OrderItem
 from . import db
+from . import cloudinary
+import cloudinary.uploader
 import os
 
 from math import ceil
@@ -142,7 +144,7 @@ def products_listing():
         stock_choices=stock_choices
         ) #, datetime=datetime
 
-# uploads folder cleaning logic
+# uploads folder cleaning logic + crosscheck with cloudinary
 def clean_uploads_folder():
     used_images = set()
     products = Product.query.all()
@@ -159,6 +161,7 @@ def clean_uploads_folder():
         file_path = os.path.join(uploads_folder, filename)
         try:
             os.remove(file_path)
+            cloudinary.uploader.destroy(filename.split('.')[0])
             print(f"Deleted unused file: {filename}")
         except Exception as e:
             print(f"Error deleting file {filename}: {e}")
@@ -177,8 +180,6 @@ def add_product():
                 if user_id in shelve_db:
                     saved_data = shelve_db[user_id]
 
-                    # print(saved_data.get_conditions())
-
                     form.productName.data = saved_data.get_name()
                     form.productCreator.data = saved_data.get_creator()
                     form.productDescription.data = saved_data.get_description()
@@ -188,10 +189,10 @@ def add_product():
                     form.productIsFeaturedStaff.data = saved_data.get_featured_staff()
 
                     condition_choices = [
-                    ('Brand New', 'Brand New'),
-                    ('Like New', 'Like New'),
-                    ('Lightly Used', 'Lightly Used'),
-                    ('Well Used', 'Well Used')
+                        ('Brand New', 'Brand New'),
+                        ('Like New', 'Like New'),
+                        ('Lightly Used', 'Lightly Used'),
+                        ('Well Used', 'Well Used')
                     ]
 
                     if saved_data.get_conditions():
@@ -218,37 +219,56 @@ def add_product():
                 productDescription = form.productDescription.data
                 productType = form.productType.data
                 productGenre = form.productGenre.data
-                subcategory = SubCategory.query.filter(SubCategory.id==productGenre).first()
-                # print(subcategory)
+                subcategory = SubCategory.query.filter(SubCategory.id == productGenre).first()
                 productThumbnail = int(form.productThumbnail.data)
                 productConditions = form.productConditions.data
                 is_featured_special = form.productIsFeaturedSpecial.data
                 is_featured_staff = form.productIsFeaturedStaff.data
 
-                # Handle file upload
+                # Handle file upload to Cloudinary
+                MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB in bytes
+
                 files = request.files.getlist('productImages')
-                upload_folder = current_app.config['UPLOAD_FOLDER']
-                uploaded_file_paths = []
+                uploaded_file_urls = []
 
                 for file in files:
                     if file:
-                        file.seek(0)  # PLEASE REMEMBER, i keep on forgetting lol
-                        file_path = os.path.join(upload_folder, secure_filename(file.filename))
+                        file.seek(0, os.SEEK_END)
+                        file_size = file.tell()  # Get file size
+                        file.seek(0)  # reset
+
+                        if file_size > MAX_FILE_SIZE:
+                            return jsonify({'error': True, 'message': "One or more images exceed the 5MB size limit. Please upload smaller images."})
+
+                        secure_name = secure_filename(file.filename)
+                        cloudinary.uploader.upload(
+                            file,
+                            public_id=secure_name.split('.')[0]
+                        )
+                        uploaded_file_urls.append(secure_name)
+
+                        # to save on cloudinary credits, cross-check with local storage
+                        file.seek(0)
+                        upload_folder = current_app.config['UPLOAD_FOLDER']
+                        file_path = os.path.join(upload_folder, secure_name)
                         file.save(file_path)
-                        uploaded_file_paths.append(secure_filename(file.filename))
+
+                # Ensure at least one image was uploaded
+                if not uploaded_file_urls:
+                    return jsonify({'error': False, 'message': "No images were uploaded. Please upload at least one image."})
 
                 # Create the new product object
                 new_product = Product(
                     name=productName,
                     creator=productCreator,
-                    image_thumbnail=secure_filename(files[productThumbnail].filename),
-                    images=uploaded_file_paths,
+                    image_thumbnail=uploaded_file_urls[productThumbnail],  # Use the thumbnail URL
+                    images=uploaded_file_urls,  # Store all image URLs
                     category_id=productType,
                     subcategories=[subcategory],
                     description=productDescription,
                     conditions=productConditions,
-                    is_featured_special = is_featured_special,
-                    is_featured_staff = is_featured_staff
+                    is_featured_special=is_featured_special,
+                    is_featured_staff=is_featured_staff
                 )
 
                 db.session.add(new_product)
@@ -258,7 +278,7 @@ def add_product():
                     shelve_path = os.path.join(current_app.instance_path, 'shelve.db')
                     with shelve.open(shelve_path) as shelve_db:
                         user_id = str(current_user.id)
-                        if user_id in shelve_db:
+                        if user_id in shelve_db.keys():
                             del shelve_db[user_id]
                 except Exception as e:
                     print(f"Error deleting saved form data: {e}")
@@ -291,8 +311,8 @@ def save_product_form():
     try:
         if session.get('product_added'):
             session.pop('product_added')
-            print(True)
-            return jsonify({'success': False, 'message': "Skipped after product addition."})
+            print('skipped saving shelve after product addition')
+            return 'skipped shelve'
         
         shelve_path = os.path.join(current_app.instance_path, 'shelve.db')
         
@@ -312,8 +332,7 @@ def save_product_form():
             )
 
             db[user_id] = form_data
-        print('success')
-        flash("The product data (except images) was saved successfully.<br>It can be viewed again when revisiting the 'Add Product' form, as long as you do not log out.", "success")
+        print('success in saving shelve form')
         return redirect(url_for('manageProducts.products_listing'))
     
     except Exception as e:
@@ -376,22 +395,39 @@ def update_product(product_id):
             product.is_featured_special = form.productIsFeaturedSpecial.data
             product.is_featured_staff = form.productIsFeaturedStaff.data
 
-            # Handle file uploads
+            # Handle file upload to Cloudinary
+            MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB in bytes
+
             files = request.files.getlist('productImages')
-            uploaded_file_paths = []
-            upload_folder = current_app.config['UPLOAD_FOLDER']
+            uploaded_file_urls = []
+
             for file in files:
                 if file:
-                    file.seek(0)  # Ensure we're at the start of the file
-                    file_path = os.path.join(upload_folder, secure_filename(file.filename))
+                    file.seek(0, os.SEEK_END)
+                    file_size = file.tell()  # Get file size
+                    file.seek(0)  # reset
+
+                    if file_size > MAX_FILE_SIZE:
+                        return jsonify({'error': True, 'message': "One or more images exceed the 5MB size limit. Please upload smaller images."})
+
+                    secure_name = secure_filename(file.filename)
+                    cloudinary.uploader.upload(
+                        file,
+                        public_id=secure_name.split('.')[0]
+                    )
+                    uploaded_file_urls.append(secure_name)
+
+                    # to save on cloudinary credits, cross-check with local storage
+                    file.seek(0)
+                    upload_folder = current_app.config['UPLOAD_FOLDER']
+                    file_path = os.path.join(upload_folder, secure_name)
                     file.save(file_path)
-                    uploaded_file_paths.append(secure_filename(file.filename))
             
             product.images = [img for img in product.images if img in form.images.data.split(',')]
             # print(form.images.data)
 
-            if uploaded_file_paths:
-                product.images.extend(uploaded_file_paths)
+            if uploaded_file_urls:
+                product.images.extend(uploaded_file_urls)
                 flag_modified(product, 'images')
             # print(product.images)
             
@@ -432,9 +468,6 @@ def delete_product():
         id = deleteForm.productID.data
         product_to_delete = Product.query.get(id)
         if product_to_delete:
-            db.session.query(ProductSubCategory).filter_by(product_id=product_to_delete.id).delete()
-            db.session.commit()
-
             db.session.delete(product_to_delete)
             db.session.commit()
             flash("The product has been removed successfully.", "success")

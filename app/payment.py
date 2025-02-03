@@ -227,7 +227,7 @@ def success():
         # retrieve previous checkout session
         checkout_sessions = stripe.checkout.Session.list(customer=current_user.stripe_id, limit=1)
         if not checkout_sessions.data:
-            flash("No checkout session found.", "error")
+            print("No checkout session found.")
             return redirect(url_for('productPagination.product_pagination'))
 
         checkout_session = checkout_sessions.data[0]
@@ -308,11 +308,10 @@ def success():
                 db.session.delete(item)
                 db.session.commit()
 
-        flash("Order placed successfully!", "success")
+        print("Order placed successfully!")
         return redirect(url_for('manageOrders.order_detail', order_id=order.id))
 
     except Exception as e:
         db.session.rollback()
         print(str(e))
-        flash("An error occurred while processing your order. Please try again.", "error")
         return redirect(url_for('productPagination.product_pagination'))

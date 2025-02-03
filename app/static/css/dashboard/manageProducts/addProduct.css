@@ -60,6 +60,11 @@
     cursor: pointer;
 }
 
+.product__form select option:disabled {
+    background-color: #e6e6e6;
+    color:rgba(0, 0, 0, 0.2);
+}
+
 .centralise-content {
     display: flex;
     justify-content: space-between;
@@ -250,4 +255,15 @@
 .product__form .button__wrapper input {
     margin-top: 1.5em;
     font-size: 1.5em;
+}
+
+span.error {
+    display: block;
+    margin-top: 5px;
+    color: red;
+}
+
+span.error.condition-error {
+    margin-top: 0;
+    margin-bottom: 30px;
 }

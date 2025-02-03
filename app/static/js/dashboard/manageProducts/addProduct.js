@@ -7,10 +7,111 @@ class Form {
         this.init();
     }
 
-    // Initialize event listeners
+    // Initialise event listeners
     init() {
         this.form.addEventListener('submit', (event) => this.handleSubmit(event));
     }
+
+    // Validate a single field
+    validateField(field) {
+        let errorSpan = field.nextElementSibling; // Assuming the error span is next to the input
+        if (!errorSpan || !errorSpan.classList.contains('error')) {
+            return true; // No error span found, skip validation
+        }
+        // Clear previous error
+        errorSpan.textContent = '';
+                
+        // Check required
+        if (field.required && !field.value.trim()) {
+            errorSpan.textContent = 'This field is required.';
+            return false;
+        }
+
+        // Check min value for stock and price
+        if (field.hasAttribute('min') && parseFloat(field.value) < parseFloat(field.min)) {
+            errorSpan.textContent = `The value must be at least ${field.min}.`;
+            return false;
+        }
+
+        // Check minlength
+        if (field.minLength && field.value.length < field.minLength) {
+            errorSpan.innerHTML = `The inputted text is too short. Please enter at least ${field.minLength} characters.<br>You currently have ${field.value.length} character(s).`;
+            return false;
+        }
+
+        // Check maxlength
+        if (field.maxLength && field.value.length > field.maxLength) {
+            errorSpan.textContent = `The inputted text is too long. Please enter less than ${field.maxLength} characters.<br>You currently have ${field.value.length} character(s).`;
+            return false;
+        }
+    
+        return true; // Field is valid
+    }
+
+    // Validate all fields
+    validateForm() {
+        let isValid = true;
+        const fields = this.form.querySelectorAll('input, select, textarea');
+        
+        let firstNF = false
+        fields.forEach(field => {
+            if (!this.validateField(field)) {
+                field.style.border = '1px solid red';
+                isValid = false;
+                field.addEventListener('change', () => {field.style.border = 'var(--bs-border-width) solid var(--bs-border-color)'});
+                if (!firstNF) {
+                    field.scrollIntoView({ behavior: 'smooth', block: 'center'});
+                    firstNF = !firstNF;
+                }
+            }
+        });
+
+        // Additional validation for stock and price
+        const conditionDivs = this.form.querySelectorAll('.condition');
+        conditionDivs.forEach(conditionDiv => {
+            const stockField = conditionDiv.querySelector('input[name*="-stock"]');
+            const priceField = conditionDiv.querySelector('input[name*="-price"]');
+            const errorSpan = conditionDiv.nextElementSibling;
+            errorSpan.innerHTML = '';
+    
+            if (stockField && priceField && errorSpan) {
+                const stockValue = parseFloat(stockField.value);
+                const priceValue = parseFloat(priceField.value);
+    
+                // Check stock
+                if (isNaN(stockValue) || stockValue <= 0) {
+                    conditionDiv.style.border = '1px solid red';
+                    stockField.style.border = '1px solid red';
+                    stockField.addEventListener('change', () => {
+                        stockField.style.border = 'var(--bs-border-width) solid var(--bs-border-color)';
+                        conditionDiv.style.border = '1px solid black';
+                    });
+                    errorSpan.innerHTML = 'Stock must be greater than 0.';
+                    isValid = false;
+                }
+
+                // Check price (only if stock is valid)
+                if (isNaN(priceValue) || priceValue <= 0) {
+                    if (errorSpan.innerHTML) {
+                        // If stock already has an error, append price error
+                        errorSpan.innerHTML += '<br>Price must be greater than 0.';
+                    } else {
+                        // If stock is valid, display price error only
+                        errorSpan.innerHTML = 'Price must be greater than 0.';
+                    }
+                    conditionDiv.style.border = '1px solid red';
+                    priceField.style.border = '1px solid red';
+                    priceField.addEventListener('change', () => {
+                        priceField.style.border = 'var(--bs-border-width) solid var(--bs-border-color)';
+                        conditionDiv.style.border = '1px solid black';
+                    });
+                    isValid = false;
+                }
+            }
+        });
+    
+        return isValid;
+    }  
 
     // Prepare form data
     prepareFormData() {
@@ -28,6 +129,10 @@ class Form {
     // Handle form submission
     async handleSubmit(event) {
         event.preventDefault();
+
+        if (!this.validateForm()) {
+            return; // Stop submission if validation fails
+        }
 
         const formData = this.prepareFormData();
 
@@ -344,32 +449,95 @@ class ConditionHandler extends ImageHandler {
                 deleteBtn.addEventListener('click', () => this.deleteCondition(condition));
             }
         });
+        this.updateDropdowns(); // reset first
     }
 
     addCondition() {
         const options = ['Brand New', 'Like New', 'Lightly Used', 'Well Used'];
+    
+        // Clone the first condition element
         const newCondition = this.conditionList[0].cloneNode(true);
+        const newError = this.conditionList[0].nextElementSibling.cloneNode(true);
+    
         newCondition.querySelectorAll('input, select').forEach(item => {
-            item.value = '';
+            item.value = ''; // Reset values
             item.id = item.id.replace(/-\d+-(?=\w+$)/, `-${this.conditionList.length}-`);
             item.name = item.id;
         });
+    
         // Update delete button functionality
         const deleteBtn = newCondition.querySelector('.deleteCondition');
         if (deleteBtn) {
-            deleteBtn.addEventListener('click', () => this.deleteCondition(newCondition));
+            deleteBtn.addEventListener('click', () => {
+                this.deleteCondition(newCondition);
+            });
         }
-
+    
+        // Add change event listener to select dropdown
+        const select = newCondition.querySelector('select');
+        if (select) {
+            select.addEventListener('change', () => this.updateDropdowns());
+        }
+    
         this.conditionsContainer.insertBefore(newCondition, this.addConditionBtn);
+        newCondition.after(newError);
         this.conditionList.push(newCondition);
-    }
+        
+        this.conditionList.forEach(c => {
+            this.updateDropdowns(); // Update dropdowns after adding new condition
+        })
+    }       
 
     deleteCondition(condition) {
         // Remove the condition from the DOM
         this.conditionsContainer.removeChild(condition);
         // Update the condition list
         this.conditionList = this.conditionList.filter(item => item !== condition);
+        this.updateDropdowns(); // Refresh dropdowns after deletion
     }
+    
+    updateDropdowns() {
+        const options = ['Brand New', 'Like New', 'Lightly Used', 'Well Used'];
+    
+        // Get all selected values from existing conditions
+        const selectedValues = Array.from(this.conditionsContainer.querySelectorAll('select'))
+            .map(select => select.value)
+            .filter(value => value); // Remove empty values
+        
+        console.log(this.conditionList)
+        this.conditionList.length > 3 ? this.addConditionBtn.style.display = 'none'  : this.addConditionBtn.style.display = 'block';
+    
+        // Iterate through all condition boxes and update their dropdowns
+        this.conditionsContainer.querySelectorAll('select').forEach(select => {
+            const currentValue = select.value; // Store current selection
+    
+            // Clear existing options
+            select.innerHTML = '';
+    
+            // Repopulate dropdown with all options, disabling selected ones
+            options.forEach(option => {
+                const optionElement = document.createElement('option');
+                optionElement.value = option;
+                optionElement.textContent = option;
+    
+                // If the option is selected in another dropdown, disable it
+                if (selectedValues.includes(option) && option !== currentValue) {
+                    optionElement.disabled = true;
+                }
+    
+                // Retain the current selection
+                if (option === currentValue) {
+                    optionElement.selected = true;
+                }
+    
+                select.appendChild(optionElement);
+            });
+    
+            // Ensure onchange event listener is always attached
+            select.removeEventListener('change', () => this.updateDropdowns());
+            select.addEventListener('change', () => this.updateDropdowns());
+        });
+    }    
 
     prepareFormData() {
         const formData = super.prepareFormData();
@@ -411,11 +579,9 @@ if (window.location.href.includes('add-product')) {
             isFeaturedSpecial: document.querySelector('[name="productIsFeaturedSpecial"]').checked,
             isFeaturedStaff: document.querySelector('[name="productIsFeaturedStaff"]').checked
         };
-        console.log(document.querySelector('[name="productIsFeaturedSpecial"]').checked)
         
 
         const csrfToken = document.querySelector('input[name="csrf_token"]').value;
-        console.log(csrfToken)
 
         fetch('/dashboard/manage-products/save', {
             method: 'POST',

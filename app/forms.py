@@ -249,12 +249,12 @@ class PaymentMethodForm(FlaskForm):
 # New product forms
 class ConditionForm(FlaskForm): # specific conditions to be listed in the AddProductForm
   condition = SelectField('Condition', validators=[DataRequired()])
-  stock = IntegerField('Stock', validators=[DataRequired(), NumberRange(min=0)])
-  price = FloatField('Price', validators=[DataRequired(), NumberRange(min=0)])
+  stock = IntegerField('Stock', validators=[DataRequired(), NumberRange(min=1)])
+  price = FloatField('Price', validators=[DataRequired(), NumberRange(min=1)])
 
 class AddProductForm(FlaskForm):
-  productName = StringField('Product Name', validators=[DataRequired(), Length(max=200)])
-  productCreator = StringField('Product Creator', validators=[DataRequired(), Length(max=200)])
+  productName = StringField('Product Name', validators=[DataRequired(), Length(max=200, min=2)])
+  productCreator = StringField('Product Creator', validators=[DataRequired(), Length(max=200, min=2)])
   productImages = MultipleFileField('', render_kw={'accept':'image/*'})
   productThumbnail = HiddenField()
   productDescription = TextAreaField('Product Description')

@@ -25,7 +25,8 @@
         <div class="cart-container">
             {% for item in cart_items %}
                 <div class="cart-item" data-product-id="{{ item.product_id }}">
-                    <img src="{{ url_for('static', filename='media/uploads/' + item.product.image_thumbnail) }}" alt="{{ item.product.name }}" class="product-image">
+                    <!-- <img src="{{ url_for('static', filename='media/uploads/' + item.product.image_thumbnail) }}" alt="{{ item.product.name }}" class="product-image"> -->
+                    <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ item.product.image_thumbnail }}" alt="{{ item.product.name }}"/>
                     <div class="product-details">
                         <h3>{{ item.product.name }}</h3>
                         <p>Condition: <b>{{ item.product_condition['condition'] }}</b></p>
@@ -63,7 +64,9 @@
         <div class="cart-summary">
             <h3>Cart Total: ${{ cart_total }}</h3>
             <button type="button" class="btn-primary" id="update-cart-btn">Update Cart</button>
-            <a href="/checkout" class="btn-primary">Proceed to Checkout</a>
+            <form action="{{ url_for('payment.checkout_cart') }}" method="POST" class="cta-form">
+                <button type="submit">Proceed to Checkout</button>
+            </form>
         </div>
     {% endif %}
 </div>

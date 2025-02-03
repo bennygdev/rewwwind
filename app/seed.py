@@ -54,6 +54,7 @@ def insert_users():
   )
 
   customer = User(
+    stripe_id = 'cus_RgCvkhikneQdWk',
      first_name = "Customer",
      last_name = "4",
      username = "Customer",
@@ -107,7 +108,7 @@ def insert_subcategories():
   vinyl_subcategories = [
     "Rock",
     "Psychedelic", 
-    "pop",
+    "Pop",
     "Jazz",
     "Classical",
     "Hip Hop",
@@ -272,7 +273,7 @@ def insert_products():
       },
       {
         "name": "Electric Ladyland",
-        "creator": "The Jimi Hendrix Experience",
+        "creator": "Jimi Hendrix",
         "description": "Electric Ladyland is the third and final studio album by the Jimi Hendrix Experience, released on October 16, 1968. The album is often regarded as one of the greatest albums of all time, blending rock, blues, and psychedelia.",
         "image_thumbnail": "electric_ladyland.png",
         "images": ['electric_ladyland.png'],
@@ -519,6 +520,22 @@ def insert_orders():
   )
   db.session.add(billing_info)
   db.session.commit()
+
+# uncomment only if needed, otherwise will create duplicate customer account.
+  # import stripe 
+  # user = User.query.filter_by(id=4).first()
+  # stripe.Customer.create(
+  #   name= f"{user.first_name} {user.last_name}",
+  #   email= user.email,
+  #   shipping={
+  #     'address': {
+  #       'line1': billing_info.address_one,
+  #       'postal_code': billing_info.postal_code
+  #     },
+  #     'name': f"{user.first_name} {user.last_name}",
+  #     'phone': billing_info.phone_number
+  #   }
+  # )
   
   for x in range(10):
     order = Order(

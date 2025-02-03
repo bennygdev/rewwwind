@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for
 from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager, current_user
@@ -10,6 +10,8 @@ from authlib.integrations.flask_client import OAuth
 from flask_migrate import Migrate
 import json
 from flask_socketio import SocketIO
+import stripe
+import cloudinary
 socketio = SocketIO()
 
 migrate = Migrate()
@@ -62,11 +64,21 @@ def create_app():
   if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
+  # Cloudinary (uncomment only before, to save on credits.)    
+  # cloudinary.config( 
+  #     cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"), 
+  #     api_key = os.getenv("CLOUDINARY_PUBLIC_KEY"), 
+  #     api_secret = os.getenv("CLOUDINARY_SECRET_KEY"),
+  #     secure=True
+  # )
+
   app.config['OAUTH2_CLIENT_ID'] = os.getenv('GOOGLE_CLIENT_ID')
   app.config['OAUTH2_CLIENT_SECRET'] = os.getenv('GOOGLE_CLIENT_SECRET')
   app.config['OAUTH2_META_URL'] = 'https://accounts.google.com/.well-known/openid-configuration'
 
-
+  app.config['STRIPE_PUBLIC_KEY'] = os.getenv('STRIPE_PUBLIC_KEY')
+  app.config['STRIPE_SECRET_KEY'] = os.getenv('STRIPE_SECRET_KEY')
+  stripe.api_key = app.config['STRIPE_SECRET_KEY']
   mail = Mail(app)
 
   db.init_app(app)
@@ -105,8 +117,12 @@ def create_app():
 
   # Chatbot API
   from .chatbot import chatbot
-
   app.register_blueprint(chatbot, url_prefix="/")
+
+  # Stripe (payment) API
+  from .payment import payment
+  csrf.exempt(payment)
+  app.register_blueprint(payment, url_prefix="/")
 
   # Dashboard pages
   from .overview import overview
@@ -115,6 +131,7 @@ def create_app():
   from .manageTradeins import manageTradeins
   from .customerChat import customerChat
   from .manageProducts import manageProducts
+  from .wishlist import wishlist
   from .manageVouchers import manageVouchers
   from .manageAccounts import manageAccounts
   from .newsletter import newsletter
@@ -125,6 +142,7 @@ def create_app():
   app.register_blueprint(manageTradeins, url_prefix="/dashboard")
   app.register_blueprint(customerChat, url_prefix="/dashboard")
   app.register_blueprint(manageProducts, url_prefix="/dashboard")
+  app.register_blueprint(wishlist, url_prefix="/dashboard")
   app.register_blueprint(manageVouchers, url_prefix="/dashboard")
   app.register_blueprint(manageAccounts, url_prefix="/dashboard")
   app.register_blueprint(newsletter, url_prefix="/dashboard")

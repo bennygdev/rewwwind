@@ -9,6 +9,7 @@ from itsdangerous import URLSafeTimedSerializer as Serializer
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    stripe_id = db.Column(db.String, nullable=True) # link to stripe api
     first_name = db.Column(db.String(150), nullable=False)
     last_name = db.Column(db.String(150), nullable=False)
     username = db.Column(db.String(150), unique=True, nullable=False)
@@ -20,6 +21,9 @@ class User(db.Model, UserMixin):
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)  # role table
     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
     updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
+    
+    # favourites
+    wishlisted_items = db.Column(db.JSON, nullable=True)
 
     # Relationship to Cart
     cart_items = db.relationship('Cart', back_populates='user', lazy=True)
@@ -160,7 +164,7 @@ class Order(db.Model):
   order_date = db.Column(db.DateTime(timezone=True), default=func.now())
   approval_date = db.Column(db.DateTime(timezone=True))
   delivery = db.Column(db.String(100), nullable=False)
-  total_amount = db.Column(db.Numeric(10, 2), nullable=False)
+  total_amount = db.Column(db.Numeric(10, 2), nullable=False, default=0)
   status = db.Column(db.String(50), default='Pending', nullable=False)
   
   user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)

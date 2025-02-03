@@ -28,7 +28,7 @@ def orders_listing():
   
   # filter logic
   recency_filter = request.args.get('recency', '', type=str)
-  if recency_filter and recency_filter != 'all':
+  if recency_filter:
     if '30' in recency_filter:
       orders_query = Order.query.filter(Order.order_date >= datetime.now() - timedelta(days=30))
     elif 'first' in recency_filter:
@@ -37,20 +37,43 @@ def orders_listing():
       orders_query = orders_query.order_by(asc(Order.order_date))
   
   cost_filter = request.args.get('cost', '', type=str)
-  if cost_filter and cost_filter != 'none':
+  if cost_filter:
     if 'highest' in cost_filter:
       orders_query = Order.query.order_by(cast(Order.total_amount, Float).desc())
     else:
       orders_query = Order.query.order_by(cast(Order.total_amount, Float).asc())
+  
+  status_filter = request.args.get('status', '', type=str)
+  if status_filter:
+    orders_query = Order.query.filter(Order.status == status_filter.title())
+
 
   # pagination logic
   page = request.args.get('page', 1, type=int)
   per_page = 10
 
   orders = orders_query.order_by(Order.id).paginate(page=page, per_page=per_page)
-  total_orders = orders_query.count()
+  total_orders = len(Order.query.all())
+  total_pending = Order.query.filter(Order.status == 'Pending').count()
 
   total_pages = ceil(total_orders / per_page)
+
+  # filter choices
+  recency_choices = [
+    ('30', 'Last 30 Days'),
+    ('first', 'Most Recent First'),
+    ('last', 'Oldest First')
+  ]
+
+  cost_choices = [
+    ('highest', 'Highest First'),
+    ('lowest', 'Lowest First')
+  ]
+
+  status_choices = [
+    ('pending', 'Pending'),
+    ('approved', 'Approved'),
+  ]
     
   return render_template(
     'dashboard/manageOrders/orders.html', 
@@ -61,7 +84,12 @@ def orders_listing():
     total_pages=total_pages,
     search_query=search_query,
     recency_filter=recency_filter,
-    cost_filter=cost_filter
+    recency_choices=recency_choices,
+    cost_filter=cost_filter,
+    cost_choices=cost_choices,
+    status_filter=status_filter,
+    status_choices=status_choices,
+    total_pending=total_pending
     )
 
 @manageOrders.route('/manage-order/order-detail=<int:order_id>')

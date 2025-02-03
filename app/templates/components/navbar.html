@@ -38,7 +38,7 @@
     <!-- Navigation links -->
     <ul class="nav__right--links">
       <li><a data-bs-toggle="offcanvas" href="#offcanvasMenu" role="button" aria-controls="offcanvasMenu" class="nav__link nav__hamburger-menu nav__mobile"><i class="fa-solid fa-bars"></i></a></li>
-      <li><a class="nav__link nav__desktop" href='/wishlist'><i class="fa-solid fa-heart fa-xl"></i>&nbsp;&nbsp;</a></li>
+      <li><a class="nav__link nav__desktop" href='{{ url_for("wishlist.favourites") }}'><i class="fa-solid fa-heart fa-xl"></i>&nbsp;&nbsp;</a></li>
       <li><a class="nav__link nav__desktop" href='/cart'><i class="fa-solid fa-cart-shopping fa-xl"></i>&nbsp;&nbsp;</a></li>
       <!-- <a class="nav__link nav__desktop" href="/cart"><button class="nav__button"><i class="fa-solid fa-cart-shopping"></i>&nbsp;&nbsp;Cart (?)</button></a> -->
       <div class="nav__link nav__desktop nav__profile--options nav__profile"><button class="nav__button">

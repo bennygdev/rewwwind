@@ -79,6 +79,7 @@
 /* orders table */
 .orders table {
     width: 100%;
+    min-width: 850px;
     /* box-shadow: inset 0 0 0 1px black; */
     border-collapse: collapse;
     border-radius: 10px;
@@ -313,4 +314,34 @@ td.orderStock div {
 .footer a.btn-primary:hover {
     color: white;
     background-color: #039752;
+}
+
+@media (max-width: 1400px) {
+    .bottom {
+        flex-direction: column;
+    }
+
+    .bottom .left {
+        gap: 20px;
+    }
+
+    .bottom .left .order_summary table {
+        min-height: 200px;
+    }
+
+    .bottom .left .order_admin {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 900px) {
+    .orders {
+        overflow-x: auto;
+    }
+}
+
+@media (max-width: 680px) {
+    .bodyContent .header {
+        flex-direction: column;
+    }
 }

@@ -81,7 +81,7 @@ h1 {
     width: 80%;
 }
 
-@media (max-width: 1400px) { /* worry about dynamic styles later */
+@media (max-width: 1400px) {
     .products__special .thumbnail, .products__special .thumbnail img {
         width: 150px;
         height: 150px;
@@ -96,13 +96,9 @@ h1 {
     margin-bottom: 4px;
 }
 
-.products__special p {
-    margin-bottom: 4px;
-}
-
 .products__special .info p.name {
     font-weight: bold;
-    font-size: 2em;
+    font-size: 1.7em;
 }
 
 .products__special .info p.creator {
@@ -110,7 +106,8 @@ h1 {
 }
 
 .products__special .info p.price {
-    font-size: 1.7em;
+    font-size: 1.7rem;
+    font-weight: bold;
 }
 
 .products__special .view_more {
@@ -142,7 +139,7 @@ h1 {
 
 .products__new .products {
     display: flex;
-    gap: 88px; /* cannot be changed otherwise display messes up, should address this if I find out how to fix it */
+    gap: 88px;
 }
 
 .products__new .product {
@@ -152,7 +149,7 @@ h1 {
 }
 
 .products__new .products .product:first-child {
-    margin-left: 40px; /* cannot be changed otherwise display messes up, should address this if I find out how to fix it */
+    margin-left: 40px;
 }
 
 .products__new .thumbnail, .products__new .thumbnail img {
@@ -175,7 +172,7 @@ h1 {
     margin-bottom: 0;
 }
 
-.products__new .info p:first-child {
+.products__new .info p.name, .products__new .info p.price {
     font-weight: bold;
     font-size: 1.8em;
 }
@@ -366,4 +363,238 @@ h1 {
   border-radius: 5px;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
+}
+
+@media (max-width: 1300px) {
+    .products__special .thumbnail,
+    .products__special .thumbnail img,
+    .products__new .thumbnail,
+    .products__new .thumbnail img,
+    .products__staff .thumbnail,
+    .products__staff .thumbnail img {
+        width: 180px;
+        height: 180px;
+    }
+
+    .products__special .info p.name, .products__special .info p.price {
+        font-size: 1.0rem;
+    }
+
+    .products__special .info p.creator, .products__special .info p.type {
+        font-size: 0.8em;
+    }
+
+    .products__new .info p.name, .products__new .info p.price {
+        font-size: 1.0rem;
+    }
+
+    .products__new .info p.creator, .products__new .info p.type {
+        font-size: 0.9rem;
+    }
+
+    .discover .categories {
+        justify-content: space-evenly;
+        align-items: flex-start;
+        gap: 30px;
+    }
+
+    .discover .category {
+        max-width: 350px;
+    }
+
+    .discover .category .thumbnail,
+    .discover .category .thumbnail img {
+        width: 350px;
+        height: 350px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .content {
+        gap: 20px;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    .products__special .view_more a {
+        font-size: 1.2em;
+    }
+
+    .products {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 60px;
+    }
+
+    .products__new .products {
+        gap: 60px;
+    }
+
+    .products__staff .products {
+        flex-wrap: wrap;
+        gap: 60px;
+    }
+
+    button.carousel-control {
+        height: 45px;
+        width: 45px;
+        padding: 0;
+    }
+
+    .discover .categories {
+        justify-content: space-evenly;
+        align-items: flex-start;
+        gap: 30px;
+    }
+
+    .discover .category {
+        max-width: 250px;
+    }
+
+    .discover .category .thumbnail,
+    .discover .category .thumbnail img {
+        width: 250px;
+        height: 250px;
+    }
+
+    .discover .category .description .category_name {
+        font-size: 1.4rem;
+    }
+
+    .discover .category .description .sub {
+        font-size: 0.8rem;
+    }
+
+    .products__new .info p.name, .products__new .info p.price {
+        font-size: 0.9rem;
+    }
+
+    .products__new .info p.creator, .products__new .info p.type {
+        font-size: 0.7rem;
+        text-wrap: inherit;
+    }
+}
+
+@media (max-width: 992px) {
+    .banner {
+        height: 150px;
+    }
+
+    .banner img {
+        height: 150px;
+    }
+
+    .products {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 40px;
+    }
+
+    .products__new .products {
+        gap: 40px;
+    }
+
+    .products__staff .thumbnail,
+    .products__staff .thumbnail img,
+    .products__special .thumbnail,
+    .products__special .thumbnail img {
+        width: 120px;
+        height: 120px;
+    }
+
+    .products__new .thumbnail,
+    .products__new .thumbnail img {
+        width: 150px;
+        height: 150px;
+    }
+
+    .discover .category {
+        max-width: 200px;
+    }
+
+    .discover .category .thumbnail,
+    .discover .category .thumbnail img {
+        width: 200px;
+        height: 200px;
+    }
+
+    .newsletter__form .form-group {
+        max-width: 50vw;
+    }
+
+    .products__special .info p.name, .products__special .info p.price {
+        font-size: 0.7rem;
+    }
+
+    .products__special .info p.creator, .products__new .info p.creator,
+    .products__special .info p.type, .products__new .info p.type {
+        font-size: 0.7rem;
+    }
+
+    .products__new .info p.name, .products__new .info p.price {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .banner {
+        height: 100px;
+    }
+
+    .banner img {
+        height: 100px;
+    }
+
+    .products {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+    }
+
+    .products__new .products {
+        gap: 30px;
+    }
+
+    .newsletter__form .form-group {
+        max-width: 70vw;
+    }
+}
+
+@media (max-width: 576px) {
+    .banner {
+        height: 100px;
+    }
+
+    .banner img {
+        height: 100px;
+    }
+
+    .products__new .thumbnail,
+    .products__new .thumbnail img {
+        width: 120px;
+        height: 120px;
+    }
+
+    .products__staff .thumbnail,
+    .products__staff .thumbnail img {
+        width: 120px;
+        height: 120px;
+    }
+
+    .discover .category .thumbnail,
+    .discover .category .thumbnail img {
+        width: 200px;
+        height: 200px;
+    }
+
+    .newsletter__form .form-group {
+        max-width: 90vw;
+    }
+
+    .newsletter__form input[type="email"] {
+        padding-right: 80px;
+    }
+
+    #newsletter__submit {
+        padding: 0 10px;
+    }
 }

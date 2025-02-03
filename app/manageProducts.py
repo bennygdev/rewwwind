@@ -1,13 +1,15 @@
 from werkzeug.utils import secure_filename
 from flask import Blueprint, render_template, redirect, url_for, request, jsonify, flash, current_app, session
 from flask_login import login_required, current_user
-from sqlalchemy import cast, Integer
+from sqlalchemy import cast, Integer, func
 from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.dialects.postgresql import JSON
 from .roleDecorator import role_required
 from .forms import AddProductForm, DeleteProductForm, AddProductFormData #, EditProductForm
 from .models import Product, Category, SubCategory, ProductSubCategory, OrderItem
 from . import db
+from . import cloudinary
+import cloudinary.uploader
 import os
 
 from math import ceil
@@ -35,22 +37,39 @@ def pagination(products):
         products_query = Product.query.filter(Product.name.ilike(f"%{search_query}%"))
     
     # filter logic
-    category_filter = request.args.get('type', '', type=str).title()
-    subcategory_filter = request.args.get('genre', '', type=str).title()
+    category_filter = request.args.get('type', '', type=str)
+    subcategory_filter = request.args.get('genre', '', type=str)
+    if ',' in subcategory_filter:
+        subcategory_filter = subcategory_filter.split(',')
+    else:
+        subcategory_filter = [subcategory_filter]
+    match_req = request.args.get('match', '', type=str)
+    if not match_req:
+        match_req = 'or'
     featured_filter = request.args.get('featured', '', type=str)
     stock_filter = request.args.get('stock', '', type=str)
     
-    if category_filter and category_filter != 'All':
-        products_query = products_query.join(Product.category).filter(Category.category_name == category_filter)
-    if subcategory_filter and subcategory_filter != 'All':
-        products_query = products_query.join(Product.subcategories).filter(SubCategory.subcategory_name == subcategory_filter)
-    if featured_filter and featured_filter != 'none':
+    if category_filter:
+        products_query = products_query.join(Product.category).filter(Category.category_name == category_filter.title())
+
+    if subcategory_filter and len(subcategory_filter) != 1:
+        if 'or' in match_req:
+            products_query = products_query.join(Product.subcategories).filter(
+                SubCategory.subcategory_name.in_([entry.title() for entry in subcategory_filter])
+            )
+        elif 'and' in match_req:
+            products_query = products_query.join(Product.subcategories).filter( 
+                SubCategory.subcategory_name.in_([entry.title() for entry in subcategory_filter])
+            ).group_by(Product.id).having(
+                func.count(Product.id) == len(subcategory_filter)
+            )
+    if featured_filter:
         if 'special' in featured_filter:
             products_query = products_query.filter(Product.is_featured_special)
         else:
             products_query = products_query.filter(Product.is_featured_staff)
 
-    if stock_filter and stock_filter != 'all':
+    if stock_filter:
         if 'limited' in stock_filter:
             products_query = products_query.filter(cast(Product.conditions[0]['stock'], Integer) <= 10)
         elif 'plenty' in stock_filter:
@@ -61,9 +80,6 @@ def pagination(products):
             products_query = products_query.order_by(cast(Product.conditions[0]['stock'], Integer).asc())
         else:
             products_query = products_query.order_by(cast(Product.conditions[0]['stock'], Integer).desc())
-    
-    if not category_filter:
-        subcategory_filter = ""
 
     # pagination logic
     page = request.args.get('page', 1, type=int)
@@ -74,7 +90,29 @@ def pagination(products):
 
     total_pages = ceil(total_products / per_page)
 
-    return products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter
+    # filter options
+    categories = Category.query.all()[:8]
+    category_choices = [(category.category_name.lower(), category.category_name) for category in categories]
+
+    subcategories = SubCategory.query.all()
+    if category_filter:
+        subcategories = SubCategory.query.join(Category).filter(Category.category_name == category_filter.title())
+    subcategory_choices = [(subcategory.subcategory_name.lower(), subcategory.subcategory_name) for subcategory in subcategories]
+
+    featured_choices = [
+        ('special', 'Special'),
+        ('staff', 'Staff')
+    ]
+
+    stock_choices = [
+        ('plenty', 'Plenty in stock'),
+        ('limited', 'Limited stock'),
+        ('no', 'No stock'),
+        ('highest', 'Highest first'),
+        ('lowest', 'Lowest first')
+    ]
+
+    return products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter, category_choices, subcategory_choices, match_req, featured_choices, stock_choices
 
 @manageProducts.route('/manage-products')
 @login_required
@@ -83,11 +121,8 @@ def products_listing():
     products = Product.query.all()
     deleteForm = DeleteProductForm()
 
-    products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter = pagination(products)
-
-    categories = Category.query.all()[:8]
-    subcategories = SubCategory.query.join(Category).filter(Category.category_name == category_filter)[:8]
-
+    products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter, category_choices, subcategory_choices, match_req, featured_choices, stock_choices = pagination(products)
+    
     return render_template(
         "dashboard/manageProducts/products.html", 
         user=current_user, 
@@ -98,15 +133,18 @@ def products_listing():
         total_pages=total_pages, 
         current_page=page, 
         search_query=search_query,
-        categories=categories,
-        subcategories=subcategories,
         category_filter=category_filter,
+        category_choices=category_choices,
         subcategory_filter=subcategory_filter,
+        subcategory_choices=subcategory_choices,
+        match_req=match_req,
         featured_filter=featured_filter,
-        stock_filter=stock_filter
+        featured_choices=featured_choices,
+        stock_filter=stock_filter,
+        stock_choices=stock_choices
         ) #, datetime=datetime
 
-# uploads folder cleaning logic
+# uploads folder cleaning logic + crosscheck with cloudinary
 def clean_uploads_folder():
     used_images = set()
     products = Product.query.all()
@@ -123,6 +161,7 @@ def clean_uploads_folder():
         file_path = os.path.join(uploads_folder, filename)
         try:
             os.remove(file_path)
+            # cloudinary.uploader.destroy(filename.split('.')[0])
             print(f"Deleted unused file: {filename}")
         except Exception as e:
             print(f"Error deleting file {filename}: {e}")
@@ -141,8 +180,6 @@ def add_product():
                 if user_id in shelve_db:
                     saved_data = shelve_db[user_id]
 
-                    # print(saved_data.get_conditions())
-
                     form.productName.data = saved_data.get_name()
                     form.productCreator.data = saved_data.get_creator()
                     form.productDescription.data = saved_data.get_description()
@@ -152,10 +189,10 @@ def add_product():
                     form.productIsFeaturedStaff.data = saved_data.get_featured_staff()
 
                     condition_choices = [
-                    ('Brand New', 'Brand New'),
-                    ('Like New', 'Like New'),
-                    ('Lightly Used', 'Lightly Used'),
-                    ('Well Used', 'Well Used')
+                        ('Brand New', 'Brand New'),
+                        ('Like New', 'Like New'),
+                        ('Lightly Used', 'Lightly Used'),
+                        ('Well Used', 'Well Used')
                     ]
 
                     if saved_data.get_conditions():
@@ -182,37 +219,56 @@ def add_product():
                 productDescription = form.productDescription.data
                 productType = form.productType.data
                 productGenre = form.productGenre.data
-                subcategory = SubCategory.query.filter(SubCategory.id==productGenre).first()
-                # print(subcategory)
+                subcategory = SubCategory.query.filter(SubCategory.id == productGenre).first()
                 productThumbnail = int(form.productThumbnail.data)
                 productConditions = form.productConditions.data
                 is_featured_special = form.productIsFeaturedSpecial.data
                 is_featured_staff = form.productIsFeaturedStaff.data
 
-                # Handle file upload
+                # Handle file upload to Cloudinary
+                MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB in bytes
+
                 files = request.files.getlist('productImages')
-                upload_folder = current_app.config['UPLOAD_FOLDER']
-                uploaded_file_paths = []
+                uploaded_file_urls = []
 
                 for file in files:
                     if file:
-                        file.seek(0)  # PLEASE REMEMBER, i keep on forgetting lol
-                        file_path = os.path.join(upload_folder, secure_filename(file.filename))
+                        file.seek(0, os.SEEK_END)
+                        file_size = file.tell()  # Get file size
+                        file.seek(0)  # reset
+
+                        if file_size > MAX_FILE_SIZE:
+                            return jsonify({'error': True, 'message': "One or more images exceed the 5MB size limit. Please upload smaller images."})
+
+                        secure_name = secure_filename(file.filename)
+                        # cloudinary.uploader.upload(
+                        #     file,
+                        #     public_id=secure_name.split('.')[0]
+                        # )
+                        uploaded_file_urls.append(secure_name)
+
+                        # to save on cloudinary credits, cross-check with local storage
+                        file.seek(0)
+                        upload_folder = current_app.config['UPLOAD_FOLDER']
+                        file_path = os.path.join(upload_folder, secure_name)
                         file.save(file_path)
-                        uploaded_file_paths.append(secure_filename(file.filename))
+
+                # Ensure at least one image was uploaded
+                if not uploaded_file_urls:
+                    return jsonify({'error': False, 'message': "No images were uploaded. Please upload at least one image."})
 
                 # Create the new product object
                 new_product = Product(
                     name=productName,
                     creator=productCreator,
-                    image_thumbnail=secure_filename(files[productThumbnail].filename),
-                    images=uploaded_file_paths,
+                    image_thumbnail=uploaded_file_urls[productThumbnail],  # Use the thumbnail URL
+                    images=uploaded_file_urls,  # Store all image URLs
                     category_id=productType,
                     subcategories=[subcategory],
                     description=productDescription,
                     conditions=productConditions,
-                    is_featured_special = is_featured_special,
-                    is_featured_staff = is_featured_staff
+                    is_featured_special=is_featured_special,
+                    is_featured_staff=is_featured_staff
                 )
 
                 db.session.add(new_product)
@@ -222,7 +278,7 @@ def add_product():
                     shelve_path = os.path.join(current_app.instance_path, 'shelve.db')
                     with shelve.open(shelve_path) as shelve_db:
                         user_id = str(current_user.id)
-                        if user_id in shelve_db:
+                        if user_id in shelve_db.keys():
                             del shelve_db[user_id]
                 except Exception as e:
                     print(f"Error deleting saved form data: {e}")
@@ -255,8 +311,8 @@ def save_product_form():
     try:
         if session.get('product_added'):
             session.pop('product_added')
-            print(True)
-            return jsonify({'success': False, 'message': "Skipped after product addition."})
+            print('skipped saving shelve after product addition')
+            return 'skipped shelve'
         
         shelve_path = os.path.join(current_app.instance_path, 'shelve.db')
         
@@ -276,8 +332,7 @@ def save_product_form():
             )
 
             db[user_id] = form_data
-        print('success')
-        flash("The product data (except images) was saved successfully.<br>It can be viewed again when revisiting the 'Add Product' form, as long as you do not log out.", "success")
+        print('success in saving shelve form')
         return redirect(url_for('manageProducts.products_listing'))
     
     except Exception as e:
@@ -340,22 +395,39 @@ def update_product(product_id):
             product.is_featured_special = form.productIsFeaturedSpecial.data
             product.is_featured_staff = form.productIsFeaturedStaff.data
 
-            # Handle file uploads
+            # Handle file upload to Cloudinary
+            MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB in bytes
+
             files = request.files.getlist('productImages')
-            uploaded_file_paths = []
-            upload_folder = current_app.config['UPLOAD_FOLDER']
+            uploaded_file_urls = []
+
             for file in files:
                 if file:
-                    file.seek(0)  # Ensure we're at the start of the file
-                    file_path = os.path.join(upload_folder, secure_filename(file.filename))
+                    file.seek(0, os.SEEK_END)
+                    file_size = file.tell()  # Get file size
+                    file.seek(0)  # reset
+
+                    if file_size > MAX_FILE_SIZE:
+                        return jsonify({'error': True, 'message': "One or more images exceed the 5MB size limit. Please upload smaller images."})
+
+                    secure_name = secure_filename(file.filename)
+                    # cloudinary.uploader.upload(
+                    #     file,
+                    #     public_id=secure_name.split('.')[0]
+                    # )
+                    # uploaded_file_urls.append(secure_name)
+
+                    # to save on cloudinary credits, cross-check with local storage
+                    file.seek(0)
+                    upload_folder = current_app.config['UPLOAD_FOLDER']
+                    file_path = os.path.join(upload_folder, secure_name)
                     file.save(file_path)
-                    uploaded_file_paths.append(secure_filename(file.filename))
             
             product.images = [img for img in product.images if img in form.images.data.split(',')]
             # print(form.images.data)
 
-            if uploaded_file_paths:
-                product.images.extend(uploaded_file_paths)
+            if uploaded_file_urls:
+                product.images.extend(uploaded_file_urls)
                 flag_modified(product, 'images')
             # print(product.images)
             
@@ -386,10 +458,7 @@ def delete_product():
     products = Product.query.all()
     clean_uploads_folder()
 
-    products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter = pagination(products)
-
-    categories = Category.query.all()[:8]
-    subcategories = SubCategory.query.join(Category).filter(Category.category_name == category_filter)[:8]
+    products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter, category_choices, subcategory_choices, match_req, featured_choices, stock_choices = pagination(products)
     deleteForm = DeleteProductForm()
 
     if OrderItem.query.filter(OrderItem.product_id==deleteForm.productID.data).first():
@@ -399,16 +468,9 @@ def delete_product():
         id = deleteForm.productID.data
         product_to_delete = Product.query.get(id)
         if product_to_delete:
-            db.session.query(ProductSubCategory).filter_by(product_id=product_to_delete.id).delete()
-            db.session.commit()
-
             db.session.delete(product_to_delete)
             db.session.commit()
             flash("The product has been removed successfully.", "success")
-
-        # Refresh the products list
-        products = Product.query.all()
-        products, total_products, total_warnings, total_pages, page, search_query, category_filter, subcategory_filter, featured_filter, stock_filter = pagination(products)
 
         return redirect(url_for('manageProducts.products_listing'))
 
@@ -422,10 +484,13 @@ def delete_product():
         total_pages=total_pages, 
         current_page=page, 
         search_query=search_query,
-        categories=categories,
-        subcategories=subcategories,
         category_filter=category_filter,
+        category_choices=category_choices,
         subcategory_filter=subcategory_filter,
+        match_req=match_req,
+        subcategory_choices=subcategory_choices,
         featured_filter=featured_filter,
-        stock_filter=stock_filter
+        featured_choices=featured_choices,
+        stock_filter=stock_filter,
+        stock_choices=stock_choices
         ) #, datetime=datetime

@@ -11,11 +11,13 @@
   <div class="product__left">
     <div class="image__container">
       <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}"/>
+      <!-- <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ product.image_thumbnail }}" alt="{{ product.name }}"/> -->
     </div>
     <div class="image-list">
       {% for image in product.images %}
-      <div class="image__container">
+      <div class="image__container ignore">
         <img src="{{ url_for('static', filename='media/uploads/' + image) }}" alt="{{ product.name }}">
+        <!-- <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ image }}" alt="{{ product.name }}"/> -->
       </div>
       {% endfor %}
     </div>
@@ -68,10 +70,12 @@
           {% endfor %}
         </div>
       </div>
+      {% if product.description %}
       <div class="description">
         <div class="header"><h3>Description</h3></div>
         <span>{{ product.description }}</span>
       </div>
+      {% endif %}
       <div class="miscellaneous">
         <div class="header"><h3>About this item</h3></div>
         <span>
@@ -90,9 +94,8 @@
           {{ cartform.condition(value=selected_condition.condition) }}
           <button type="submit" class="filter">Add to Cart</button>
       </form>
-      <form action="/check-out/{{ product.id }}" method="POST" class="cta-form">
-          <!-- {{ cartform.hidden_tag() }} please remember to add something like this, cartform can be any unique form class defined
-            in forms.py -->
+      <form action="{{ url_for('payment.checkout_product', product_id=product.id) }}" method="POST" class="cta-form">
+          <input type="hidden" name="condition" value="{{ selected_condition.condition }}">
           <button type="submit" class="filter">Buy Now</button>
       </form>
       <!-- <hr> -->
@@ -111,12 +114,19 @@
     <div class="header__left">
       <div class="rating">
         <h1>Customer Reviews</h1>
-        <i class="bi bi-star-fill"></i>
-        <i class="bi bi-star-fill"></i>
-        <i class="bi bi-star-fill"></i>
-        <i class="bi bi-star-fill"></i>
-        <i class="bi bi-star-fill"></i>
+        <div class="stars">
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+          <i class="bi bi-star-fill"></i>
+          {% if product.rating %}
+          <span class="ratingScore" id="rating-score" get-rating-here="{{ product.rating }}">{% if product.rating %}{{ product.rating }}{% else %}No reviews yet. Be the first one!{% endif %}</span>
+          {% endif %}
+        </div>
+        {% if not product.rating %}
         <span class="ratingScore" id="rating-score" get-rating-here="{{ product.rating }}">{% if product.rating %}{{ product.rating }}{% else %}No reviews yet. Be the first one!{% endif %}</span>
+        {% endif %}
       </div>
     </div>
     <div class="header__right">
@@ -124,19 +134,17 @@
       <div class="write"><span>Write a review</span>&nbsp;&nbsp;<i class="bi bi-pencil-square"></i></div>
       {% endif %}
       {% if product.reviews|length != 0  %}
-      <div class="filters">
-        <div class="filter-container">
-          <div class="filter {% if rating_filter %}activated{% endif %}" filter-for="rating" id="filter">
-            <span class="selected {% if not rating_filter %}highlighted{% endif %}">{% if rating_filter %}{{ rating_filter|title }}{% else %}All{% endif %}</span>&nbsp;&nbsp;<i class="bi bi-chevron-down"></i>
-            <ul class="filter--options">
-              <li class="highlighted">All</li>
-              {% for tag in ['Highest first', 'Lowest first', '1 star', '2 star', '3 star', '4 star', '5 star'] %}
-              <li class="{% if tag == rating_filter %}highlighted{% endif %}">{{ tag }}</li>
-              {% endfor %}
-            </ul>
-          </div>
-        </div>
+      <form id="filterForm" method="get" action="{{ url_for('productPagination.product_detail', product_id=product.id) }}" class="filters__form">
+      <div class="filter__group">
+        <label for="ratings">Filter</label>
+        <select name="ratings" id="ratings" class="filter__select">
+          <option value="">All</option>
+          {% for value, label in rating_choices %}
+          <option value="{{ value }}" {% if rating_filter == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
       </div>
+      </form>
       {% endif %}
     </div>
   </div>
@@ -210,8 +218,15 @@
       <h2 style="text-align: center;">{% if delete %}
         You are about to delete the following review.
         {% else %}
-        Admins and owners are not allowed to add products to their cart to avoid conflicts.
-        <br>Please use a dummy customer account instead.
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+          {% if category == 'info' %}
+          {{ message|replace('\n', '<br>')|safe }}
+          {% endif %}
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
         {% endif %}
       </h2>
       {% if delete %}
@@ -258,7 +273,7 @@
       {% endif %}
       <div class="buttons">
         <div class="button-wrapper">
-          <input id="cancel" name="cancel" type="button" value="Cancel">
+          <input id="cancel" name="cancel" type="button" value="Cancel" onclick="window.location.href = './{{ product.id }}'">
         </div>
         {% if delete %}
         <div class="button-wrapper">
@@ -322,7 +337,7 @@
 {% endblock %}
 
 {% block body_scripts %}
-<script type="text/javascript" src="{{ url_for('static', filename='js/pageInteractions/filters.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/dashboardFilters.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/pageInteractions/persistentScrollPosition.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/productPagination/productPage.js') }}"></script>
 {% if user.role_id %}

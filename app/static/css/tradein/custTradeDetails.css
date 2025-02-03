@@ -165,31 +165,45 @@ input, select {
     gap: 10px;
 }
 
+/* Buttons */
 .btn {
     font-family: "OpenSansSemiBold";
     text-decoration: none;
     font-size: 1em;
     padding: 0.6em 1.5em;
-    border-radius: 50px;
+    border-radius: 5px;  /* Change this from 50px to 5px */
     cursor: pointer;
     text-align: center;
     display: inline-block;
 }
 
+/* Approve Button */
 .btn-success {
-    background-color: #039752;
+    background-color: #28a745;
     color: white;
     border: none;
 }
 
-.btn-secondary {
-    background-color: #6c757d;
+/* Reject Button */
+.btn-danger {
+    background-color: #dc3545;
     color: white;
     border: none;
 }
 
 .btn-success:hover {
-    background-color: #028344;
+    background-color: #218838;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+/* Back Button */
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    border: none;
 }
 
 .btn-secondary:hover {

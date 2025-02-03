@@ -41,7 +41,17 @@
         </div>
     </div>
 
-    <!-- Show shipping & payment form only if status is Approved -->
+    <!-- Admin Approve/Deny Buttons -->
+    {% if current_user.role_id in [2, 3] %}
+    <div class="admin-actions">
+        <a href="{{ url_for('manageTradeins.update_trade_status', trade_id=trade_item.id, status='Approved') }}" 
+           class="btn btn-success">Approve</a>
+        <a href="{{ url_for('manageTradeins.update_trade_status', trade_id=trade_item.id, status='Rejected') }}" 
+           class="btn btn-danger">Reject</a>
+    </div>
+    {% endif %}
+
+    <!-- Shipping & Payment (Only for Approved Trades) -->
     {% if trade_item.status == "Approved" %}
     <div class="shipping-payment-section">
         <h2>Shipping & Payment</h2>

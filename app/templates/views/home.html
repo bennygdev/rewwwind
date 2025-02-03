@@ -16,8 +16,8 @@
     <div class="product">
       <a href="{{ url_for('productPagination.product_detail', product_id = product.id) }}">
         <div class="thumbnail">
-          <!-- <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}" /> -->
-          <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ product.image_thumbnail }}" alt="{{ product.name }}"/>
+          <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}" />
+          <!-- <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ product.image_thumbnail }}" alt="{{ product.name }}"/> -->
         </div>
       </a>
       <div class="info">

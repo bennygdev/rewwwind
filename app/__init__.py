@@ -64,13 +64,13 @@ def create_app():
   if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
-  # Configuration       
-  cloudinary.config( 
-      cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"), 
-      api_key = os.getenv("CLOUDINARY_PUBLIC_KEY"), 
-      api_secret = os.getenv("CLOUDINARY_SECRET_KEY"),
-      secure=True
-  )
+  # Cloudinary (uncomment only before, to save on credits.)    
+  # cloudinary.config( 
+  #     cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"), 
+  #     api_key = os.getenv("CLOUDINARY_PUBLIC_KEY"), 
+  #     api_secret = os.getenv("CLOUDINARY_SECRET_KEY"),
+  #     secure=True
+  # )
 
   app.config['OAUTH2_CLIENT_ID'] = os.getenv('GOOGLE_CLIENT_ID')
   app.config['OAUTH2_CLIENT_SECRET'] = os.getenv('GOOGLE_CLIENT_SECRET')

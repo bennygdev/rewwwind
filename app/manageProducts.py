@@ -161,7 +161,7 @@ def clean_uploads_folder():
         file_path = os.path.join(uploads_folder, filename)
         try:
             os.remove(file_path)
-            cloudinary.uploader.destroy(filename.split('.')[0])
+            # cloudinary.uploader.destroy(filename.split('.')[0])
             print(f"Deleted unused file: {filename}")
         except Exception as e:
             print(f"Error deleting file {filename}: {e}")
@@ -241,10 +241,10 @@ def add_product():
                             return jsonify({'error': True, 'message': "One or more images exceed the 5MB size limit. Please upload smaller images."})
 
                         secure_name = secure_filename(file.filename)
-                        cloudinary.uploader.upload(
-                            file,
-                            public_id=secure_name.split('.')[0]
-                        )
+                        # cloudinary.uploader.upload(
+                        #     file,
+                        #     public_id=secure_name.split('.')[0]
+                        # )
                         uploaded_file_urls.append(secure_name)
 
                         # to save on cloudinary credits, cross-check with local storage
@@ -411,11 +411,11 @@ def update_product(product_id):
                         return jsonify({'error': True, 'message': "One or more images exceed the 5MB size limit. Please upload smaller images."})
 
                     secure_name = secure_filename(file.filename)
-                    cloudinary.uploader.upload(
-                        file,
-                        public_id=secure_name.split('.')[0]
-                    )
-                    uploaded_file_urls.append(secure_name)
+                    # cloudinary.uploader.upload(
+                    #     file,
+                    #     public_id=secure_name.split('.')[0]
+                    # )
+                    # uploaded_file_urls.append(secure_name)
 
                     # to save on cloudinary credits, cross-check with local storage
                     file.seek(0)

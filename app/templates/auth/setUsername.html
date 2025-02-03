@@ -26,6 +26,11 @@
       <div class="register__username">
         {{ form.username.label }}
         {{ form.username(class="form-control", placeholder="") }}
+        {% if form.username.errors %}
+          {% for error in form.username.errors %}
+            <span class="error">{{ error }}</span>
+          {% endfor %}
+        {% endif %}
       </div>
       {{ form.submit(class="username__button") }}
     </form>

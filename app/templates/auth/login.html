@@ -24,6 +24,11 @@
       <div class="login__email">
         {{ form.emailUsername.label }}
         {{ form.emailUsername(class="form-control", placeholder="yourname@example.com") }}
+        {% if form.emailUsername.errors %}
+          {% for error in form.emailUsername.errors %}
+            <span class="error">{{ error }}</span>
+          {% endfor %}
+        {% endif %}
       </div>
       <div class="login__password">
         {{ form.password.label }}
@@ -33,6 +38,11 @@
             <i class="fa-solid fa-eye" id="eye-icon"></i>
           </button>
         </div>
+        {% if form.password.errors %}
+          {% for error in form.password.errors %}
+            <span class="error">{{ error }}</span>
+          {% endfor %}
+        {% endif %}
       </div>
       <p id="forgot__password"><a href="/reset-password">Forgot Password?</a></p>
       <hr id="divider">

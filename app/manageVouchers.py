@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from .roleDecorator import role_required
 from . import db
 from .models import Voucher, VoucherType
-from .forms import VoucherForm
+from .forms import VoucherForm, EditVoucherForm
 from math import ceil
 import json
 
@@ -99,23 +99,23 @@ def add_voucher():
   form = VoucherForm()
     
   if form.validate_on_submit():
-    print(form.criteria_json.data)
-    criteria = json.loads(form.criteria_json.data) if form.criteria_json.data else []
-    print(criteria)
-        
-    voucher = Voucher(
-      voucher_code=form.code.data,
-      voucher_description=form.description.data,
-      voucherType_id=VoucherType.query.filter_by(voucher_type=form.voucher_type.data).first().id,
-      discount_value=form.discount_value.data,
-      criteria=criteria,
-      eligible_categories=form.eligible_categories.data,
-      expiry_days=form.expiry_days.data,
-      is_active=form.is_active.data == 'True'
-    )
-        
-    db.session.add(voucher)
     try:
+      print(form.criteria_json.data)
+      criteria = json.loads(form.criteria_json.data) if form.criteria_json.data else []
+      print(criteria)
+          
+      voucher = Voucher(
+        voucher_code=form.code.data,
+        voucher_description=form.description.data,
+        voucherType_id=VoucherType.query.filter_by(voucher_type=form.voucher_type.data).first().id,
+        discount_value=form.discount_value.data,
+        criteria=criteria,
+        eligible_categories=list(form.eligible_categories.data),
+        expiry_days=form.expiry_days.data,
+        is_active=form.is_active.data == 'True'
+      )
+          
+      db.session.add(voucher)
       db.session.commit()
       flash('Voucher created successfully!', 'success')
       return redirect(url_for('manageVouchers.vouchers_listing'))
@@ -160,24 +160,24 @@ def view_voucher(id):
 @role_required(2, 3)
 def edit_voucher(id):
   voucher = Voucher.query.get_or_404(id)
-  form = VoucherForm(obj=voucher)
+  form = EditVoucherForm(voucher_id=id, obj=voucher)
     
   if form.validate_on_submit():
-    # Update voucher details
-    voucher.voucher_code = form.code.data
-    voucher.voucher_description = form.description.data
-    voucher.voucherType_id = VoucherType.query.filter_by(voucher_type=form.voucher_type.data).first().id
-    voucher.discount_value = form.discount_value.data
-    voucher.is_active = form.is_active.data == 'True'
-        
-    # Parse and save criteria
-    criteria = json.loads(form.criteria_json.data) if form.criteria_json.data else []
-    voucher.criteria = criteria
-        
-    voucher.eligible_categories = form.eligible_categories.data
-    voucher.expiry_days = form.expiry_days.data
-        
     try:
+      # Update voucher details
+      voucher.voucher_code = form.code.data
+      voucher.voucher_description = form.description.data
+      voucher.voucherType_id = VoucherType.query.filter_by(voucher_type=form.voucher_type.data).first().id
+      voucher.discount_value = form.discount_value.data
+      voucher.is_active = form.is_active.data == 'True'
+          
+      # Parse and save criteria
+      criteria = json.loads(form.criteria_json.data) if form.criteria_json.data else []
+      voucher.criteria = criteria
+          
+      voucher.eligible_categories = list(form.eligible_categories.data)
+      voucher.expiry_days = form.expiry_days.data
+        
       db.session.commit()
       flash('Voucher updated successfully!', 'success')
       return redirect(url_for('manageVouchers.vouchers_listing'))
@@ -191,6 +191,7 @@ def edit_voucher(id):
     form.voucher_type.data = voucher.voucher_types.voucher_type
     form.is_active.data = str(voucher.is_active)
     if voucher.eligible_categories:
+      print("yes")
       form.eligible_categories.data = voucher.eligible_categories
 
     

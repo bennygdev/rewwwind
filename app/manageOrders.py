@@ -42,13 +42,19 @@ def orders_listing():
       orders_query = Order.query.order_by(cast(Order.total_amount, Float).desc())
     else:
       orders_query = Order.query.order_by(cast(Order.total_amount, Float).asc())
+  
+  status_filter = request.args.get('status', '', type=str)
+  if status_filter:
+    orders_query = Order.query.filter(Order.status == status_filter.title())
+
 
   # pagination logic
   page = request.args.get('page', 1, type=int)
   per_page = 10
 
   orders = orders_query.order_by(Order.id).paginate(page=page, per_page=per_page)
-  total_orders = orders_query.count()
+  total_orders = len(Order.query.all())
+  total_pending = Order.query.filter(Order.status == 'Pending').count()
 
   total_pages = ceil(total_orders / per_page)
 
@@ -63,6 +69,11 @@ def orders_listing():
     ('highest', 'Highest First'),
     ('lowest', 'Lowest First')
   ]
+
+  status_choices = [
+    ('pending', 'Pending'),
+    ('approved', 'Approved'),
+  ]
     
   return render_template(
     'dashboard/manageOrders/orders.html', 
@@ -75,7 +86,10 @@ def orders_listing():
     recency_filter=recency_filter,
     recency_choices=recency_choices,
     cost_filter=cost_filter,
-    cost_choices=cost_choices
+    cost_choices=cost_choices,
+    status_filter=status_filter,
+    status_choices=status_choices,
+    total_pending=total_pending
     )
 
 @manageOrders.route('/manage-order/order-detail=<int:order_id>')

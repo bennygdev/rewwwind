@@ -29,12 +29,22 @@
             <i class="fa-solid fa-eye" id="eye-icon"></i>
           </button>
         </div>
+        {% if form.password.errors %}
+          {% for error in form.password.errors %}
+            <span class="error">{{ error }}</span>
+          {% endfor %}
+        {% endif %}
       </div>
       <div class="login__password">
         {{ form.confirmPassword.label }}
         <div class="password-wrapper">
           {{ form.confirmPassword(class="form-control password") }}
         </div>
+        {% if form.confirmPassword.errors %}
+          {% for error in form.confirmPassword.errors %}
+            <span class="error">{{ error }}</span>
+          {% endfor %}
+        {% endif %}
       </div>
       {{ form.submit(class="reset__button") }}
     </form>

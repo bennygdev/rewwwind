@@ -1,0 +1,165 @@
+{% extends "dashboard/base.html" %}
+{% set active_page = "newsletter" %}
+{% block title %}Newsletter{% endblock %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/newsletter/newsletter.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard/accounts/deleteModal.css') }}">
+{% endblock %}
+
+{% block headerContent %}
+<div class="newsletter__header">
+  <h1 id="newsletter__title">Send Newsletter</h1>
+  <div class="newsletter__statistics">
+    <div class="statistic__box">
+      <i class="fa-solid fa-envelope fa-xl"></i>
+      <div class="newsletter__statistic">
+        <p class="statistic__label">Total Posts</p>
+        <span class="statistic__amount">{{ posts_count }}</span>
+      </div>
+    </div>
+    <div class="statistic__box">
+      <i class="fa-solid fa-users fa-xl"></i>
+      <div class="newsletter__statistic">
+        <p class="statistic__label">Total Subscribers</p>
+        <span class="statistic__amount">{{ subscribers_count }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="newsletter__container">
+  <div class="newsletter">
+    
+    <!-- Flash validation -->
+    {% include "components/flashValidation.html" %}
+    
+    <form method="POST" class="newsletter__form" id="newsletterForm">
+      {{ form.csrf_token }}
+        
+      <div class="newsletter__field">
+        {{ form.title.label }}
+        {{ form.title(class="newsletter__input", placeholder="Enter newsletter title") }}
+        {% if form.title.errors %}
+          <div class="newsletter__error">
+            {% for error in form.title.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+        
+      <div class="newsletter__field">
+        {{ form.description.label }}
+        {{ form.description(class="newsletter__textarea", placeholder="Write your newsletter content here") }}
+        {% if form.description.errors %}
+          <div class="newsletter__error">
+            {% for error in form.description.errors %}
+              <span>{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+        
+      <button type="submit" class="newsletter__submit" id="submitButton">
+        <span>Send Newsletter</span>
+        <span id="spinnerContainer" class="spinner hidden"></span>
+      </button>
+    </form>
+  </div>
+  <div class="newsletter__subscribers">
+    <div class="newsletter__wrapper">
+      <div class="subscriber__header">
+        <p class="newsletter__subscribers--title">Subscription List</p>
+        <div class="subscribers__pagination">
+          <ul>
+            {% if current_page > 1 %}
+            <li class="pagePrevious__button">
+              <a href="{{ url_for('newsletter.newsletter_page', page=current_page-1, q=search_query) }}">Previous</a>
+            </li>
+            {% endif %}
+            {% for p in range(1, total_pages + 1) %}
+            <li class="{% if p == current_page %}active{% endif %}">
+              <a href="{{ url_for('newsletter.newsletter_page', page=p, q=search_query) }}" class="page__button">{{ p }}</a>
+            </li>
+            {% endfor %}
+            {% if current_page < total_pages %}
+            <li class="pageNext__button">
+              <a href="{{ url_for('newsletter.newsletter_page', page=current_page+1, q=search_query) }}">Next</a>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+
+      <form method="get" action="{{ url_for('newsletter.newsletter_page') }}" class="newsletter__search">
+        <div class="search__container">
+          <input type="text" name="q" class="search__bar" placeholder="Search by email..." value="{{ search_query }}" autocomplete="off">
+          <button type="submit" class="search__button">
+            <i class="fa-solid fa-magnifying-glass fa-sm"></i>
+          </button>
+          {% if search_query %}
+            <a href="{{ url_for('newsletter.newsletter_page') }}" class="clear__button">
+              <i class="fa-solid fa-xmark fa-md"></i>
+            </a>
+          {% endif %}
+        </div>
+      </form>
+
+      <ul class="newsletter__subscribers--list">
+        {% for subscriber in subscribers %}
+        <li class="newsletter__subscribers--item">
+          {{ subscriber.email }}
+          <form id="deleteForm-{{ subscriber.id }}" action="{{ url_for('newsletter.delete_subscriber', id=subscriber.id) }}" method="POST" onsubmit="event.preventDefault(); openDeleteModal({{ subscriber.id }})">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <a id="deleteButton{{ subscriber.id }}" onclick="openDeleteModal({{ subscriber.id }})"><span class="newsletter__subscribers--delete">
+              <i class="fa-solid fa-trash"></i>
+            </span></button>
+          </form>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- reminder: need to wrap each list tile as a link -->
+<div class="newsletter__posts">
+  <div class="posts__wrapper">
+    <div class="posts__header">
+      <p class="newsletter__posts--title">Recent Posts</p>
+      <a href="{{ url_for('newsletter.newsletter_all_posts') }}">View All</a>
+    </div>
+    <div class="newsletter__posts--list">
+      {% for post in recent_posts %}
+      <div class="newsletter__posts--item">
+        <div class="newsletter__post--content">
+          <a href="{{ url_for('newsletter.newsletter_post_content', id=post.id) }}">
+            <h3>{{ post.title }}</h3>
+          </a>
+          <p>{{ post.description|truncate(100) }}</p>
+          <span class="newsletter__post--date">{{ post.created_at.strftime('%B %d, %Y') }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- modal -->
+{% include "components/deleteModal.html" %}
+
+{% endblock %}
+
+{% block body_scripts %}
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/deleteModal.js') }}"
+></script>
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/dashboard/newsletter/sendingIndicator.js') }}"
+></script>
+{% endblock %}

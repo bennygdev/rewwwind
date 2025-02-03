@@ -1,0 +1,103 @@
+h1 {
+  font-family: "OpenSansSemibold";
+  font-size: 1.5em;
+  margin-bottom: 30px;
+}
+
+.headerGradient {
+  height: 20vh;
+  background: rgb(174,238,230);
+  background: linear-gradient(90deg, rgba(174,238,230,1) 0%, rgba(238,222,174,1) 100%);
+}
+
+.notifications__content {
+  margin-top: 30px;
+}
+
+.notifications__section--header {
+  margin-bottom: 24px;
+}
+
+.notifications__section--title {
+  font-family: "OpenSansSemibold";
+  font-size: 1.2em;
+  margin-bottom: 8px;
+}
+
+.notifications__section--subtitle {
+  font-family: "OpenSansRegular";
+  font-size: 0.9em;
+  color: #666;
+  margin: 0;
+}
+
+.notifications__option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+}
+
+.notifications__option--info {
+  flex: 1;
+}
+
+.notifications__option--title {
+  font-family: "OpenSansSemibold";
+  font-size: 1em;
+  margin: 0 0 4px 0;
+}
+
+.notifications__option--description {
+  font-family: "OpenSansRegular";
+  font-size: 0.9em;
+  color: #666;
+  margin: 0;
+}
+
+/* Custom checkbox styling */
+.notifications__checkbox {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 24px;
+  margin-left: 16px;
+}
+
+.notifications__checkbox--input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.notifications__checkbox--custom {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 24px;
+}
+
+.notifications__checkbox--custom:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+.notifications__checkbox--input:checked + .notifications__checkbox--custom {
+  background-color: #039752;
+}
+
+.notifications__checkbox--input:checked + .notifications__checkbox--custom:before {
+  transform: translateX(24px);
+}

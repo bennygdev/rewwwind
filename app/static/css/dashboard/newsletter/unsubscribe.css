@@ -1,0 +1,45 @@
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+  background-color: #f3f4f6;
+  margin: 0;
+}
+
+#message {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+#unsubscribeBtn {
+  background-color: #ef4444;
+  color: white;
+  font-weight: bold;
+  padding: 15px 20px;
+  font-size: 1em;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#unsubscribeBtn:hover {
+  background-color: #dc2626;
+}
+
+#unsubscribeBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.text-green-600 { 
+  color: #16a34a;
+}
+
+.text-red-600 { 
+  color: #dc2626;
+}

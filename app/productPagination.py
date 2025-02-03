@@ -117,6 +117,8 @@ def product_detail(product_id):
     reviewForm = AddReviewForm()
     cartForm = AddToCartForm()
 
+    not_customer = request.args.get('not_customer', type=bool)
+
     # Render template
     return render_template(
         "/views/productPage.html",
@@ -128,7 +130,8 @@ def product_detail(product_id):
         reviews=reviews,
         total_pages=total_pages,
         current_page=page,
-        rating_filter=rating_filter
+        rating_filter=rating_filter,
+        not_customer=not_customer
     )
 
 @productPagination.route('/product/<int:product_id>/add-review', methods=['GET', 'POST'])
@@ -331,7 +334,7 @@ def product_specials():
     form = AddToCartForm()
 
     return render_template(
-        "/views/products.html",
+        "/views/productSpecials.html",
         user=current_user,
         products=products,
         total_products=total_products,

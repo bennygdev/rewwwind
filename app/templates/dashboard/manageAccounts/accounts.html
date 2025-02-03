@@ -40,6 +40,11 @@
     </div> -->
     <form method="get" action="{{ url_for('manageAccounts.accounts_listing') }}">
       <div class="search__container">
+        <!-- Preserve current filter values -->
+        {% if role_filter %}
+        <input type="hidden" name="role" value="{{ role_filter }}">
+        {% endif %}
+
         <input
           type="text"
           name="q"
@@ -53,7 +58,7 @@
           <i class="fa-solid fa-magnifying-glass"></i>
         </button>
         {% if search_query %}
-          <a href="{{ url_for('manageAccounts.accounts_listing') }}" class="clear__button">
+          <a href="{{ url_for('manageAccounts.accounts_listing', role=role_filter) }}" class="clear__button">
             <i class="fa-solid fa-xmark fa-lg"></i>
           </a>
         {% endif %}
@@ -67,6 +72,29 @@
 
 <!-- Flash validation -->
 {% include "components/flashValidation.html" %}
+
+<div class="content__filters">
+  <form id="filterForm" method="get" action="{{ url_for('manageAccounts.accounts_listing') }}" class="filters__form">
+    <!-- Preserve search query if exists -->
+    {% if search_query %}
+    <input type="hidden" name="q" value="{{ search_query }}">
+    {% endif %}
+
+    <div class="filter__group">
+      <label for="role">Role:</label>
+      <select name="role" id="role" class="filter__select">
+        <option value="">All</option>
+        {% for value, label in role_choices %}
+        <option value="{{ value }}" {% if role_filter == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    {% if role_filter %}
+    <a href="{{ url_for('manageAccounts.accounts_listing', q=search_query) }}" class="clear__filters">Clear Filters</a>
+    {% endif %}
+  </form>
+</div>
 
 <div class="accounts">
   <table>
@@ -126,17 +154,24 @@
 <div class="accounts__pagination">
   <ul>
     {% if current_page > 1 %}
-    <li class="pagePrevious__button"><a href="{{ url_for('manageAccounts.accounts_listing', page=current_page-1, q=search_query) }}">Previous</a></li>
+    <li class="pagePrevious__button"><a href="{{ url_for('manageAccounts.accounts_listing', page=current_page-1, q=search_query, role=role_filter) }}">Previous</a></li>
     {% endif %}
     {% for p in range(1, total_pages + 1) %}
     <li class="{% if p == current_page %}active{% endif %}">
-      <a href="{{ url_for('manageAccounts.accounts_listing', page=p, q=search_query) }}" class="page__button">{{ p }}</a>
+      <a href="{{ url_for('manageAccounts.accounts_listing', page=p, q=search_query, role=role_filter) }}" class="page__button">{{ p }}</a>
     </li>
     {% endfor %}
     {% if current_page < total_pages %}
-    <li class="pageNext__button"><a href="{{ url_for('manageAccounts.accounts_listing', page=current_page+1, q=search_query) }}">Next</a></li>
+    <li class="pageNext__button"><a href="{{ url_for('manageAccounts.accounts_listing', page=current_page+1, q=search_query, role=role_filter) }}">Next</a></li>
     {% endif %}
   </ul>
 </div>
 
+{% endblock %}
+
+{% block body_scripts %}
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/dashboardFilters.js') }}"
+></script>
 {% endblock %}

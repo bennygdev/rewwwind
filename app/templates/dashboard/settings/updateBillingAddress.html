@@ -9,10 +9,7 @@
 {% block title %}Update Billing Address{% endblock %}
 
 {% block headerContent %}
-<div class="billing__header">
-  <h1 id="billing__title">Update Billing Address</h1>
-  <p id="billing__subtitles">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</p>
-</div>
+<div class="headerGradient"></div>
 {% endblock %}
 
 {% block content %}
@@ -21,7 +18,9 @@
 {% include "components/flashValidation.html" %}
 
 <!-- Back button -->
-<a href="{{ url_for('dashboard.user_settings') }}" class="back__button--darker">Back</a>
+<a href="{{ url_for('dashboard.user_settings') }}" class="back__link"><i class="fa-solid fa-chevron-left fa-sm"></i>Back</a>
+
+<h1>My Billing Addresses</h1>
 
 {% if billing_addresses %}
   {% for address in billing_addresses %}
@@ -39,13 +38,15 @@
           <h3>Address Two</h3>
           {{ address.address_two or 'N/A' }}
         </div>
-        <div class="billing__unitNumber">
-          <h3>Unit Number</h3>
-          {{ address.unit_number }}
-        </div>
-        <div class="billing__postalCode">
-          <h3>Postal Code</h3>
-          {{ address.postal_code }}
+        <div class="billing__addressRow">
+          <div class="billing__unitNumber">
+            <h3>Unit Number</h3>
+            {{ address.unit_number }}
+          </div>
+          <div class="billing__postalCode">
+            <h3>Postal Code</h3>
+            {{ address.postal_code }}
+          </div>
         </div>
         <div class="billing__phoneNumber">
           <h3>Phone Number</h3>
@@ -61,30 +62,57 @@
         <div class="billing__editAddressOne">
           {{ form.address_one.label }} 
           {{ form.address_one(class="form-control", value=address.address_one) }}
+          {% if form.address_one.errors %}
+            {% for error in form.address_one.errors %}
+              <span class="error-message">{{ error }}</span>
+            {% endfor %}
+          {% endif %}
         </div>
         <div class="billing__editAddressTwo">
           {{ form.address_two.label }} 
           {{ form.address_two(class="form-control", value=address.address_two) }}
+          {% if form.address_two.errors %}
+            {% for error in form.address_two.errors %}
+              <span class="error-message">{{ error }}</span>
+            {% endfor %}
+          {% endif %}
         </div>
         <div class="billing__addressRow">
           <div class="billing__editUnitNumber">
             {{ form.unit_number.label }} 
             {{ form.unit_number(class="form-control", value=address.unit_number) }}
+            {% if form.unit_number.errors %}
+              {% for error in form.unit_number.errors %}
+                <span class="error-message">{{ error }}</span>
+              {% endfor %}
+            {% endif %}
           </div>
           <div class="billing__editPostalCode">
             {{ form.postal_code.label }} 
             {{ form.postal_code(class="form-control", value=address.postal_code) }}
+            {% if form.postal_code.errors %}
+              {% for error in form.postal_code.errors %}
+                <span class="error-message">{{ error }}</span>
+              {% endfor %}
+            {% endif %}
           </div>
         </div>
         <div class="billing__editPhoneNumber">
           {{ form.phone_number.label }} 
           {{ form.phone_number(class="form-control", value=address.phone_number) }}
+          {% if form.phone_number.errors %}
+            {% for error in form.phone_number.errors %}
+              <span class="error-message">{{ error }}</span>
+            {% endfor %}
+          {% endif %}
         </div>
       </form>
     </div>
 
     <div class="billing__right">
-      <button class="billing__editButton" id="editButton{{ address.id }}" onclick="toggleEditForm({{ address.id }})"><i class="fa-solid fa-pen"></i>Edit</button>
+      <div class="billing__buttonContainer">
+        <button class="billing__editButton" id="editButton{{ address.id }}" onclick="toggleEditForm({{ address.id }})">Edit</button>
+      </div>
 
       <!-- hidden by default -->
       <div class="button-group" id="buttonGroup{{ address.id }}" style="display: none;">
@@ -103,7 +131,7 @@
   <p>No billing addresses found.</p>
 {% endif %}
 
-<a href="{{ url_for('dashboard.add_billing_address') }}" class="billing__addButton"><i class="fa-solid fa-plus fa-lg"></i>Add</a>
+<a href="{{ url_for('dashboard.add_billing_address') }}" class="billing__addButton">Add</a>
 
 <!-- modal -->
 {% include "components/deleteModal.html" %}

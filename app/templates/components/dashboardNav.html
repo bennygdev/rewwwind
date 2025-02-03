@@ -7,6 +7,7 @@
           <li><a href="/dashboard/manage-tradeins" class="dashboard__link {{ 'dashboard__link--active' if active_page == 'manage_tradeins' else '' }}"><i class="fa-solid fa-shopping-bag"></i>Manage Trade-ins</a></li>
           {% if user.role_id in [2, 3] %}
           <li><a href="/dashboard/customer-chat" class="dashboard__link {{ 'dashboard__link--active' if active_page == 'customer_chat' else '' }}"><i class="fa-solid fa-comment"></i>Customer Chat</a></li>
+          <li><a href="/dashboard/newsletter" class="dashboard__link {{ 'dashboard__link--active' if active_page == 'newsletter' else '' }}"><i class="fa-solid fa-envelope"></i>Newsletter</a></li>
           <li><a href="/dashboard/manage-products" class="dashboard__link {{ 'dashboard__link--active' if active_page == 'manage_products' else '' }}"><i class="fa-solid fa-gifts"></i>Manage Products</a></li>
           <li><a href="/dashboard/manage-vouchers" class="dashboard__link {{ 'dashboard__link--active' if active_page == 'manage_vouchers' else '' }}"><i class="fa-solid fa-ticket"></i>Manage Vouchers</a></li>
           <li><a href="/dashboard/manage-accounts" class="dashboard__link {{ 'dashboard__link--active' if active_page == 'manage_accounts' else '' }}"><i class="fa-solid fa-users"></i>Manage Accounts</a></li>

@@ -49,9 +49,7 @@
 
 {% block content %}
 
-<a href="{{ url_for('manageAccounts.accounts_listing') }}" class="back__button--darker">Back</a>
-
-<h2 id="personal__header">Personal Information</h2>
+<a href="{{ url_for('manageAccounts.accounts_listing') }}" class="back__link"><i class="fa-solid fa-chevron-left fa-sm"></i>Back</a>
 
 <div class="personal__wrapper">
   <div class="personal__information">
@@ -63,51 +61,123 @@
         <div class="personal__name">
           <div class="personal__firstName">
             <h3>First Name</h3>
-            {{ selectedUser.first_name }}
+            <span>{{ selectedUser.first_name }}</span>
           </div>
           <div class="personal__lastName">
             <h3>Last Name</h3>
-            {{ selectedUser.last_name }}
+            <span>{{ selectedUser.last_name or 'N/A' }}</span>
           </div>
         </div>
         <div class="personal__extra">
           <div class="personal__username">
             <h3>Username</h3>
-            {{ selectedUser.username }}
+            <span>{{ selectedUser.username }}</span>
           </div>
-          <div class="personal__id">
-            <h3>ID</h3>
-            {{ selectedUser.id }}
+          <div class="personal__email">
+            <h3>Email</h3>
+            <span>{{ selectedUser.email }}</span>
           </div>
         </div>
       </div>
     </div>
     <div class="personal__right">
-      <div class="personal__email">
-        <i class="fa-solid fa-envelope fa-lg"></i>{{ selectedUser.email }}
-      </div>
-      <div class="personal__totalOrders">
-        <i class="fa-solid fa-box-open fa-lg"></i> {{ selectedUser.orderCount }} Total Orders
-      </div>
+      {% if not (current_user.role_id == 3 and selectedUser.role_id == 3) %}
+      <a href="{{ url_for('manageAccounts.edit_account', id=selectedUser.id) }}" id="account__editButton">Edit</a>
+      <a href="{{ url_for('manageAccounts.change_password', id=selectedUser.id) }}" id="account__changePassword">Change Password</a>
+      {% endif %}
     </div>
   </div>
 </div>
 
-<h2 id="personal__header">Billing Address</h2>
-<!-- Will be added later -->
+<!-- Use chart js here -->
+ <!-- Total orders line chart, total vouchers (pie chart by voucher type), reviews line chart (by date). Header should show the title and amount -->
+<!-- Should hide if the user role is admin or owner -->
+<p id="account__header">Statistics</p>
+{% if selectedUser.role_id == 1 %}
+<div class="personal__charts">
+  <div class="statistic__box">
+    <div class="account__statistic">
+      <div class="statistic__label">
+        Total Orders ({{ total_orders }})
+      </div>
+      <canvas id="userOrderTrendChart"></canvas>
+    </div>
+  </div>
+  <div class="statistic__box">
+    <div class="account__statistic">
+      <div class="statistic__label">
+        Total Vouchers ({{ total_vouchers }})
+      </div>
+      <canvas id="userVoucherTypesChart"></canvas>
+    </div>
+  </div>
+  <div class="statistic__box">
+    <div class="account__statistic">
+      <div class="statistic__label">
+        Total Reviews ({{ total_reviews }})
+      </div>
+      <canvas id="userReviewTrendChart"></canvas>
+    </div>
+  </div>
+</div>
+{% endif %}
 
-<h2 id="personal__header">Payment Information</h2>
-<!-- Will be added later -->
+<p id="account__header">Billing Address</p>
+<div class="card__grid">
+  {% if billing_addresses %}
+    {% for address in billing_addresses %}
+    <div class="card__item billing__card">
+      <div class="billing__details">
+        <h3 class="card__title">Billing Address #{{ loop.index }}</h3>
+        <p>Address: {{ address.address_one }}</p>
+        {% if address.address_two %}
+        <p>Address Line 2: {{ address.address_two }}</p>
+        {% endif %}
+        <p>Unit Number: {{ address.unit_number }}</p>
+        <p>Postal Code: {{ address.postal_code }}</p>
+        <p>Phone Number: {{ address.phone_number }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+  <p>No billing addresses found.</p>
+  {% endif %}
+</div>
+
+<p id="account__header">Payment Information</p>
+<div class="card__grid">
+  {% if payment_informations %}
+    {% for payment_info in payment_informations %}
+    <div class="card__item payment__card">
+      <div class="payment__header">
+        <h3 class="card__title">
+          {{ payment_info.payment_types.payment_type }} 
+          <img 
+            src="{{ url_for('static', filename='media/card_logos/' + payment_info.payment_types.payment_type + '.svg') }}" 
+            alt="{{ payment_info.payment_types.payment_type }} Logo" 
+            class="payment__logo"
+          >
+        </h3>
+      </div>
+      <div class="payment__details">
+        <p>Card Name: {{ payment_info.card_name }}</p>
+        <p>Card Number: **** **** **** {{ payment_info.card_number[-4:] }}</p>
+        <p>Expiry: {{ payment_info.expiry_date }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+  <p>No payment information found.</p>
+  {% endif %}
+</div>
 
 <div class="account__buttons">
   {% if not (current_user.role_id == 3 and selectedUser.role_id == 3) %}
-    <a href="{{ url_for('manageAccounts.edit_account', id=selectedUser.id) }}" id="account__editButton">Edit</a>
-    <a href="{{ url_for('manageAccounts.change_password', id=selectedUser.id) }}" id="account__changePassword">Change Password</a>
+    <form id="deleteForm-{{ selectedUser.id }}" action="{{ url_for('manageAccounts.delete_account', id=selectedUser.id) }}" method="POST" onsubmit="event.preventDefault(); openDeleteModal({{ selectedUser.id }})">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="button" id="account__deleteButton" onclick="openDeleteModal({{ selectedUser.id }})">Delete</button>
+    </form>
   {% endif %}
-  <form id="deleteForm-{{ selectedUser.id }}" action="{{ url_for('manageAccounts.delete_account', id=selectedUser.id) }}" method="POST" onsubmit="event.preventDefault(); openDeleteModal({{ selectedUser.id }})">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <button type="button" id="account__deleteButton" onclick="openDeleteModal({{ selectedUser.id }})">Delete</button>
-  </form>
 </div>
 
 <!-- modal -->
@@ -117,8 +187,20 @@
 {% endblock %}
 
 {% block body_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script
   type="text/javascript"
   src="{{ url_for('static', filename='js/deleteModal.js') }}"
 ></script>
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/dashboard/accountDetailChart.js') }}"
+></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    {% if selectedUser.role_id == 1 %}
+      initializeAccountDetailsCharts({{ selectedUser.id }});
+    {% endif %}
+  });
+</script>
 {% endblock %}

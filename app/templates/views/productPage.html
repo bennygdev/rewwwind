@@ -123,7 +123,7 @@
       {% if user.role_id %}
       <div class="write"><span>Write a review</span>&nbsp;&nbsp;<i class="bi bi-pencil-square"></i></div>
       {% endif %}
-      {% if reviews.items and product.reviews  %}
+      {% if product.reviews|length != 0  %}
       <div class="filters">
         <div class="filter-container">
           <div class="filter {% if rating_filter %}activated{% endif %}" filter-for="rating" id="filter">
@@ -202,15 +202,24 @@
     </div>
   </div>
 
-  {% elif delete %}
+  {% elif delete or not_customer %}
   <div class="delete">
     <i class="bi bi-x-lg fa-2xl"></i>
     <i class="bi bi-exclamation-circle"></i>
     <div class="header ignore">
-      <h2>You are about to delete the following review.</h2>
+      <h2 style="text-align: center;">{% if delete %}
+        You are about to delete the following review.
+        {% else %}
+        Admins and owners are not allowed to add products to their cart to avoid conflicts.
+        <br>Please use a dummy customer account instead.
+        {% endif %}
+      </h2>
+      {% if delete %}
       <span>This action <strong>cannot be undone</strong> when performed.</span>
+      {% endif %}
     </div>
     <div class="review ignore">
+      {% if delete %}
       <div class="left">
         <img src="{{ url_for('static',filename='profile_pics/' + review.user.image) }}">
       </div>
@@ -246,13 +255,16 @@
         </div>
         {% endif %}
       </div>
+      {% endif %}
       <div class="buttons">
         <div class="button-wrapper">
           <input id="cancel" name="cancel" type="button" value="Cancel">
         </div>
+        {% if delete %}
         <div class="button-wrapper">
           {{ deleteform.submit() }}
         </div>
+        {% endif %}
       </div>
     </form>
   </div>
@@ -301,6 +313,7 @@
     </div>
   </form>
   {% endif %}
+</div>
 </div>
 {% endwith %}
 

@@ -20,3 +20,62 @@ function toggleEditForm(id) {
     buttonGroup.style.display = 'none';
   }
 }
+
+function clearErrors(formId) {
+  const form = document.getElementById(formId);
+  const errorMessages = form.getElementsByClassName('error-message');
+  while (errorMessages.length > 0) {
+      errorMessages[0].remove();
+  }
+}
+
+function displayErrors(formId, errors) {
+  const form = document.getElementById(formId);
+  for (const field in errors) {
+      const input = form.querySelector(`[name="${field}"]`);
+      if (input) {
+          const errorDiv = document.createElement('span');
+          errorDiv.className = 'error-message';
+          errorDiv.textContent = errors[field][0];
+          input.parentNode.appendChild(errorDiv);
+      }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const forms = document.querySelectorAll('.editPayment__form');
+  
+  forms.forEach(form => {
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const formId = form.id;
+      const formData = new FormData(form);
+          
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          body: formData
+        });
+              
+        const data = await response.json();
+              
+        clearErrors(formId);
+              
+        if (data.success) {
+          const id = formId.replace('editForm', '');
+          toggleEditForm(id);
+          location.reload();
+        } else {
+          if (data.errors) {
+            displayErrors(formId, data.errors);
+          }
+          if (data.message) {
+            console.error(data.message);
+          }
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    });
+  });
+});

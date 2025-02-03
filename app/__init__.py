@@ -9,6 +9,8 @@ import os
 from authlib.integrations.flask_client import OAuth
 from flask_migrate import Migrate
 import json
+from flask_socketio import SocketIO
+socketio = SocketIO()
 
 migrate = Migrate()
 
@@ -20,6 +22,16 @@ oauth = OAuth()
 
 load_dotenv()
 
+def update_user_order_counts(app):
+  with app.app_context():
+    from .models import User, Order
+    users = User.query.all()
+    for user in users:
+      order_count = Order.query.filter_by(user_id=user.id).count()
+      user.orderCount = order_count
+    db.session.commit()
+    print('Updated order counts for all users!')
+
 def create_app():
   app = Flask(__name__)
   app.config['SECRET_KEY'] = '123456789'
@@ -27,8 +39,24 @@ def create_app():
   app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
   app.config['MAIL_PORT'] = 465
   app.config['MAIL_USE_SSL'] = True
-  app.config['MAIL_USERNAME'] = os.getenv('EMAIL_USER')
-  app.config['MAIL_PASSWORD'] = os.getenv('EMAIL_PASS') 
+  # app.config['MAIL_USERNAME'] = os.getenv('EMAIL_USER')
+  # app.config['MAIL_PASSWORD'] = os.getenv('EMAIL_PASS') 
+
+  def update_mail_config(email_type='default'):
+    if email_type == 'auth':
+      app.config['MAIL_USERNAME'] = os.getenv('EMAIL_USER')
+      app.config['MAIL_PASSWORD'] = os.getenv('EMAIL_PASS')
+    elif email_type == 'newsletter':
+      app.config['MAIL_USERNAME'] = os.getenv('EMAIL_USER2')
+      app.config['MAIL_PASSWORD'] = os.getenv('EMAIL_PASS2')
+    else:
+      # Default fallback
+      app.config['MAIL_USERNAME'] = os.getenv('EMAIL_USER')
+      app.config['MAIL_PASSWORD'] = os.getenv('EMAIL_PASS')
+
+    mail.init_app(app)
+
+  app.config['UPDATE_MAIL_CONFIG'] = update_mail_config
 
   app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'media', 'uploads') # temporary image upload folder
   if not os.path.exists(app.config['UPLOAD_FOLDER']):
@@ -43,7 +71,7 @@ def create_app():
 
   db.init_app(app)
   csrf.init_app(app)
-  mail.init_app(app)
+  # mail.init_app(app)
 
   migrate.init_app(app, db)  # Initialize Flask-Migrate
 
@@ -62,6 +90,7 @@ def create_app():
     }
   )
 
+  socketio.init_app(app)
   # REMINDER: Only use camel casing, no hyphens etc. flask will flag an error if thats the case.
   # Initialise Routes
 
@@ -80,6 +109,7 @@ def create_app():
   app.register_blueprint(chatbot, url_prefix="/")
 
   # Dashboard pages
+  from .overview import overview
   from .dashboard import dashboard
   from .manageOrders import manageOrders
   from .manageTradeins import manageTradeins
@@ -87,7 +117,9 @@ def create_app():
   from .manageProducts import manageProducts
   from .manageVouchers import manageVouchers
   from .manageAccounts import manageAccounts
-  
+  from .newsletter import newsletter
+
+  app.register_blueprint(overview, url_prefix="/dashboard")
   app.register_blueprint(dashboard, url_prefix="/dashboard")
   app.register_blueprint(manageOrders, url_prefix="/dashboard")
   app.register_blueprint(manageTradeins, url_prefix="/dashboard")
@@ -95,6 +127,7 @@ def create_app():
   app.register_blueprint(manageProducts, url_prefix="/dashboard")
   app.register_blueprint(manageVouchers, url_prefix="/dashboard")
   app.register_blueprint(manageAccounts, url_prefix="/dashboard")
+  app.register_blueprint(newsletter, url_prefix="/dashboard")
 
   # Product Pages
   from .productPagination import productPagination
@@ -112,6 +145,8 @@ def create_app():
   from .models import User, Product, Role, Order, OrderItem, Category, ProductSubCategory
 
   create_database(app)
+
+  update_user_order_counts(app)
 
   # User load
   login_manager = LoginManager()
@@ -153,7 +188,7 @@ def create_database(app):
       print('Created Database!')
       # insert_categories()
 
-      from .seed import insert_categories, insert_products, insert_users, insert_payment_types, insert_default_roles, insert_subcategories 
+      from .seed import insert_categories, insert_products, insert_users, insert_payment_types, insert_default_roles, insert_subcategories, insert_orders, insert_voucher_types
 
       insert_default_roles()
       insert_payment_types()
@@ -161,3 +196,5 @@ def create_database(app):
       insert_categories()
       insert_subcategories()
       insert_products()
+      insert_orders()
+      insert_voucher_types()

@@ -1,0 +1,114 @@
+<nav class="main__navbar">
+  <div class="nav__left">
+    <!-- <a href='/'><img src="" id="nav__logo" class="nav__logo" alt="Logo"></a> -->
+    <a href="/" class="logo__title--link"><h1 class="logo__title">Rewwwind</h1></a>
+    <ul class="nav__left--links">
+      <li><a class="nav__link nav__desktop" href='/products'>Products</a></li>
+      <li><a class="nav__link nav__desktop" href='/trade-in'>Trade-in</a></li>
+      <li><a class="nav__link nav__desktop" href='/about-us'>About</a></li>
+    </ul>
+     <!-- Search btn here -->
+    </div>
+
+  <div class="nav__right">
+    <div class="search__wrapper">
+      <form method="get" action="{{ url_for('productPagination.product_pagination') }}">
+          <div class="nav__search-container">
+          <input
+            type="text"
+            name="q"
+            id="search__bar"
+            class="search__bar"
+            placeholder="Search by product name..."
+            value="{{ search_query }}"
+            autocomplete="off"
+          >
+          <button type="submit" class="search__button" id="search__button">
+              <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+          {% if search_query %}
+              <a href="{{ url_for('productPagination.product_pagination') }}" class="clear__button">
+                  <i class="fa-solid fa-xmark fa-lg"></i>
+              </a>
+          {% endif %}
+          </div>
+      </form>
+    </div>
+
+    <!-- Navigation links -->
+    <ul class="nav__right--links">
+      <li><a data-bs-toggle="offcanvas" href="#offcanvasMenu" role="button" aria-controls="offcanvasMenu" class="nav__link nav__hamburger-menu nav__mobile"><i class="fa-solid fa-bars"></i></a></li>
+      <li><a class="nav__link nav__desktop" href='/wishlist'><i class="fa-solid fa-heart fa-xl"></i>&nbsp;&nbsp;</a></li>
+      <li><a class="nav__link nav__desktop" href='/cart'><i class="fa-solid fa-cart-shopping fa-xl"></i>&nbsp;&nbsp;</a></li>
+      <!-- <a class="nav__link nav__desktop" href="/cart"><button class="nav__button"><i class="fa-solid fa-cart-shopping"></i>&nbsp;&nbsp;Cart (?)</button></a> -->
+      <div class="nav__link nav__desktop nav__profile--options nav__profile"><button class="nav__button">
+        {% if not user.is_authenticated %}
+        <i class="fa-regular fa-user"></i>&nbsp;&nbsp;Sign in
+        {% else %}
+          {% if current_user.image.startswith('http') %}
+            <img src="{{ current_user.image }}" id="mini_profile_img" alt="Mini profile image">Hello, {{user.username}}
+          {% elif current_user.image %}
+            <img src="{{ url_for('static',filename='profile_pics/' + current_user.image) }}" id="mini_profile_img" alt="Mini profile image">Hello, {{user.username}}
+          {% else %}
+            <img src="{{ url_for('static',filename='profile_pics/profile_image_default.jpg') }}" id="mini_profile_img" alt="Mini profile image">Hello, {{user.username}}
+          {% endif %}
+        {% endif %}
+      </button></div>
+      <!-- <div class="nav__link nav__desktop nav__profile"><button class="nav__button"><i class="fa-regular fa-user"></i> Sign In</button></div> -->
+      <!-- add options menu when click -->
+      <div class="nav__optionMenu">
+        <ul class="nav__optionMenu--links">
+          <!-- logged out -->
+          {% if user.is_authenticated %}
+          <li><a class="nav__optionMenu--link" href="/dashboard/profile">Your Profile</a></li>
+          <li><a class="nav__optionMenu--link" href="/dashboard/overview">My Dashboard</a></li>
+          <li><a class="nav__optionMenu--link" href="/dashboard/manage-orders">My Orders</a></li>
+          <li><a class="nav__optionMenu--link" href="/logout">Log Out</a></li>
+          <!-- logged in -->
+          {% else %}
+          <li><a class="nav__optionMenu--link" href="/login">Login</a></li>
+          <li><a class="nav__optionMenu--link" href="/register">Register</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </ul>
+  </div>
+
+
+
+</nav>
+
+<!-- Offcanvas menu -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenu">
+  <div class="offcanvas-header">
+    <a href="/" class="logo__title--link"><h1 class="logo__title">Rewwwind</h1></a>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <ul class="offcanvas-nav">
+      <li><a class="nav__link {{ 'offcanvas__link--active' if active_page == 'overview' else '' }}" href='/dashboard/overview'>Overview</a></li>
+      <li><a class="nav__link {{ 'offcanvas__link--active' if active_page == 'manage_orders' else '' }}" href='/dashboard/manage-orders'>Manage Orders</a></li>
+      <li><a class="nav__link {{ 'offcanvas__link--active' if active_page == 'manage_tradeins' else '' }}" href='/dashboard/manage-tradeins'>Manage Trade-ins</a></li>
+      {% if user.role_id in [2, 3] %}
+      <li><a class="nav__link {{ 'offcanvas__link--active' if active_page == 'customer_chat' else '' }}" href='/dashboard/customer-chat'>Customer Chat</a></li>
+      <li><a class="nav__link {{ 'offcanvas__link--active' if active_page == 'newsletter' else '' }}" href='/dashboard/newsletter'>Newsletter</a></li>
+      <li><a class="nav__link {{ 'offcanvas__link--active' if active_page == 'manage_products' else '' }}" href='/dashboard/manage-products'>Manage Products</a></li>
+      <li><a class="nav__link {{ 'offcanvas__link--active' if active_page == 'manage_vouchers' else '' }}" href='/dashboard/manage-vouchers'>Manage Vouchers</a></li>
+      <li><a class="nav__link {{ 'offcanvas__link--active' if active_page == 'manage_accounts' else '' }}" href='/dashboard/manage-accounts'>Manage Accounts</a></li>
+      {% endif %}
+      {% if user.role_id == 3 %}
+      <li><a class="nav__link {{ 'offcanvas__link--active' if active_page == 'add_any_account' else '' }}" href='/dashboard/add-any-account'>Add Any Account</a></li>
+      {% endif %}
+      <li><a class="nav__link {{ 'offcanvas__link--active' if active_page == 'profile' else '' }}" href='/dashboard/profile'>My Profile</a></li>
+      <li><a class="nav__link {{ 'offcanvas__link--active' if active_page == 'settings' else '' }}" href='/dashboard/settings'>Settings</a></li>
+      <li><a class="nav__link" href='/'>Back to Store</a></li>
+      <li><a class="nav__link" href='/logout'>Log Out</a></li>
+    </ul>
+    <div class="offcanvas-nav__extra">
+      <a href="/"><p>Privacy Policy</p></a>
+      <a href="/"><p>Terms of service</p></a>
+      <a href="/"><p>License</p></a>
+      <p>&copy; Rewwwind   2024</p>
+    </div>
+  </div>
+</div>

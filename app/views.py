@@ -1,19 +1,24 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, jsonify
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 import os
 import json
-from .forms import TradeItemForm
-from .models import Product, tradeDetail
+from .forms import TradeItemForm, MailingListForm
+from .models import Product, tradeDetail, MailingList
 from . import db
 from datetime import timedelta
 from sqlalchemy import func
-
+from secrets import token_urlsafe
 
 views = Blueprint('views', __name__)
 
-@views.route('/')
+def generate_unsubscribe_token():
+  return token_urlsafe(16)
+
+@views.route('/', methods=['GET', 'POST'])
 def home():
+  mailing_list_form = MailingListForm()
+
 
   special_products = Product.query.filter_by(is_featured_special=True).all() # special (featured) products
   home_special_products = special_products[:6] # max special to display in home
@@ -22,9 +27,50 @@ def home():
   new_products = Product.query.filter(Product.created_at >= max_days).all() # product should be less than 7 days old to be new
   home_new_products = new_products[:18]
 
+  staff_products = Product.query.filter_by(is_featured_staff=True).all() # staff (featured) products
+  home_staff_products = staff_products[:3]
+
   # staff_picks = Product.query.filter_by(is_featured_staff=True)
 
-  return render_template("views/home.html", user=current_user, special_products=special_products, max_special = home_special_products, max_new = home_new_products)
+  if request.method == 'POST':
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+      if mailing_list_form.validate():
+        try:
+          new_subscriber = MailingList(
+            email=mailing_list_form.email.data,
+            unsubscribe_token=generate_unsubscribe_token()
+          )
+          db.session.add(new_subscriber)
+          db.session.commit()
+          return jsonify({'success': True})
+        except Exception as e:
+          db.session.rollback()
+          return jsonify({'success': False, 'error': 'Subscription failed'})
+      else:
+        # Return validation errors
+        return jsonify({
+          'success': False, 
+          'error': mailing_list_form.email.errors[0] if mailing_list_form.email.errors else 'Validation failed'
+        })
+      
+    # fallback for non ajax
+    if mailing_list_form.validate_on_submit():
+      new_subscriber = MailingList(
+        email=mailing_list_form.email.data,
+        unsubscribe_token=generate_unsubscribe_token()
+      )
+      db.session.add(new_subscriber)
+      db.session.commit()
+
+  return render_template(
+    "views/home.html", 
+    user=current_user, 
+    special_products=special_products, 
+    max_special = home_special_products, 
+    max_new = home_new_products, 
+    max_staff = home_staff_products,
+    mailing_list_form=mailing_list_form
+  )
 
 @views.route('/trade-in')
 def trade_Onboard(): 
@@ -34,6 +80,10 @@ def trade_Onboard():
 @login_required  
 def trade_form():
     form = TradeItemForm()
+
+    if current_user.role_id in [2,3]:
+      flash("Admins and owners are not allowed to trade in items to avoid conflicts.\nPlease use a dummy customer account instead.", "info")
+      return redirect(url_for('auth.login'))
 
     if form.validate_on_submit():
 
@@ -75,4 +125,5 @@ def trade_form():
 
 
     
+
 

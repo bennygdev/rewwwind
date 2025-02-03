@@ -2,22 +2,171 @@
 {% set active_page = "overview" %}
 {% block title %}Overview{% endblock %}
 
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard/overview.css') }}">
+{% endblock %}
+
+{% block headerContent %}
+<div class="overview__header">
+  <div class="greeting__message">
+    <img src="{{ image_file }}" id="mini_profile_image" alt="Mini profile image">
+    <p>Welcome, {{ current_user.username }}!</p>
+  </div>
+  <div class="overview__statistics--header">
+    <div class="statistic__box--header">
+      <i class="fa-solid fa-users fa-xl"></i>
+      <div class="overview__statistic--header">
+        <p class="statistic__label--header">{{ headerLabel1 }}</p>
+        <span class="statistic__headerValue1">{{ headerValue1 }}</span>
+      </div>
+    </div>
+    <div class="statistic__box--header">
+      <i class="fa-solid fa-money-bill fa-xl"></i>
+      <div class="overview__statistic--header">
+        <p class="statistic__label--header">{{ headerLabel2 }}</p>
+        <span class="statistic__headerValue2">{{ headerValue2 }}</span>
+      </div>
+    </div>
+    <div class="statistic__box--header">
+      <i class="fa-solid fa-box fa-xl"></i>
+      <div class="overview__statistic--header">
+        <p class="statistic__label--header">{{ headerLabel3 }}</p>
+        <span class="statistic__headerValue3">{{ headerValue3 }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
 
 {% block content %}
-<!-- Need to add logic here, to check if the user is customer, admin or owner -->
+<div class="statistics__wrapper">
+  <div class="statistics__top">
+    {% if current_user.role_id == 1 %}
+    <div class="statistic__box">
+      <div class="overview__statistic">
+        <div class="statistic__label">Trade-in Frequency</div>
+        <canvas id="tradeFrequencyChart"></canvas>
+      </div>
+    </div>
+    <div class="statistic__box">
+      <div class="overview__statistic">
+        <div class="statistic__label">Buying Trend</div>
+        <canvas id="buyingTrendChart"></canvas>
+      </div>
+    </div>
+    {% elif current_user.role_id in [2, 3] %}
+    <div class="statistic__box">
+      <div class="overview__statistic">
+        <div class="statistic__label">Weekly Sign-ups</div>
+        <canvas id="weeklySignupsChart"></canvas>
+        <!-- <canvas id="categorySalesChart"></canvas> -->
+      </div>
+    </div>
+    <div class="statistic__box">
+      <div class="overview__statistic">
+        <div class="statistic__label">Product Sales Over Time</div>
+        <canvas id="productSalesChart"></canvas>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  <div class="statistics__bottom">
+    
+    <div class="statistic__box">
+      <div class="overview__statistic">
+        <div class="statistic__label">
+          {% if user.role_id == 1 %}
+            Pending Orders
+          {% else %}
+            Total Pending Orders
+          {% endif %}
+        </div>
+        <div class="pending-list">
+          {% if pending_orders %}
+            {% for order in pending_orders %}
+              <div class="pending-item">
+                <a href="{{ url_for('manageOrders.order_detail', order_id=order.id) }}" class="pending-link">
+                  <div class="pending-header">
+                    <span class="pending-id">Order #{{ order.id }}</span>
+                    <span class="pending-date">{{ order.order_date.strftime('%Y-%m-%d') }}</span>
+                  </div>
+                  {% if user.role_id != 1 %}
+                    <span class="pending-customer">Customer: {{ order.user.username }}</span>
+                  {% endif %}
+                  <span class="pending-count">{{ order.order_items|sum(attribute='quantity') }} items</span>
+                </a>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="no-items">No pending orders</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
 
-{% block userOverview %}
-<!-- Probably have to do a include block. -->
-{% if user.role_id == 1 %}
-{% include "dashboard/customer_overview.html" %}
-{% elif user.role_id in [2, 3] %}
-{% include "dashboard/admin_overview.html" %}
-{% endif %}
+    <div class="statistic__box">
+      <div class="overview__statistic">
+        <div class="statistic__label">
+          {% if user.role_id == 1 %}
+            Pending Trade-ins
+          {% else %}
+            Total Pending Trade-ins
+          {% endif %}
+        </div>
+        <div class="pending-list">
+          {% if pending_trades %}
+            {% for trade in pending_trades %}
+              <div class="pending-item">
+                <a href="{{ url_for('manageTradeins.view_trade_details', trade_id=trade.id) }}" class="pending-link">
+                  <div class="pending-header">
+                    <span class="pending-id">Trade #{{ trade.id }}</span>
+                    <span class="pending-date">{{ trade.created_at.strftime('%Y-%m-%d') }}</span>
+                  </div>
+                  {% if user.role_id != 1 %}
+                    <span class="pending-customer">Customer: {{ trade.user.username }}</span>
+                  {% endif %}
+                  <div class="pending-details">
+                    <span class="pending-type">{{ trade.item_type }}</span>
+                    <span class="pending-condition">{{ trade.item_condition }}</span>
+                  </div>
+                </a>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="no-items">No pending trade-ins</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+
+    {% if user.role_id == 1 %}
+    <div class="statistic__box">
+      <div class="overview__statistic">
+        <div class="statistic__label">My Top Categories</div>
+        <canvas id="topCategoriesChart"></canvas>
+      </div>
+    </div>
+    {% elif user.role_id in [2, 3] %}
+    <!-- Empty for now, will add admin charts later -->
+    <div class="statistic__box">
+      <div class="overview__statistic">
+        <div class="statistic__label">Sales By Category</div>
+        <canvas id="categorySalesChart"></canvas>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
 
 {% endblock %}
 
-<!-- method of checking here -->
-<!-- {{ user.role_id }} -->
-<h1>Dashboard overview</h1>
-
+{% block body_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/dashboard/overviewChart.js') }}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    window.initDashboardCharts({{ current_user.role_id }});
+  });
+</script>
 {% endblock %}

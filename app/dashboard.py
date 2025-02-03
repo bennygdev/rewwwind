@@ -1,7 +1,7 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app
+from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app, jsonify, abort
 from flask_login import login_required, current_user
-from .forms import UpdatePersonalInformation, ChangePasswordForm, BillingAddressForm, PaymentMethodForm
-from .models import User, BillingAddress, PaymentInformation, PaymentType
+from .forms import UpdatePersonalInformation, ChangePasswordForm, BillingAddressForm, PaymentMethodForm, ChangeEmailForm
+from .models import User, BillingAddress, PaymentInformation, PaymentType, Review, Cart, Order, UserVoucher, MailingList
 from .roleDecorator import role_required
 from . import db
 import secrets
@@ -10,13 +10,7 @@ from PIL import Image
 from werkzeug.security import generate_password_hash, check_password_hash
 
 dashboard = Blueprint('dashboard', __name__)
-# Overview, profile page, settings page
-
-@dashboard.route('/overview')
-@login_required
-@role_required(1, 2, 3)
-def overview():
-  return render_template("dashboard/overview.html", user=current_user)
+# Profile page, settings page
 
 @dashboard.route('/profile')
 @login_required
@@ -32,7 +26,9 @@ def user_profile():
   else:
     image_file = url_for('static', filename='profile_pics/profile_image_default.jpg')
 
-  return render_template("dashboard/profile/profile.html", user=current_user, image_file=image_file)
+  orders = Order.query.filter_by(user_id=current_user.id).order_by(Order.order_date.desc()).limit(6).all()
+
+  return render_template("dashboard/profile/profile.html", user=current_user, image_file=image_file, orders=orders)
 
 @dashboard.route('/settings')
 @login_required
@@ -56,6 +52,51 @@ def update_personal_information():
 
   return render_template("dashboard/settings/updatePersonalInfo.html", user=current_user, image_file=image_file)
 
+@dashboard.route('/settings/change-email', methods=['GET', 'POST'])
+@login_required
+@role_required(1, 2, 3)
+def change_email():
+  form = ChangeEmailForm()
+
+  if current_user.google_account:
+    abort(404)
+
+  if form.validate_on_submit():
+    try:
+      current_user.email = form.email.data
+      db.session.commit()
+      flash("Your email has been updated!", "success")
+      return redirect(url_for('dashboard.update_personal_information'))
+    except Exception as e:
+      db.session.rollback()
+      flash("An unexpected error occurred. Please try again.", "error")
+
+  return render_template("dashboard/settings/changeEmail.html", user=current_user, form=form)
+
+@dashboard.route('/settings/delete-account', methods=['GET', 'POST'])
+@login_required
+@role_required(1, 2, 3)
+def delete_account():
+  selectedUser = User.query.get_or_404(current_user.id)
+
+  try:
+    # Delete all user related info
+    PaymentInformation.query.filter_by(user_id=selectedUser.id).delete()
+    BillingAddress.query.filter_by(user_id=selectedUser.id).delete()
+    Review.query.filter_by(user_id=selectedUser.id).delete()
+    Cart.query.filter_by(user_id=selectedUser.id).delete()
+    UserVoucher.query.filter_by(user_id=selectedUser.id).delete()
+
+    # No orders and tradeins since i think website should store them as safety
+        
+    db.session.delete(selectedUser)
+    db.session.commit()
+  except Exception as e:
+    db.session.rollback()
+    flash("An error occurred while deleting the account. Please try again.", "error")
+    print(f"Error deleting account: {str(e)}")
+
+  return redirect(url_for('views.home'))
 
 def save_picture(form_picture):
   random_hex = secrets.token_hex(8)
@@ -92,19 +133,6 @@ def update_personal_information_form():
 
   # current user because logged in user
   if form.validate_on_submit():
-
-    if form.username.data != current_user.username:
-      user = User.query.filter_by(username=form.username.data).first()
-      if user:
-        flash("That username is taken. Please choose another one.", "error")
-        return render_template('dashboard/settings/updatePersonalInfoForm.html', user=current_user, form=form)
-
-    if form.email.data != current_user.email:
-      user = User.query.filter_by(email=form.email.data).first()
-      if user:
-        flash("That email is taken. Please choose another one.", "error")
-        return render_template('dashboard/settings/updatePersonalInfoForm.html', user=current_user, form=form)
-
     if form.picture.data:
       picture_file = save_picture(form.picture.data)
       current_user.image = picture_file
@@ -117,7 +145,6 @@ def update_personal_information_form():
     current_user.first_name = form.firstName.data
     current_user.last_name = form.lastName.data
     current_user.username = form.username.data
-    current_user.email = form.email.data
     db.session.commit()
     flash("Your account has been updated!", 'success')
     return redirect(url_for('dashboard.update_personal_information'))
@@ -126,10 +153,6 @@ def update_personal_information_form():
     form.firstName.data = current_user.first_name
     form.lastName.data = current_user.last_name
     form.username.data = current_user.username
-    form.email.data = current_user.email
-
-  if form.picture.errors:
-    flash("File does not have an approved extension: jpg, png", "error")
 
   return render_template("dashboard/settings/updatePersonalInfoForm.html", user=current_user, form=form, image_file=image_file)
 
@@ -139,24 +162,18 @@ def update_personal_information_form():
 def change_password():
   form = ChangePasswordForm()
 
+  if current_user.google_account:
+    abort(404)
+
   if form.validate_on_submit():
-    if check_password_hash(current_user.password, form.password.data):
-      flash("New password cannot be the same as the previous password", "error")
-      return render_template('dashboard/settings/changePassword.html', user=current_user, form=form)
-    
-    # update
-    current_user.password = generate_password_hash(form.password.data, method='pbkdf2:sha256')
-    db.session.commit()
-    flash("Password updated successfully!", "success")
-    return redirect(url_for('dashboard.update_personal_information'))
-  
-  if form.confirmPassword.data != form.password.data:
-    flash("Both passwords must match.", "error")
-    return render_template('dashboard/settings/changePassword.html', user=current_user, form=form)
-  
-  if form.password.errors:
-    flash("Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.", "error")
-    return render_template('dashboard/settings/changePassword.html', user=current_user, form=form)
+    try:
+      current_user.password = generate_password_hash(form.password.data, method='pbkdf2:sha256')
+      db.session.commit()
+      flash("Password updated successfully!", "success")
+      return redirect(url_for('dashboard.update_personal_information'))
+    except Exception as e:
+      db.session.rollback()
+      flash("An unexpected error occurred. Please try again.", "error")
 
   return render_template('dashboard/settings/changePassword.html', user=current_user, form=form)
   
@@ -168,25 +185,45 @@ def update_billing_address():
   billing_addresses = BillingAddress.query.filter_by(user_id=current_user.id).all()
 
   if form.validate_on_submit():
-    billing_id = request.form.get('billing_id')  # get billing id from hidden field
-    billing_address = BillingAddress.query.get(billing_id)
-        
-    if billing_address and billing_address.user_id == current_user.id:
-      billing_address.address_one = form.address_one.data
-      billing_address.address_two = form.address_two.data
-      billing_address.unit_number = form.unit_number.data
-      billing_address.postal_code = form.postal_code.data
-      billing_address.phone_number = form.phone_number.data
-            
-      db.session.commit()
-      flash("Billing address updated successfully!", "success")
-    else:
-      flash("Invalid billing address or unauthorized access.", "error")
-        
-    return redirect(url_for('dashboard.update_billing_address'))
-  
-  if form.postal_code.errors:
-    flash("Postal code must be in numbers.", "error")
+    try:
+      billing_id = request.form.get('billing_id')  # get billing id from hidden field
+      billing_address = BillingAddress.query.get(billing_id)
+          
+      if billing_address and billing_address.user_id == current_user.id:
+        billing_address.address_one = form.address_one.data
+        billing_address.address_two = form.address_two.data
+        billing_address.unit_number = form.unit_number.data
+        billing_address.postal_code = form.postal_code.data
+        billing_address.phone_number = form.phone_number.data
+              
+        db.session.commit()
+        flash("Billing address updated successfully!", "success")
+        return jsonify({
+          'success': True,
+          'message': "Billing address updated successfully!"
+        })
+      else:
+        flash("Invalid billing address or unauthorized access.", "error")
+        return jsonify({
+          'success': False,
+          'message': "Invalid billing address or unauthorized access.",
+          'errors': {}
+        })
+    except Exception as e:
+      db.session.rollback()
+      flash("Unexpected error occurred while saving billing address.", "error")
+      return jsonify({
+        'success': False,
+        'message': "Unexpected error occurred while saving billing address.",
+        'errors': {}
+      })
+
+  if form.errors:
+    return jsonify({
+      'success': False,
+      'message': "Please correct the errors below.",
+      'errors': form.errors
+    })
 
   return render_template("dashboard/settings/updateBillingAddress.html", user=current_user, billing_addresses=billing_addresses, form=form)
 
@@ -197,22 +234,23 @@ def add_billing_address():
   form = BillingAddressForm()
 
   if form.validate_on_submit():
-    billing_address = BillingAddress(
-      user_id = current_user.id,
-      address_one = form.address_one.data,
-      address_two = form.address_two.data,
-      unit_number = form.unit_number.data,
-      postal_code = form.postal_code.data,
-      phone_number = form.phone_number.data
-    )
+    try:
+      billing_address = BillingAddress(
+        user_id = current_user.id,
+        address_one = form.address_one.data,
+        address_two = form.address_two.data,
+        unit_number = form.unit_number.data,
+        postal_code = form.postal_code.data,
+        phone_number = form.phone_number.data
+      )
 
-    db.session.add(billing_address)
-    db.session.commit()
-    flash("Billing address added!", "success")
-    return redirect(url_for('dashboard.update_billing_address'))
-
-  if form.postal_code.errors:
-    flash("Postal code must be in numbers.", "error")
+      db.session.add(billing_address)
+      db.session.commit()
+      flash("Billing address added!", "success")
+      return redirect(url_for('dashboard.update_billing_address'))
+    except Exception as e:
+      db.session.rollback()
+      flash("Unexpected error occurred while saving billing address.", "error")
 
   return render_template("dashboard/settings/addBillingAddress.html", user=current_user, form=form)
 
@@ -241,41 +279,45 @@ def update_payment_information():
   payment_types = PaymentType.query.all()
 
   if form.validate_on_submit():
-    method_id = request.form.get('method_id')  # get payment id from hidden field
-    payment_method = PaymentInformation.query.get(method_id)
-        
-    if payment_method and payment_method.user_id == current_user.id:
-      payment_method.paymentType_id = form.paymentType_id.data
-      payment_method.card_name = form.card_name.data
-      payment_method.card_number = form.card_number.data
-      payment_method.expiry_date = form.expiry_date.data
-      payment_method.card_cvv = form.card_cvv.data
-            
-      db.session.commit()
-      flash("Payment method updated successfully!", "success")
-    else:
-      flash("Invalid Payment method or unauthorized access.", "error")
-        
-    return redirect(url_for('dashboard.update_payment_information'))
-  
-  # Handle specific validation errors for any scenario
+    try:
+      method_id = request.form.get('method_id')  # get payment id from hidden field
+      payment_method = PaymentInformation.query.get(method_id)
+          
+      if payment_method and payment_method.user_id == current_user.id:
+        payment_method.paymentType_id = form.paymentType_id.data
+        payment_method.card_name = form.card_name.data
+        payment_method.card_number = form.card_number.data
+        payment_method.expiry_date = form.expiry_date.data
+        payment_method.card_cvv = form.card_cvv.data
+              
+        db.session.commit()
+        flash("Payment method updated successfully!", "success")
+        return jsonify({
+          'success': True,
+          'message': "Payment information updated successfully!"
+        })
+      else:
+        flash("Invalid Payment method or unauthorized access.", "error")
+        return jsonify({
+          'success': False,
+          'message': "Invalid payment information or unauthorized access.",
+          'errors': {}
+        })    
+    except Exception as e:
+      db.session.rollback()
+      flash("Unexpected error occurred while saving payment information.", "error")
+      return jsonify({
+        'success': False,
+        'message': "Unexpected error occurred while saving payment information.",
+        'errors': {}
+      })
+
   if form.errors:
-    for field, errors in form.errors.items():
-      for error in errors:
-        # Convert field name to more readable format
-        field_name = {
-          'paymentType_id': 'Card Type',
-          'card_name': 'Card Name',
-          'card_number': 'Card Number',
-          'expiry_date': 'Expiry Date',
-          'card_cvv': 'CVV'
-        }.get(field, field.replace('_', ' ').title())
-                
-        # Don't include field name if it's already in the error message
-        if error.startswith('This appears to be') or error.startswith('Invalid'):
-          flash(error, "error")
-        else:
-          flash(f"{field_name}: {error}", "error")
+    return jsonify({
+      'success': False,
+      'message': "Please correct the errors below.",
+      'errors': form.errors
+    })
 
   return render_template("dashboard/settings/updatePaymentInfo.html", user=current_user, payment_methods=payment_methods, payment_types=payment_types, form=form)
 
@@ -286,38 +328,23 @@ def add_payment_method():
   form = PaymentMethodForm()
 
   if form.validate_on_submit():
-    payment_method = PaymentInformation(
-      user_id = current_user.id,
-      paymentType_id = form.paymentType_id.data,
-      card_name = form.card_name.data,
-      card_number = form.card_number.data,
-      expiry_date = form.expiry_date.data,
-      card_cvv = form.card_cvv.data
-    )
+    try:
+      payment_method = PaymentInformation(
+        user_id = current_user.id,
+        paymentType_id = form.paymentType_id.data,
+        card_name = form.card_name.data,
+        card_number = form.card_number.data,
+        expiry_date = form.expiry_date.data,
+        card_cvv = form.card_cvv.data
+      )
 
-    db.session.add(payment_method)
-    db.session.commit()
-    flash("Payment Method added!", "success")
-    return redirect(url_for('dashboard.update_payment_information'))
-
-  # Handle specific validation errors for any scenario
-  if form.errors:
-    for field, errors in form.errors.items():
-      for error in errors:
-        # Convert field name to more readable format
-        field_name = {
-          'paymentType_id': 'Card Type',
-          'card_name': 'Card Name',
-          'card_number': 'Card Number',
-          'expiry_date': 'Expiry Date',
-          'card_cvv': 'CVV'
-        }.get(field, field.replace('_', ' ').title())
-                
-        # Don't include field name if it's already in the error message
-        if error.startswith('This appears to be') or error.startswith('Invalid'):
-          flash(error, "error")
-        else:
-          flash(f"{field_name}: {error}", "error")
+      db.session.add(payment_method)
+      db.session.commit()
+      flash("Payment Method added!", "success")
+      return redirect(url_for('dashboard.update_payment_information'))
+    except Exception as e:
+      db.session.rollback()
+      flash("Unexpected error occurred while saving payment information.", "error")
 
   return render_template("dashboard/settings/addPaymentMethod.html", user=current_user, form=form)
 
@@ -335,3 +362,36 @@ def delete_payment_method(id):
   else:
     flash("Invalid billing address or unauthorized access.", "error")
     return redirect(url_for('dashboard.update_payment_information'))
+  
+@dashboard.route('/settings/manage-notifications')
+@login_required
+@role_required(1, 2, 3)
+def manage_notifications():
+  mailing_list_entry = MailingList.query.filter_by(email=current_user.email).first()
+
+  return render_template("dashboard/settings/manageNotifications.html", user=current_user, mailing_list_entry=mailing_list_entry)
+
+@dashboard.route('/settings/toggle-marketing-emails', methods=['POST'])
+@login_required
+@role_required(1, 2, 3)
+def toggle_marketing_emails():
+  data = request.get_json()
+  subscribed = data.get('subscribed', False)
+    
+  try:
+    mailing_list_entry = MailingList.query.filter_by(email=current_user.email).first()
+        
+    if subscribed and not mailing_list_entry:
+      new_entry = MailingList(
+        email=current_user.email,
+        unsubscribe_token=secrets.token_urlsafe(32)
+      )
+      db.session.add(new_entry)
+    elif not subscribed and mailing_list_entry:
+      db.session.delete(mailing_list_entry)
+        
+    db.session.commit()
+    return jsonify({'success': True})
+  except Exception as e:
+    db.session.rollback()
+    return jsonify({'success': False, 'error': str(e)}), 500

@@ -4,15 +4,13 @@
 {% block styles %}
 <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/settings/settings.css') }}">
 <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/settings/updatePersonalInfo.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard/accounts/deleteModal.css') }}">
 {% endblock %}
 
 {% block title %}Update Personal Information{% endblock %}
 
 {% block headerContent %}
-<div class="settings__header">
-  <h1 id="settings__title">Update Personal Information</h1>
-  <p id="settings__subtitles">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</p>
-</div>
+<div class="headerGradient"></div>
 {% endblock %}
 
 {% block content %}
@@ -21,50 +19,71 @@
   {% include "components/flashValidation.html" %}
 
   <!-- Back button -->
-  <a href="{{ url_for('dashboard.user_settings') }}" class="back__button--darker">Back</a>
+  <a href="{{ url_for('dashboard.user_settings') }}" class="back__link"><i class="fa-solid fa-chevron-left fa-sm"></i>Back</a>
 
 <div class="profile__content">
   <div class="profile__left">
     <div class="profile__pictureBox">
       <img src="{{ image_file }}" id="mini_profile_image" alt="Mini profile image">
+      <div class="profile__topInfo">
+        <p id="profile__topName">{{ user.first_name }} {{ user.last_name }}</p>
+        <span id="profile__topId">User ID: {{ user.id }}</span>
+      </div>
     </div>
     <div class="profile__informationBox">
+      <h3>Personal Information</h3>
       <div class="profile__info1 profile__row">
         <div class="profile__firstName">
-          <h3>First Name</h3>
-          <p>{{ user.first_name }}</p>
+          <p class="profile__header">First Name</p>
+          <span>{{ user.first_name }}</span>
         </div>
         <div class="profile__lastName">
-          <h3>Last Name</h3>
-          <p>{{ user.last_name or 'N/A' }}</p>
+          <p class="profile__header">Last Name</p>
+          <span>{{ user.last_name or 'N/A' }}</span>
         </div>
       </div>
       <div class="profile__info2 profile__row">
         <div class="profile__username">
-          <h3>Username</h3>
-          <p>{{ user.username }}</p>
+          <p class="profile__header">Username</p>
+          <span>{{ user.username }}</span>
         </div>
         <div class="profile__email">
-          <h3>Email Address</h3>
-          <p>{{ user.email }}</p>
-        </div>
-      </div>
-      <div class="profile__info3 profile__row">
-        <div class="profile__userId">
-          <h3>User ID</h3>
-          <p>{{ user.id }}</p>
+          <p class="profile__header">Email Address</p>
+          <span>{{ user.email }}</span>
         </div>
       </div>
     </div>
   </div>
   <div class="profile__right">
     <div class="profile__buttons">
-      <a href="{{ url_for('dashboard.update_personal_information_form') }}" class="back__button--darker"><i class="fa-solid fa-pen"></i>&nbsp; Update</a>
-      <a href="{{ url_for('dashboard.change_password') }}" class="back__button--darker">Change Password</a>
+      <a href="{{ url_for('dashboard.update_personal_information_form') }}" class="account__editButton">Edit</a>
+      {% if not user.google_account %}
+        <a href="{{ url_for('dashboard.change_password') }}" class="account__editButton2">Change Password</a>
+      {% endif %}
     </div>
   </div>
 </div>
 
+<div class="profile__lowerButtons">
+  {% if not user.google_account %}
+    <a href="{{ url_for('dashboard.change_email') }}" class="account__editButton">Change Email</a>
+  {% endif %}
+  <form id="deleteForm-{{ user.id }}" action="{{ url_for('dashboard.delete_account', id=user.id) }}" method="POST" onsubmit="event.preventDefault(); openDeleteModal({{ user.id }})">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="button" id="account__deleteButton" onclick="openDeleteModal({{ user.id }})">Delete</button>
+  </form>
+</div>
+
 <!-- <img src="{{ image_file }}" alt=""> -->
 
+<!-- modal -->
+{% include "components/deleteModal.html" %}
+
+{% endblock %}
+
+{% block body_scripts %}
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/deleteModal.js') }}"
+></script>
 {% endblock %}

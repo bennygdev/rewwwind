@@ -86,12 +86,14 @@
   </div>
   <div class="offcanvas-body">
     <ul class="offcanvas-nav">
-      <li><a class='nav__link offcanvas__link--active' href='/'>Home</a></li>
-      <li><a class='nav__link' href='/products'>Products</a></li>
-      <li><a class='nav__link' href='/trade-in'>Trade-in</a></li>
-      <li><a class='nav__link' href='/about-us'>About</a></li>
-      <li><a class='nav__link' href='/wishlist'>Wishlist</a></li>
-      <li><a class='nav__link' href='/cart'>Cart</a></li>
+      <li><a class="nav__link {{ 'offcanvas__link--active' if active_page == 'home' else '' }}" href='/'>Home</a></li>
+      <li><a class="nav__link {{ 'offcanvas__link--active' if active_page == 'products' else '' }}" href='/products'>Products</a></li>
+      <li><a class="nav__link {{ 'offcanvas__link--active' if active_page == 'tradein' else '' }}" href='/trade-in'>Trade-in</a></li>
+      <li><a class="nav__link {{ 'offcanvas__link--active' if active_page == 'about' else '' }}" href='/about-us'>About</a></li>
+      <li><a class="nav__link {{ 'offcanvas__link--active' if active_page == 'wishlist' else '' }}" href='/wishlist'>Wishlist</a></li>
+      <li><a class="nav__link {{ 'offcanvas__link--active' if active_page == 'cart' else '' }}" href='/cart'>Cart</a></li>
+      <li><a class="nav__link" href='/dashboard/overview'>My Dashboard</a></li>
+      <li><a class="nav__link" href='/dashboard/settings'>Settings</a></li>
     </ul>
     <div class="offcanvas-nav__extra">
       <a href="/"><p>Privacy Policy</p></a>

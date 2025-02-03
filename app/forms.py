@@ -1,77 +1,191 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from flask import request, flash
+from flask_login import current_user
 from werkzeug.utils import secure_filename
-from wtforms import StringField, TextAreaField, IntegerField, DateField, FloatField, FieldList, FormField, SelectField, BooleanField, FileField, MultipleFileField, EmailField, PasswordField, RadioField, HiddenField, SubmitField
+from werkzeug.security import check_password_hash
+from wtforms import StringField, TextAreaField, IntegerField, DateField, FloatField, FieldList, FormField, SelectField, BooleanField, FileField, MultipleFileField, EmailField, PasswordField, RadioField, SelectMultipleField, HiddenField, SubmitField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, Optional, NumberRange, Regexp, ValidationError
 from PIL import Image # file object validator
 from mimetypes import guess_type # file extension validator
-from .models import User, Category, Product
 from wtforms.validators import Regexp
+from .models import User, Category, SubCategory, Product, MailingList, Voucher
+from datetime import datetime
+import re
+import json
 
 # Account-related forms
 class LoginForm(FlaskForm):
-  emailUsername = StringField('Email/Username', validators=[DataRequired()])
-  password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
+  emailUsername = StringField('Email/Username', validators=[DataRequired(message="Email or username is required")])
+  password = PasswordField('Password', validators=[DataRequired(message="Password is required"), Length(min=6)])
   submit = SubmitField('Login')
 
+  def validate_emailUsername(self, field):
+    user = User.query.filter((User.email == field.data) | (User.username == field.data)).first()
+    if not user:
+      raise ValidationError('Invalid email or username')
+    elif user.google_account:
+      raise ValidationError('Please use Google Sign-In for this account')
+        
+    # Store the user for password validation
+    self.user = user
+
+  def validate_password(self, field):
+    if hasattr(self, 'user'):  # Only check if user exists (passed email validation)
+      if not check_password_hash(self.user.password, field.data):
+        raise ValidationError('Invalid password')
+
 class RegisterForm(FlaskForm):
-  firstName = StringField('First Name', validators=[DataRequired()])
-  lastName = StringField('Last Name', validators=[DataRequired()])
-  email = EmailField('Email', validators=[DataRequired(), Email()])
-  password = PasswordField('Password', validators=[DataRequired(), Length(min=8), Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", message="Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.")])
-  confirmPassword = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message="Passwords must match")])
+  firstName = StringField('First Name', validators=[DataRequired(message="First name is required")])
+  lastName = StringField('Last Name', validators=[DataRequired(message="Last name is required")])
+  email = EmailField('Email', validators=[DataRequired(message="Email is required"), Email(message="Please enter a valid email address")])
+  password = PasswordField('Password', validators=[DataRequired(message="Password is required"), Length(min=8), Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", message="Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.")])
+  confirmPassword = PasswordField('Confirm Password', validators=[DataRequired(message="Please confirm your password"), EqualTo('password', message="Passwords must match")])
   submit = SubmitField('Create Account')
 
+  def validate_email(self, field):
+    user = User.query.filter_by(email=field.data).first()
+    if user:
+      raise ValidationError('An account with that email already exists.')
+
 class UsernameForm(FlaskForm):
-  username = StringField('Username', validators=[DataRequired(), Length(max=15)])
+  username = StringField('Username', validators=[DataRequired(message="Username is required"), Length(max=15, message="Username must be less than 15 characters")])
   submit = SubmitField('Proceed')
 
+  def validate_username(self, field):
+    user = User.query.filter_by(username=field.data).first()
+    if user:
+      raise ValidationError('This username is already taken.')
+
 class RequestResetForm(FlaskForm):
-  email = EmailField('Email', validators=[DataRequired(), Email()])
+  email = EmailField('Email', validators=[DataRequired(message="Email is required"), Email(message="Please enter a valid email address")])
   submit = SubmitField('Request Password Reset')
 
+  def validate_email(self, field):
+    user = User.query.filter_by(email=field.data).first()
+    if not user:
+      raise ValidationError('There is no account with that email')
+    elif user.google_account:
+      raise ValidationError('This email is linked to a Google account. Please sign in with Google')
+    self.user = user
+
 class ResetPasswordForm(FlaskForm):
-  password = PasswordField('Password', validators=[DataRequired(), Length(min=8), Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", message="Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.")])
-  confirmPassword = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message="Passwords must match")])
+  password = PasswordField('Password', validators=[DataRequired(message="Password is required"), Length(min=8), Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", message="Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.")])
+  confirmPassword = PasswordField('Confirm Password', validators=[DataRequired(message="Please confirm your password"), EqualTo('password', message="Passwords must match")])
   submit = SubmitField('Reset Password')
 
+  def __init__(self, user, *args, **kwargs):
+    super(ResetPasswordForm, self).__init__(*args, **kwargs)
+    self.user = user
+
+  def validate_password(self, field):
+    if check_password_hash(self.user.password, field.data):
+      raise ValidationError("New password cannot be the same as the previous password")
+
 class UpdatePersonalInformation(FlaskForm):
-  firstName = StringField('First Name', validators=[DataRequired()])
-  lastName = StringField('Last Name') # most wesbites do not need last name
+  firstName = StringField('First Name', validators=[DataRequired(), Length(max=150, message="First name cannot exceed 150 characters.")])
+  lastName = StringField('Last Name', validators=[Length(max=150, message="Last name cannot exceed 150 characters.")]) # most wesbites do not need last name
   username = StringField('Username', validators=[DataRequired(), Length(max=15)])
-  email = EmailField('Email', validators=[DataRequired(), Email()])
-  picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
+  picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'], 'Only JPG and PNG images are allowed.')])
   submit = SubmitField('Update')
+
+  def validate_username(self, username):
+    if username.data != current_user.username:
+      user = User.query.filter_by(username=username.data).first()
+      if user:
+        raise ValidationError("That username is taken. Please choose another one.")
+
+  def validate_picture(self, picture):
+    if picture.data:
+      try:
+        # Attempt to open the image to verify it's valid
+        Image.open(picture.data)
+      except:
+        raise ValidationError("The uploaded file is not a valid image.")
 
 class ChangePasswordForm(FlaskForm):
   password = PasswordField('Password', validators=[DataRequired(), Length(min=8), Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", message="Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.")])
   confirmPassword = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password', message="Passwords must match")])
   submit = SubmitField('Save')
 
-class AdminChangeUserInfoForm(FlaskForm):
-  firstName = StringField('First Name', validators=[DataRequired()])
-  lastName = StringField('Last Name')
-  username = StringField('Username', validators=[DataRequired(), Length(max=15)])
+  def validate_password(self, password):
+    if check_password_hash(current_user.password, password.data):
+      raise ValidationError("New password cannot be the same as your current password.")
+
+class ChangeEmailForm(FlaskForm):
   email = EmailField('Email', validators=[DataRequired(), Email()])
+  submit = SubmitField('Save')
+
+  def validate_email(self, email):
+    if email.data == current_user.email:
+      raise ValidationError("New email cannot be the same as your current email.")
+            
+    user = User.query.filter_by(email=email.data).first()
+    if user:
+      raise ValidationError("This email is already taken. Please try again.")
+
+class AdminChangeUserInfoForm(FlaskForm):
+  firstName = StringField('First Name', validators=[DataRequired(message="First name is required."), Length(max=150, message="First name cannot exceed 150 characters.")])
+  lastName = StringField('Last Name', validators=[Length(max=150, message="Last name cannot exceed 150 characters.")])
+  username = StringField('Username', validators=[DataRequired(message="Username is required."), Length(max=15, message="Username cannot exceed 15 characters.")])
+  email = EmailField('Email', validators=[DataRequired(message="Email is required."), Email(message="Please enter a valid email address.")])
   submit = SubmitField('Update')
 
+  def __init__(self, original_username, original_email, *args, **kwargs):
+    super(AdminChangeUserInfoForm, self).__init__(*args, **kwargs)
+    self.original_username = original_username
+    self.original_email = original_email
+
+  def validate_username(self, username):
+    if username.data != self.original_username:
+      user = User.query.filter_by(username=username.data).first()
+      if user:
+        raise ValidationError("This username is already taken.")
+
+  def validate_email(self, email):
+    if email.data != self.original_email:
+      user = User.query.filter_by(email=email.data).first()
+      if user:
+        raise ValidationError("This email address is already registered.")
+
 class OwnerAddAccountForm(FlaskForm):
-  firstName = StringField('First Name', validators=[DataRequired()])
-  lastName = StringField('Last Name', validators=[DataRequired()])
-  username = StringField('Username', validators=[DataRequired(), Length(max=15)])
-  email = EmailField('Email', validators=[DataRequired(), Email()])
-  password = PasswordField('Password', validators=[DataRequired(), Length(min=8), Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", message="Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.")])
-  role_id = IntegerField('Role ID', validators=[DataRequired()])
+  firstName = StringField('First Name', validators=[DataRequired(message="First name is required."), Length(max=150, message="First name cannot exceed 150 characters.")])
+  lastName = StringField('Last Name', validators=[DataRequired(message="Last name is required."), Length(max=150, message="Last name cannot exceed 150 characters.")])
+  username = StringField('Username', validators=[DataRequired(message="Username is required."), Length(max=15, message="Username cannot exceed 15 characters.")])
+  email = EmailField('Email', validators=[DataRequired(message="Email is required."), Email(message="Please enter a valid email address.")])
+  password = PasswordField('Password', validators=[DataRequired(message="Password is required."), Length(min=8), Regexp(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", message="Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.")])
+  role_id = IntegerField('Role ID', validators=[DataRequired(message="Please select a role.")])
   submit = SubmitField('Create Account')
 
+  def validate_username(self, username):
+    user = User.query.filter_by(username=username.data).first()
+    if user:
+      raise ValidationError("This username is already taken.")
+
+  def validate_email(self, email):
+    user = User.query.filter_by(email=email.data).first()
+    if user:
+      raise ValidationError("This email address is already registered.")
+
 class BillingAddressForm(FlaskForm):
-  address_one = StringField('Address One', validators=[DataRequired()])
-  address_two = StringField('Address Two')
-  unit_number = StringField('Unit Number', validators=[DataRequired(), Length(max=15)])
-  postal_code = StringField('Postal Code', validators=[DataRequired(), Length(min=5, max=6), Regexp(r"^[0-9]*$", message="Postal code must be numbers only.")])
-  phone_number = IntegerField('Phone Number', validators=[DataRequired(), NumberRange(min=60000000, max=99999999)])
+  address_one = StringField('Address One', validators=[DataRequired(message="Address is required"), Length(min=5, max=255, message="Address must be between 5 and 255 characters")])
+  address_two = StringField('Address Two', validators=[Length(max=255, message="Address cannot exceed 255 characters")])
+  unit_number = StringField('Unit Number', validators=[DataRequired(), Length(max=15, message="Unit number cannot exceed 15 characters"), Regexp(r'^[A-Za-z0-9-]+$', message="Unit number can only contain letters, numbers, and hyphens")])
+  postal_code = StringField('Postal Code', validators=[DataRequired(message="Postal code is required"), Length(min=5, max=6, message="Postal code must be between 5 to 6 digits"), Regexp(r"^[0-9]*$", message="Postal code must contain only numbers.")])
+  phone_number = StringField('Phone Number', validators=[DataRequired(message="Phone number is required")])
   submit = SubmitField('Save')
+        
+  def validate_phone_number(self, field):
+    if field.data:
+      cleaned_number = ''.join(filter(str.isdigit, field.data))
+            
+      if not cleaned_number.startswith(('6', '8', '9')):
+        raise ValidationError("Phone number must start with 6, 8, or 9")
+            
+      if len(cleaned_number) != 8:
+        raise ValidationError("Phone number must be 8 digits long")
+            
+      field.data = cleaned_number
 
 class PaymentMethodForm(FlaskForm):
   paymentType_id = RadioField(
@@ -83,10 +197,10 @@ class PaymentMethodForm(FlaskForm):
     ],
     validators=[DataRequired()]
   )
-  card_name = StringField('Card Name', validators=[DataRequired()])
-  card_number = StringField('Card Number', validators=[DataRequired(), Length(min=15, max=16), Regexp(r"^[0-9]*$", message="Card number must be numbers only.")])
-  expiry_date = StringField('Expiry Date (MM/YY)', validators=[DataRequired(), Length(max=5), Regexp(r'^(0[1-9]|1[0-2])\/\d{2}$', message="Expiry date must be in MM/YY format.")])
-  card_cvv = PasswordField('CVV', validators=[DataRequired(), Length(min=3, max=4), Regexp(r"^[0-9]*$", message="CVV must be numbers only.")])
+  card_name = StringField('Card Name', validators=[DataRequired(message="Cardholder name is required"), Length(min=2, max=255, message="Name must be between 2 and 255 characters"), Regexp(r'^[A-Za-z\s-]+$', message="Name can only contain letters, spaces, and hyphens")])
+  card_number = StringField('Card Number', validators=[DataRequired(message="Card number is required"), Length(min=15, max=16), Regexp(r'^\d+$', message="Card number must contain only numbers")])
+  expiry_date = StringField('Expiry Date (MM/YY)', validators=[DataRequired(message="Expiry date is required"), Length(max=5)])
+  card_cvv = PasswordField('CVV', validators=[DataRequired(message="CVV is required"), Regexp(r'^\d+$', message="CVV must contain only numbers")])
   submit = SubmitField('Save')
 
   def get_card_type_from_number(self, card_number):
@@ -100,45 +214,70 @@ class PaymentMethodForm(FlaskForm):
     return None
 
   def validate_card_number(self, field):
-    card_number = field.data
+    if not field.data:
+        return
+            
+    card_number = field.data.strip()
     selected_type = self.paymentType_id.data
     detected_type = self.get_card_type_from_number(card_number)
-
-    # If the number could be valid for any card type, store that information
-    possible_types = []
         
-    # Check Visa format
-    if card_number.startswith('4') and (len(card_number) in [13, 16]):
-      possible_types.append('Visa')
-            
-    # Check Mastercard format
-    if card_number.startswith(('51', '52', '53', '54', '55')) and len(card_number) == 16:
-      possible_types.append('Mastercard')
-            
-    # Check Amex format
-    if card_number.startswith(('34', '37')) and len(card_number) == 15:
-      possible_types.append('American Express')
+    # Validate card number format based on type
+    if selected_type == '1':  # Visa
+      if not (card_number.startswith('4') and len(card_number) in [13, 16]):
+        raise ValidationError('Invalid Visa card number. Must start with 4 and be 13 or 16 digits')
+    elif selected_type == '2':  # Mastercard
+      if not (card_number.startswith(('51', '52', '53', '54', '55')) and len(card_number) == 16): 
+        raise ValidationError('Invalid Mastercard number. Must start with 51-55 and be 16 digits')
+    elif selected_type == '3':  # Amex
+      if not (card_number.startswith(('34', '37')) and len(card_number) == 15):
+        raise ValidationError('Invalid American Express card number. Must start with 34 or 37 and be 15 digits')
 
-    # If the number matches the selected type's format, it's valid
-    if detected_type == selected_type:
+    # Check if card type matches selected type
+    if detected_type and detected_type != selected_type:
+      card_types = {
+        '1': 'Visa',
+        '2': 'Mastercard',
+        '3': 'American Express'
+      }
+      detected_name = card_types.get(detected_type, 'Unknown')
+      raise ValidationError(f'This appears to be a {detected_name} card number. Please select the correct card type')
+    
+  def validate_expiry_date(self, field):
+    if not field.data:
       return
-
-    # If the number doesn't match any valid format
-    if not possible_types:
-      if selected_type == '1':  # Visa
-        raise ValidationError('Invalid Visa card number. Must start with 4 and be 13 or 16 digits long.')
-      elif selected_type == '2':  # Mastercard
-        raise ValidationError('Invalid Mastercard number. Must start with 51-55 and be 16 digits long.')
-      elif selected_type == '3':  # Amex
-        raise ValidationError('Invalid American Express card number. Must start with 34 or 37 and be 15 digits long.')
+            
+    if not re.match(r'^\d{2}/\d{2}$', field.data):
+      raise ValidationError('Expiry date must be in MM/YY format')
+            
+    month, year = field.data.split('/')
+    try:
+      month = int(month)
+      year = int('20' + year)  # Convert to full year
+    except ValueError:
+      raise ValidationError('Expiry date must contain valid numbers')
         
-    # If the number is valid for a different card type than selected
-    elif possible_types and detected_type != selected_type:
-      raise ValidationError(f'This appears to be a {", ".join(possible_types)} card number. Please select the correct card type or enter a different card number.')
+    # Validate month range
+    if not 1 <= month <= 12:
+      raise ValidationError('Month must be between 01 and 12')
+        
+    current_date = datetime.now()
+    current_year = current_date.year
+    current_month = current_date.month
+        
+    # Validate expiration
+    if year < current_year or (year == current_year and month < current_month):
+      raise ValidationError('Card has expired')
+        
+    # Validate future date
+    if year > current_year + 10:
+      raise ValidationError('Expiry date too far in the future')
 
   def validate_card_cvv(self, field):
+    if not field.data:
+      return
+
     payment_type = self.paymentType_id.data
-    cvv = field.data
+    cvv = field.data.strip()
 
     if payment_type == '3':  # American Express
       if len(cvv) != 4:
@@ -146,7 +285,7 @@ class PaymentMethodForm(FlaskForm):
     else:  # Visa and Mastercard
       if len(cvv) != 3:
         if len(cvv) == 4:
-          raise ValidationError('This appears to be an American Express CVV. Please enter a 3-digit CVV for this card type.')
+          raise ValidationError('Please enter a 3-digit CVV for this card type')
         else:
           raise ValidationError('Please enter a valid 3-digit CVV')
 
@@ -178,8 +317,9 @@ class AddProductForm(FlaskForm):
   
     # populating product select choices from sql.
     categories = Category.query.all()
+    subcategories = SubCategory.query.filter(SubCategory.category_id==1).all()
     self.productType.choices = [(category.id, category.category_name) for category in categories]
-    self.productGenre.choices = [(category.id, category.category_name) for category in categories]
+    self.productGenre.choices = [(subcategory.id, subcategory.subcategory_name) for subcategory in subcategories]
 
     # populating condition select choices
     condition_choices = [
@@ -208,6 +348,70 @@ class AddProductForm(FlaskForm):
               image.verify()
           except (IOError, SyntaxError):
               raise ValidationError('The image file could not be submitted. Please check if the image file is corrupted, and submit a different file if so.')
+          
+
+# SHELVE FUNCTIONALITY PURELY FOR ADDPRODUCTFORM, other logic found in manageProducts.save_product_form route, and also the most bottom of addProduct.js
+class AddProductFormData:
+  def __init__(self, name, creator, description, type, genre, conditions, featured_special, featured_staff):
+    self.__name = name
+    self.__creator = creator
+    self.__description = description
+    self.__type = type
+    self.__genre = genre
+    self.__conditions = conditions
+    self.__featured_special = featured_special
+    self.__featured_staff = featured_staff
+  
+  def to_dict(self):
+    return {
+        "name": self.__name,
+        "creator": self.__creator,
+        "description": self.__description,
+        "type": self.__type,
+        "genre": self.__genre,
+        "featured_special": self.__featured_special,
+        "featured_staff": self.__featured_staff
+    }
+  
+  def get_name(self):
+    return self.__name
+  def set_name(self, name):
+    self.__name = name
+  
+  def get_creator(self):
+    return self.__creator
+  def set_creator(self, creator):
+    self.__creator = creator
+  
+  def get_description(self):
+    return self.__description
+  def set_description(self, description):
+    self.__description = description
+  
+  def get_type(self):
+    return self.__type
+  def set_type(self, type):
+    self.__type = type
+  
+  def get_genre(self):
+    return self.__genre
+  def set_genre(self, genre):
+    self.__genre = genre
+  
+  def get_conditions(self):
+    return self.__conditions
+  def set_conditions(self, conditions):
+    self.__conditions = conditions
+  
+  def get_featured_special(self):
+    return self.__featured_special
+  def set_featured_special(self, featured_special):
+    self.__featured_special = featured_special
+  
+  def get_featured_staff(self):
+    return self.__featured_staff
+  def set_featured_staff(self, featured_staff):
+    self.__featured_staff = featured_staff
 
 class DeleteProductForm(FlaskForm):
   productID = HiddenField()
@@ -237,9 +441,15 @@ class DeleteReviewForm(FlaskForm):
     if field.data != 'CONFIRMDELETE':
        raise ValidationError('The confirmation input is invalid. Please type CONFIRMDELETE to confirm the deletion.')
 
+# Order-related Forms
+class UpdateOrderForm(FlaskForm):
+  approved = RadioField('Approve Order', choices=['Approved', 'Not Approved'], default='Not Approved')
+  submit = SubmitField('Update Approval')
+
 # Cart-related Forms
 class AddToCartForm(FlaskForm):
   condition = HiddenField(default=0)
+  quantity = IntegerField('Quantity')
   submit = SubmitField('Add to Cart')
 
 #Trade-in form stuff
@@ -256,7 +466,6 @@ class TradeItemForm(FlaskForm):
     ], validators=[DataRequired()])
 
     images = FileField('Images', validators=[FileAllowed(['jpg', 'jpeg', 'png'], 'Only image files are allowed.')])
-    
     title = StringField('Title', validators=[DataRequired(), Length(min=3, max=255, message="Title must be at least 3 characters.")])
     author = StringField('Author / Artist', validators=[DataRequired(), Length(min=3, max=255, message="Author must be at least 3 characters.")])
     genre = StringField('Genre', validators=[DataRequired(), Length(min=3, max=255, message="Genre must be at least 3 characters.")])
@@ -267,3 +476,179 @@ class TradeItemForm(FlaskForm):
     ])
     
     submit = SubmitField('Submit')
+    
+class VoucherForm(FlaskForm):
+  code = StringField('Voucher Code', validators=[DataRequired(), Length(min=3, max=50), Regexp(r'^[A-Za-z0-9_-]*$', message="Voucher code can only contain letters, numbers, underscores and dashes")])
+  description = TextAreaField('Description', validators=[DataRequired(), Length(max=1000)])
+  voucher_type = SelectField('Voucher Type', choices=[
+    ('percentage', 'Percentage Discount'),
+    ('fixed_amount', 'Fixed Amount Off'),
+    ('free_shipping', 'Free Shipping')
+  ], validators=[DataRequired()])
+  discount_value = FloatField('Discount Value', validators=[Optional(), NumberRange(min=0)])
+    
+  # Criteria fields
+  criteria_json = StringField('Voucher Criteria')
+  # min_cart_amount = FloatField('Minimum Cart Amount', validators=[Optional(), NumberRange(min=0)])
+  # min_cart_items = IntegerField('Minimum Cart Items', validators=[Optional(), NumberRange(min=1)])
+  # first_purchase_only = BooleanField('First Purchase Only')
+  eligible_categories = SelectMultipleField('Eligible Categories', 
+    choices=[
+      ('Vinyl', 'Vinyl'),
+      ('Book', 'Book')
+    ],
+    validators=[DataRequired(message="Please select at least one category")]
+  )
+    
+  expiry_days = SelectField('Expiry Period', choices=[
+    (7, '7 Days'),
+    (14, '14 Days'),
+    (30, '30 Days'),
+    (60, '60 Days'),
+    (90, '90 Days')
+  ], coerce=int, validators=[DataRequired(message="Expiry day is required")])
+
+  is_active = RadioField('Voucher Status', choices=[
+    ('True', 'Active'),
+    ('False', 'Not Active')
+  ], default='True', validators=[DataRequired(message="Please select one voucher status")])
+
+  submit = SubmitField('Create Voucher')
+    
+  def __init__(self, *args, **kwargs):
+    super(VoucherForm, self).__init__(*args, **kwargs)
+    # Populate categories dynamically
+    self.eligible_categories.choices = [
+      ('Vinyl', 'Vinyl'),
+      ('Book', 'Book')
+    ]
+    
+  def validate_code(self, field):
+    if Voucher.query.filter_by(voucher_code=field.data).first():
+      raise ValidationError('This voucher code is already in use.')
+    
+    if not re.match(r'^[A-Za-z0-9_-]*$', field.data):
+      raise ValidationError('Voucher code can only contain letters, numbers, underscores and dashes')
+
+  def validate_description(self, field):
+    if len(field.data) > 1000:
+        raise ValidationError('Description cannot exceed 1000 characters.')
+
+  def validate_discount_value(self, field):
+    try:
+      value = float(field.data)
+    except (TypeError, ValueError):
+      raise ValidationError('Discount value must be a number')
+
+    if self.voucher_type.data == 'percentage':
+      if not 0 <= field.data <= 100:
+        raise ValidationError('Percentage discount must be between 0 and 100')
+    elif self.voucher_type.data == 'fixed_amount':
+      if field.data <= 0:
+        raise ValidationError('Fixed amount discount must be greater than 0')
+    elif self.voucher_type.data == 'free_shipping':
+      field.data = 0  # No discount value needed for free shipping
+
+  def validate_eligible_categories(self, field):
+    if not field.data:
+      raise ValidationError('Please select at least one eligible category.')
+
+  def validate_criteria_json(self, field):
+    if not field.data or field.data == '[]':
+      raise ValidationError('Please add at least one voucher criteria.')
+
+class EditVoucherForm(FlaskForm):
+  code = StringField('Voucher Code', validators=[DataRequired(), Length(min=3, max=50), Regexp(r'^[A-Za-z0-9_-]*$', message="Voucher code can only contain letters, numbers, underscores and dashes")])
+  description = TextAreaField('Description', validators=[DataRequired(), Length(max=1000)])
+  voucher_type = SelectField('Voucher Type', choices=[
+    ('percentage', 'Percentage Discount'),
+    ('fixed_amount', 'Fixed Amount Off'),
+    ('free_shipping', 'Free Shipping')
+  ], validators=[DataRequired()])
+  discount_value = FloatField('Discount Value', validators=[Optional(), NumberRange(min=0)])
+    
+  # Criteria fields
+  criteria_json = StringField('Voucher Criteria')
+  # min_cart_amount = FloatField('Minimum Cart Amount', validators=[Optional(), NumberRange(min=0)])
+  # min_cart_items = IntegerField('Minimum Cart Items', validators=[Optional(), NumberRange(min=1)])
+  # first_purchase_only = BooleanField('First Purchase Only')
+  eligible_categories = SelectMultipleField('Eligible Categories', 
+    choices=[
+      ('Vinyl', 'Vinyl'),
+      ('Book', 'Book')
+    ],
+    validators=[DataRequired(message="Please select at least one category")]
+  )
+    
+  expiry_days = SelectField('Expiry Period', choices=[
+    (7, '7 Days'),
+    (14, '14 Days'),
+    (30, '30 Days'),
+    (60, '60 Days'),
+    (90, '90 Days')
+  ], coerce=int, validators=[DataRequired(message="Expiry day is required")])
+
+  is_active = RadioField('Voucher Status', choices=[
+    ('True', 'Active'),
+    ('False', 'Not Active')
+  ], default='True', validators=[DataRequired(message="Please select one voucher status")])
+
+  submit = SubmitField('Create Voucher')
+    
+  def __init__(self, voucher_id, *args, **kwargs):
+    super(EditVoucherForm, self).__init__(*args, **kwargs)
+    # Populate categories dynamically
+    self.eligible_categories.choices = [
+      ('Vinyl', 'Vinyl'),
+      ('Book', 'Book')
+    ]
+    self.voucher_id = voucher_id
+    
+  def validate_code(self, field):
+    existing_voucher = Voucher.query.filter_by(voucher_code=field.data).first()
+    if existing_voucher and existing_voucher.id != self.voucher_id:
+      raise ValidationError('This voucher code is already in use.')
+        
+    if not re.match(r'^[A-Za-z0-9_-]*$', field.data):
+      raise ValidationError('Voucher code can only contain letters, numbers, underscores and dashes')
+
+  def validate_description(self, field):
+    if len(field.data) > 1000:
+        raise ValidationError('Description cannot exceed 1000 characters.')
+
+  def validate_discount_value(self, field):
+    try:
+      value = float(field.data)
+    except (TypeError, ValueError):
+      raise ValidationError('Discount value must be a number')
+
+    if self.voucher_type.data == 'percentage':
+      if not 0 <= field.data <= 100:
+        raise ValidationError('Percentage discount must be between 0 and 100')
+    elif self.voucher_type.data == 'fixed_amount':
+      if field.data <= 0:
+        raise ValidationError('Fixed amount discount must be greater than 0')
+    elif self.voucher_type.data == 'free_shipping':
+      field.data = 0  # No discount value needed for free shipping
+
+  def validate_eligible_categories(self, field):
+    if not field.data:
+      raise ValidationError('Please select at least one eligible category.')
+
+  def validate_criteria_json(self, field):
+    if not field.data or field.data == '[]':
+      raise ValidationError('Please add at least one voucher criteria.')
+    
+class MailingListForm(FlaskForm):
+  email = EmailField('Email', validators=[DataRequired(), Email(message="Please enter a valid email address.")])
+  submit = SubmitField('Subscribe')
+
+  def validate_email(self, field):
+    existing_email = MailingList.query.filter_by(email=field.data).first()
+    if existing_email:
+      raise ValidationError('This email is already subscribed to our newsletter.')
+    
+class NewsletterForm(FlaskForm):
+  title = StringField('Newsletter Title', validators=[DataRequired(message='Title is required'), Length(min=5, max=100, message='Title must be between 5 and 100 characters')])
+  description = TextAreaField('Newsletter Content', validators=[DataRequired(message='Newsletter content is required'), Length(min=20, max=2000, message='Content must be between 20 and 2000 characters')])
+  submit = SubmitField('Send Newsletter')

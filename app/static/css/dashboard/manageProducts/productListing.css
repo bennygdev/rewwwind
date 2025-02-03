@@ -408,6 +408,12 @@ td.highStock div {
     color: #039752;
 }
 
+.delete__form-container i.bi-plus-circle {
+    font-size: 4em;
+    color: red;
+    transform: rotate(45deg);
+}
+
 .delete__form-container h2 {
     font-weight: bold;
     font-size: 1.5em;

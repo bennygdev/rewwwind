@@ -1,5 +1,5 @@
 # seed.py
-from .models import Product, Category, SubCategory, db, User
+from .models import Product, Category, SubCategory, Order, OrderItem, PaymentInformation, BillingAddress, db, User, Voucher, VoucherType
 from werkzeug.security import generate_password_hash
 
 def insert_default_roles():
@@ -107,7 +107,7 @@ def insert_subcategories():
   vinyl_subcategories = [
     "Rock",
     "Psychedelic", 
-    "Pop",
+    "pop",
     "Jazz",
     "Classical",
     "Hip Hop",
@@ -497,3 +497,122 @@ def insert_products():
       db.session.commit()
 
   print("Inserted products.")
+
+def insert_orders():
+  payment_info = PaymentInformation(
+      user_id=4,
+      paymentType_id=1,
+      card_number="1234567812345678",
+      card_name="John Doe",
+      expiry_date="12/25",
+      card_cvv="123"
+  )
+  db.session.add(payment_info)
+  db.session.commit()
+
+  billing_info = BillingAddress(
+    user_id=4,
+    address_one='123 Milky Way Drive, Arizona, #40-888, 39482',
+    unit_number='1',
+    postal_code='123456',
+    phone_number='+65 1234 56789',
+  )
+  db.session.add(billing_info)
+  db.session.commit()
+  
+  for x in range(10):
+    order = Order(
+        user_id=4,
+        total_amount=0,
+        delivery='Standard',
+        payment_type_id=1,
+        payment_information_id=payment_info.id,
+        billing_id=billing_info.id
+    )
+    db.session.add(order)
+    db.session.commit()
+    
+    products = Product.query.all()
+    from random import randint
+    for product in products[:randint(1,4)]:
+      i = randint(0,3)
+      item = OrderItem(
+        order_id=order.id,
+        product_id=product.id,
+        product_condition=product.conditions[i],
+        quantity=randint(1,10),
+        unit_price=product.conditions[i]['price']
+      )
+      db.session.add(item)
+      db.session.commit()
+
+      order.update_total()
+      db.session.commit()
+
+  # second
+  payment_info = PaymentInformation(
+      user_id=4,
+      paymentType_id=2,
+      card_number="1234567812345678",
+      card_name="John Doe",
+      expiry_date="12/25",
+      card_cvv="123"
+  )
+  db.session.add(payment_info)
+  db.session.commit()
+
+  billing_info = BillingAddress(
+    user_id=4,
+    address_one='123 Milky Way Drive, Arizona, #40-888, 39482',
+    unit_number='1',
+    postal_code='123456',
+    phone_number='+65 1234 56789',
+  )
+  db.session.add(billing_info)
+  db.session.commit()
+  
+  for x in range(10):
+    from datetime import datetime,timedelta
+    order = Order(
+        user_id=4,
+        order_date=datetime.now()-timedelta(days=randint(20, 40)),
+        total_amount=0,
+        delivery='Expedited',
+        payment_type_id=2,
+        payment_information_id=payment_info.id,
+        billing_id=billing_info.id
+    )
+    db.session.add(order)
+    db.session.commit()
+    
+    products = Product.query.all()
+    from random import randint
+    for product in products[4:randint(5,15)]:
+      i = randint(0,3)
+      item = OrderItem(
+        order_id=order.id,
+        product_id=product.id,
+        product_condition=product.conditions[i],
+        quantity=randint(1,10),
+        unit_price=product.conditions[i]['price']
+      )
+      db.session.add(item)
+      db.session.commit()
+
+    order.update_total()
+    db.session.commit()
+
+def insert_voucher_types():
+  types = [
+    VoucherType(voucher_type='percentage'),
+    VoucherType(voucher_type='fixed_amount'),
+    VoucherType(voucher_type='free_shipping')
+  ]
+    
+  for type in types:
+    existing = VoucherType.query.filter_by(voucher_type=type.voucher_type).first()
+    if not existing:
+      db.session.add(type)
+    
+  db.session.commit()
+  print("Inserted voucher types.")

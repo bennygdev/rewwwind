@@ -70,3 +70,16 @@ textarea:focus, input:focus{
   border-radius: 10px;
   border: 0;
 }
+
+.back__link {
+  color: #039752;
+  cursor: pointer;
+  font-size: 1.1em;
+  text-decoration: none;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #039752;
+}
+
+.back__link i {
+  margin-right: 10px;
+}

@@ -10,7 +10,7 @@
 {% block content %}
 
 <h1>Update personal information</h1>
-<a href="{{ url_for('dashboard.update_personal_information') }}" class="back__button--darker">Back</a>
+<a href="{{ url_for('dashboard.update_personal_information') }}" class="back__link"><i class="fa-solid fa-chevron-left fa-sm"></i>Back</a>
 
 <form method="POST" class="updateInfo__form" enctype="multipart/form-data">
   {{ form.hidden_tag() }}
@@ -24,19 +24,30 @@
     <div class="updateInfo__firstName">
       {{ form.firstName.label }}
       {{ form.firstName(class="form-control") }}
+      {% if form.firstName.errors %}
+        {% for error in form.firstName.errors %}
+          <span class="error-message">{{ error }}</span>
+        {% endfor %}
+      {% endif %}
     </div>
     <div class="updateInfo__lastName">
       {{ form.lastName.label }}
       {{ form.lastName(class="form-control") }}
+      {% if form.lastName.errors %}
+        {% for error in form.lastName.errors %}
+          <span class="error-message">{{ error }}</span>
+        {% endfor %}
+      {% endif %}
     </div>
   </div>
   <div class="updateInfo__username">
     {{ form.username.label }}
     {{ form.username(class="form-control") }}
-  </div>
-  <div class="updateInfo__email">
-    {{ form.email.label }}
-    {{ form.email(class="form-control") }}
+    {% if form.username.errors %}
+      {% for error in form.username.errors %}
+        <span class="error-message">{{ error }}</span>
+      {% endfor %}
+    {% endif %}
   </div>
   <!-- <div class="updateInfo__picture">
     {{ form.picture.label }}
@@ -61,6 +72,11 @@
       {% endif %}
       <div class="image__file">
         {{ form.picture(class="form-control-file", id="imageInput") }}
+        {% if form.picture.errors %}
+          {% for error in form.picture.errors %}
+            <span class="error-message">{{ error }}</span>
+          {% endfor %}
+        {% endif %}
       </div>
     </div>
   </div>

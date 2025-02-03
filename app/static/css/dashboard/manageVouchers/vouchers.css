@@ -1,0 +1,489 @@
+.vouchers__header {
+  background-color: #039752;
+  color: #fff;
+  padding: 30px 30px;
+  position: relative;
+}
+
+.vouchers__header a {
+  color: #fff;
+}
+
+/* Header search section */
+.extraPadding {
+  height: 14px;
+}
+
+.headerContent {
+  margin-bottom: 20px;
+}
+
+.headerContent .voucherSearch__wrapper {
+  position: absolute;
+  bottom: -24px;
+  width: 100%;
+  padding-right: 30px;
+  max-width: calc(100% - 30px);
+}
+
+.headerContent .search__container {
+  position: relative;
+  display: flex;
+  width: 100%;
+  /* max-width: calc(100% - 30px); */
+}
+
+.headerContent .search__bar {
+  width: 100%;
+  padding: 12px 40px 12px 15px;
+  border-radius: 10px;
+  background-color: #fff;
+  border: none;
+  /* border: 1px solid black; */
+}
+
+.headerContent .search__bar.focused {
+  border-radius: 8px 8px 0 0;
+  border-bottom: none;
+}
+
+.headerContent .search__button {
+  background-color: transparent;
+  padding: 12px;
+  color: #039572;
+  position: absolute;
+  right: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  border: 0;
+}
+
+.headerContent .clear__button {
+  background-color: transparent;
+  padding: 12px;
+  color: #039572;
+  position: absolute;
+  right: 25px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  border: 0;
+}
+
+/* Filter styles */
+.content__filters {
+  margin-top: 10px;
+}
+
+.filters__form {
+  display: flex;
+  gap: 20px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.filter__group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter__group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #6e6e6e;
+}
+
+.filter__select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  min-width: 150px;
+  background-color: #ffffff;
+  color: #6e6e6e;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.filter__select:hover {
+  background-color: #fafafa;
+}
+
+.clear__filters {
+  padding: 8px 16px;
+  background-color: #ffffff;
+  color: #6e6e6e;
+  border: none;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background-color 0.3s;
+  margin-left: auto;
+}
+
+.clear__filters:hover {
+  background-color: #fafafa;
+  text-decoration: none;
+  color: #6e6e6e;
+}
+
+/* Vouchers Table */
+.vouchers__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  padding: 20px 0px;
+  margin-top: 30px;
+}
+
+/* Card Styles */
+.voucher__card {
+  position: relative;
+  height: 300px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.voucher__card--top {
+  height: calc(100% - 30%);
+  background-color: #f5f5f5;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.type-icon {
+  font-size: 4em;
+  color: #039752;
+}
+
+.voucher__status {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-family: "OpenSansSemibold";
+}
+
+.voucher__status.active {
+  background-color: #e3f5eb;
+  color: #039752;
+}
+
+.voucher__status.inactive {
+  background-color: #f5e3e3;
+  color: #973939;
+}
+
+/* Card Bottom Section (Overlay) */
+.voucher__card--bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30%;
+  background-color: rgba(238, 238, 238, 0.95);
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Bottom Left Content */
+.voucher__info {
+  display: flex;
+  flex-direction: column;
+  column-gap: 10px;
+  row-gap: 10px;
+}
+
+.voucher__code {
+  font-weight: bold;
+  color: #333;
+  font-size: 1.1em;
+  margin: 0;
+}
+
+.voucher__type {
+  color: #6e6e6e;
+  font-size: 0.9em;
+  margin: 0;
+}
+
+
+.controls {
+  display: flex;
+  gap: 12px;
+  align-self: end;
+}
+
+.controls i {
+  color: #6e6e6e;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  font-size: 1.1em;
+}
+
+.controls i:hover {
+  color: #039752;
+}
+
+/* Pagination */
+.vouchers__pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.vouchers__pagination ul {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  padding: 0;
+}
+
+.vouchers__pagination li {
+  display: inline-block;
+  font-family: "OpenSansSemibold";
+}
+
+.vouchers__pagination .page__button {
+  text-decoration: none;
+  padding: 8px 14px;
+  color: #039752;
+  border: 1px solid #039752;
+  border-radius: 100px;
+}
+
+.vouchers__pagination .active .page__button {
+  background-color: #039752;
+  padding: 12px 18px;
+  color: white;
+}
+
+.pageNext__button {
+  margin-left: 10px;
+}
+
+.pagePrevious__button {
+  margin-right: 10px;
+}
+
+.pageNext__button a {
+  background-color: #e6e6e6;
+  padding: 10px 20px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #000;
+}
+
+.pagePrevious__button a {
+  background-color: #e6e6e6;
+  padding: 10px 20px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #000;
+}
+
+/* Modal Styles */
+.voucherDetails__modal {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.4);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.voucherDetails__modal .modal-content h2 {
+  font-family: "OpenSansSemibold";
+  font-size: 1.3em;
+  margin-bottom: 0;
+}
+
+.voucher__header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.voucherModal__content {
+  background-color: #fefefe;
+  padding: 20px;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 800px;
+  max-height: 100%;
+  overflow-y: auto;
+  position: relative;
+}
+
+.close-modal {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close-modal:hover,
+.close-modal:focus {
+  color: black;
+  text-decoration: none;
+}
+
+.voucherDetails__container {
+  margin-top: 20px;
+}
+
+.voucher__detail {
+  margin-bottom: 15px;
+  display: flex;
+}
+
+.voucher__detail strong {
+  width: 150px;
+  margin-right: 20px;
+  font-weight: bold;
+}
+
+pre {
+  font-family: "OpenSansRegular";
+  font-size: 1em;
+}
+
+/* Media queries */
+/* @media (max-width: 768px) {
+  .vouchers__grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .vouchers__grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 12px;
+  }
+} */
+
+@media (max-width: 1024px) {
+  .vouchers__grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 15px;
+  }
+
+  .filters__form {
+    gap: 15px;
+  }
+
+  .filter__select {
+    min-width: 130px;
+  }
+}
+
+@media (max-width: 768px) {
+  .vouchers__header {
+    padding: 20px;
+  }
+
+  .headerContent .search__wrapper {
+    padding-right: 20px;
+  }
+
+  .filters__form {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .filter__group {
+    width: 100%;
+  }
+
+  .filter__select {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .clear__filters {
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
+  }
+
+  .vouchers__pagination ul {
+    gap: 8px;
+  }
+
+  .vouchers__pagination .page__button {
+    padding: 6px 12px;
+  }
+
+  .vouchers__pagination .active .page__button {
+    padding: 8px 14px;
+  }
+
+  .voucherModal__content {
+    width: 90%;
+    margin: 20px;
+  }
+
+  .voucher__detail {
+    flex-direction: column;
+  }
+
+  .voucher__detail strong {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+
+  .headerContent .voucherSearch__wrapper {
+    padding: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .vouchers__header {
+    padding: 15px;
+  }
+
+  .voucher__card {
+    height: 250px;
+  }
+
+  .type-icon {
+    font-size: 3em;
+  }
+
+  .voucher__status {
+    font-size: 0.75em;
+    padding: 4px 8px;
+  }
+
+  .controls {
+    gap: 8px;
+  }
+
+  .vouchers__pagination .pagePrevious__button a,
+  .vouchers__pagination .pageNext__button a {
+    padding: 8px 15px;
+  }
+}

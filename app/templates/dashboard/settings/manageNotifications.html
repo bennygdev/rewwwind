@@ -1,0 +1,49 @@
+{% extends "dashboard/base.html" %}
+{% set active_page = "settings" %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/settings/manageNotifications.css') }}">
+{% endblock %}
+
+{% block title %}Manage Notifications{% endblock %}
+
+{% block headerContent %}
+<div class="headerGradient"></div>
+{% endblock %}
+
+{% block content %}
+
+<!-- Flash validation -->
+{% include "components/flashValidation.html" %}
+
+<!-- Back button -->
+<a href="{{ url_for('dashboard.user_settings') }}" class="back__link"><i class="fa-solid fa-chevron-left fa-sm"></i>Back</a>
+
+<div class="notifications__content">
+  <div class="notifications__section">
+    <div class="notifications__section--header">
+      <p class="notifications__section--title">Marketing Communications</p>
+      <p class="notifications__section--subtitle">Stay updated with our latest products, exclusive offers and promotions</p>
+    </div>
+    
+    <div class="notifications__option">
+      <div class="notifications__option--info">
+        <h3 class="notifications__option--title">Marketing Emails</h3>
+        <p class="notifications__option--description">Receive our newsletter with updates about new products, special offers, and upcoming sales</p>
+      </div>
+      <label class="notifications__checkbox">
+        <input type="checkbox" class="notifications__checkbox--input" id="marketingEmails" {% if mailing_list_entry %}checked{% endif %}>
+        <span class="notifications__checkbox--custom"></span>
+      </label>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block body_scripts %}
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/dashboard/settings/notificationToggler.js') }}"
+></script>
+{% endblock %}

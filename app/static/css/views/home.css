@@ -307,3 +307,63 @@ h1 {
     font-size: 2em;
     font-weight: bold;
 }
+
+/* Newsletter CTA */
+.newsletter {
+  text-align: center;
+  padding-bottom: 100px;
+}
+
+.newsletter .message {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.newsletter .message.success {
+  color: green;
+}
+
+.newsletter .message.error {
+  color: red;
+}
+
+.newsletter__form {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.newsletter__form .form-group {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 30vw;
+  margin: 0 auto;
+}
+
+.newsletter__form input[type="email"] {
+  width: 100%;
+  padding-right: 100px;
+  border-radius: 5px;
+}
+
+.newsletter__form input[type="email"]:focus {
+  outline: none;
+  box-shadow: none; 
+}
+
+#newsletter__submit {
+  background-color: #039752;
+  color: #fff;
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  padding: 0 15px;
+  border: 0;
+  border-radius: 5px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}

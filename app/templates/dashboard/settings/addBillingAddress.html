@@ -10,7 +10,7 @@
 {% block content %}
 
 <h1>Add Billing Address</h1>
-<a href="{{ url_for('dashboard.update_billing_address') }}" class="back__button--darker">Back</a>
+<a href="{{ url_for('dashboard.update_billing_address') }}" class="back__link"><i class="fa-solid fa-chevron-left fa-sm"></i>Back</a>
 
 <form method="POST" class="addBilling__form">
   {{ form.hidden_tag() }}
@@ -21,24 +21,49 @@
   <div class="addBilling__addressOne">
     {{ form.address_one.label }}
     {{ form.address_one(class="form-control") }}
+    {% if form.address_one.errors %}
+      {% for error in form.address_one.errors %}
+        <span class="error-message">{{ error }}</span>
+      {% endfor %}
+    {% endif %}
   </div>
   <div class="addBilling__addressTwo">
     {{ form.address_two.label }}
     {{ form.address_two(class="form-control") }}
+    {% if form.address_two.errors %}
+      {% for error in form.address_two.errors %}
+        <span class="error-message">{{ error }}</span>
+      {% endfor %}
+    {% endif %}
   </div>
   <div class="addBilling__addressRow">
     <div class="addBilling__unitNumber">
       {{ form.unit_number.label }}
       {{ form.unit_number(class="form-control") }}
+      {% if form.unit_number.errors %}
+        {% for error in form.unit_number.errors %}
+          <span class="error-message">{{ error }}</span>
+        {% endfor %}
+      {% endif %}
     </div>
     <div class="addBilling__postalCode">
       {{ form.postal_code.label }}
       {{ form.postal_code(class="form-control") }}
+      {% if form.postal_code.errors %}
+        {% for error in form.postal_code.errors %}
+          <span class="error-message">{{ error }}</span>
+        {% endfor %}
+      {% endif %}
     </div>
   </div>
   <div class="addBilling__phoneNumber">
     {{ form.phone_number.label }}
     {{ form.phone_number(class="form-control") }}
+    {% if form.phone_number.errors %}
+      {% for error in form.phone_number.errors %}
+        <span class="error-message">{{ error }}</span>
+      {% endfor %}
+    {% endif %}
   </div>
   
   <div class="button__wrapper">

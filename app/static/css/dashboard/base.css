@@ -30,7 +30,7 @@
 .dashboard__right > .content {
   background-color: #f3f3f3;
   width: 85%;
-  min-height: 100vh;
+  min-height: calc(100vh - 80px);
   /* height: 200vh; */
   flex-direction: column;
 }
@@ -44,4 +44,18 @@
   font-weight: bolder;
   letter-spacing: 0.5px;
   margin-bottom: 0.4em;
+}
+
+@media (max-width: 1088px) {
+  .dashboard__left {
+    display: none;
+  }
+
+  .placeholder__left {
+    display: none;
+  }
+
+  .dashboard__right .content {
+    width: 100%;
+  }
 }

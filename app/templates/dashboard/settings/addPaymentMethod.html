@@ -10,7 +10,7 @@
 {% block content %}
 
 <h1>Add Payment Method</h1>
-<a href="{{ url_for('dashboard.update_payment_information') }}" class="back__button--darker">Back</a>
+<a href="{{ url_for('dashboard.update_payment_information') }}" class="back__link"><i class="fa-solid fa-chevron-left fa-sm"></i>Back</a>
 
 <form method="POST" class="addPayment__form">
   {{ form.hidden_tag() }}
@@ -31,22 +31,47 @@
       </div>
       {% endfor %}
     </div>
+    {% if form.paymentType_id.errors %}
+      {% for error in form.paymentType_id.errors %}
+        <span class="error-message">{{ error }}</span>
+      {% endfor %}
+    {% endif %}
   </div>
   <div class="addPayment__cardName">
     {{ form.card_name.label }}
     {{ form.card_name(class="form-control") }}
+    {% if form.card_name.errors %}
+      {% for error in form.card_name.errors %}
+        <span class="error-message">{{ error }}</span>
+      {% endfor %}
+    {% endif %}
   </div>
   <div class="addPayment__cardNumber">
     {{ form.card_number.label }}
     {{ form.card_number(class="form-control") }}
+    {% if form.card_number.errors %}
+      {% for error in form.card_number.errors %}
+        <span class="error-message">{{ error }}</span>
+      {% endfor %}
+    {% endif %}
   </div>
   <div class="addPayment__cardExpiryDate">
     {{ form.expiry_date.label }}
     {{ form.expiry_date(class="form-control", placeholder="MM/YY") }}
+    {% if form.expiry_date.errors %}
+      {% for error in form.expiry_date.errors %}
+        <span class="error-message">{{ error }}</span>
+      {% endfor %}
+    {% endif %}
   </div>
   <div class="addPayment__cardCVV">
     {{ form.card_cvv.label }}
     {{ form.card_cvv(class="form-control") }}
+    {% if form.card_cvv.errors %}
+      {% for error in form.card_cvv.errors %}
+        <span class="error-message">{{ error }}</span>
+      {% endfor %}
+    {% endif %}
   </div>
   
   <div class="button__wrapper">

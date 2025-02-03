@@ -1,0 +1,64 @@
+h1 {
+  font-family: "OpenSansSemibold";
+  font-size: 1.5em;
+  margin-bottom: 30px;
+}
+
+.changeEmail__form {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.changeEmail__email {
+  width: 25vw;
+}
+
+.changeEmail__button {
+  color: #fff;
+  background-color: #039752;
+  padding: 7px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  border: none;
+  margin-top: 15px;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.875em;
+  margin-top: 5px;
+  display: block;
+}
+
+/* Media Queries */
+@media screen and (max-width: 1024px) {
+  .changeEmail__email {
+    width: 50vw;
+  }
+  
+  .changeEmail__button {
+    width: 15vw;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .changeEmail__email {
+    width: 85vw;
+  }
+  
+  .changeEmail__button {
+    width: 35vw;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .changeEmail__email {
+    width: 90vw;
+  }
+  
+  .changeEmail__button {
+    width: 50vw;
+  }
+}

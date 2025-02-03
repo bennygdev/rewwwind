@@ -21,7 +21,46 @@
     <p>{{ user.username }}</p>
   </div>
   <div class="profile__editButton">
-    <a href="/dashboard/update-personal-information">Update Information</a>
+    <a href="{{ url_for('dashboard.update_personal_information') }}">Update Information</a>
+  </div>
+
+  <div class="profile__orders">
+    <div class="profile__orders-header">
+      <h2 class="profile__orders-title">My Orders</h2>
+      <a href="{{ url_for('manageOrders.orders_listing') }}" class="profile__orders-viewall">View All</a>
+    </div>
+    
+    {% if orders %}
+      <div class="orders__scroll">
+        <div class="orders__container">
+          {% for order in orders %}
+            <a href="{{ url_for('manageOrders.order_detail', order_id=order.id) }}" class="order__card">
+              <div class="order__header">
+                <div class="order__id">Order #{{ order.id }}</div>
+                <div class="order__date">{{ order.order_date.strftime('%B %d, %Y') }}</div>
+              </div>
+              
+              <div class="order__details">
+                <div class="order__delivery">
+                  <span class="label">Shipping:</span>
+                  <span>{{ order.delivery }}</span>
+                </div>
+                <div class="order__amount">
+                  <span class="label">Total:</span>
+                  <span>${{ "%.2f"|format(order.total_amount) }}</span>
+                </div>
+              </div>
+
+              <div class="order__status order__status--{{ order.status.lower() }}">
+                {{ order.status }}
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      <p class="orders__empty">No orders found.</p>
+    {% endif %}
   </div>
 </div>
 {% endblock %}

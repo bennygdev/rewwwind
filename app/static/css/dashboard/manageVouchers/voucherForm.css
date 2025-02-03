@@ -1,0 +1,242 @@
+h1 {
+  font-family: "OpenSansSemibold";
+  font-size: 1.5em;
+  margin-bottom: 30px;
+}
+
+.addVoucher__Form {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.addVoucher__code {
+  width: 15vw;
+}
+
+.addVoucher__description {
+  width: 35vw;
+}
+
+.addVoucher__voucherType {
+  width: 20vw;
+}
+
+.addVoucher__discountValueField {
+  width: 15vw;
+}
+
+.addVoucher__criteriaSection {
+  margin-top: 20px;
+}
+
+.addVoucher__criteriaSection h3 {
+  font-family: "OpenSansSemibold";
+  font-size: 1.3em;
+  margin-bottom: 10px; 
+  margin: 0;
+}
+
+.criteria__header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.criteria-type, .criteria-input {
+  width: 20vw;
+}
+
+.addVoucher__categoriesEligible {
+  display: flex;
+  flex-direction: column;
+  width: 10vw;
+  margin-top: 30px;
+}
+
+.addVoucher__expiryDays {
+  display: flex;
+  flex-direction: column;
+  width: 15vw;
+}
+
+.addCriteria__button {
+  padding: 5px 10px;
+  font-size: 0.9em;
+  color: #fff;
+  background-color: #039752;
+  border: 0;
+  border-radius: 5px;
+}
+
+.btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.addVoucher__button {
+  color: #fff;
+  background-color: #039752;
+  padding: 7px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  border: none;
+  margin-top: 15px;
+}
+
+.categories-grid {
+  display: flex;
+  gap: 20px;
+  margin-top: 10px;
+  width: fit-content; 
+}
+
+.category-card {
+  position: relative;
+}
+
+.category-checkbox {
+  display: none;
+}
+
+.category-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  border: 2px solid #e5e5e5;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 100px; 
+}
+
+.category-label i {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.category-label span {
+  font-size: 14px;
+}
+
+.category-checkbox:checked + .category-label {
+  border-color: #039752;
+  background-color: rgba(3, 151, 82, 0.05);
+}
+
+.addVoucher__categoriesEligible {
+  width: auto;
+  margin-top: 30px;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.875em;
+  margin-top: 5px;
+  display: block;
+}
+
+/* Media Queries */
+@media (max-width: 1024px) {
+  .addVoucher__code,
+  .addVoucher__description,
+  .addVoucher__voucherType,
+  .addVoucher__discountValueField,
+  .addVoucher__expiryDays {
+    width: 50%;
+  }
+
+  .criteria-type, 
+  .criteria-input {
+    width: 30vw;
+  }
+}
+
+@media (max-width: 768px) {
+  .addVoucher__Form {
+    gap: 15px;
+  }
+
+  .addVoucher__code,
+  .addVoucher__description,
+  .addVoucher__voucherType,
+  .addVoucher__discountValueField,
+  .addVoucher__expiryDays {
+    width: 100%;
+  }
+
+  .criteria-type, 
+  .criteria-input {
+    width: 100%;
+  }
+
+  .criteria-list-item {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+
+  .delete-criteria {
+    align-self: flex-start;
+  }
+
+  .categories-grid {
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .category-card {
+    flex: 1 1 calc(50% - 15px);
+    min-width: 120px;
+  }
+
+  .category-label {
+    padding: 15px;
+    min-width: unset;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.3em;
+    margin-bottom: 20px;
+  }
+
+  .addVoucher__Form {
+    gap: 12px;
+  }
+
+  .criteria__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .addCriteria__button {
+    width: 100%;
+  }
+
+  .category-card {
+    flex: 1 1 100%;
+  }
+
+  .category-label i {
+    font-size: 20px;
+  }
+
+  .category-label span {
+    font-size: 12px;
+  }
+
+  .button__wrapper {
+    width: 100%;
+  }
+
+  .addVoucher__button {
+    width: 100%;
+  }
+}

@@ -51,3 +51,126 @@
   border-radius: 10px;
   margin-top: 15px;
 }
+
+.profile__orders {
+  margin-top: 40px;
+  padding: 0 20px;
+}
+
+.profile__orders-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.profile__orders-title {
+  font-family: "OpenSansBold";
+  font-size: 1.5em;
+  margin: 0;
+}
+
+.profile__orders-viewall {
+  color: #039752;
+  text-decoration: none;
+  font-family: "OpenSansSemibold";
+  font-size: 0.9em;
+}
+
+.profile__orders-viewall:hover {
+  text-decoration: underline;
+}
+
+.orders__scroll {
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 10px; /* Space for scrollbar */
+}
+
+.orders__container {
+  display: flex;
+  gap: 20px;
+  padding: 2px; /* Prevent box-shadow cutoff */
+}
+
+.order__card {
+  flex: 0 0 300px; /* Fixed width for each card */
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.order__card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.order__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.order__id {
+  font-family: "OpenSansBold";
+  font-size: 1.1em;
+}
+
+.order__date {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.order__details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 40px;
+}
+
+.order__delivery, .order__amount {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.label {
+  color: #666;
+}
+
+.order__status {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.9em;
+  font-family: "OpenSansSemibold";
+}
+
+.order__status--approved {
+  background-color: #e7f7ed;
+  color: #039752;
+}
+
+.order__status--pending {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.order__status--not.approved {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+.orders__empty {
+  text-align: center;
+  color: #666;
+  padding: 40px 0;
+}

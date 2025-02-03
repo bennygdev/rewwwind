@@ -7,6 +7,7 @@
   padding: 20px 50px;
   position: absolute;
   width: 100%;
+  height: 80px;
   top: 0;
   left: 0;
   background: #ffffff;
@@ -221,6 +222,10 @@ img#mini_profile_img {
   opacity: 0.8;
 }
 
+.offcanvas__link--active {
+  color: #039752;
+}
+
 .offcanvas-nav__extra a {
   color: #039752;
 }
@@ -281,7 +286,7 @@ img#mini_profile_img {
   border-bottom-right-radius: 10px;
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1160px) {
   .nav__left--links {
     gap: 20px;
   }
@@ -291,9 +296,29 @@ img#mini_profile_img {
   }
 }
 
-@media (max-width: 1024px) {
+/* Around tablet sizing */
+@media (max-width: 1088px) {
   nav {
+    width: auto;
     padding: 10px 30px;
+  }
+
+  .nav__right {
+    width: auto;
+  }
+
+  .nav__right .search__wrapper {
+    margin-left: 0;
+    width: calc(100% - 100px);
+    margin-right: 30px;
+  }
+
+  .nav__right .search__bar {
+    width: 100%;
+    padding: 10px 40px 10px 15px;
+    border-radius: 10px;
+    background-color: #eee;
+    border: none;
   }
 
   .nav__links {
@@ -312,6 +337,31 @@ img#mini_profile_img {
   }
 
   .nav__search-container {
-    width: 55vw;
+    width: 40vw;
+  }
+}
+
+@media (max-width: 768px) {
+  .logo__title {
+    font-family: "CharisSILBold";
+    color: #039752; 
+    font-size: 2em;
+    margin-bottom: 0;
+    margin-right: 20px;
+  }
+
+  .nav__search-container {
+    width: 30vw;
+  }
+}
+
+@media (max-width: 650px) {
+
+  .nav__search-container {
+    width: 25vw;
+    display: none;
+  }
+  .search__wrapper {
+    display: none;
   }
 }

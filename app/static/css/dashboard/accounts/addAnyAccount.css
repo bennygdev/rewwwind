@@ -26,13 +26,12 @@ h1 {
 }
 
 .addAccount__button {
-  width: 8vw;
-  height: 45px;
-  background-color: #039752;
-  border: 0;
-  font-family: "OpenSansSemibold";
   color: #fff;
-  border-radius: 10px;
+  background-color: #039752;
+  padding: 7px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  border: 0;
   margin-top: 15px;
 }
 
@@ -54,4 +53,57 @@ h1 {
 
 .password-toggle:focus {
   outline: none;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.875em;
+  margin-top: 5px;
+  display: block;
+}
+
+/* Media Queries */
+@media screen and (max-width: 1024px) {
+  .addAccount__firstName, .addAccount__lastName {
+    width: 25vw;
+  }
+  
+  .addAccount__username, .addAccount__email, .addAccount__role, .addAccount__password {
+    width: 40vw;
+  }
+}
+
+@media screen and (max-width: 768px) {
+
+  .addAccount__name {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .addAccount__firstName, .addAccount__lastName {
+    width: 60vw;
+  }
+  
+  .addAccount__username, .addAccount__email, .addAccount__role, .addAccount__password {
+    width: 60vw;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .addAccount__firstName, .addAccount__lastName {
+    width: 90vw;
+  }
+  
+  .addAccount__username, .addAccount__email, .addAccount__role, .addAccount__password {
+    width: 90vw;
+  }
+  
+  h1 {
+    font-size: 1.2em;
+  }
+  
+  .addAccount__form {
+    margin-top: 15px;
+    gap: 8px;
+  }
 }

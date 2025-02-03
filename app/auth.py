@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app
 from . import db, mail, oauth
 from .models import User
 from .forms import LoginForm, RegisterForm, UsernameForm, RequestResetForm, ResetPasswordForm
@@ -57,22 +57,12 @@ def google_callback():
 def login():
   form = LoginForm()
   if form.validate_on_submit():
-    emailUsername = form.emailUsername.data
-    password = form.password.data
-        
-    user = User.query.filter((User.email == emailUsername) | (User.username == emailUsername)).first()
-
-    if user:
-      if not user.google_account:  # check if user is a regular account
-        if check_password_hash(user.password, password):
-          login_user(user, remember=True)
-          return redirect(url_for('views.home'))
-        else:
-          flash('Invalid password', 'error')
-      else:  # if user signed up with google, display message
-        flash('This account was created with Google Sign-In. Please use Google login.', 'info')
-    else:
-      flash('Invalid email or username.', 'error')
+    try:
+      login_user(form.user, remember=True)
+      return redirect(url_for('views.home'))
+    except Exception as e:
+      flash('An unexpected error occurred. Please try again.', 'error')
+      return render_template("auth/login.html", user=current_user, form=form)
 
   return render_template("auth/login.html", user=current_user, form=form)
 
@@ -80,6 +70,18 @@ def login():
 @login_required
 def logout():
   logout_user()
+  try: # shelve removal (for addproductform)
+    shelve_path = os.path.join(current_app.instance_path, 'shelve.db')
+    # if os.path.exists(shelve_path):
+    #   os.remove(shelve_path)
+    #   print("Shelve db has been removed.")
+    for ext in ['.bak', '.dat', '.dir']:
+      aux = shelve_path + ext
+      if os.path.exists(aux):
+        os.remove(aux)
+        print(f"Shelve auxiliary file {aux} has been removed.")
+  except Exception as e:
+    print(f"Error removing shelve in auth.py: {e}")
   print("Logged out user")
   return redirect(url_for('views.home')) # switch to home
 
@@ -88,23 +90,13 @@ def register():
     form = RegisterForm()
     
     if form.validate_on_submit():
+      try:
         # Extract form data
         first_name = form.firstName.data
         last_name = form.lastName.data
         email = form.email.data
         password = form.password.data
         
-        # Check if the email already exists
-        email_exists = User.query.filter_by(email=email).first()
-        if email_exists:
-            flash('An account with that email already exists.', 'error')
-            return render_template("auth/register.html", user=current_user, form=form)
-        
-        # Additional validation checks (already handled by WTForms)
-        if not first_name or not last_name:
-            flash('All fields are required.', 'error')
-            return render_template("auth/register.html", user=current_user, form=form)
-
         # add user to database
         new_user = User(
           first_name = first_name, 
@@ -122,19 +114,9 @@ def register():
         
         session['user_id'] = new_user.id
         return redirect(url_for('auth.register_step2'))
-    
-    # actually not proper validation, needs to be updated later
-    if form.confirmPassword.data != form.password.data:
-      flash("Passwords must match", "error")
-
-    if form.password.errors:
-      flash("Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.", "error")
-
-    # debugger
-    if form.errors:
-        print("Form validation errors:")
-        for field, error_messages in form.errors.items():
-            print(f"{field}: {error_messages}")
+      except Exception as e:
+        db.session.rollback()
+        flash("An unexpected error occurred. Please try again.", "error")
 
     return render_template("auth/register.html", user=current_user, form=form)
 
@@ -153,67 +135,66 @@ def register_step2():
     return redirect(url_for('auth.register'))
   
   if form.validate_on_submit():
-    username_exists = User.query.filter_by(username=form.username.data).first()
-    if username_exists:
-      flash('An account with that username already exists.', 'error')
-      return render_template("auth/setUsername.html", user=current_user, form=form)
+    try:
+      # update
+      user.username = form.username.data
 
-    # update
-    user.username = form.username.data
-
-    db.session.commit()
-    session.pop('user_id', None)
-    print("Name change success")
-    flash("Account created successfully! Please log in with your new account.", "success")
-    return redirect(url_for('auth.login'))
+      db.session.commit()
+      session.pop('user_id', None)
+      flash("Account created successfully! Please log in with your new account.", "success")
+      return redirect(url_for('auth.login'))
+    except Exception as e:
+      db.session.rollback()
+      flash("An unexpected error occurred. Please try again.", "error")
 
   return render_template("auth/setUsername.html", user=current_user, form=form)
 
 def send_reset_email(user):
-  token = user.get_reset_token()
-  msg = Message('Password Reset Request', sender='rewwwindhelp@gmail.com', recipients=[user.email])
-  msg.body = f'''To reset your password, visit the following link:
-  {url_for('auth.reset_token', token=token, _external=True)}
+  current_app.config['UPDATE_MAIL_CONFIG']('auth')
 
+  token = user.get_reset_token()
+
+  reset_link = url_for('auth.reset_token', token=token, _external=True)
+
+  personalized_body = f'''To reset your password, visit the following link:
+  <a href='{reset_link}'>Reset Password</a>
+
+  <br><br>
   The link will expire in 30 minutes.
 
+  <br><br>
   If you did not make this request then simply ignore this email and no changes will be made.
   '''
+
+  msg = Message(
+    'Password Reset Request', 
+    sender=('Rewwwind Help', current_app.config['MAIL_USERNAME']), 
+    recipients=[user.email],
+    body=personalized_body,
+    html=personalized_body
+  )
   mail.send(msg)
 
 @auth.route('/reset-password', methods=['GET', 'POST'])
 def reset_password_request():
-  print(os.getenv("EMAIL_USER")) 
-  print(os.getenv("EMAIL_PASS")) 
-
   if current_user.is_authenticated:
     return redirect(url_for('views.home'))
 
   form = RequestResetForm() 
 
   if form.validate_on_submit():
-    # Add this validation to auth later
-    user = User.query.filter_by(email=form.email.data).first()
-    
-    if user:
-      if user.google_account: 
-        flash("This email is linked to a Google account. Please sign in with Google.", "info")
-        return redirect(url_for('auth.login'))
-      else:
-        send_reset_email(user)
-        flash('An email has been sent with instructions to reset your password.', 'info')
-        return redirect(url_for('auth.login'))
-    else:
-      # Flash message for non-existing accounts
-      flash('There is no account with that email. You must register first', 'error')
-      return render_template("auth/resetPasswordRequest.html", user=current_user, form=form)
+    try:
+      send_reset_email(form.user)
+      flash('An email has been sent with instructions to reset your password.', 'info')
+      return redirect(url_for('auth.login'))
+    except Exception as e:
+      flash('An unexpected error occurred. Please try again.', 'error')
 
   return render_template("auth/resetPasswordRequest.html", user=current_user, form=form)
 
 # need to update: disallow same previous password and both passwords need to match
 @auth.route('/reset-password/<token>', methods=['GET', 'POST'])
 def reset_token(token):
-  form = ResetPasswordForm()
   if current_user.is_authenticated:
     return redirect(url_for('views.home'))
   
@@ -222,30 +203,17 @@ def reset_token(token):
     flash("That is an invalid or expired token", "error")
     return redirect(url_for('auth.reset_password_request'))
   
+  form = ResetPasswordForm(user)
   if form.validate_on_submit():
-    if check_password_hash(user.password, form.password.data):
-      flash("New password cannot be the same as the previous password", "error")
-      return redirect(url_for('auth.reset_token', token=token, _external=True))
+    try:
+      # update
+      user.password = generate_password_hash(form.password.data, method='pbkdf2:sha256')
 
-    # update
-    user.password = generate_password_hash(form.password.data, method='pbkdf2:sha256')
-
-    db.session.commit()
-    flash("Your password has been updated! You are now able to log in. ", "success")
-    return redirect(url_for('auth.login'))
+      db.session.commit()
+      flash("Your password has been updated! You are now able to log in. ", "success")
+      return redirect(url_for('auth.login'))
+    except Exception as e:
+      db.session.rollback()
+      flash("An unexpected error occurred. Please try again.", "error")
   
-  if form.confirmPassword.data != form.password.data:
-    flash("Both passwords must match.", "error")
-    return redirect(url_for('auth.reset_token', token=token, _external=True))
-  
-  if form.password.errors:
-    flash("Password must be at least 8 characters, at least one uppercase letter, one lowercase letter, one number and one special character.", "error")
-    return redirect(url_for('auth.reset_token', token=token, _external=True))
-  
-  form = ResetPasswordForm()
   return render_template("auth/reset_token.html", user=current_user, form=form)
-
-# @auth.route('/resettest')
-# def resettest():
-#   form = ResetPasswordForm()
-#   return render_template("auth/reset_token.html", user=current_user, form=form)

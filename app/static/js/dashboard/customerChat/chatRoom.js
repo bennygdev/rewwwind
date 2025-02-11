@@ -194,3 +194,7 @@ socket.on('chat_ended', (data) => {
     });
   }
 });
+
+socket.on('join_error', (data) => {
+  window.location.href = '/dashboard/customer-chat';
+});

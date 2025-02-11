@@ -1,5 +1,144 @@
-/* Admin dashboard chat styles */
+/* Chat rooms styles */
+h1 {
+  font-family: "OpenSansSemibold";
+  font-size: 1.5em;
+  margin-bottom: 30px;
+}
+
+.chat-container {
+  width: 100%;
+  padding: 0 15px;
+}
+
+.chat-sidebar {
+  width: 25%;
+}
+
 .chat-requests {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.chat-request-card {
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.chat-request-card:hover {
+  background-color: #f8f9fa;
+  cursor: pointer;
+}
+
+.chat-request-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-request-header h5 {
+  margin: 0;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.chat-request-header small {
+  color: #6c757d;
+}
+
+.support-type {
+  margin: 0.5rem 0;
+}
+
+.support-type p {
+  margin: 0;
+  color: #495057;
+}
+
+.join-chat-btn {
+  background-color: #039572;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  width: auto;
+}
+
+/* Keep your existing status indicators and other styles */
+.status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+}
+
+.status-online {
+  background-color: #28a745;
+}
+
+.status-waiting {
+  background-color: #ffc107;
+}
+
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+}
+
+.chat-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.chat-controls button {
+  padding: 5px 15px;
+}
+
+.chat-request-card.active {
+  border-left: 4px solid #28a745;
+  background-color: #f8f9fa;
+}
+
+.chat-request-card.active .join-chat-btn {
+  background-color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.admin-badge {
+  background-color: #28a745;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  margin-left: 8px;
+}
+
+.status-badge {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  margin-left: 8px;
+}
+
+.status-active {
+  background-color: #28a745;
+  color: white;
+}
+
+.status-waiting {
+  background-color: #ffc107;
+  color: black;
+}
+
+/* .chat-requests {
   max-height: 80vh;
   overflow-y: auto;
 }
@@ -12,8 +151,9 @@
 .chat-request-card:hover {
   background-color: #f8f9fa;
   cursor: pointer;
-}
+} */
 
+/* Admin dashboard chat styles */
 .chat-messages {
   height: calc(100vh - 250px);
   overflow-y: auto;

@@ -22,12 +22,15 @@ def customer_chat():
     
   for room_id, chat_data in all_chats.items():
     customer = User.query.get(chat_data['customer'])
+    admin = User.query.get(chat_data['admin']) if chat_data['admin'] else None
     if customer:
       active_chat_users.append({
         'room_id': room_id,
         'customer_name': f"{customer.first_name} {customer.last_name}",
         'start_time': chat_data.get('start_time', datetime.now().strftime('%H:%M')),
-        'status': chat_data['status']
+        'status': chat_data['status'],
+        'supportType': chat_data.get('supportType', 'general'),
+        'admin_name': f"{admin.first_name}" if admin else None
       })
     
   return render_template("dashboard/customerChat/customerChat.html", user=current_user, active_chats=active_chat_users)
@@ -37,17 +40,22 @@ def customer_chat():
 @role_required(2, 3)  # Admin roles
 def chat_room(room_id):
     if room_id not in active_chats:
-        flash('Chat room not found', 'error')
-        return redirect(url_for('customerChat.customer_chat'))
+      flash('Chat room not found', 'error')
+      return redirect(url_for('customerChat.customer_chat'))
         
     chat_data = active_chats[room_id]
+
+    if chat_data['admin'] is not None:
+      flash('This chat room is already being handled by another support representative', 'error')
+      return redirect(url_for('customerChat.customer_chat'))
+
     customer = User.query.get(chat_data['customer'])
     
     return render_template(
-        "dashboard/customerChat/chatRoom.html",
-        room_id=room_id,
-        customer_name=f"{customer.first_name} {customer.last_name}",
-        start_time=chat_data.get('start_time', datetime.now().strftime('%H:%M'))
+      "dashboard/customerChat/chatRoom.html",
+      room_id=room_id,
+      customer_name=f"{customer.first_name} {customer.last_name}",
+      start_time=chat_data.get('start_time', datetime.now().strftime('%H:%M'))
     )
 
 @customerChat.route('/api/check-auth')
@@ -120,7 +128,14 @@ def handle_admin_join(data):
     
   room_id = data['room_id']
   if room_id in active_chats:
+    if active_chats[room_id]['admin'] is not None:
+      emit('join_error', {
+        'message': 'This chat room is already being handled by another support representative'
+      })
+      return
+
     active_chats[room_id]['admin'] = current_user.id
+    active_chats[room_id]['admin_name'] = current_user.first_name
     active_chats[room_id]['status'] = 'active'
         
     join_room(room_id)
@@ -136,6 +151,12 @@ def handle_admin_join(data):
       'admin_name': current_user.first_name
     }, room=room_id)
 
+    emit('room_status_update', {
+      'room_id': room_id,
+      'status': 'active',
+      'admin_name': current_user.first_name
+    }, broadcast=True)
+
 # Handle admin leaving chat without ending it
 @socketio.on('admin_leave_chat')
 def handle_admin_leave(data):
@@ -147,13 +168,21 @@ def handle_admin_leave(data):
     admin_name = current_user.first_name
     # Mark chat as waiting for new admin but preserve messages
     active_chats[room_id]['admin'] = None
-    active_chats[room_id]['status'] = 'waiting' 
+    active_chats[room_id]['admin_name'] = None
+    active_chats[room_id]['status'] = 'waiting'
 
     # Notify customer with admin's name
     emit('admin_left_chat', {
       'message': f'Support representative {admin_name} has left the chat. Please wait for a new representative.',
       'admin_name': admin_name
     }, room=room_id)
+
+    # broadcast update to chat rooms
+    emit('room_status_update', {
+      'room_id': room_id,
+      'status': 'waiting',
+      'update_type': 'admin_left'
+    }, broadcast=True)
         
     # Broadcast chat request to all admins
     customer = User.query.get(active_chats[room_id]['customer'])

@@ -1,6 +1,12 @@
 const socket = io();
 let currentRoom = null;
 
+const chatInputArea = document.querySelector('.chat-input-area');
+const saveStatusDiv = document.createElement('div');
+
+saveStatusDiv.className = 'save-status mt-2 text-center';
+chatInputArea.appendChild(saveStatusDiv);
+
 // Add chat controls to header
 document.querySelector('.chat-header').innerHTML += `
   <div class="chat-controls">
@@ -180,19 +186,55 @@ socket.on('chat_ended', (data) => {
     </div>
   `;
   document.querySelector('.chat-messages').insertAdjacentHTML('beforeend', messageHtml);
-  
-  // For both customer and admin ended cases
-  // Redirect to main chat page after delay
-  setTimeout(() => {
-    window.location.href = '/dashboard/customer-chat';
-  }, 3000);
 
-  // Remove from active chats if admin ended it
+  // remove from active chats if admin ended it
   if (data.ended_by === 'admin') {
+    // keep the input enabled until we receive chat_history_saved
+    document.getElementById('endChatBtn').style.display = 'none';
     socket.emit('remove_chat_request', {
-      room_id: currentRoom
+        room_id: currentRoom
     });
+  } else {
+    document.getElementById('adminChatInput').disabled = true;
+    document.getElementById('endChatBtn').style.display = 'none';
   }
+});
+
+socket.on('saving_chat_history', () => {
+  saveStatusDiv.textContent = 'Saving chat history...';
+  saveStatusDiv.className = 'save-status mt-2 text-center text-warning';
+
+  const chatMessages = document.querySelector('.chat-messages');
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+});
+
+socket.on('chat_history_saved', (data) => {
+  if (data.error) {
+    saveStatusDiv.textContent = 'Error saving chat history';
+    saveStatusDiv.className = 'save-status mt-2 text-center text-danger';
+  } else {
+    saveStatusDiv.textContent = 'Chat history successfully saved';
+    saveStatusDiv.className = 'save-status mt-2 text-center text-success';
+      
+    const currentURL = window.location.pathname;
+    if (currentURL.includes('/chat-room/')) {
+      document.getElementById('adminChatInput').disabled = true;
+    }
+  }
+  
+  const chatMessages = document.querySelector('.chat-messages');
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+  
+  // hide the message after 5 seconds
+  setTimeout(() => {
+    saveStatusDiv.textContent = '';
+    saveStatusDiv.className = 'save-status mt-2 text-center';
+      
+    // redirect admin back to chat list after successful save if they ended the chat
+    if (!data.error && currentURL.includes('/chat-room/')) {
+      window.location.href = '/dashboard/customer-chat';
+    }
+  }, 5000);
 });
 
 socket.on('join_error', (data) => {

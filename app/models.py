@@ -313,3 +313,17 @@ class MailingPost(db.Model):
   description = db.Column(db.Text, nullable=False)
   created_at = db.Column(db.DateTime(timezone=True), default=func.now())
   updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
+
+class ChatHistory(db.Model):
+  __tablename__ = 'chat_histories'
+  id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+  chat = db.Column(db.JSON, nullable=False) 
+  admin_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+  user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+  support_type = db.Column(db.String(50), nullable=False)
+  chat_summary = db.Column(db.Text, nullable=True)
+  created_at = db.Column(db.DateTime(timezone=True), default=func.now())
+    
+  # Relationships
+  admin = db.relationship('User', foreign_keys=[admin_id], backref='admin_chats')
+  user = db.relationship('User', foreign_keys=[user_id], backref='user_chats')

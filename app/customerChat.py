@@ -3,14 +3,17 @@ from flask_login import login_required, current_user
 from flask_socketio import emit, join_room, leave_room
 from .roleDecorator import role_required
 from . import db, socketio
-from .models import User, Role
+from .models import User, Role, ChatHistory
 from datetime import datetime
+import google.generativeai as genai
 
 customerChat = Blueprint('customerChat', __name__)
 
 # Store active chat rooms
 active_chats = {}  
 # Format: {room_id: {'customer': customer_id, 'admin': admin_id, 'status': 'waiting/active'}}
+
+chat_model = genai.GenerativeModel("gemini-1.5-flash")
 
 @customerChat.route('/customer-chat')
 @login_required
@@ -229,24 +232,61 @@ def handle_chat_end(data):
   ended_by = data.get('ended_by', 'system')
     
   if room_id in active_chats:
+    chat_data = active_chats[room_id].copy()
     end_message = 'Chat ended by customer.' if ended_by == 'customer' else 'Chat ended by support representative.'
         
-    # Notify both parties that chat has ended
     emit('chat_ended', {
       'message': end_message,
       'ended_by': ended_by,
       'room_id': room_id
-    }, broadcast=True)
+    }, room=room_id)
         
-    # Clean up
+    emit('remove_chat_request', {
+      'room_id': room_id
+    }, broadcast=True)
+
+    # check if admin is present in the chat
+    had_admin = chat_data.get('admin') is not None
+        
+    # only proceed with saving if there was an admin involved
+    if had_admin:
+      emit('saving_chat_history', room=room_id)
+            
+      # Save chat history
+      try:
+        chat_history = ChatHistory(
+          chat=chat_data['messages'],
+          admin_id=chat_data['admin'],
+          user_id=chat_data['customer'],
+          support_type=chat_data.get('supportType', 'general')
+        )
+        db.session.add(chat_history)
+        db.session.commit()
+                
+        # generate summary with Gemini
+        chat_text = "\n".join([f"{msg['type']}: {msg['message']}" for msg in chat_data['messages']])
+        prompt = f"Please provide a brief summary of this customer service chat:\n\n{chat_text}"
+                
+        response = chat_model.generate_content(prompt)
+        summary = response.text
+                
+        # update the chat history with summary
+        chat_history.chat_summary = summary
+        db.session.commit()
+                
+        emit('chat_history_saved', {
+          'message': 'Chat history successfully saved'
+        }, room=room_id)
+      except Exception as e:
+        print(f"Error saving chat history: {str(e)}")
+        emit('chat_history_saved', {
+          'message': 'Error saving chat history',
+          'error': True
+        }, room=room_id)
+                
     leave_room(room_id)
     del active_chats[room_id]
 
-    # If ended by admin, broadcast removal of chat request
-    if ended_by == 'admin':
-      emit('remove_chat_request', {
-        'room_id': room_id
-      }, broadcast=True)
 
 # Handle user disconnection
 @socketio.on('disconnect')

@@ -61,7 +61,7 @@ function setupSearch(options) {
     selectedContainer.innerHTML = `
       <div>
         ${formatSelected(item)}
-        <button type="button" onclick="clearSelected('${options.clearFunction}')" style="margin-left: 10px; color: #dc2626;">×</button>
+        <button type="button" class="selected__button" onclick="clearSelected('${options.clearFunction}')"><i class="fa-solid fa-xmark"></i></button>
       </div>
     `;
     selectedContainer.style.display = 'block';

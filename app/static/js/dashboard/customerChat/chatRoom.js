@@ -10,8 +10,8 @@ chatInputArea.appendChild(saveStatusDiv);
 // Add chat controls to header
 document.querySelector('.chat-header').innerHTML += `
   <div class="chat-controls">
-    <button class="btn btn-secondary" id="backBtn">Back</button>
-    <button class="btn btn-danger" id="endChatBtn">End Chat</button>
+    <button id="backBtn">Back</button>
+    <button id="endChatBtn">End Chat</button>
   </div>
 `;
 
@@ -55,8 +55,8 @@ socket.on('connect', () => {
 socket.on('admin_joined', (data) => {
   console.log('Successfully joined room:', data);
   const messageHtml = `
-    <div class="message system mb-3">
-      <div class="message-content bg-success text-white p-2 rounded">
+    <div class="message system">
+      <div class="message-content">
         ${data.message}
       </div>
     </div>
@@ -85,11 +85,11 @@ function sendMessage() {
       
     // Add message to chat
     const messageHtml = `
-      <div class="message outgoing mb-3">
-        <div class="message-content bg-primary text-white p-2 rounded">
+      <div class="message outgoing">
+        <div class="message-content">
           ${message}
         </div>
-        <small class="text-muted">${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</small>
+        <small class="message-time">${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</small>
       </div>
     `;
     document.querySelector('.chat-messages').insertAdjacentHTML('beforeend', messageHtml);
@@ -108,11 +108,11 @@ socket.on('new_message', (data) => {
   console.log('Received message:', data);
   if (data.sender_type === 'customer') {
     const messageHtml = `
-      <div class="message incoming mb-3">
-        <div class="message-content bg-light p-2 rounded">
+      <div class="message incoming">
+        <div class="message-content">
           ${data.message}
         </div>
-        <small class="text-muted">${data.timestamp}</small>
+        <small class="message-time">${data.timestamp}</small>
       </div>
     `;
     document.querySelector('.chat-messages').insertAdjacentHTML('beforeend', messageHtml);

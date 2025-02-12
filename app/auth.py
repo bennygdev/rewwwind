@@ -8,6 +8,7 @@ from flask_mail import Message
 from dotenv import load_dotenv
 import os
 from secrets import token_urlsafe
+from .identicon import create_identicon
 
 auth = Blueprint('auth', __name__)
 
@@ -120,6 +121,29 @@ def register():
 
     return render_template("auth/register.html", user=current_user, form=form)
 
+def generate_user_identicon(username):
+  filename = f"identicon_{username}.png"
+    
+  static_folder = os.path.join(current_app.root_path, 'static', 'profile_pics')
+    
+  os.makedirs(static_folder, exist_ok=True)
+    
+  filepath = os.path.join(static_folder, filename)
+    
+  try:
+    create_identicon(
+      username=username,
+      filename=filepath,
+      avatar_size=5, # 5x5 grid
+      img_size_per_cell=100 # 100 pixels per cell
+    )
+        
+    # Return just the filename
+    return filename
+  except Exception as e:
+    print(f"Error generating identicon: {e}")
+    return 'profile_image_default.jpg'
+
 @auth.route('/register-2', methods=['GET', 'POST'])
 def register_step2():
   form = UsernameForm()
@@ -138,6 +162,9 @@ def register_step2():
     try:
       # update
       user.username = form.username.data
+
+      identicon_path = generate_user_identicon(user.username)
+      user.image = identicon_path
 
       db.session.commit()
       session.pop('user_id', None)

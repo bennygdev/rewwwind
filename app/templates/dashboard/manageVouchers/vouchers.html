@@ -9,22 +9,33 @@
 
 {% block headerContent %}
 <div class="vouchers__header">
-  <h1 id="vouchers__title">Manage Vouchers</h1>
-  <a href="{{ url_for('manageVouchers.add_voucher') }}" >Add New Voucher</a>
-  <a href="{{ url_for('manageVouchers.gift_voucher_page') }}" >Gift Voucher</a>
+  <h1 id="vouchers__title">
+    {% if is_customer %}
+      My Vouchers
+    {% else %}
+      Manage Vouchers
+    {% endif %}
+  </h1>
+  {% if not is_customer %}
+    <a href="{{ url_for('manageVouchers.add_voucher') }}" >Add New Voucher</a>
+    <a href="{{ url_for('manageVouchers.gift_voucher_page') }}" >Gift Voucher</a>
+  {% endif %}
   <div class="extraPadding"></div>
   <div class="voucherSearch__wrapper">
     <form method="get" action="{{ url_for('manageVouchers.vouchers_listing') }}">
       <div class="search__container">
         <!-- Preserve current filter values -->
-        {% if expiry_filter %}
-        <input type="hidden" name="expiry" value="{{ expiry_filter }}">
-        {% endif %}
-        {% if type_filter %}
-        <input type="hidden" name="type" value="{{ type_filter }}">
-        {% endif %}
         {% if status_filter %}
         <input type="hidden" name="status" value="{{ status_filter }}">
+        {% endif %}
+        
+        {% if not is_customer %}
+          {% if expiry_filter %}
+          <input type="hidden" name="expiry" value="{{ expiry_filter }}">
+          {% endif %}
+          {% if type_filter %}
+          <input type="hidden" name="type" value="{{ type_filter }}">
+          {% endif %}
         {% endif %}
 
         <input
@@ -61,6 +72,17 @@
     <input type="hidden" name="q" value="{{ search_query }}">
     {% endif %}
     
+    {% if is_customer %}
+    <div class="filter__group">
+      <label for="status">Status:</label>
+      <select name="status" id="status" class="filter__select">
+        <option value="">All</option>
+        {% for value, label in status_choices %}
+        <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% else %}
     <div class="filter__group">
       <label for="expiry">Expiry:</label>
       <select name="expiry" id="expiry" class="filter__select">
@@ -90,14 +112,77 @@
         {% endfor %}
       </select>
     </div>
+    {% endif %}
 
-    {% if expiry_filter or type_filter or status_filter %}
-    <a href="{{ url_for('manageVouchers.vouchers_listing', q=search_query) }}" class="clear__filters">Clear Filters</a>
+    {% if is_customer %}
+      {% if status_filter %}
+      <a href="{{ url_for('manageVouchers.vouchers_listing', q=search_query) }}" class="clear__filters">Clear Filters</a>
+      {% endif %}
+    {% else %}
+      {% if expiry_filter or type_filter or status_filter %}
+      <a href="{{ url_for('manageVouchers.vouchers_listing', q=search_query) }}" class="clear__filters">Clear Filters</a>
+      {% endif %}
     {% endif %}
   </form>
 </div>
 
 <div class="vouchers__grid">
+  {% if is_customer %}
+    {% for user_voucher in vouchers %}
+    <div class="voucher__card">
+      <div class="voucher__card--top">
+        <i class="fa-solid 
+          {% if user_voucher.voucher.voucherType_id == 1 %}
+            fa-percent
+          {% elif user_voucher.voucher.voucherType_id == 2 %}
+            fa-dollar-sign
+          {% else %}
+            fa-truck-fast
+          {% endif %} 
+          type-icon">
+        </i>
+        <div class="voucher__display">
+          <div class="voucher__status 
+            {% if user_voucher.is_used %}
+              used
+            {% elif user_voucher.expires_at < now %}
+              expired
+            {% else %}
+              active
+            {% endif %}">
+            {% if user_voucher.is_used %}
+              Used
+            {% elif user_voucher.expires_at < now %}
+              Expired
+            {% else %}
+              Active
+            {% endif %}
+          </div>
+          <div class="voucher__types">
+            {% if user_voucher.voucher.voucherType_id == 1 %}
+              {{ user_voucher.voucher.discount_value }}% Off
+            {% elif user_voucher.voucher.voucherType_id == 2 %}
+              ${{ user_voucher.voucher.discount_value }} Off
+            {% else %}
+              Free Shipping
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="voucher__card--bottom">
+        <div class="voucher__info">
+          <p class="voucher__code">{{ user_voucher.voucher.voucher_code }}</p>
+          <p class="voucher__expiry">Expires: {{ user_voucher.expires_at.strftime('%Y-%m-%d') }}</p>
+        </div>
+        <div class="controls">
+          <a href="#" onclick="viewVoucherDetails({{ user_voucher.voucher.id }}); return false;">
+            <i class="fa-solid fa-eye"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
   {% for voucher in vouchers %}
   <div class="voucher__card">
     <div class="voucher__card--top">
@@ -112,8 +197,10 @@
         {% endif %} 
         type-icon">
       </i>
-      <div class="voucher__status {{ 'active' if voucher.is_active else 'inactive' }}">
-        {{ 'Active' if voucher.is_active else 'Inactive' }}
+      <div class="voucher__display">
+        <div class="voucher__status {{ 'active' if voucher.is_active else 'inactive' }}">
+          {{ 'Active' if voucher.is_active else 'Inactive' }}
+        </div>
       </div>
     </div>
     <div class="voucher__card--bottom">
@@ -146,6 +233,7 @@
     </div>
   </div>
   {% endfor %}
+  {% endif %}
 </div>
 
 <div class="vouchers__pagination">

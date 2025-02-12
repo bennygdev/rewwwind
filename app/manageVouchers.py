@@ -12,8 +12,66 @@ manageVouchers = Blueprint('manageVouchers', __name__)
 
 @manageVouchers.route('/manage-vouchers')
 @login_required
-@role_required(2, 3)
+@role_required(1, 2, 3)
 def vouchers_listing():
+  current_time = datetime.now()
+
+  if current_user.role_id == 1:
+    page = request.args.get('page', 1, type=int)
+    per_page = 12
+        
+    # base query for user vouchers with joined voucher data
+    user_vouchers_query = UserVoucher.query.join(
+      Voucher, UserVoucher.voucher_id == Voucher.id
+    ).filter(UserVoucher.user_id == current_user.id)
+
+    # apply filters
+    status_filter = request.args.get('status', '')
+    if status_filter == 'used':
+      user_vouchers_query = user_vouchers_query.filter(UserVoucher.is_used == True)
+    elif status_filter == 'unused':
+      user_vouchers_query = user_vouchers_query.filter(UserVoucher.is_used == False)
+    elif status_filter == 'expired':
+      user_vouchers_query = user_vouchers_query.filter(UserVoucher.expires_at < datetime.now())
+    elif status_filter == 'active':
+      user_vouchers_query = user_vouchers_query.filter(
+        UserVoucher.expires_at >= datetime.now(),
+        UserVoucher.is_used == False
+      )
+
+    search_query = request.args.get('q', '', type=str)
+    if search_query:
+      user_vouchers_query = user_vouchers_query.filter(
+        Voucher.voucher_code.ilike(f"%{search_query}%")
+      )
+
+    total_vouchers = user_vouchers_query.count()
+    user_vouchers = user_vouchers_query.order_by(
+      UserVoucher.claimed_at.desc()
+    ).paginate(page=page, per_page=per_page)
+
+    total_pages = ceil(total_vouchers / per_page)
+
+    status_choices = [
+      ('active', 'Active'),
+      ('used', 'Used'),
+      ('expired', 'Expired'),
+      ('unused', 'Unused')
+    ]
+
+    return render_template(
+      "dashboard/manageVouchers/vouchers.html",
+      user=current_user,
+      vouchers=user_vouchers,
+      total_pages=total_pages,
+      current_page=page,
+      search_query=search_query,
+      status_filter=status_filter,
+      status_choices=status_choices,
+      is_customer=True,
+      now=current_time
+    )
+
   vouchers = Voucher.query.order_by(Voucher.created_at.desc()).all()
 
   # pagination

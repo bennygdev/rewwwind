@@ -284,6 +284,20 @@
         <strong>Eligible Categories:</strong>
         <span id="modal__voucher--categories"></span>
       </div>
+      {% if is_customer %}
+      <div class="voucher__detail">
+        <strong>Claim Date:</strong>
+        <span id="modal__voucher--claim-date"></span>
+      </div>
+      <div class="voucher__detail">
+        <strong>Expiry Date:</strong>
+        <span id="modal__voucher--expiry-date"></span>
+      </div>
+      <div class="voucher__detail">
+        <strong>Status:</strong>
+        <span id="modal__voucher--status"></span>
+      </div>
+      {% else %}
       <div class="voucher__detail">
         <strong>Expiry:</strong>
         <span id="modal__voucher--expiry"></span>
@@ -296,6 +310,7 @@
         <strong>Created At:</strong>
         <span id="modal__voucher--created"></span>
       </div>
+      {% endif %}
       <div class="voucher__detail">
         <strong>Criteria:</strong>
         <pre id="modal__voucher--criteria"></pre  >
@@ -322,6 +337,7 @@
 document.addEventListener('DOMContentLoaded', function() {
   const modal = document.getElementById('voucherDetailsModal');
   const closeModal = document.querySelector('.close-modal');
+  const isCustomer = {{ 'true' if is_customer else 'false' }};
 
   const formatCriteria = (criteria) => {
     if (!criteria || criteria.length === 0) return 'No specific criteria';
@@ -345,7 +361,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const options = { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    };
     return new Intl.DateTimeFormat('en-US', options).format(date);
   };
 
@@ -372,12 +394,17 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('modal__voucher--categories').textContent = 
           voucher.eligible_categories ? voucher.eligible_categories.join(', ') : 'N/A';
         
-        document.getElementById('modal__voucher--expiry').textContent = `${voucher.expiry_days} days`;
-        document.getElementById('modal__voucher--status').textContent = voucher.is_active ? 'Active' : 'Inactive';
-        
-        document.getElementById('modal__voucher--created').textContent = formatDate(voucher.created_at);
-        
         document.getElementById('modal__voucher--criteria').textContent = formatCriteria(voucher.criteria);
+        
+        if (isCustomer) {
+          document.getElementById('modal__voucher--claim-date').textContent = formatDate(voucher.claim_date);
+          document.getElementById('modal__voucher--expiry-date').textContent = formatDate(voucher.expiry_date);
+          document.getElementById('modal__voucher--status').textContent = voucher.status;
+        } else {
+          document.getElementById('modal__voucher--expiry').textContent = `${voucher.expiry_days} days`;
+          document.getElementById('modal__voucher--status').textContent = voucher.is_active ? 'Active' : 'Inactive';
+          document.getElementById('modal__voucher--created').textContent = formatDate(voucher.created_at);
+        }
         
         modal.style.display = 'flex';
       })

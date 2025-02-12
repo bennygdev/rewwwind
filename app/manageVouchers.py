@@ -187,32 +187,64 @@ def add_voucher():
 
 @manageVouchers.route('/manage-vouchers/view/<int:id>')
 @login_required
-@role_required(2, 3)
+@role_required(1, 2, 3)
 def view_voucher(id):
-  voucher = Voucher.query.get_or_404(id)
+  if current_user.role_id == 1:
+    user_voucher = UserVoucher.query.filter_by(
+      user_id=current_user.id,
+      voucher_id=id
+    ).join(
+      Voucher, UserVoucher.voucher_id == Voucher.id
+    ).first_or_404()
 
-  type_mapping = {
-    'fixed_amount': 'Fixed Amount',
-    'free_shipping': 'Free Shipping',
-    'percentage': 'Percentage'
-  }
+    type_mapping = {
+      'fixed_amount': 'Fixed Amount',
+      'free_shipping': 'Free Shipping',
+      'percentage': 'Percentage'
+    }
 
-  voucher_type = voucher.voucher_types.voucher_type
-  formatted_type = type_mapping.get(voucher_type, voucher_type)
+    voucher = user_voucher.voucher
+    voucher_type = voucher.voucher_types.voucher_type
+    formatted_type = type_mapping.get(voucher_type, voucher_type)
 
-  return jsonify({
-    'id': voucher.id,
-    'code': voucher.voucher_code,
-    'description': voucher.voucher_description,
-    'type': formatted_type,
-    'discount_value': str(voucher.discount_value),
-    'criteria': voucher.criteria,
-    'eligible_categories': voucher.eligible_categories,
-    'expiry_days': voucher.expiry_days,
-    'is_active': voucher.is_active,
-    'created_at': voucher.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-    'updated_at': voucher.updated_at.strftime('%Y-%m-%d %H:%M:%S')
-  })
+    return jsonify({
+      'id': voucher.id,  # voucher id, not uservoucher id
+      'code': voucher.voucher_code,
+      'description': voucher.voucher_description,
+      'type': formatted_type,
+      'discount_value': str(voucher.discount_value),
+      'eligible_categories': voucher.eligible_categories,
+      'criteria': voucher.criteria,
+      'claim_date': user_voucher.claimed_at.strftime('%Y-%m-%d %H:%M:%S'),
+      'expiry_date': user_voucher.expires_at.strftime('%Y-%m-%d %H:%M:%S'),
+      'is_used': user_voucher.is_used,
+      'status': 'Used' if user_voucher.is_used else 'Expired' if user_voucher.expires_at < datetime.now() else 'Active'
+    })
+  else:
+    voucher = Voucher.query.get_or_404(id)
+
+    type_mapping = {
+      'fixed_amount': 'Fixed Amount',
+      'free_shipping': 'Free Shipping',
+      'percentage': 'Percentage'
+    }
+
+    voucher_type = voucher.voucher_types.voucher_type
+    formatted_type = type_mapping.get(voucher_type, voucher_type)
+
+    return jsonify({
+      'id': voucher.id,
+      'code': voucher.voucher_code,
+      'description': voucher.voucher_description,
+      'type': formatted_type,
+      'discount_value': str(voucher.discount_value),
+      'criteria': voucher.criteria,
+      'eligible_categories': voucher.eligible_categories,
+      'expiry_days': voucher.expiry_days,
+      'is_active': voucher.is_active,
+      'created_at': voucher.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+      'updated_at': voucher.updated_at.strftime('%Y-%m-%d %H:%M:%S')
+    })
 
 @manageVouchers.route('/manage-vouchers/edit-voucher/<int:id>', methods=['GET', 'POST'])
 @login_required

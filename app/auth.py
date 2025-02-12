@@ -183,23 +183,25 @@ def send_reset_email(user):
 
   reset_link = url_for('auth.reset_token', token=token, _external=True)
 
-  personalized_body = f'''To reset your password, visit the following link:
-  <a href='{reset_link}'>Reset Password</a>
+  image_path = os.path.join(current_app.root_path, 'static', 'media', 'abstractheader1.jpg')
 
-  <br><br>
-  The link will expire in 30 minutes.
-
-  <br><br>
-  If you did not make this request then simply ignore this email and no changes will be made.
-  '''
+  html_body = render_template('email/reset_password.html', user=user,reset_link=reset_link)
 
   msg = Message(
     'Password Reset Request', 
     sender=('Rewwwind Help', current_app.config['MAIL_USERNAME']), 
     recipients=[user.email],
-    body=personalized_body,
-    html=personalized_body
+    html=html_body
   )
+
+  with open(image_path, 'rb') as img:
+    msg.attach(
+      'abstractheader1.jpg',
+      'image/jpeg',
+      img.read(),
+      'inline',
+      headers={'Content-ID': '<header_image>'} 
+    )
   mail.send(msg)
 
 @auth.route('/reset-password', methods=['GET', 'POST'])
@@ -215,6 +217,7 @@ def reset_password_request():
       flash('An email has been sent with instructions to reset your password.', 'info')
       return redirect(url_for('auth.login'))
     except Exception as e:
+      print(e)
       flash('An unexpected error occurred. Please try again.', 'error')
 
   return render_template("auth/resetPasswordRequest.html", user=current_user, form=form)

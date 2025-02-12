@@ -210,7 +210,74 @@
   color: #000;
 }
 
+/* Filter styles */
+.content__filters {
+  margin-top: 10px;
+}
+
+.filters__form {
+  display: flex;
+  gap: 20px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.filter__group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter__group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #6e6e6e;
+}
+
+.filter__select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  min-width: 150px;
+  background-color: #ffffff;
+  color: #6e6e6e;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.filter__select:hover {
+  background-color: #fafafa;
+}
+
+.clear__filters {
+  padding: 8px 16px;
+  background-color: #ffffff;
+  color: #6e6e6e;
+  border: none;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background-color 0.3s;
+  margin-left: auto;
+}
+
+.clear__filters:hover {
+  background-color: #fafafa;
+  text-decoration: none;
+  color: #6e6e6e;
+}
+
 /* Media Queries */
+@media (max-width: 1024px) {
+  .filters__form {
+    gap: 15px;
+  }
+
+  .filter__select {
+    min-width: 130px;
+  }
+}
+
 @media screen and (max-width: 768px) {
   .chatHistory__posts {
     padding: 10px;
@@ -252,6 +319,27 @@
   .pageNext__button a,
   .pagePrevious__button a {
     padding: 8px 15px;
+  }
+
+  .filters__form {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .filter__group {
+    width: 100%;
+  }
+
+  .filter__select {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .clear__filters {
+    width: 100%;
+    text-align: center;
+    margin-top: 10px;
   }
 }
 

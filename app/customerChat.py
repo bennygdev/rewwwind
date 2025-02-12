@@ -86,20 +86,43 @@ def chat_history():
   # pagination
   page = request.args.get('page', 1, type=int)
   per_page = 10
+
+  # filters
+  category_filter = request.args.get('category', '')
+  support_type_filter = request.args.get('support_type', '')
     
   # search 
   search_query = request.args.get('q', '', type=str)
     
+  chat_query = db.session.query(
+    ChatHistory,
+    User.first_name.label('customer_first_name'),
+    User.last_name.label('customer_last_name'),
+    User.username.label('customer_username')
+  ).join(User, ChatHistory.user_id == User.id)
+    
   if search_query:
-    chat_query = db.session.query(ChatHistory, User.first_name.label('customer_first_name'), User.last_name.label('customer_last_name'), User.username.label('customer_username')).join(User, ChatHistory.user_id == User.id).filter(ChatHistory.id == search_query if search_query.isdigit() else ChatHistory.id == -1)
-  else:
-    chat_query = db.session.query(ChatHistory, User.first_name.label('customer_first_name'), User.last_name.label('customer_last_name'), User.username.label('customer_username')).join(User, ChatHistory.user_id == User.id)
+    if search_query.isdigit():
+      chat_query = chat_query.filter(db.cast(ChatHistory.id, db.String).like(f"%{search_query}%"))
+    
+  if category_filter == 'my_chats':
+    chat_query = chat_query.filter(ChatHistory.admin_id == current_user.id)
+    
+  if support_type_filter:
+    chat_query = chat_query.filter(ChatHistory.support_type == support_type_filter)
 
   total_chats = chat_query.count()
     
   chats = chat_query.order_by(ChatHistory.id.desc()).paginate(page=page, per_page=per_page)
     
   total_pages = ceil(total_chats / per_page)
+
+  support_type_choices = [
+    ('billing', 'Billing'),
+    ('technical', 'Technical'),
+    ('account', 'Account'),
+    ('general', 'General')
+  ]
     
   # get admin names for each chat
   chat_data = []
@@ -123,7 +146,10 @@ def chat_history():
     chats=chat_data,
     total_pages=total_pages,
     current_page=page,
-    search_query=search_query
+    search_query=search_query,
+    category_filter=category_filter,
+    support_type_filter=support_type_filter,
+    support_type_choices=support_type_choices
   )
 
 @customerChat.route('/chat-history/<int:id>', methods=['GET'])

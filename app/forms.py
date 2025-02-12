@@ -638,6 +638,27 @@ class EditVoucherForm(FlaskForm):
   def validate_criteria_json(self, field):
     if not field.data or field.data == '[]':
       raise ValidationError('Please add at least one voucher criteria.')
+
+class VoucherGiftForm(FlaskForm):
+  user_id = HiddenField('User ID', 
+    validators=[DataRequired(message="Please select a user")]
+    )
+    
+  voucher_id = HiddenField('Voucher ID',
+    validators=[DataRequired(message="Please select a voucher")]
+  )
+    
+  submit = SubmitField('Gift Voucher')
+    
+  def validate_user_id(self, field):
+    user = User.query.get(field.data)
+    if not user or user.role_id != 1:  # Ensure user exists and is a customer
+      raise ValidationError('Invalid user selected.')
+            
+  def validate_voucher_id(self, field):
+    voucher = Voucher.query.get(field.data)
+    if not voucher or not voucher.is_active:
+      raise ValidationError('Selected voucher is not active or does not exist.')
     
 class MailingListForm(FlaskForm):
   email = EmailField('Email', validators=[DataRequired(), Email(message="Please enter a valid email address.")])

@@ -1,0 +1,59 @@
+{% extends "dashboard/base.html" %}
+{% set active_page = "gift_vouchers" %}
+{% block title %}Gift Vouchers{% endblock %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/manageVouchers/giftVoucher.css') }}">
+{% endblock %}
+
+{% block content %}
+<h1>Gift Voucher</h1>
+
+<a href="{{ url_for('manageVouchers.vouchers_listing') }}", class="back__link"><i class="fa-solid fa-chevron-left fa-sm"></i>Back</a>
+
+<div class="gift-voucher__container">
+  <form id="giftVoucherForm" class="gift-voucher__form">
+    {{ form.csrf_token() }}
+        
+    <div class="form__group">
+      <label for="userSearch">Search User</label>
+      <div class="search__container">
+        <input type="text" 
+          id="userSearch" 
+          class="search__input" 
+          placeholder="Search by username..."
+          autocomplete="off">
+        <div id="userSearchResults" class="search__results"></div>
+        <div id="selectedUser" class="selected__item"></div>
+        {{ form.user_id(id="selectedUserId") }}
+      </div>
+      <span id="userError" class="error__message" style="display: none;"></span>
+    </div>
+        
+    <div class="form__group">
+      <label for="voucherSearch">Search Voucher</label>
+      <div class="search__container">
+        <input type="text" 
+          id="voucherSearch" 
+          class="search__input" 
+          placeholder="Search by voucher code..."
+          autocomplete="off">
+        <div id="voucherSearchResults" class="search__results"></div>
+        <div id="selectedVoucher" class="selected__item"></div>
+        {{ form.voucher_id(id="selectedVoucherId") }}
+      </div>
+      <span id="voucherError" class="error__message" style="display: none;"></span>
+    </div>
+        
+    <button type="submit" class="submit__button">Gift Voucher</button>
+  </form>
+</div>
+
+{% endblock %}
+
+{% block body_scripts %}
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/dashboard/manageVouchers/giftVoucher.js') }}"
+></script>
+{% endblock %}

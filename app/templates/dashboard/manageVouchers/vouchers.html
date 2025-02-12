@@ -11,6 +11,7 @@
 <div class="vouchers__header">
   <h1 id="vouchers__title">Manage Vouchers</h1>
   <a href="{{ url_for('manageVouchers.add_voucher') }}" >Add New Voucher</a>
+  <a href="{{ url_for('manageVouchers.gift_voucher_page') }}" >Gift Voucher</a>
   <div class="extraPadding"></div>
   <div class="voucherSearch__wrapper">
     <form method="get" action="{{ url_for('manageVouchers.vouchers_listing') }}">

@@ -226,6 +226,12 @@ def reset_password_request():
           'message': 'Failed to send reset email'
         })
       flash('An unexpected error occurred. Please try again.', 'error')
+  elif request.method == 'POST':
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+      return jsonify({
+        'success': False,
+        'errors': {field: errors for field, errors in form.errors.items()}
+      })
 
   return render_template("auth/resetPasswordRequest.html", user=current_user, form=form)
 

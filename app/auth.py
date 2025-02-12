@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app, jsonify
 from . import db, mail, oauth
 from .models import User
 from .forms import LoginForm, RegisterForm, UsernameForm, RequestResetForm, ResetPasswordForm
@@ -215,9 +215,16 @@ def reset_password_request():
     try:
       send_reset_email(form.user)
       flash('An email has been sent with instructions to reset your password.', 'info')
+      if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({'success': True})
       return redirect(url_for('auth.login'))
     except Exception as e:
       print(e)
+      if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({
+          'success': False,
+          'message': 'Failed to send reset email'
+        })
       flash('An unexpected error occurred. Please try again.', 'error')
 
   return render_template("auth/resetPasswordRequest.html", user=current_user, form=form)

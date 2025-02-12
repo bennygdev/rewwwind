@@ -6,6 +6,7 @@ from . import db, socketio
 from .models import User, Role, ChatHistory
 from datetime import datetime
 import google.generativeai as genai
+from math import ceil
 
 customerChat = Blueprint('customerChat', __name__)
 
@@ -77,6 +78,68 @@ def check_active_chat():
         'messages': data['messages']
       })
   return jsonify({'hasActiveChat': False})
+
+@customerChat.route('/chat-history', methods=['GET'])
+@login_required
+@role_required(2, 3)
+def chat_history():
+  # pagination
+  page = request.args.get('page', 1, type=int)
+  per_page = 10
+    
+  # search 
+  search_query = request.args.get('q', '', type=str)
+    
+  if search_query:
+    chat_query = db.session.query(ChatHistory, User.first_name.label('customer_first_name'), User.last_name.label('customer_last_name'), User.username.label('customer_username')).join(User, ChatHistory.user_id == User.id).filter(ChatHistory.id == search_query if search_query.isdigit() else ChatHistory.id == -1)
+  else:
+    chat_query = db.session.query(ChatHistory, User.first_name.label('customer_first_name'), User.last_name.label('customer_last_name'), User.username.label('customer_username')).join(User, ChatHistory.user_id == User.id)
+
+  total_chats = chat_query.count()
+    
+  chats = chat_query.order_by(ChatHistory.id.desc()).paginate(page=page, per_page=per_page)
+    
+  total_pages = ceil(total_chats / per_page)
+    
+  # get admin names for each chat
+  chat_data = []
+  for chat, customer_first_name, customer_last_name, customer_username in chats.items:
+    admin = User.query.get(chat.admin_id)
+    admin_name = f"{admin.first_name} {admin.last_name}" if admin else "Unknown"
+    customer_name = f"{customer_first_name} {customer_last_name}"
+        
+    chat_data.append({
+      'id': chat.id,
+      'admin_name': admin_name,
+      'customer_name': customer_name,
+      'customer_username': customer_username,
+      'support_type': chat.support_type,
+      'chat_summary': chat.chat_summary,
+      'created_at': chat.created_at
+    })
+    
+  return render_template(
+    "dashboard/customerChat/chatHistory.html",
+    chats=chat_data,
+    total_pages=total_pages,
+    current_page=page,
+    search_query=search_query
+  )
+
+@customerChat.route('/chat-history/<int:id>', methods=['GET'])
+@login_required
+@role_required(2, 3)
+def chat_history_detail(id):
+  chat = ChatHistory.query.get_or_404(id)
+  customer = User.query.get(chat.user_id)
+  admin = User.query.get(chat.admin_id)
+    
+  return render_template(
+    "dashboard/customerChat/chatHistoryDetail.html",
+    chat=chat,
+    customer=customer,
+    admin=admin
+  )
 
 # Socket.IO event handlers
 

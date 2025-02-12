@@ -174,7 +174,7 @@ def register_step2():
       db.session.rollback()
       flash("An unexpected error occurred. Please try again.", "error")
 
-  return render_template("auth/setUsername.html", user=current_user, form=form)
+  return render_template("auth/setUsername.html", user=None, form=form)
 
 def send_reset_email(user):
   current_app.config['UPDATE_MAIL_CONFIG']('auth')

@@ -84,7 +84,7 @@
       {% for chat in chats %}
       <div class="chatHistory__posts--item">
         <div class="chatHistory__post--content">
-          <a href="{{ url_for('customerChat.chat_history_detail', id=chat.id) }}">
+          <a href="{{ url_for('customerChat.chat_history_content', id=chat.id) }}">
             <h3>Chat #{{ chat.id }}</h3>
           </a>
           <p>

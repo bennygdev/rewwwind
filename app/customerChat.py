@@ -155,13 +155,13 @@ def chat_history():
 @customerChat.route('/chat-history/<int:id>', methods=['GET'])
 @login_required
 @role_required(2, 3)
-def chat_history_detail(id):
+def chat_history_content(id):
   chat = ChatHistory.query.get_or_404(id)
   customer = User.query.get(chat.user_id)
   admin = User.query.get(chat.admin_id)
     
   return render_template(
-    "dashboard/customerChat/chatHistoryDetail.html",
+    "dashboard/customerChat/chatHistoryContent.html",
     chat=chat,
     customer=customer,
     admin=admin

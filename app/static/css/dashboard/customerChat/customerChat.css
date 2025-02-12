@@ -2,7 +2,7 @@
 h1 {
   font-family: "OpenSansSemibold";
   font-size: 1.5em;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
 }
 
 .chat-sidebar {
@@ -12,6 +12,7 @@ h1 {
 .chat-requests {
   max-height: 80vh;
   overflow-y: auto;
+  margin-top: 20px;
 }
 
 .chat-request-card {

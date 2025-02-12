@@ -29,6 +29,7 @@
 
 .settings__container:last-child {
   border-bottom: none;
+  margin-top: 10px;
 }
 
 .settings__title {
@@ -60,6 +61,15 @@
 
 .settings__button:hover {
   background-color: #028347;
+}
+
+.logout__button {
+  color: #fff;
+  background-color: #ff4c24;
+  padding: 7px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  border: none;
 }
 
 @media (max-width: 480px) {

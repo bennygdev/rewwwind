@@ -84,6 +84,14 @@ def privacy_policy():
 def license():
   return render_template('views/license.html')
 
+@views.route('/exchanges-and-returns')
+def exchanges_and_returns():
+  return render_template('views/exchanges.html')
+
+@views.route('/faq')
+def faq():
+  return render_template('views/faq.html')
+
 @views.route('/trade-in')
 def trade_Onboard(): 
     return render_template('views/tradeOnboarding.html')

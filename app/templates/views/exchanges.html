@@ -1,0 +1,80 @@
+{% extends "views/base.html" %}
+{% set active_page = "home" %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/views/exchanges.css') }}">
+{% endblock %}
+
+{% block title %}Exchange and Returns{% endblock %}
+
+{% block content %}
+<div class="exchange__container">
+  <div class="exchange__header">
+    <h1>Exchange and Returns</h1>
+  </div>
+
+  <div class="exchange__section">
+    <p>We are committed to providing you with a pleasant second-hand shopping experience at Rewwwind. We understand that sometimes purchases may not meet your expectations, and we're here to help. See the options below to get started.</p>
+  </div>
+
+  <div class="exchange__section">
+    <p class="exchange__section--header">Exchange Policy for Books and Records</p>
+    <p>Shop with peace of mind! You can exchange books and records purchased from our online store within 7 days of receiving your order, provided that:</p>
+    <ul>
+      <li>The items are in the same condition as when delivered</li>
+      <li>All original packaging and labels are intact</li>
+      <li>You have your order confirmation email or receipt</li>
+    </ul>
+    
+    <p>To initiate an exchange:</p>
+    <ol>
+      <li>Contact us at support@rewwwind.com within 7 days of receiving your order</li>
+      <li>Bring the items you wish to exchange to our store within 14 days of purchase</li>
+      <li>You will receive store credit of equivalent value that can be used both in-store and online</li>
+    </ol>
+  </div>
+
+  <div class="exchange__section">
+    <p class="exchange__section--header">Order Cancellation</p>
+    <p>Changed your mind? We understand. You can cancel your order:</p>
+    <ul>
+      <li>Within 24 hours of placing your order</li>
+      <li>Before the order has been shipped</li>
+      <li>You will receive store credit of equivalent value</li>
+    </ul>
+    <p>Please note that cancellations are not possible after the 24-hour period or once the order has been shipped.</p>
+  </div>
+
+  <div class="exchange__section">
+    <p class="exchange__section--header">Quality Issues</p>
+    <p>If you receive an item that:</p>
+    <ul>
+      <li>Differs significantly from its description</li>
+      <li>Has undisclosed damage or defects</li>
+      <li>Is the wrong item</li>
+      <li>Has playback issues (for records)</li>
+      <li>Has missing pages or severe damage (for books)</li>
+    </ul>
+    <p>Please contact us immediately at support@rewwwind.com with photos and details of the issue. We will work with you to resolve the situation promptly.</p>
+  </div>
+
+  <div class="exchange__section">
+    <p class="exchange__section--header">Returns Policy</p>
+    <p>As we deal in second-hand items, all sales are generally final. However, we understand that exceptional circumstances may arise. In such cases:</p>
+    <ul>
+      <li>Returns are considered on a case-by-case basis</li>
+      <li>Items must be in original condition with all tags/packaging</li>
+      <li>Approved returns will receive store credit</li>
+      <li>Return shipping costs may apply unless the item was misrepresented</li>
+    </ul>
+  </div>
+
+  <div class="exchange__section">
+    <p class="exchange__section--header">Contact Us</p>
+    <p>If you have any questions or concerns about your order, please don't hesitate to reach out to us at:</p>
+    <p>Email: <a href="mailto:rewwwindhelp@gmail.com">rewwwindhelp@gmail.com</a></p>
+    <p>180 Ang Mo Kio Ave 8, Singapore 569830</p>
+    <p>Phone: +1 (234) 567-890</p>
+  </div>
+</div>
+{% endblock %}

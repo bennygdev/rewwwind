@@ -1,0 +1,314 @@
+{% extends "views/base.html" %}
+{% set active_page = "home" %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/views/faq.css') }}">
+{% endblock %}
+
+{% block title %}Frequently Asked Questions{% endblock %}
+
+{% block content %}
+<div class="faq__container">
+  <div class="faq__header">
+    <h1>Frequently Asked Questions</h1>
+  </div>
+
+  <div class="faq__description">
+    <p>Have a question? We can help! Check out these frequently asked questions. If you still can't find an answer to your question, shoot us an email at <a href="mailto:rewwwindhelp@gmail.com">rewwwindhelp@gmail.com</a>, and we'll get back to you as soon as we can!</p>
+  </div>
+
+  <div class="quick__links">
+    <a href="#general" class="quick__link--button">General</a>
+    <a href="#making-a-purchase" class="quick__link--button">Making a Purchase</a>
+    <a href="#order-status" class="quick__link--button">Order Status</a>
+    <a href="#shipping-information" class="quick__link--button">Shipping Information</a>
+    <a href="#my-rewwwind-account" class="quick__link--button">My Rewwwind Account</a>
+  </div>
+
+  <div class="faq__section" id="general">
+    <h2 class="faq__section--header">General</h2>
+    <div class="accordion accordion-flush" id="general_accordion">
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#general1">
+            Do you have a physical store? I want to see the items in person before buying.
+          </button>
+        </h2>
+        <div id="general1" class="accordion-collapse collapse">
+          <div class="accordion-body">
+            We have a physical space in Singapore, <a href="https://www.nyp.edu.sg">Nanyang Polytechnic</a>. Please note it showcases a selection of our items and not our full inventory available online! 
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#general2">
+            Can I send in my old items to you?
+          </button>
+        </h2>
+        <div id="general2" class="accordion-collapse collapse">
+          <div class="accordion-body">
+            Yes, we do take in preloved books and records. Check out our <a href="/trade-in">Trade-in</a> page for more details!
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="faq__section" id="making-a-purchase">
+    <h2 class="faq__section--header">Making a Purchase</h2>
+    <div class="accordion accordion-flush" id="purchase-accordion">
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#payment1">
+            What payment methods are accepted?
+          </button>
+        </h2>
+        <div id="payment1" class="accordion-collapse collapse">
+          <div class="accordion-body">
+            We accept payment by Visa, Mastercard, American Express and Stripe. Your payment information is processed securely. We have access to your credit card information.
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#payment2">
+            Why do certain discounts not apply to my cart?
+          </button>
+        </h2>
+        <div id="payment2" class="accordion-collapse collapse">
+          <div class="accordion-body">
+            This might be due to the terms and conditions of the discounts! Please do note that some discounts are not stackable with each other.
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#payment3">
+            How do I apply a discount code?
+          </button>
+        </h2>
+        <div id="payment3" class="accordion-collapse collapse">
+          <div class="accordion-body">
+            Simply key in the discount code at the checkout, in the "Discount code" section.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="faq__section" id="order-status">
+    <h2 class="faq__section--header">Order Status</h2>
+    <div class="accordion accordion-flush" id="orderstatus_accordion">
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#orderstatus1">
+            When will my order be shipped out?
+          </button>
+        </h2>
+        <div id="orderstatus1" class="accordion-collapse collapse">
+          <div class="accordion-body">
+            <strong>Local orders:</strong> All orders are packed and shipped within 2-7 business days on a next-day-delivery service. Business days are Monday through Friday (excluding weekends and public holidays).
+            <br><br>
+            <strong>International orders:</strong> All orders to Indonesia, Malaysia (West Malaysia), Hong Kong, Philippines, South Korea, Thailand, and Taiwan are packed and shipped within 2-7 business days. They may take up to 7 business days to arrive. Business days are Monday through Friday (excluding weekends and public holidays).
+            <br><br>
+            Some orders may experience delays due to customs. Unfortunately, we have no control over these delays and cannot predict what they may be. If necessary, we suggest that you contact your local office for additional information!
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#orderstatus2">
+            I need to change my shipping address!
+          </button>
+        </h2>
+        <div id="orderstatus2" class="accordion-collapse collapse">
+          <div class="accordion-body">
+            Please do let us know any changes to your address within 2 hours of placing your order via <a href="mailto:rewwwindhelp@gmail.com">rewwwindhelp@gmail.com</a>
+            <br><br>
+            Any changes made after 2 hours will be accepted only on a case-by-case basis. If your order has been shipped out already, we regret to inform that no change will be possible.
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#orderstatus3">
+            Can I add or remove items from my order?
+          </button>
+        </h2>
+        <div id="orderstatus3" class="accordion-collapse collapse">
+          <div class="accordion-body">
+            Please do let us know any changes to your order within 2 hours of placing your order, via <a href="mailto:rewwwindhelp@gmail.com">rewwwindhelp@gmail.com</a>!
+            <br><br>
+            Any changes made after 2 hours will be accepted only on a case-by-case basis. If your order has been shipped out already, we regret to inform that no change will be possible.
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#orderstatus4">
+            Can I exchange items from my order for something else?
+          </button>
+        </h2>
+        <div id="orderstatus4" class="accordion-collapse collapse">
+          <div class="accordion-body">
+            Changed your mind? Let us know within 2 hours of placing your order, via <a href="mailto:rewwwindhelp@gmail.com">rewwwindhelp@gmail.com</a>!
+            <br><br>
+            You will receive a gift card of the equivalent value of your item or order in SGD that you can spend on other items instead.
+            <br><br>
+            Any changes made after 2 hours will be accepted only on a case-by-case basis. If your order has been shipped out already, we regret to inform that no change will be possible.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="faq__section" id="shipping-information">
+    <h2 class="faq__section--header">Shipping Information</h2>
+    <div class="accordion accordion-flush" id="shipping_accordion">
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#shipping1">
+            How much does delivery cost?
+          </button>
+        </h2>
+        <div id="shipping1" class="accordion-collapse collapse">
+          <div class="accordion-body">
+            <strong>Local orders:</strong> All orders above S$30 are eligible for free delivery. A shipping fee of S$4 is charged for orders below S$30.
+            <br><br>
+            <strong>Malaysian orders:</strong> We are delighted to offer FREE delivery for all orders to Western Malaysia. For orders to Eastern Malaysia (Sarawak, Sabah), a live quote based on prevailing shipping rates is provided by our partner, Shippit, upon checkout!
+            <br><br>
+            <strong>Rest of the world:</strong> We currently also ship to Australia, Hong Kong, Indonesia, Philippines, South Korea, Taiwan, Thailand, United Kingdom, United States, and Vietnam.
+            <br><br>
+            A live quote based on prevailing shipping rates is provided by our partner, Shippit, upon checkout!
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#shipping2">
+            Do you deliver internationally?
+          </button>
+        </h2>
+        <div id="shipping2" class="accordion-collapse collapse">
+          <div class="accordion-body">
+            We currently accept orders from Singapore, Australia, Hong Kong, Indonesia, Malaysia, Philippines, South Korea, Taiwan, Thailand, United Kingdom, United States, and Vietnam.
+            <br><br>
+            Thanks for supporting us from across the borders!
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="faq__section" id="my-rewwwind-account">
+    <h2 class="faq__section--header">My Rewwwind Account</h2>
+    <div class="accordion accordion-flush" id="account_accordion">
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#account1">
+            How do I update my email address?
+          </button>
+        </h2>
+        <div id="account1" class="accordion-collapse collapse">
+          <div class="accordion-body">
+            <ol>
+              <li>Login into your Rewwwind account.</li>
+              <li>Click on "My Dashboard" and head to the "Settings" tab.</li>
+              <li>Click on "Edit Personal Information"</li>
+              <li>Click on "Change Email", and you can change your email address there!</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#account2">
+            How do I update my email preferences or unsubscribe?
+          </button>
+        </h2>
+        <div id="account2" class="accordion-collapse collapse">
+          <div class="accordion-body">
+            You should see a link to unsubscribe in the footer of all the emails we send out. Simply click the link to unsubscribe.
+            <br><br>
+            Alternatively, you can also access it by:
+            <ol>
+              <li>Login into your Rewwwind account.</li>
+              <li>Click on "My Dashboard" and head to the "Settings" tab.</li>
+              <li>Click on "View Notification Options"</li>
+              <li>From there, you can adjust your notification preferences!</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#account3">
+            How do I update my password?
+          </button>
+        </h2>
+        <div id="account3" class="accordion-collapse collapse">
+          <div class="accordion-body">
+            <ol>
+              <li>Login into your Rewwwind account.</li>
+              <li>Click on "My Dashboard" and head to the "Settings" tab.</li>
+              <li>Click on "Edit Personal Information"</li>
+              <li>Click on "Change Password", enter your new password and submit!</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#account4">
+            How do I delete my account?
+          </button>
+        </h2>
+        <div id="account4" class="accordion-collapse collapse">
+          <div class="accordion-body">
+            We're sad to see you go!
+            <ol>
+              <li>Login into your Rewwwind account.</li>
+              <li>Click on "My Dashboard" and head to the "Settings" tab.</li>
+              <li>Click on "Edit Personal Information"</li>
+              <li>Click on "Delete account", where you can delete your account.</li>
+            </ol>
+            Or alternatively, you can email us at <a href="mailto:rewwwindhelp@gmail.com">rewwwindhelp@gmail.com</a> and let us know the email address that you use for your Rewwwind account.
+            <br><br>
+            We'll help to delete your account for you.
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#account5">
+            How do I update the address on my Rewwwind account?
+          </button>
+        </h2>
+        <div id="account5" class="accordion-collapse collapse">
+          <div class="accordion-body">
+            <ol>
+              <li>Login into your Rewwwind account.</li>
+              <li>Click on "My Dashboard" and head to the "Settings" tab.</li>
+              <li>Click on "View Billing Addresses"</li>
+              <li>Either add a new address, or edit your existing addresses!</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#account6">
+            I can't seem to login/can't change my password!
+          </button>
+        </h2>
+        <div id="account6" class="accordion-collapse collapse">
+          <div class="accordion-body">
+            If you do not have a Google Account, please email us at <a href="mailto:rewwwindhelp@gmail.com">rewwwindhelp@gmail.com</a>, and let us know the email address. We'll send you an account invite!
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

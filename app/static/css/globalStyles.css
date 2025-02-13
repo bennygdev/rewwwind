@@ -48,6 +48,12 @@ textarea:focus, input:focus{
   outline: none;
 }
 
+.accordion {
+  --bs-accordion-active-bg: transparent;
+  --bs-accordion-active-color: #000;
+  --bs-accordion-btn-focus-box-shadow: transparent;
+}
+
 .back__button {
   font-family: "OpenSansSemibold";
   text-decoration: none;

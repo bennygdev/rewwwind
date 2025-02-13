@@ -1,0 +1,29 @@
+.exchange__container {
+  max-width: 750px;
+  margin-top: calc(80px + 100px);
+  justify-self: center;
+  padding: 0 1rem;
+}
+
+h1 {
+  font-family: "CharisSILBold";
+  text-align: center;
+  font-size: 2em;
+  margin-bottom: 2rem;
+}
+
+.exchange__section {
+  margin-bottom: 2rem;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.exchange__section:last-child {
+  padding-bottom: 10px;
+  border-bottom: none;
+}
+
+.exchange__section--header {
+  font-family: "OpensansBold";
+  margin-bottom: 5px;
+}

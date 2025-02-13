@@ -9,10 +9,11 @@
 
 {% block content %}
 <div class="paddedContent">
-  <img src="{{ url_for('static', filename='media/lightbulb.png') }}" alt="404" id="pageNotFound__img">
-  <h1 id="pageNotFound__title">Page not found!</h1>
-  <p id="pageNotFound__subtitle">Seems like this page does not exist.</p>
-  <a href="/"><button id="pageNotFound__button">Go Back</button></a>
+  <div class="nocontent">
+    <h1 id="pageNotFound__title">404 Page not found</h1>
+    <p id="pageNotFound__subtitle">Seems like this page does not exist.</p>
+    <a href="/"><button id="pageNotFound__button">Return Home</button></a>
+  </div>
 </div>
 
 {% endblock %}

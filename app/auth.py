@@ -204,10 +204,6 @@ def send_reset_email(user):
   #   )
   mail.send(msg)
 
-@auth.route('/testemail')
-def testemail():
-  return render_template('email/reset_password.html')
-
 @auth.route('/reset-password', methods=['GET', 'POST'])
 def reset_password_request():
   if current_user.is_authenticated:

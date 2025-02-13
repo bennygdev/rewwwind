@@ -72,6 +72,18 @@ def home():
     mailing_list_form=mailing_list_form
   )
 
+@views.route('/terms-of-service')
+def terms_of_service():
+  return render_template('views/termsofservice.html')
+
+@views.route('/privacy-policy')
+def privacy_policy():
+  return render_template('views/privacypolicy.html')
+
+@views.route('/license')
+def license():
+  return render_template('views/license.html')
+
 @views.route('/trade-in')
 def trade_Onboard(): 
     return render_template('views/tradeOnboarding.html')

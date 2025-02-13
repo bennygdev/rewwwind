@@ -1,0 +1,93 @@
+{% extends "views/base.html" %}
+{% set active_page = "home" %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/views/privacypolicy.css') }}">
+{% endblock %}
+
+{% block title %}Privacy Policy{% endblock %}
+
+{% block content %}
+<div class="privacy__container">
+  <h1>Privacy Policy</h1>
+
+  <div class="privacy__section">
+    <p>This Privacy Policy describes how your personal information is collected, used, and shared when you visit or make a purchase from Rewwwind (the "Site").</p>
+  </div>
+
+  <div class="privacy__section">
+    <p class="privacy__section--header">Personal information we collect</p>
+    <p>When you visit the Site, we automatically collect certain information about your device, including information about your web browser, IP address, time zone, and some of the cookies that are installed on your device. Additionally, as you browse the Site, we collect information about the individual web pages or products that you view, what websites or search terms referred you to the Site, and information about how you interact with the Site.</p>
+    
+    <p>When you make a purchase or attempt to make a purchase through the Site, we collect certain information from you, including your:</p>
+    <ul>
+      <li>Name</li>
+      <li>Billing address</li>
+      <li>Shipping address</li>
+      <li>Payment information</li>
+      <li>Email address</li>
+      <li>Phone number</li>
+    </ul>
+    
+    <p>For trade-in services, we collect additional information such as:</p>
+    <ul>
+      <li>Details about the items you wish to trade (books/records)</li>
+      <li>Photos of trade-in items</li>
+      <li>Transaction history of trades</li>
+      <li>Trade credit balance</li>
+    </ul>
+  </div>
+
+  <div class="privacy__section">
+    <p class="privacy__section--header">How we use your personal Information</p>
+    <p>We use the information that we collect generally to:</p>
+    <ul>
+      <li>Fulfill any orders placed through the Site (including processing your payment information, arranging for shipping, and providing you with invoices and/or order confirmations)</li>
+      <li>Process and manage your trade-in requests</li>
+      <li>Communicate with you about your orders, trade-ins, and services</li>
+      <li>Screen our orders for potential risk or fraud</li>
+      <li>Provide you with information about new products, special offers, and promotions</li>
+      <li>Improve and optimize our Site</li>
+    </ul>
+  </div>
+
+  <div class="privacy__section">
+    <p class="privacy__section--header">Sharing your personal Information</p>
+    <p>We share your Personal Information with third parties to help us use your Personal Information, as described above. These include:</p>
+    <ul>
+      <li>Payment processors to handle transactions</li>
+      <li>Shipping providers to deliver your orders</li>
+      <li>Analytics services to improve our Site</li>
+    </ul>
+    <p>We may also share your Personal Information to comply with applicable laws and regulations, to respond to a subpoena, search warrant or other lawful request for information we receive, or to otherwise protect our rights.</p>
+  </div>
+
+  <div class="privacy__section">
+    <p class="privacy__section--header">Your rights</p>
+    <p>You have the right to:</p>
+    <ul>
+      <li>Access your personal information</li>
+      <li>Correct any inaccurate information</li>
+      <li>Request deletion of your information</li>
+      <li>Object to our use of your information</li>
+      <li>Withdraw consent for marketing communications</li>
+    </ul>
+  </div>
+
+  <div class="privacy__section">
+    <p class="privacy__section--header">Data retention</p>
+    <p>We will maintain your Personal Information for our records unless and until you ask us to delete this information. Information about trade-ins and purchases may be retained for legal and accounting purposes.</p>
+  </div>
+
+  <div class="privacy__section">
+    <p class="privacy__section--header">Changes</p>
+    <p>We may update this privacy policy from time to time in order to reflect changes to our practices or for other operational, legal or regulatory reasons. When we make changes, we will update the date at the top of this policy.</p>
+  </div>
+
+  <div class="privacy__section">
+    <p class="privacy__section--header">Contact us</p>
+    <p>For more information about our privacy practices, if you have questions, or if you would like to make a complaint, please contact us by email at [Your Contact Email] or by mail using the details provided below:</p>
+    <a href="mailto:rewwwindhelp@gmail.com">rewwwindhelp@gmail.com</a>
+  </div>
+</div>
+{% endblock %}

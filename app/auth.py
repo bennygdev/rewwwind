@@ -183,7 +183,7 @@ def send_reset_email(user):
 
   reset_link = url_for('auth.reset_token', token=token, _external=True)
 
-  image_path = os.path.join(current_app.root_path, 'static', 'media', 'abstractheader1.jpg')
+  # image_path = os.path.join(current_app.root_path, 'static', 'media', 'abstractheader1.jpg')
 
   html_body = render_template('email/reset_password.html', user=user,reset_link=reset_link)
 
@@ -194,15 +194,19 @@ def send_reset_email(user):
     html=html_body
   )
 
-  with open(image_path, 'rb') as img:
-    msg.attach(
-      'abstractheader1.jpg',
-      'image/jpeg',
-      img.read(),
-      'inline',
-      headers={'Content-ID': '<header_image>'} 
-    )
+  # with open(image_path, 'rb') as img:
+  #   msg.attach(
+  #     'abstractheader1.jpg',
+  #     'image/jpeg',
+  #     img.read(),
+  #     'inline',
+  #     headers={'Content-ID': '<header_image>'} 
+  #   )
   mail.send(msg)
+
+@auth.route('/testemail')
+def testemail():
+  return render_template('email/reset_password.html')
 
 @auth.route('/reset-password', methods=['GET', 'POST'])
 def reset_password_request():

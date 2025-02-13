@@ -28,7 +28,7 @@ def send_newsletter(form):
     return False
     
   try:
-    image_path = os.path.join(current_app.root_path, 'static', 'media', 'abstractheader2.jpg')
+    # image_path = os.path.join(current_app.root_path, 'static', 'media', 'abstractheader2.jpg')
 
     for subscriber in mailing_list:
       if not subscriber.unsubscribe_token:
@@ -52,14 +52,14 @@ def send_newsletter(form):
         html=html_body
       )
 
-      with open(image_path, 'rb') as img:
-        msg.attach(
-          'abstractheader2.jpg',
-          'image/jpeg',
-          img.read(),
-          'inline',
-          headers={'Content-ID': '<header_image>'} 
-        )
+      # with open(image_path, 'rb') as img:
+      #   msg.attach(
+      #     'abstractheader2.jpg',
+      #     'image/jpeg',
+      #     img.read(),
+      #     'inline',
+      #     headers={'Content-ID': '<header_image>'} 
+      #   )
 
       mail.send(msg)
 

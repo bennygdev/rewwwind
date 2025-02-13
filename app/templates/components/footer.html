@@ -1,0 +1,74 @@
+<!-- replace with url_for later -->
+<footer class="footer">
+  <div class="footer__content">
+    <div class="footer__section footer__brand">
+      <a href="/" class="logo__title--link">
+        <h1 class="logo__title">Rewwwind</h1>
+      </a>
+      <p class="footer__quote">"Music and literature are the purest forms of art, for they require no interpretation beyond themselves."</p>
+      <div class="footer__social">
+        <a href="#" class="social-icon"><i class="fa-brands fa-facebook"></i></a>
+        <a href="#" class="social-icon"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" class="social-icon"><i class="fa-brands fa-twitter"></i></a>
+        <a href="#" class="social-icon"><i class="fa-brands fa-youtube"></i></a>
+      </div>
+    </div>
+    
+    <div class="footer__section footer__links">
+      <h3>About</h3>
+      <ul>
+        <li><a href="/about-us">About Us</a></li>
+        <li><a href="/our-impact">Our Impact</a></li>
+        <li><a href="/contact-us">Contact Us</a></li>
+        <li><a href="/faq">FAQ</a></li>
+        <li><a href="/exchanges-and-returns">Exchanges and Returns</a></li>
+      </ul>
+    </div>
+
+    <div class="footer__section footer__links">
+      <h3>Shop</h3>
+      <ul>
+        <li><a href="/products">Products</a></li>
+        <li><a href="/trade-in">Trade In</a></li>
+        <li><a href="/rewards">Rewards</a></li>
+        <li><a href="/wishlist">Wishlist</a></li>
+      </ul>
+    </div>
+    
+    <div class="footer__section footer__links">
+      <h3>Legal</h3>
+      <ul>
+        <li><a href="/terms-of-service">Terms of Service</a></li>
+        <li><a href="/privacy-policy">Privacy Policy</a></li>
+        <li><a href="/license">License</a></li>
+      </ul>
+    </div>
+
+    <div class="footer__section footer__contact">
+      <h3>Stay Connected</h3>
+      <div class="contact__info">
+        <div class="contact__item">
+          <i class="fa-solid fa-envelope"></i>
+          <a href="mailto:info@rewwwind.com">info@rewwwind.com</a>
+        </div>
+        <div class="contact__item">
+          <i class="fa-solid fa-phone"></i>
+          <a href="tel:+1234567890">+1 (234) 567-890</a>
+        </div>
+      </div>
+      <div class="footer__payment">
+        <h4>Payment Methods</h4>
+        <div class="payment__methods">
+          <img src="{{ url_for('static', filename='media/card_logos/Visa.svg') }}" alt="Visa">
+          <img src="{{ url_for('static', filename='media/card_logos/Mastercard.svg') }}" alt="Mastercard">
+          <img src="{{ url_for('static', filename='media/card_logos/American express.svg') }}" alt="American Express">
+          <img src="{{ url_for('static', filename='media/card_logos/Stripe.svg') }}" alt="Stripe">
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer__bottom">
+    <p>&copy; 2025 Rewwwind. All rights reserved.</p>
+  </div>
+</footer>

@@ -94,7 +94,19 @@ def faq():
 
 @views.route('/trade-in')
 def trade_Onboard(): 
-    return render_template('views/tradeOnboarding.html')
+  return render_template('views/tradeOnboarding.html')
+
+@views.route('/about-us')
+def about_us():
+  return render_template('views/aboutus.html')
+
+@views.route('/contact-us')
+def contact_us():
+  return render_template('views/contactus.html')
+
+@views.route('/our-impact')
+def our_impact():
+  return render_template('views/ourimpact.html')
 
 @views.route('/tradeForm', methods=['GET', 'POST'])
 @login_required  

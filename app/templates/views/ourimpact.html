@@ -1,0 +1,106 @@
+{% extends "views/base.html" %}
+{% set active_page = "our_impact" %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/views/ourimpact.css') }}">
+{% endblock %}
+
+{% block title %}Our Impact{% endblock %}
+
+{% block content %}
+<div class="about__menu">
+  <ul class="about__menu--links">
+    <li><a class="about__menu--link {{ 'about__link--active' if active_page == 'about' else '' }}" href="/about-us">About</a></li>
+    <li><a class="about__menu--link {{ 'about__link--active' if active_page == 'our_impact' else '' }}" href="/our-impact">Impact</a></li>
+  </ul>
+</div>
+
+<div class="impact__container">
+  <h1 class="impact__header">Doing good for people and planet.</h1>
+
+  <div class="impact__introduction">
+    <p>We make sure that whether you are donating your items, trading-in for other goods, or simply making a purchase, every step of your journey with Thryft makes a difference.</p>
+  </div>
+
+  <div class="impact__section">
+    <div class="impact__section--left">
+      <img src="{{ url_for('static', filename='media/waste.jpg') }}" alt="Our warehouse">
+    </div>
+    <div class="impact__section--right">
+      <h2 class="impact__section--header">The problem of our generation</h2>
+      <p>Did you know? 60% of global greenhouse gas emissions is caused by the production and use of household goods and services, but only 1% of “stuff” is still in use six months from its purchase.</p>
+      <p>Our mission is to create a way to consume that is easy on your wallet and the planet while also directly contributing to communities in need. Win-win-win!</p>
+    </div>
+  </div>
+
+  <h2 class="impact__header2">With supporters like you, we're getting closer everday.</h2>
+
+  <div class="impact__support1">
+    <div class="impact__support1--left">
+      <img src="{{ url_for('static', filename='media/children.jpg') }}" alt="Our warehouse">
+      <h3>$29848.04 raised</h3>
+      <p>With your help, we donate credits raised from donated books to social and environmental causes.</p>
+    </div>
+    <div class="impact__support1--right">
+      <img src="{{ url_for('static', filename='media/resources.jpg') }}" alt="Our warehouse">
+      <h2>Over 108,000 items rehomed</h2>
+      <p>Saving over 4 thousand trees and 35 million liters of water.</p>
+    </div>
+  </div>
+
+  <h2 class="impact__header2">The savings that truly matter</h2>
+
+  <div class="impact__description">
+    <p>By giving and committing to social and environmental initiatives, we bridge the gap between consumption and doing good.</p>
+
+    <p>This way, you don’t just feel better when you thrift with us, but we all do better too.</p>
+  </div>
+
+  <h2 class="impact__header3">Partners you've made a difference to</h2>
+
+  <div class="impact__partners">
+    <div class="impact__partners--grid">
+      <div class="impact__partners--item">
+        <img src="{{ url_for('static', filename='media/partner-logolakeside.png') }}" alt="Lakeside Family Services">
+        <h3>Lakeside Family Services</h3>
+        <p>$4050.84 donated towards children and youth services.</p>
+      </div>
+      <div class="impact__partners--item">
+        <img src="{{ url_for('static', filename='media/partner-logomorningstar.png') }}" alt="MorningStar">
+        <h3>MorningStar</h3>
+        <p>$2500.86 donated towards their CareNights programme to provide evening care services for families in need.</p>
+      </div>
+      <div class="impact__partners--item">
+        <img src="{{ url_for('static', filename='media/partner-logomws.png') }}" alt="Methodist Welfare Services">
+        <h3>Methodist Welfare Services</h3>
+        <p>$2257.07 donated to assist two low-income families through the pandemic.</p>
+      </div>
+      <div class="impact__partners--item">
+        <img src="{{ url_for('static', filename='media/partner-logowwf.png') }}" alt="WWF-Singapore">
+        <h3>WWF-Singapore</h3>
+        <p>$1,476.76 to their For Nature For Us community and recovery programme.</p>
+      </div>
+      <div class="impact__partners--item">
+        <img src="{{ url_for('static', filename='media/partner-logochulia.png') }}" alt="Project Chulia Street">
+        <h3>Project Chulia Street</h3>
+        <p>200 wash basins given to migrant workers during the COVID-19 lockdown to improve their qulaity of life.</p>
+      </div>
+      <div class="impact__partners--item">
+        <img src="{{ url_for('static', filename='media/partner-logofoodbank.png') }}" alt="The Food Bank Singapore">
+        <h3>The Food Bank Singapore</h3>
+        <p>22 meals and delivery provided for people in need during COVID-19.</p>
+      </div>
+      <div class="impact__partners--item">
+        <img src="{{ url_for('static', filename='media/partner-logonew-hope.png') }}" alt="New Hope Community Services">
+        <h3>New Hope Community Services</h3>
+        <p>Sponsored a life skills training programme at their shelter for displaced families, and the cost of meals and utilities for one shelter resident.</p>
+      </div>
+      <div class="impact__partners--item">
+        <img src="{{ url_for('static', filename='media/partner-logobiab.png') }}" alt="Blessings in a Bag">
+        <h3>Blessings in a Bag</h3>
+        <p>Over 160 books sold on their behalf on our platform, with 100% profits going back to them.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

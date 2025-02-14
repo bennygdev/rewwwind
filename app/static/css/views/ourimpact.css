@@ -1,0 +1,330 @@
+.about__menu {
+  margin-top: 80px;
+  border-top: 1px solid #ddd;
+}
+
+.about__menu--links {
+  font-family: "OpenSansRegular";
+  display: flex;
+  width: 93%;
+  margin: 0 auto;
+  flex-direction: row;
+  gap: 20px;
+  padding: 15px 20px;
+  list-style-type: none;
+  border-bottom: 1px solid #ddd;
+}
+
+.about__menu--link {
+  text-decoration: none;
+  color: #000;
+  font-size: 0.95em;
+}
+
+.about__link--active {
+  padding-bottom: 15px;
+  border-bottom: 2px solid #000;
+}
+
+.impact__container {
+  margin-top: calc(80px + 20px);
+  justify-self: center;
+  padding: 0;
+}
+
+.impact__header {
+  font-family: "CharisSILBold";
+  text-align: center;
+  font-size: 3em;
+  margin-bottom: 2rem;
+}
+
+.impact__description {
+  text-align: center;
+  font-size: 1.15em;
+  margin-bottom: 80px;
+}
+
+.impact__header2 {
+  font-family: "CharisSILBold";
+  text-align: center;
+  font-size: 2em;
+  margin-bottom: 2rem;
+}
+
+.impact__header3 {
+  font-family: "CharisSILBold";
+  text-align: center;
+  font-size: 1.8em;
+  margin-bottom: 2rem;
+}
+
+.impact__introduction {
+  margin: 0 auto;
+  margin-bottom: 60px;
+  max-width: 750px;
+  text-align: center;
+  font-size: 1.15em;
+}
+
+.impact__section {
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 80px;
+  padding: 0px 60px;
+}
+
+.impact__section img {
+  width: 100%;
+  height: 600px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.impact__section--right, .impact__section--left {
+  width: 50%;
+  height: 600px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.impact__section--right img, .impact__section--left img {
+  height: 100%;
+}
+
+.impact__section--right:has(img), .impact__section--left:has(img) {
+  overflow: hidden;
+}
+
+.impact__section:last-child {
+  padding-bottom: 10px;
+  border-bottom: none;
+}
+
+.impact__section--header, .impact__cta--header {
+  font-family: "CharisSILBold";
+  margin-bottom: 10px;
+}
+
+.impact__section--headerImportant {
+  font-family: "OpensansBold";
+  text-decoration: underline;
+  margin-bottom: 5px;
+}
+
+.impact__support1 {
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+  padding: 0px 60px;
+  margin-bottom: 80px;
+}
+
+.impact__support1--left, .impact__support1--right {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+}
+
+.impact__support1--left img, .impact__support1--right img {
+  width: 100%;
+  height: 650px;
+  object-fit: cover;
+  object-position: center;
+  margin-bottom: 20px;
+}
+
+.impact__support1--left h3, .impact__support1--right h2 {
+  font-family: "CharisSILBold";
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+.impact__support1--left p, .impact__support1--right p {
+  max-width: 80%;
+}
+
+/* Partners grid */
+.impact__partners {
+  padding: 0 60px;
+  margin-bottom: 80px;
+}
+
+.impact__partners--grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.impact__partners--item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.impact__partners--item img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  object-position: center;
+  margin-bottom: 15px;
+}
+
+.impact__partners--item h3 {
+  font-family: "CharisSILBold";
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+.impact__partners--item p {
+  font-size: 1.05em;
+  line-height: 1.5;
+  color: #333;
+}
+
+/* Media Queries */
+
+/* partners grid */
+@media (max-width: 1200px) {
+  .impact__partners--grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .impact__partners--grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .impact__partners--grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .impact__partners {
+    padding: 0 20px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .about__menu--links {
+    width: 100%;
+    padding: 15px 10px;
+  }
+
+  .impact__section {
+    padding: 0px 20px;
+    gap: 20px;
+  }
+
+  .impact__introduction {
+    padding: 0 20px;
+  }
+
+  .impact__header {
+    font-size: 2.5em;
+  }
+
+  .impact__support1 {
+    padding: 0px 20px;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .about__menu--links {
+    padding: 10px;
+  }
+
+  .impact__section {
+    flex-direction: column;
+    padding: 0px 15px;
+  }
+
+  .impact__section--right, 
+  .impact__section--left {
+    width: 100%;
+    height: auto;
+  }
+
+  .impact__section img {
+    height: 300px;
+  }
+
+  .impact__header {
+    font-size: 2em;
+    padding: 0 15px;
+  }
+
+  .impact__introduction {
+    padding: 0 15px;
+    font-size: 1em;
+  }
+
+  .impact__support1 {
+    flex-direction: column;
+    padding: 0px 15px;
+  }
+
+  .impact__support1--left, 
+  .impact__support1--right {
+    width: 100%;
+  }
+
+  .impact__support1--left img, 
+  .impact__support1--right img {
+    height: 300px;
+  }
+
+  .impact__header2 {
+    font-size: 1.6em;
+    padding: 0 15px;
+  }
+
+  .impact__header3 {
+    font-size: 1.4em;
+    padding: 0 15px;
+  }
+
+  .impact__description {
+    padding: 0 15px;
+    font-size: 1em;
+  }
+
+  .impact__partners {
+    padding: 0 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .impact__section img {
+    height: 250px;
+  }
+
+  .impact__header {
+    font-size: 1.8em;
+  }
+
+  .impact__support1--left img, 
+  .impact__support1--right img {
+    height: 250px;
+  }
+
+  .impact__partners--item img {
+    height: 250px;
+  }
+
+  .impact__header2 {
+    font-size: 1.4em;
+  }
+
+  .impact__header3 {
+    font-size: 1.3em;
+  }
+}

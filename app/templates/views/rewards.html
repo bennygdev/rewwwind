@@ -1,0 +1,152 @@
+{% extends "views/base.html" %}
+{% set active_page = "rewards" %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/views/rewards.css') }}">
+{% endblock %}
+
+{% block title %}Rewards{% endblock %}
+
+{% block content %}
+<div class="reward__container">
+  <h1 class="reward__header">Rewards & Vouchers</h1>
+
+  <div class="reward__introduction">
+    <p>Discover exclusive rewards and savings on your favorite vinyl records and books. Our vouchers are designed to make your shopping experience more enjoyable while helping you save on your favorite items.</p>
+  </div>
+
+  <div class="reward__introduction">
+    <p>Browse through our specially curated selection of vouchers - from free shipping to amazing discounts, there's something for every music and book lover!</p>
+  </div>
+
+  <h2 class="reward__section--header">Vinyl Exclusive Vouchers</h2>
+  <div class="reward__section">
+    <div class="voucher__grid">
+      <div class="voucher__card">
+        <div class="voucher__type-icon">
+          <i class="fas fa-truck"></i>
+        </div>
+        <span class="voucher__code">VINYLSHIP</span>
+        <h3 class="voucher__title">Free Shipping on Vinyl</h3>
+        <p class="voucher__description">Enjoy free shipping on any vinyl record purchase above $50. Perfect for building your collection!</p>
+        <div class="voucher__meta">
+          <div><i class="far fa-clock"></i> Valid for 30 days</div>
+          <div><i class="fas fa-record-vinyl"></i> Vinyl Only</div>
+        </div>
+      </div>
+
+      <div class="voucher__card">
+        <div class="voucher__type-icon">
+          <i class="fas fa-percent"></i>
+        </div>
+        <span class="voucher__code">VINYL25</span>
+        <h3 class="voucher__title">25% Off Vinyl</h3>
+        <p class="voucher__description">Get 25% off on your vinyl purchase. Maximum discount of $30.</p>
+        <div class="voucher__meta">
+          <div><i class="far fa-clock"></i> Valid for 14 days</div>
+          <div><i class="fas fa-record-vinyl"></i> Vinyl Only</div>
+        </div>
+      </div>
+
+      <div class="voucher__card">
+        <div class="voucher__type-icon">
+          <i class="fas fa-tag"></i>
+        </div>
+        <span class="voucher__code">VINYLNEW15</span>
+        <h3 class="voucher__title">$15 Off New Releases</h3>
+        <p class="voucher__description">Save $15 on any new release vinyl record. Minimum purchase of $75 required.</p>
+        <div class="voucher__meta">
+          <div><i class="far fa-clock"></i> Valid for 7 days</div>
+          <div><i class="fas fa-record-vinyl"></i> New Releases Only</div>
+        </div>
+      </div>
+
+      <div class="voucher__card">
+        <div class="voucher__type-icon">
+          <i class="fas fa-gift"></i>
+        </div>
+        <span class="voucher__code">VINYL2FOR1</span>
+        <h3 class="voucher__title">Buy 1 Get 1 50% Off</h3>
+        <p class="voucher__description">Buy any vinyl and get 50% off on your second vinyl of equal or lesser value.</p>
+        <div class="voucher__meta">
+          <div><i class="far fa-clock"></i> Valid for 30 days</div>
+          <div><i class="fas fa-record-vinyl"></i> Selected Vinyl Only</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="reward__section--header">Book Lovers' Specials</h2>
+  <div class="reward__section">
+    <div class="voucher__grid">
+      <div class="voucher__card">
+        <div class="voucher__type-icon">
+          <i class="fas fa-book"></i>
+        </div>
+        <span class="voucher__code">BOOKWORM20</span>
+        <h3 class="voucher__title">20% Off Books</h3>
+        <p class="voucher__description">Enjoy 20% off on all books. Perfect for expanding your reading collection!</p>
+        <div class="voucher__meta">
+          <div><i class="far fa-clock"></i> Valid for 30 days</div>
+          <div><i class="fas fa-book"></i> All Books</div>
+        </div>
+      </div>
+
+      <div class="voucher__card">
+        <div class="voucher__type-icon">
+          <i class="fas fa-truck"></i>
+        </div>
+        <span class="voucher__code">BOOKSHIP</span>
+        <h3 class="voucher__title">Free Book Shipping</h3>
+        <p class="voucher__description">Free shipping on any book order above $35. Stock up on your reading list!</p>
+        <div class="voucher__meta">
+          <div><i class="far fa-clock"></i> Valid for 14 days</div>
+          <div><i class="fas fa-book"></i> Books Only</div>
+        </div>
+      </div>
+
+      <div class="voucher__card">
+        <div class="voucher__type-icon">
+          <i class="fas fa-tag"></i>
+        </div>
+        <span class="voucher__code">BOOK10OFF</span>
+        <h3 class="voucher__title">$10 Off Books</h3>
+        <p class="voucher__description">Take $10 off when you spend $50 or more on books.</p>
+        <div class="voucher__meta">
+          <div><i class="far fa-clock"></i> Valid for 30 days</div>
+          <div><i class="fas fa-book"></i> All Books</div>
+        </div>
+      </div>
+
+      <div class="voucher__card">
+        <div class="voucher__type-icon">
+          <i class="fas fa-gift"></i>
+        </div>
+        <span class="voucher__code">BOOKNEW</span>
+        <h3 class="voucher__title">15% Off New Releases</h3>
+        <p class="voucher__description">Get 15% off on all new release books. Stay current with the latest titles!</p>
+        <div class="voucher__meta">
+          <div><i class="far fa-clock"></i> Valid for 21 days</div>
+          <div><i class="fas fa-book"></i> New Releases Only</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="how-to-access">
+    <div class="reward__section--left">
+      <h2 class="reward__section--header">How to Use Your Vouchers</h2>
+      <ul class="instruction-list">
+        <li>Sign in to your account to view all available vouchers</li>
+        <li>Add items to your cart that match the voucher criteria</li>
+        <li>Enter the voucher code at checkout to apply your discount</li>
+        <li>Complete your purchase and enjoy your savings!</li>
+      </ul>
+      <p>Note: Some vouchers may have specific requirements or limitations. Please read the descriptions carefully.</p>
+    </div>
+    <div class="reward__section--right">
+      <img src="{{ url_for('static', filename='') }}" alt="How to use vouchers">
+    </div>
+  </div>
+</div>
+{% endblock %}

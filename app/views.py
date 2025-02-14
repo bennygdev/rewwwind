@@ -108,6 +108,10 @@ def contact_us():
 def our_impact():
   return render_template('views/ourimpact.html')
 
+@views.route('/rewards')
+def rewards_page():
+  return render_template('views/rewards.html')
+
 @views.route('/tradeForm', methods=['GET', 'POST'])
 @login_required  
 def trade_form():

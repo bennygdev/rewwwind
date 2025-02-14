@@ -1,0 +1,173 @@
+.reward__container {
+  margin-top: calc(80px + 80px);
+  padding: 0 2rem;
+  max-width: 1500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.reward__header {
+  font-family: "CharisSILBold";
+  text-align: center;
+  font-size: 3em;
+  margin-bottom: 2rem;
+}
+
+.reward__introduction {
+  margin: 0 auto;
+  margin-bottom: 60px;
+  max-width: 750px;
+  text-align: center;
+  font-size: 1.15em;
+  line-height: 1.6;
+}
+
+.reward__section {
+  margin-bottom: 4rem;
+}
+
+.reward__section--header {
+  font-family: "CharisSILBold";
+  margin-bottom: 1.5rem;
+  font-size: 2em;
+  color: #333;
+  padding-left: 1rem;
+}
+
+.voucher__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  padding: 1rem;
+}
+
+.voucher__card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #eee;
+}
+
+.voucher__card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.voucher__type-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #e3f2fd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  color: #1976d2;
+  font-size: 1.5rem;
+}
+
+.voucher__code {
+  display: inline-block;
+  background: #f5f5f5;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  font-family: "OpensansBold";
+  letter-spacing: 0.5px;
+}
+
+.voucher__title {
+  font-family: "OpensansBold";
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.voucher__description {
+  color: #666;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+.voucher__meta {
+  font-size: 0.875rem;
+  color: #666;
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.voucher__meta i {
+  margin-right: 0.5rem;
+  width: 16px;
+}
+
+.how-to-access {
+  display: flex;
+  align-items: center;
+  gap: 4rem;
+  padding: 4rem;
+  background: #f9f9f9;
+  margin: 4rem 0;
+  border-radius: 12px;
+}
+
+.reward__section--left {
+  flex: 1;
+}
+
+.reward__section--right {
+  flex: 1;
+}
+
+.reward__section--right img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.instruction-list {
+  list-style: none;
+  padding: 0;
+  margin: 2rem 0;
+}
+
+.instruction-list li {
+  margin-bottom: 1rem;
+  padding-left: 2rem;
+  position: relative;
+  line-height: 1.6;
+}
+
+.instruction-list li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: #1976d2;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .how-to-access {
+    flex-direction: column;
+    padding: 2rem;
+    gap: 2rem;
+  }
+  
+  .voucher__grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .reward__header {
+    font-size: 2.5em;
+  }
+}

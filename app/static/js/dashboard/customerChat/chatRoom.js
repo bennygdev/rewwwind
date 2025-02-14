@@ -4,6 +4,8 @@ let currentRoom = null;
 const chatInputArea = document.querySelector('.chat-input-area');
 const saveStatusDiv = document.createElement('div');
 
+let adminTypingTimeout;
+
 saveStatusDiv.className = 'save-status mt-2 text-center';
 chatInputArea.appendChild(saveStatusDiv);
 
@@ -66,6 +68,21 @@ socket.on('admin_joined', (data) => {
 
 // Handle sending messages
 document.getElementById('sendMessage').addEventListener('click', sendMessage);
+document.getElementById('adminChatInput').addEventListener('input', (e) => {
+  const input = e.target;
+  
+  if (currentRoom) {
+    socket.emit('admin_typing', { room_id: currentRoom });
+    
+    clearTimeout(adminTypingTimeout);
+    
+    // set new timeout
+    adminTypingTimeout = setTimeout(() => {
+      socket.emit('admin_stopped_typing', { room_id: currentRoom });
+    }, 1000); // delay 1 second
+  }
+});
+
 document.getElementById('adminChatInput').addEventListener('keypress', (e) => {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
@@ -77,6 +94,9 @@ function sendMessage() {
   const messageInput = document.getElementById('adminChatInput');
   const message = messageInput.value.trim();
   if (message && currentRoom) {
+    clearTimeout(adminTypingTimeout);
+    socket.emit('admin_stopped_typing', { room_id: currentRoom });
+
     console.log('Sending message to room:', currentRoom);
     socket.emit('chat_message', {
       room_id: currentRoom,
@@ -239,4 +259,29 @@ socket.on('chat_history_saved', (data) => {
 
 socket.on('join_error', (data) => {
   window.location.href = '/dashboard/customer-chat';
+});
+
+// Typing indicators
+socket.on('customer_typing', () => {
+  const chatMessages = document.querySelector('.chat-messages');
+  let typingIndicator = document.querySelector('.typing-indicator');
+  
+  if (!typingIndicator) {
+    const indicatorHtml = `
+      <div class="message incoming typing-indicator">
+        <div class="message-content">
+          Customer is typing...
+        </div>
+      </div>
+    `;
+    chatMessages.insertAdjacentHTML('beforeend', indicatorHtml);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+});
+
+socket.on('customer_stopped_typing', () => {
+  const typingIndicator = document.querySelector('.typing-indicator');
+  if (typingIndicator) {
+    typingIndicator.remove();
+  }
 });

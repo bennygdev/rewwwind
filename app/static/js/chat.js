@@ -17,6 +17,8 @@ let chatEndedByAdmin = false;
 let userMessage;
 let inputInitHeight;
 
+let typingTimeout;
+
 const setInitialHeight = () => {
   inputInitHeight = chatInput.scrollHeight;
 };
@@ -28,6 +30,17 @@ chatInput.addEventListener("input", () => {
   
   chatInput.style.height = `${inputInitHeight}px`;
   chatInput.style.height = `${chatInput.scrollHeight}px`;
+
+  if (isSupportChat && currentRoom) {
+    socket.emit('customer_typing', { room_id: currentRoom });
+    
+    clearTimeout(typingTimeout);
+    
+    // set new timeout
+    typingTimeout = setTimeout(() => {
+      socket.emit('customer_stopped_typing', { room_id: currentRoom });
+    }, 1000); // delay 1 second
+  }
 });
 
 document.getElementById('supportBtn').addEventListener('click', async () => {
@@ -303,6 +316,11 @@ const handleChat = () => {
   chatInput.value = "";
   chatInput.style.height = `${inputInitHeight}px`
 
+  if (isSupportChat && currentRoom) {
+    clearTimeout(typingTimeout);
+    socket.emit('customer_stopped_typing', { room_id: currentRoom });
+  }
+
   // append user message to chatbox
   chatbox.appendChild(createChatLi(userMessage, "outgoing"));
   chatbox.scrollTo(0, chatbox.scrollHeight);
@@ -563,3 +581,22 @@ function resetChat() {
 
   chatbox.innerHTML = '';
 }
+
+// Typing indicators
+socket.on('admin_typing', () => {
+  const existingIndicator = document.querySelector('.typing-indicator');
+  if (!existingIndicator) {
+    const typingLi = document.createElement("li");
+    typingLi.classList.add("chat", "incoming", "typing-indicator");
+    typingLi.innerHTML = `<span><i class="fa-solid fa-headset"></i></span><p>Support representative is typing...</p>`;
+    chatbox.appendChild(typingLi);
+    chatbox.scrollTo(0, chatbox.scrollHeight);
+  }
+});
+
+socket.on('admin_stopped_typing', () => {
+  const typingIndicator = document.querySelector('.typing-indicator');
+  if (typingIndicator) {
+    typingIndicator.remove();
+  }
+});

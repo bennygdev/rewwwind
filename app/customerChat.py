@@ -428,3 +428,40 @@ def error_handler(e):
 @socketio.on('ping_connection')
 def handle_ping():
   emit('pong_connection')
+
+# Typing indicators
+@socketio.on('customer_typing')
+def handle_customer_typing(data):
+  if not current_user.is_authenticated:
+    return
+        
+  room_id = data['room_id']
+  if room_id in active_chats:
+    emit('customer_typing', room=room_id)
+
+@socketio.on('customer_stopped_typing')
+def handle_customer_stopped_typing(data):
+  if not current_user.is_authenticated:
+    return
+        
+  room_id = data['room_id']
+  if room_id in active_chats:
+    emit('customer_stopped_typing', room=room_id)
+
+@socketio.on('admin_typing')
+def handle_admin_typing(data):
+  if not current_user.is_authenticated or current_user.role_id not in [2, 3]:
+    return
+        
+  room_id = data['room_id']
+  if room_id in active_chats:
+    emit('admin_typing', room=room_id)
+
+@socketio.on('admin_stopped_typing')
+def handle_admin_stopped_typing(data):
+  if not current_user.is_authenticated or current_user.role_id not in [2, 3]:
+    return
+        
+  room_id = data['room_id']
+  if room_id in active_chats:
+    emit('admin_stopped_typing', room=room_id)

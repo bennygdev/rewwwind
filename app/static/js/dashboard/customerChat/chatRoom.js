@@ -133,7 +133,7 @@ socket.on('chat_history', (data) => {
     data.messages.forEach(msg => {
       const messageHtml = `
         <div class="message ${msg.type === 'outgoing' ? 'outgoing' : 'incoming'} mb-3">
-          <div class="message-content ${msg.type === 'outgoing' ? 'bg-primary text-white' : 'bg-light'} p-2 rounded">
+          <div class="message-content">
             ${msg.message}
           </div>
           <small class="text-muted">${msg.timestamp}</small>

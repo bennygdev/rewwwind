@@ -59,6 +59,7 @@ def chat_room(room_id):
       "dashboard/customerChat/chatRoom.html",
       room_id=room_id,
       customer_name=f"{customer.first_name} {customer.last_name}",
+      support_type=chat_data.get('supportType', 'general'),
       start_time=chat_data.get('start_time', datetime.now().strftime('%H:%M'))
     )
 

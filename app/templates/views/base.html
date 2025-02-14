@@ -30,7 +30,9 @@
   <!-- Chatbot -->
   {% include "components/chat.html" %}
 
-  {% include "components/footer.html" %}
+  {% if active_page != 'login' and active_page != 'register' and active_page != 'reset_password' and active_page != 'setUsername' %}
+    {% include "components/footer.html" %}
+  {% endif %}
 
   <script
     type="text/javascript"

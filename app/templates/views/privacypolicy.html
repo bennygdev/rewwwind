@@ -1,5 +1,5 @@
 {% extends "views/base.html" %}
-{% set active_page = "home" %}
+{% set active_page = "privacy_policy" %}
 
 {% block styles %}
 <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/views/privacypolicy.css') }}">
@@ -9,7 +9,7 @@
 
 {% block content %}
 <div class="privacy__container">
-  <h1>Privacy Policy</h1>
+  <h1 class="privacy__header">Privacy Policy</h1>
 
   <div class="privacy__section">
     <p>This Privacy Policy describes how your personal information is collected, used, and shared when you visit or make a purchase from Rewwwind (the "Site").</p>

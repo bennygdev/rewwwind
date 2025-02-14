@@ -1,5 +1,5 @@
 {% extends "views/base.html" %}
-{% set active_page = "home" %}
+{% set active_page = "terms_of_service" %}
 
 {% block styles %}
 <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/views/termsofservice.css') }}">
@@ -9,9 +9,7 @@
 
 {% block content %}
 <div class="tos__container">
-  <div class="tos__header">
-    <h1>Terms of Service</h1>
-  </div>
+  <h1 class="tos__header">Terms of Service</h1>
 
   <div class="terms__section">
     <p>Welcome to Rewwwind. By accessing our website and using our services, you agree to these terms and conditions ("Terms"). Please read them carefully.</p>

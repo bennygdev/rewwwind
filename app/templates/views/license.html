@@ -1,5 +1,5 @@
 {% extends "views/base.html" %}
-{% set active_page = "home" %}
+{% set active_page = "license" %}
 
 {% block styles %}
 <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/views/license.css') }}">
@@ -9,9 +9,7 @@
 
 {% block content %}
 <div class="license__container">
-  <div class="license__header">
-    <h1>License Agreement</h1>
-  </div>
+  <h1 class="license__header">License Agreement</h1>
 
   <div class="license__section">
     <p>This License Agreement ("License") governs your use of Rewwwind's platform and services for buying, selling, and trading second-hand books and records.</p>

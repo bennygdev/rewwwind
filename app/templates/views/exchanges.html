@@ -1,5 +1,5 @@
 {% extends "views/base.html" %}
-{% set active_page = "home" %}
+{% set active_page = "exchanges" %}
 
 {% block styles %}
 <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/views/exchanges.css') }}">
@@ -9,9 +9,7 @@
 
 {% block content %}
 <div class="exchange__container">
-  <div class="exchange__header">
-    <h1>Exchange and Returns</h1>
-  </div>
+  <h1 class="exchange__header">Exchange and Returns</h1>
 
   <div class="exchange__section">
     <p>We are committed to providing you with a pleasant second-hand shopping experience at Rewwwind. We understand that sometimes purchases may not meet your expectations, and we're here to help. See the options below to get started.</p>

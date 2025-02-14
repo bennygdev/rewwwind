@@ -1,5 +1,5 @@
 {% extends "views/base.html" %}
-{% set active_page = "home" %}
+{% set active_page = "faq" %}
 
 {% block styles %}
 <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/views/faq.css') }}">
@@ -9,9 +9,7 @@
 
 {% block content %}
 <div class="faq__container">
-  <div class="faq__header">
-    <h1>Frequently Asked Questions</h1>
-  </div>
+  <h1 class="faq__header">Frequently Asked Questions</h1>
 
   <div class="faq__description">
     <p>Have a question? We can help! Check out these frequently asked questions. If you still can't find an answer to your question, shoot us an email at <a href="mailto:rewwwindhelp@gmail.com">rewwwindhelp@gmail.com</a>, and we'll get back to you as soon as we can!</p>

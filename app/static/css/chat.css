@@ -461,6 +461,10 @@
 .leave-btn {
   background-color: #dc3545;
   color: white;
+  padding: 8px 15px;
+  border-radius: 4px;
+  border: 0 none;
+  margin-right: 10px;
 }
 
 .leave-btn:hover {
@@ -470,6 +474,9 @@
 .stay-btn {
   background-color: #28a745;
   color: white;
+  padding: 8px 15px;
+  border-radius: 4px;
+  border: 0 none;
 }
 
 .stay-btn:hover {

@@ -193,8 +193,8 @@ function showLeaveWarning() {
       <div class="warning-text">Are you sure you want to leave this support chat?</div>
       <div class="warning-text">This will end your current chat session.</div>
       <div class="warning-buttons">
-        <button class="warning-btn leave-btn">Leave Chat</button>
-        <button class="warning-btn stay-btn">Stay in Chat</button>
+        <button class="leave-btn">Leave Chat</button>
+        <button class="stay-btn">Stay in Chat</button>
       </div>
     </div>
   `;

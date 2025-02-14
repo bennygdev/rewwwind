@@ -1,7 +1,51 @@
 const socket = io();
 
+function updateChatRequestsContainer(hasChats) {
+  const chatContainer = document.querySelector('.chat-container');
+  const existingEmptyState = document.querySelector('.empty-chat-state');
+  const existingSidebar = document.querySelector('.chat-sidebar');
+
+  if (!hasChats && !existingEmptyState) {
+    // Remove sidebar if it exists
+    if (existingSidebar) {
+      existingSidebar.remove();
+    }
+    
+    // Add empty state
+    const emptyState = `
+      <div class="empty-chat-state">
+        <img src="/static/media/chat-empty.png" alt="No active chats">
+        <h2>No Active Chats</h2>
+        <p>There are currently no customers waiting for support.</p>
+      </div>
+    `;
+    chatContainer.innerHTML = emptyState;
+  } else if (hasChats && !existingSidebar) {
+    // Remove empty state if it exists
+    if (existingEmptyState) {
+      existingEmptyState.remove();
+    }
+    
+    // Add sidebar with chat requests
+    const sidebar = `
+      <div class="chat-sidebar">
+        <div class="chat-requests"></div>
+      </div>
+    `;
+    chatContainer.innerHTML = sidebar;
+  }
+}
+
 // Handle new chat requests
 socket.on('new_chat_request', (data) => {
+  let chatRequests = document.querySelector('.chat-requests');
+  
+  // If we don't have a chat requests container, create the sidebar structure
+  if (!chatRequests) {
+    updateChatRequestsContainer(true);
+    chatRequests = document.querySelector('.chat-requests');
+  }
+
   const existingCard = document.querySelector(`.chat-request-card[data-room-id="${data.room_id}"]`);
   if (existingCard) {
     existingCard.remove();
@@ -38,6 +82,12 @@ socket.on('remove_chat_request', (data) => {
   const requestCard = document.querySelector(`.chat-request-card[data-room-id="${data.room_id}"]`);
   if (requestCard) {
     requestCard.remove();
+    
+    // Check if there are any remaining chat requests
+    const remainingRequests = document.querySelectorAll('.chat-request-card');
+    if (remainingRequests.length === 0) {
+      updateChatRequestsContainer(false);
+    }
   }
 });
 
@@ -77,7 +127,7 @@ socket.on('room_status_update', (data) => {
 });
 
 // Join chat functionality
-document.querySelector('.chat-requests').addEventListener('click', (e) => {
+document.addEventListener('click', (e) => {
   if (e.target.classList.contains('join-chat-btn') && !e.target.disabled) {
     const roomId = e.target.dataset.roomId;
     window.location.href = `/dashboard/chat-room/${roomId}`;
@@ -98,6 +148,11 @@ socket.on('chat_ended', (data) => {
     const requestCard = document.querySelector(`.chat-request-card[data-room-id="${data.room_id}"]`);
     if (requestCard) {
       requestCard.remove();
+
+      const remainingRequests = document.querySelectorAll('.chat-request-card');
+      if (remainingRequests.length === 0) {
+        updateChatRequestsContainer(false);
+      }
     }
   }
 });

@@ -192,6 +192,73 @@
   display: block;
 }
 
+/* Username suggestions */
+.username-suggestions-wrapper {
+  margin-top: 10px;
+}
+
+.suggestions-label {
+  font-size: 0.9em;
+  color: #666;
+  margin-bottom: 8px;
+  display: none;
+}
+
+.username-suggestions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.username-suggestion-btn {
+  padding: 8px 16px;
+  background-color: #f3f3f3;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9em;
+  color: #333;
+}
+
+.username-suggestion-btn:hover {
+  background-color: #e3e3e3;
+  transform: translateY(-1px);
+}
+
+.generating-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+}
+
+.generating-text {
+  color: #666;
+  font-size: 0.9em;
+  font-style: italic;
+  margin: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+/* Animations */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #039752;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 /* Media Queries */
 @media screen and (min-width: 1200px) {
   .register__form {
@@ -252,17 +319,17 @@
 
   .register__left {
     width: 100%;
-    height: 25vh; /* Reduced from 30vh */
-    min-height: 150px; /* Ensure minimum height */
+    height: 25vh;
+    min-height: 150px;
   }
 
   .register__right {
     width: 100%;
-    padding: 40px 20px; /* Increased top padding */
+    padding: 40px 20px;
     height: auto;
-    position: relative; /* Add this */
-    background-color: #fff; /* Ensure background is solid */
-    z-index: 1; /* Add this */
+    position: relative;
+    background-color: #fff;
+    z-index: 1;
   }
 
   .register__form {
@@ -314,6 +381,15 @@
   #register__subtitle--reminder {
     text-align: center;
   }
+
+  .username-suggestions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .username-suggestion-btn {
+    width: 100%;
+  }
 }
 
 @media screen and (max-height: 600px) {
@@ -334,7 +410,6 @@
   }
 }
 
-/* For very small screens */
 @media screen and (max-width: 320px) {
   .username__button {
     width: 40vw;

@@ -17,20 +17,20 @@
     <div class="footer__section footer__links">
       <h3>About</h3>
       <ul>
-        <li><a href="/about-us">About Us</a></li>
-        <li><a href="/our-impact">Our Impact</a></li>
-        <li><a href="/contact-us">Contact Us</a></li>
-        <li><a href="/faq">FAQ</a></li>
-        <li><a href="/exchanges-and-returns">Exchanges and Returns</a></li>
+        <li><a href="{{ url_for('views.about_us') }}">About Us</a></li>
+        <li><a href="{{ url_for('views.our_impact') }}">Our Impact</a></li>
+        <li><a href="{{ url_for('views.contact_us') }}">Contact Us</a></li>
+        <li><a href="{{ url_for('views.faq') }}">FAQ</a></li>
+        <li><a href="{{ url_for('views.exchanges_and_returns') }}">Exchanges and Returns</a></li>
       </ul>
     </div>
 
     <div class="footer__section footer__links">
       <h3>Shop</h3>
       <ul>
-        <li><a href="/products">Products</a></li>
-        <li><a href="/trade-in">Trade In</a></li>
-        <li><a href="/rewards">Rewards</a></li>
+        <li><a href="{{ url_for('productPagination.product_pagination') }}">Products</a></li>
+        <li><a href="{{ url_for('views.trade_Onboard') }}">Trade In</a></li>
+        <li><a href="{{ url_for('views.rewards_page') }}">Rewards</a></li>
         <li><a href="/wishlist">Wishlist</a></li>
       </ul>
     </div>
@@ -38,9 +38,9 @@
     <div class="footer__section footer__links">
       <h3>Legal</h3>
       <ul>
-        <li><a href="/terms-of-service">Terms of Service</a></li>
-        <li><a href="/privacy-policy">Privacy Policy</a></li>
-        <li><a href="/license">License</a></li>
+        <li><a href="{{ url_for('views.terms_of_service') }}">Terms of Service</a></li>
+        <li><a href="{{ url_for('views.privacy_policy') }}">Privacy Policy</a></li>
+        <li><a href="{{ url_for('views.license') }}">License</a></li>
       </ul>
     </div>
 

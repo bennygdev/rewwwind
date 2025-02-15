@@ -129,29 +129,46 @@ class Form {
     // Handle form submission
     async handleSubmit(event) {
         event.preventDefault();
-
+    
+        // Get the submit button
+        const submitButton = this.form.querySelector('#submit');
+    
+        // Disable the button and add a loading indicator
+        submitButton.disabled = true;
+        submitButton.value = 'Submitting...'; // Change the button text
+        submitButton.classList.add('loading'); // Add a class for styling (optional)
+    
+        // Validate the form
         if (!this.validateForm()) {
+            // Re-enable the button and reset the text if validation fails
+            submitButton.disabled = false;
+            submitButton.value = 'Add Product'; // Reset button text
+            submitButton.classList.remove('loading'); // Remove loading class
             return; // Stop submission if validation fails
         }
-
+    
+        // Prepare form data
         const formData = this.prepareFormData();
-
+    
         try {
+            // Submit the form data
             const response = await fetch(this.submitUrl, {
                 method: 'POST',
                 body: formData,
             });
-
+    
             const contentType = response.headers.get("Content-Type");
-
+    
             if (contentType && contentType.includes("application/json")) {
                 const result = await response.json();
                 const flashContainer = document.querySelector('.flash-messages');
                 flashContainer.innerHTML = '';
-
+    
                 if (result.success) {
-                    result.message.includes('add') ? window.location.href = '../manage-products' : window.location.href = '../../manage-products'
+                    // Redirect on success
+                    result.message.includes('add') ? window.location.href = '../manage-products' : window.location.href = '../../manage-products';
                 } else {
+                    // Display error message
                     this.displayFlashMessage(result.message, 'error');
                     this.resetForm();
                     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -160,6 +177,11 @@ class Form {
         } catch (error) {
             console.error('Error submitting form:', error);
             this.displayFlashMessage("An unexpected error occurred.", 'error');
+        } finally {
+            // Re-enable the button and reset the text
+            submitButton.disabled = false;
+            submitButton.value = 'Add Product'; // Reset button text
+            submitButton.classList.remove('loading'); // Remove loading class
         }
     }
 

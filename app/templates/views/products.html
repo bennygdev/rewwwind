@@ -4,6 +4,28 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/pageInteractions/multiFilter.css') }}">
 <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/views/productPagination.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/pageInteractions/filters.css') }}">
+<style>
+/* List View */
+.products.list-view {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.products.list-view .product {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.products.list-view .thumbnail {
+  flex: 1;
+}
+
+.products.list-view .info {
+  flex: 2;
+}
+</style>
 {% endblock %}
 {% block title %}Products{% endblock %}
 {% block content %}
@@ -73,7 +95,6 @@
               {% endfor %}
           </select>
       </div>
-      
       {% if category_filter or subcategory_filter or price_filter or rating_filter %}
       <div class="filter__group">
       <a href="{{ url_for('productPagination.product_pagination', q=search_query) }}" class="clear__filters">Clear Filters</a>
@@ -81,6 +102,14 @@
       </div>
   </form>
   </div>
+</div>
+<div class="view-toggle">
+  <button id="gridViewButton" class="active" title="Grid View">
+    <i class="bi bi-grid-fill"></i>
+  </button>
+  <button id="listViewButton" title="List View">
+    <i class="bi bi-list-ul"></i>
+  </button>
 </div>
 {% if products.items %}
 <div class="products">
@@ -172,4 +201,29 @@
 <script type="text/javascript" src="{{ url_for('static', filename='js/dashboardFilters.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/pageInteractions/multiFilter.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/productPagination/productPagination.js') }}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const gridViewButton = document.getElementById('gridViewButton');
+    const listViewButton = document.getElementById('listViewButton');
+    const productsContainer = document.querySelector('.products');
+  
+    // Event listener for Grid View button
+    gridViewButton.addEventListener('click', function () {
+      if (!gridViewButton.classList.contains('active')) {
+        gridViewButton.classList.add('active');
+        listViewButton.classList.remove('active');
+        productsContainer.classList.remove('list-view');
+      }
+    });
+  
+    // Event listener for List View button
+    listViewButton.addEventListener('click', function () {
+      if (!listViewButton.classList.contains('active')) {
+        listViewButton.classList.add('active');
+        gridViewButton.classList.remove('active');
+        productsContainer.classList.add('list-view');
+      }
+    });
+  });
+</script>
 {% endblock %}

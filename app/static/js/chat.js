@@ -23,6 +23,46 @@ const setInitialHeight = () => {
   inputInitHeight = chatInput.scrollHeight;
 };
 
+const saveAIChatHistory = () => {
+  if (!isSupportChat) {
+    const chatMessages = [];
+    document.querySelectorAll('.chatbox .chat').forEach(li => {
+      const messageText = li.querySelector('p').textContent;
+      const isOutgoing = li.classList.contains('outgoing');
+      chatMessages.push({
+        message: messageText,
+        type: isOutgoing ? 'outgoing' : 'incoming'
+      });
+    });
+    
+    localStorage.setItem('aiChatHistory', JSON.stringify(chatMessages));
+  }
+}
+
+const loadAIChatHistory = () => {
+  const savedHistory = localStorage.getItem('aiChatHistory');
+  if (savedHistory && !isSupportChat) {
+    const chatMessages = JSON.parse(savedHistory);
+    chatbox.innerHTML = '';
+    
+    chatMessages.forEach(msg => {
+      const messageElement = createChatLi(msg.message, msg.type);
+      chatbox.appendChild(messageElement);
+    });
+    
+    // Show chat interface if there's history
+    if (chatMessages.length > 0) {
+      document.getElementById('chatChoice').style.display = 'none';
+      document.querySelector('.chatbox').style.display = 'block';
+      document.querySelector('.chat-input').style.display = 'flex';
+      switchToSupportLink.style.display = 'block';
+      backBtn.style.display = 'block';
+    }
+    
+    chatbox.scrollTo(0, chatbox.scrollHeight);
+  }
+}
+
 chatInput.addEventListener("input", () => {
   if (!inputInitHeight) {
     setInitialHeight(); // Set the initial height if not set already
@@ -92,9 +132,14 @@ document.getElementById('chatbotBtn').addEventListener('click', () => {
   switchToSupportLink.style.display = 'block';
   backBtn.style.display = 'block';
 
-  const greetingMessage = createChatLi('Hi there 👋\nHow can I help you today?', 'incoming');
-  chatbox.innerHTML = ''; // Clear any existing messages
-  chatbox.appendChild(greetingMessage);
+  if (chatbox.children.length === 0) {
+    const greetingMessage = createChatLi('Hi there 👋\nHow can I help you today?', 'incoming');
+    chatbox.innerHTML = ''; // Clear any existing messages
+    chatbox.appendChild(greetingMessage);
+    
+    // Save initial greeting
+    saveAIChatHistory();
+  }
 });
 
 const chatHeader = document.querySelector('.chatbot header');
@@ -305,6 +350,8 @@ const generateResponse = async (incomingChatLi) => {
   } finally {
     chatbox.scrollTo(0, chatbox.scrollHeight);
   }
+
+  return Promise.resolve();
 }
 
 const handleChat = () => {
@@ -337,15 +384,21 @@ const handleChat = () => {
         const incomingChatLi = createChatLi("Thinking...", "incoming");
         chatbox.appendChild(incomingChatLi);
         chatbox.scrollTo(0, chatbox.scrollHeight);
-        generateResponse(incomingChatLi);
+        generateResponse(incomingChatLi).then(() => {
+          saveAIChatHistory();
+        });
     }, 600);
+
+    saveAIChatHistory();
   }
 }
 
 // Add reconnection logic when page loads
 window.addEventListener('load', () => {
   if (isSupportChat) {
-      socket.emit('customer_reconnect');
+    socket.emit('customer_reconnect');
+  } else {
+    loadAIChatHistory();
   }
 });
 
@@ -564,6 +617,8 @@ function resetChat() {
   chatInput.disabled = false;
   chatEndedByAdmin = false;
   isShowingWarning = false;
+
+  localStorage.removeItem('aiChatHistory');
 
   const chatChoice = document.getElementById('chatChoice');
   document.querySelector('.chatbox').style.display = 'none';

@@ -633,3 +633,133 @@ def insert_voucher_types():
     
   db.session.commit()
   print("Inserted voucher types.")
+
+def insert_vouchers():
+  from .models import Voucher, VoucherType
+    
+  # mapping of type names to their IDs
+  type_map = {type.voucher_type: type.id for type in VoucherType.query.all()}
+    
+  vouchers_data = {
+    # Vinyl Exclusive Vouchers
+    'VINYLSHIP': {
+      'description': 'Enjoy free shipping on any vinyl record purchase above $50. Perfect for building your collection!',
+      'type': 'free_shipping',
+      'discount_value': 0,
+      'criteria': [{'type': 'min_cart_amount', 'value': 50}],
+      'eligible_categories': ['Vinyl'],
+      'expiry_days': 30
+    },
+    'VINYL25': {
+      'description': 'Get 25% off on your vinyl purchase. Maximum discount of $30.',
+      'type': 'percentage',
+      'discount_value': 25,
+      'criteria': [{'type': 'min_cart_items', 'value': 1}],
+      'eligible_categories': ['Vinyl'],
+      'expiry_days': 14
+    },
+    'VINYLNEW15': {
+      'description': 'Save $15 on any new release vinyl record. Minimum purchase of $75 required.',
+      'type': 'fixed_amount',
+      'discount_value': 15,
+      'criteria': [
+        {'type': 'min_cart_amount', 'value': 75}
+      ],
+      'eligible_categories': ['Vinyl'],
+      'expiry_days': 7
+    },
+    'VINYL2FOR1': {
+      'description': 'Buy any vinyl and get 50% off on your second vinyl of equal or lesser value.',
+      'type': 'percentage',
+      'discount_value': 50,
+      'criteria': [{'type': 'min_cart_amount', 'value': 2}],
+      'eligible_categories': ['Vinyl'],
+      'expiry_days': 30
+    },
+        
+    # Book Lovers' Specials
+    'BOOKWORM20': {
+      'description': 'Enjoy 20% off on all books. Perfect for expanding your reading collection!',
+      'type': 'percentage',
+      'discount_value': 20,
+      'criteria': [{'type': 'min_cart_items', 'value': 1}],
+      'eligible_categories': ['Book'],
+      'expiry_days': 30
+    },
+    'BOOKSHIP': {
+      'description': 'Free shipping on any book order above $35. Stock up on your reading list!',
+      'type': 'free_shipping',
+      'discount_value': 0,
+      'criteria': [{'type': 'min_cart_amount', 'value': 50}],
+      'eligible_categories': ['Book'],
+      'expiry_days': 14
+    },
+    'BOOK10OFF': {
+      'description': 'Take $10 off when you spend $50 or more on books.',
+      'type': 'fixed_amount',
+      'discount_value': 10,
+      'criteria': [{'type': 'min_cart_amount', 'value': 50}],
+      'eligible_categories': ['Book'],
+      'expiry_days': 30
+    },
+    'BOOKNEW': {
+      'description': 'Get 15% off on all new release books. Stay current with the latest titles!',
+      'type': 'percentage',
+      'discount_value': 15,
+      'criteria': [{'type': 'min_cart_items', 'value': 1}],
+      'eligible_categories': ['Book'],
+      'expiry_days': 21
+    },
+        
+    # Special Vouchers
+    'FIRSTOFF10': {
+      'description': 'Enjoy 10% off on your first order. Start your journey at Rewwwind!',
+      'type': 'percentage',
+      'discount_value': 10,
+      'criteria': [{'type': 'first_purchase_only', 'value': 'true'}],
+      'eligible_categories': ['Book', 'Vinyl'],
+      'expiry_days': 30
+    },
+    'FREESHIP': {
+      'description': 'Free shipping on your order above $50. Stock up on your reading list!',
+      'type': 'free_shipping',
+      'discount_value': 0,
+      'criteria': [{'type': 'min_cart_amount', 'value': 50}],
+      'eligible_categories': ['Book', 'Vinyl'],
+      'expiry_days': 14
+    },
+    'GET10OFF': {
+      'description': 'Take $15 off when you spend $100 or more.',
+      'type': 'fixed_amount',
+      'discount_value': 15,
+      'criteria': [{'type': 'min_cart_amount', 'value': 100}],
+      'eligible_categories': ['Book', 'Vinyl'],
+      'expiry_days': 30
+    },
+    'SPECIAL15': {
+      'description': 'Get 15% off on all new specials. Stay current with the latest titles!',
+      'type': 'percentage',
+      'discount_value': 15,
+      'criteria': [{'type': 'min_cart_items', 'value': 1}],
+      'eligible_categories': ['Book', 'Vinyl'],
+      'expiry_days': 21
+    }
+  }
+
+  for code, data in vouchers_data.items():
+    voucher_exists = Voucher.query.filter_by(voucher_code=code).first()
+    if not voucher_exists:
+      new_voucher = Voucher(
+        voucher_code=code,
+        voucher_description=data['description'],
+        voucherType_id=type_map[data['type']],
+        discount_value=data['discount_value'],
+        criteria=data['criteria'],
+        eligible_categories=data['eligible_categories'],
+        expiry_days=data['expiry_days'],
+        is_active=True
+      )
+      db.session.add(new_voucher)
+    
+  db.session.commit()
+  print('Inserted default vouchers into the database!')

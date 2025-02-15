@@ -28,6 +28,8 @@ def send_newsletter(form):
     return False
     
   try:
+    # image_path = os.path.join(current_app.root_path, 'static', 'media', 'abstractheader2.jpg')
+
     for subscriber in mailing_list:
       if not subscriber.unsubscribe_token:
         subscriber.unsubscribe_token = generate_unsubscribe_token()
@@ -36,21 +38,28 @@ def send_newsletter(form):
       
       # Personalized message with unsubscribe link
       # personalized_body = f"{form.description.data}\n\n---\nTo unsubscribe from our newsletter, click here: {unsubscribe_link}"
-      personalized_body = f"""
-      {form.description.data}
-      
-      <br><br><br>
-      To unsubscribe from our newsletter, <a href='{unsubscribe_link}'>Unsubscribe</a>
-      """
+      html_body = render_template('email/newsletter.html',
+        title=form.title.data,
+        content=form.description.data,
+        unsubscribe_link=unsubscribe_link
+      )
 
       # Create message for each subscriber
       msg = Message(
         subject=form.title.data, 
         sender=('Rewwwind Mail', current_app.config['MAIL_USERNAME']),
         recipients=[subscriber.email],
-        body=personalized_body,
-        html=personalized_body
+        html=html_body
       )
+
+      # with open(image_path, 'rb') as img:
+      #   msg.attach(
+      #     'abstractheader2.jpg',
+      #     'image/jpeg',
+      #     img.read(),
+      #     'inline',
+      #     headers={'Content-ID': '<header_image>'} 
+      #   )
 
       mail.send(msg)
 

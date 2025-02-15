@@ -17,6 +17,8 @@ let chatEndedByAdmin = false;
 let userMessage;
 let inputInitHeight;
 
+let typingTimeout;
+
 const setInitialHeight = () => {
   inputInitHeight = chatInput.scrollHeight;
 };
@@ -28,6 +30,17 @@ chatInput.addEventListener("input", () => {
   
   chatInput.style.height = `${inputInitHeight}px`;
   chatInput.style.height = `${chatInput.scrollHeight}px`;
+
+  if (isSupportChat && currentRoom) {
+    socket.emit('customer_typing', { room_id: currentRoom });
+    
+    clearTimeout(typingTimeout);
+    
+    // set new timeout
+    typingTimeout = setTimeout(() => {
+      socket.emit('customer_stopped_typing', { room_id: currentRoom });
+    }, 1000); // delay 1 second
+  }
 });
 
 document.getElementById('supportBtn').addEventListener('click', async () => {
@@ -193,8 +206,8 @@ function showLeaveWarning() {
       <div class="warning-text">Are you sure you want to leave this support chat?</div>
       <div class="warning-text">This will end your current chat session.</div>
       <div class="warning-buttons">
-        <button class="warning-btn leave-btn">Leave Chat</button>
-        <button class="warning-btn stay-btn">Stay in Chat</button>
+        <button class="leave-btn">Leave Chat</button>
+        <button class="stay-btn">Stay in Chat</button>
       </div>
     </div>
   `;
@@ -302,6 +315,11 @@ const handleChat = () => {
   // Clear input and reset height
   chatInput.value = "";
   chatInput.style.height = `${inputInitHeight}px`
+
+  if (isSupportChat && currentRoom) {
+    clearTimeout(typingTimeout);
+    socket.emit('customer_stopped_typing', { room_id: currentRoom });
+  }
 
   // append user message to chatbox
   chatbox.appendChild(createChatLi(userMessage, "outgoing"));
@@ -563,3 +581,22 @@ function resetChat() {
 
   chatbox.innerHTML = '';
 }
+
+// Typing indicators
+socket.on('admin_typing', () => {
+  const existingIndicator = document.querySelector('.typing-indicator');
+  if (!existingIndicator) {
+    const typingLi = document.createElement("li");
+    typingLi.classList.add("chat", "incoming", "typing-indicator");
+    typingLi.innerHTML = `<span><i class="fa-solid fa-headset"></i></span><p>Support representative is typing...</p>`;
+    chatbox.appendChild(typingLi);
+    chatbox.scrollTo(0, chatbox.scrollHeight);
+  }
+});
+
+socket.on('admin_stopped_typing', () => {
+  const typingIndicator = document.querySelector('.typing-indicator');
+  if (typingIndicator) {
+    typingIndicator.remove();
+  }
+});

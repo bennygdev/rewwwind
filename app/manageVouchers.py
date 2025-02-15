@@ -2,17 +2,76 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash,
 from flask_login import login_required, current_user
 from .roleDecorator import role_required
 from . import db
-from .models import Voucher, VoucherType
-from .forms import VoucherForm, EditVoucherForm
+from .models import User, Voucher, VoucherType, UserVoucher
+from .forms import VoucherForm, EditVoucherForm, VoucherGiftForm
 from math import ceil
 import json
+from datetime import datetime, timedelta
 
 manageVouchers = Blueprint('manageVouchers', __name__)
 
 @manageVouchers.route('/manage-vouchers')
 @login_required
-@role_required(2, 3)
+@role_required(1, 2, 3)
 def vouchers_listing():
+  current_time = datetime.now()
+
+  if current_user.role_id == 1:
+    page = request.args.get('page', 1, type=int)
+    per_page = 12
+        
+    # base query for user vouchers with joined voucher data
+    user_vouchers_query = UserVoucher.query.join(
+      Voucher, UserVoucher.voucher_id == Voucher.id
+    ).filter(UserVoucher.user_id == current_user.id)
+
+    # apply filters
+    status_filter = request.args.get('status', '')
+    if status_filter == 'used':
+      user_vouchers_query = user_vouchers_query.filter(UserVoucher.is_used == True)
+    elif status_filter == 'unused':
+      user_vouchers_query = user_vouchers_query.filter(UserVoucher.is_used == False)
+    elif status_filter == 'expired':
+      user_vouchers_query = user_vouchers_query.filter(UserVoucher.expires_at < datetime.now())
+    elif status_filter == 'active':
+      user_vouchers_query = user_vouchers_query.filter(
+        UserVoucher.expires_at >= datetime.now(),
+        UserVoucher.is_used == False
+      )
+
+    search_query = request.args.get('q', '', type=str)
+    if search_query:
+      user_vouchers_query = user_vouchers_query.filter(
+        Voucher.voucher_code.ilike(f"%{search_query}%")
+      )
+
+    total_vouchers = user_vouchers_query.count()
+    user_vouchers = user_vouchers_query.order_by(
+      UserVoucher.claimed_at.desc()
+    ).paginate(page=page, per_page=per_page)
+
+    total_pages = ceil(total_vouchers / per_page)
+
+    status_choices = [
+      ('active', 'Active'),
+      ('used', 'Used'),
+      ('expired', 'Expired'),
+      ('unused', 'Unused')
+    ]
+
+    return render_template(
+      "dashboard/manageVouchers/vouchers.html",
+      user=current_user,
+      vouchers=user_vouchers,
+      total_pages=total_pages,
+      current_page=page,
+      search_query=search_query,
+      status_filter=status_filter,
+      status_choices=status_choices,
+      is_customer=True,
+      now=current_time
+    )
+
   vouchers = Voucher.query.order_by(Voucher.created_at.desc()).all()
 
   # pagination
@@ -128,32 +187,64 @@ def add_voucher():
 
 @manageVouchers.route('/manage-vouchers/view/<int:id>')
 @login_required
-@role_required(2, 3)
+@role_required(1, 2, 3)
 def view_voucher(id):
-  voucher = Voucher.query.get_or_404(id)
+  if current_user.role_id == 1:
+    user_voucher = UserVoucher.query.filter_by(
+      user_id=current_user.id,
+      voucher_id=id
+    ).join(
+      Voucher, UserVoucher.voucher_id == Voucher.id
+    ).first_or_404()
 
-  type_mapping = {
-    'fixed_amount': 'Fixed Amount',
-    'free_shipping': 'Free Shipping',
-    'percentage': 'Percentage'
-  }
+    type_mapping = {
+      'fixed_amount': 'Fixed Amount',
+      'free_shipping': 'Free Shipping',
+      'percentage': 'Percentage'
+    }
 
-  voucher_type = voucher.voucher_types.voucher_type
-  formatted_type = type_mapping.get(voucher_type, voucher_type)
+    voucher = user_voucher.voucher
+    voucher_type = voucher.voucher_types.voucher_type
+    formatted_type = type_mapping.get(voucher_type, voucher_type)
 
-  return jsonify({
-    'id': voucher.id,
-    'code': voucher.voucher_code,
-    'description': voucher.voucher_description,
-    'type': formatted_type,
-    'discount_value': str(voucher.discount_value),
-    'criteria': voucher.criteria,
-    'eligible_categories': voucher.eligible_categories,
-    'expiry_days': voucher.expiry_days,
-    'is_active': voucher.is_active,
-    'created_at': voucher.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-    'updated_at': voucher.updated_at.strftime('%Y-%m-%d %H:%M:%S')
-  })
+    return jsonify({
+      'id': voucher.id,  # voucher id, not uservoucher id
+      'code': voucher.voucher_code,
+      'description': voucher.voucher_description,
+      'type': formatted_type,
+      'discount_value': str(voucher.discount_value),
+      'eligible_categories': voucher.eligible_categories,
+      'criteria': voucher.criteria,
+      'claim_date': user_voucher.claimed_at.strftime('%Y-%m-%d %H:%M:%S'),
+      'expiry_date': user_voucher.expires_at.strftime('%Y-%m-%d %H:%M:%S'),
+      'is_used': user_voucher.is_used,
+      'status': 'Used' if user_voucher.is_used else 'Expired' if user_voucher.expires_at < datetime.now() else 'Active'
+    })
+  else:
+    voucher = Voucher.query.get_or_404(id)
+
+    type_mapping = {
+      'fixed_amount': 'Fixed Amount',
+      'free_shipping': 'Free Shipping',
+      'percentage': 'Percentage'
+    }
+
+    voucher_type = voucher.voucher_types.voucher_type
+    formatted_type = type_mapping.get(voucher_type, voucher_type)
+
+    return jsonify({
+      'id': voucher.id,
+      'code': voucher.voucher_code,
+      'description': voucher.voucher_description,
+      'type': formatted_type,
+      'discount_value': str(voucher.discount_value),
+      'criteria': voucher.criteria,
+      'eligible_categories': voucher.eligible_categories,
+      'expiry_days': voucher.expiry_days,
+      'is_active': voucher.is_active,
+      'created_at': voucher.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+      'updated_at': voucher.updated_at.strftime('%Y-%m-%d %H:%M:%S')
+    })
 
 @manageVouchers.route('/manage-vouchers/edit-voucher/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -214,3 +305,113 @@ def delete_voucher(id):
   else:
     flash("Invalid voucher or unauthorized access.", "error")
     return redirect(url_for('manageVouchers.vouchers_listing'))
+  
+# Voucher gifting
+@manageVouchers.route('/gift-voucher')
+@login_required
+@role_required(2, 3)
+def gift_voucher_page():
+  form = VoucherGiftForm()
+
+  return render_template("dashboard/manageVouchers/giftVoucher.html", form=form, user=current_user)
+
+@manageVouchers.route('/api/gift-voucher', methods=['POST'])
+@login_required
+@role_required(2, 3)
+def gift_voucher():
+  try:
+    user_id = request.form.get('user_id', type=int)
+    voucher_id = request.form.get('voucher_id', type=int)
+        
+    if not user_id or not voucher_id:
+      return jsonify({
+        'success': False,
+        'message': 'Missing required parameters'
+      }), 400
+            
+    # Verify user and voucher exist
+    user = User.query.get(user_id)
+    voucher = Voucher.query.get(voucher_id)
+        
+    if not user or not voucher:
+      return jsonify({
+        'success': False,
+        'message': 'Invalid user or voucher'
+      }), 404
+            
+    # Check if user already has this voucher
+    existing_voucher = UserVoucher.query.filter_by(
+      user_id=user_id,
+      voucher_id=voucher_id,
+      is_used=False
+    ).first()
+        
+    if existing_voucher:
+      return jsonify({
+        'success': False,
+        'message': 'User already has this active voucher'
+      }), 400
+            
+    # calculate expiry date based on voucher's expiry_days
+    expires_at = datetime.now() + timedelta(days=voucher.expiry_days)
+        
+    user_voucher = UserVoucher(
+      user_id=user_id,
+      voucher_id=voucher_id,
+      expires_at=expires_at
+    )
+        
+    db.session.add(user_voucher)
+    db.session.commit()
+
+    return jsonify({
+      'success': True,
+      'message': f'Voucher {voucher.voucher_code} successfully gifted to {user.username}'
+    })
+  except Exception as e:
+    db.session.rollback()
+    return jsonify({
+      'success': False,
+      'message': f'Error gifting voucher: {str(e)}'
+    }), 500
+    
+@manageVouchers.route('/api/search-users')
+@login_required
+@role_required(2, 3)
+def search_users():
+  query = request.args.get('q', '')
+  if not query or len(query) < 2:
+    return jsonify([])
+        
+  users = User.query.filter(
+    User.role_id == 1,
+    User.username.ilike(f'%{query}%')  # Search by username
+  ).limit(10).all()
+    
+  return jsonify([{
+    'id': user.id,
+    'username': user.username,
+    'email': user.email
+  } for user in users])
+
+@manageVouchers.route('/api/search-vouchers')
+@login_required
+@role_required(2, 3)
+def search_vouchers():
+  query = request.args.get('q', '')
+  if not query or len(query) < 2:
+    return jsonify([])
+        
+  # Search for active vouchers
+  vouchers = Voucher.query.filter(
+    Voucher.is_active == True,
+    Voucher.voucher_code.ilike(f'%{query}%')  # Search by voucher code
+  ).limit(10).all()
+    
+  return jsonify([{
+    'id': voucher.id,
+    'code': voucher.voucher_code,
+    'description': voucher.voucher_description,
+    'type': voucher.voucher_types.voucher_type,
+    'discount_value': str(voucher.discount_value)
+  } for voucher in vouchers])

@@ -13,7 +13,6 @@ from flask import request
 manageAccounts = Blueprint('manageAccounts', __name__)
 # Admin account (account listing) and adding accounts (Owner)
 
-# Online will be done later
 @manageAccounts.route('/manage-accounts')
 @login_required
 @role_required(2, 3)
@@ -27,7 +26,6 @@ def accounts_listing():
   newUsers = User.query.filter(User.created_at >= seven_days_ago).count()
 
   # newUsers = 0
-  onlineCount = 0
 
   # pagination
   page = request.args.get('page', 1, type=int)
@@ -70,7 +68,6 @@ def accounts_listing():
     user=current_user, 
     totalUsers=totalUsers, 
     newUsers=newUsers, 
-    onlineCount=onlineCount, 
     accounts=accounts, 
     total_pages=total_pages, 
     current_page=page, 

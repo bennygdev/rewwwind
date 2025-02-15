@@ -38,6 +38,9 @@
     <p class="settings__paragraph">Choose which emails and alerts you want to receive to stay informed about account activity and updates.</p>
     <a href="{{ url_for('dashboard.manage_notifications') }}" class="settings__button">View Notification Options</a>
   </div>
+  <div class="settings__container">
+    <a href="{{ url_for('auth.logout') }}" class="logout__button">Log Out</a>
+  </div>
 </div>
 
 {% endblock %}

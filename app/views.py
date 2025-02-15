@@ -72,9 +72,45 @@ def home():
     mailing_list_form=mailing_list_form
   )
 
+@views.route('/terms-of-service')
+def terms_of_service():
+  return render_template('views/termsofservice.html')
+
+@views.route('/privacy-policy')
+def privacy_policy():
+  return render_template('views/privacypolicy.html')
+
+@views.route('/license')
+def license():
+  return render_template('views/license.html')
+
+@views.route('/exchanges-and-returns')
+def exchanges_and_returns():
+  return render_template('views/exchanges.html')
+
+@views.route('/faq')
+def faq():
+  return render_template('views/faq.html')
+
 @views.route('/trade-in')
 def trade_Onboard(): 
-    return render_template('views/tradeOnboarding.html')
+  return render_template('views/tradeOnboarding.html')
+
+@views.route('/about-us')
+def about_us():
+  return render_template('views/aboutus.html')
+
+@views.route('/contact-us')
+def contact_us():
+  return render_template('views/contactus.html')
+
+@views.route('/our-impact')
+def our_impact():
+  return render_template('views/ourimpact.html')
+
+@views.route('/rewards')
+def rewards_page():
+  return render_template('views/rewards.html')
 
 @views.route('/tradeForm', methods=['GET', 'POST'])
 @login_required  

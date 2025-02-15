@@ -6,6 +6,7 @@ from . import db, socketio
 from .models import User, Role, ChatHistory
 from datetime import datetime
 import google.generativeai as genai
+from math import ceil
 
 customerChat = Blueprint('customerChat', __name__)
 
@@ -58,6 +59,7 @@ def chat_room(room_id):
       "dashboard/customerChat/chatRoom.html",
       room_id=room_id,
       customer_name=f"{customer.first_name} {customer.last_name}",
+      support_type=chat_data.get('supportType', 'general'),
       start_time=chat_data.get('start_time', datetime.now().strftime('%H:%M'))
     )
 
@@ -77,6 +79,94 @@ def check_active_chat():
         'messages': data['messages']
       })
   return jsonify({'hasActiveChat': False})
+
+@customerChat.route('/chat-history', methods=['GET'])
+@login_required
+@role_required(2, 3)
+def chat_history():
+  # pagination
+  page = request.args.get('page', 1, type=int)
+  per_page = 10
+
+  # filters
+  category_filter = request.args.get('category', '')
+  support_type_filter = request.args.get('support_type', '')
+    
+  # search 
+  search_query = request.args.get('q', '', type=str)
+    
+  chat_query = db.session.query(
+    ChatHistory,
+    User.first_name.label('customer_first_name'),
+    User.last_name.label('customer_last_name'),
+    User.username.label('customer_username')
+  ).join(User, ChatHistory.user_id == User.id)
+    
+  if search_query:
+    if search_query.isdigit():
+      chat_query = chat_query.filter(db.cast(ChatHistory.id, db.String).like(f"%{search_query}%"))
+    
+  if category_filter == 'my_chats':
+    chat_query = chat_query.filter(ChatHistory.admin_id == current_user.id)
+    
+  if support_type_filter:
+    chat_query = chat_query.filter(ChatHistory.support_type == support_type_filter)
+
+  total_chats = chat_query.count()
+    
+  chats = chat_query.order_by(ChatHistory.id.desc()).paginate(page=page, per_page=per_page)
+    
+  total_pages = ceil(total_chats / per_page)
+
+  support_type_choices = [
+    ('billing', 'Billing'),
+    ('technical', 'Technical'),
+    ('account', 'Account'),
+    ('general', 'General')
+  ]
+    
+  # get admin names for each chat
+  chat_data = []
+  for chat, customer_first_name, customer_last_name, customer_username in chats.items:
+    admin = User.query.get(chat.admin_id)
+    admin_name = f"{admin.first_name} {admin.last_name}" if admin else "Unknown"
+    customer_name = f"{customer_first_name} {customer_last_name}"
+        
+    chat_data.append({
+      'id': chat.id,
+      'admin_name': admin_name,
+      'customer_name': customer_name,
+      'customer_username': customer_username,
+      'support_type': chat.support_type,
+      'chat_summary': chat.chat_summary,
+      'created_at': chat.created_at
+    })
+    
+  return render_template(
+    "dashboard/customerChat/chatHistory.html",
+    chats=chat_data,
+    total_pages=total_pages,
+    current_page=page,
+    search_query=search_query,
+    category_filter=category_filter,
+    support_type_filter=support_type_filter,
+    support_type_choices=support_type_choices
+  )
+
+@customerChat.route('/chat-history/<int:id>', methods=['GET'])
+@login_required
+@role_required(2, 3)
+def chat_history_content(id):
+  chat = ChatHistory.query.get_or_404(id)
+  customer = User.query.get(chat.user_id)
+  admin = User.query.get(chat.admin_id)
+    
+  return render_template(
+    "dashboard/customerChat/chatHistoryContent.html",
+    chat=chat,
+    customer=customer,
+    admin=admin
+  )
 
 # Socket.IO event handlers
 
@@ -338,3 +428,40 @@ def error_handler(e):
 @socketio.on('ping_connection')
 def handle_ping():
   emit('pong_connection')
+
+# Typing indicators
+@socketio.on('customer_typing')
+def handle_customer_typing(data):
+  if not current_user.is_authenticated:
+    return
+        
+  room_id = data['room_id']
+  if room_id in active_chats:
+    emit('customer_typing', room=room_id)
+
+@socketio.on('customer_stopped_typing')
+def handle_customer_stopped_typing(data):
+  if not current_user.is_authenticated:
+    return
+        
+  room_id = data['room_id']
+  if room_id in active_chats:
+    emit('customer_stopped_typing', room=room_id)
+
+@socketio.on('admin_typing')
+def handle_admin_typing(data):
+  if not current_user.is_authenticated or current_user.role_id not in [2, 3]:
+    return
+        
+  room_id = data['room_id']
+  if room_id in active_chats:
+    emit('admin_typing', room=room_id)
+
+@socketio.on('admin_stopped_typing')
+def handle_admin_stopped_typing(data):
+  if not current_user.is_authenticated or current_user.role_id not in [2, 3]:
+    return
+        
+  room_id = data['room_id']
+  if room_id in active_chats:
+    emit('admin_stopped_typing', room=room_id)

@@ -1,0 +1,91 @@
+{% extends "views/base.html" %}
+{% set active_page = "license" %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/views/license.css') }}">
+{% endblock %}
+
+{% block title %}License{% endblock %}
+
+{% block content %}
+<div class="license__container">
+  <h1 class="license__header">License Agreement</h1>
+
+  <div class="license__section">
+    <p>This License Agreement ("License") governs your use of Rewwwind's platform and services for buying, selling, and trading second-hand books and records.</p>
+  </div>
+
+  <div class="license__section">
+    <p class="license__section--header">Platform License</p>
+    <p>We grant you a limited, non-exclusive, non-transferable license to:</p>
+    <ul>
+      <li>Access and use our platform for personal, non-commercial use</li>
+      <li>Participate in our trade-in program according to our terms</li>
+      <li>Create and maintain a user account</li>
+      <li>Purchase and receive products through our platform</li>
+    </ul>
+  </div>
+
+  <div class="license__section">
+    <p class="license__section--header">Trade-In Rights</p>
+    <p>When participating in our trade-in program, you:</p>
+    <ul>
+      <li>Grant us the right to evaluate and assess your items</li>
+      <li>Transfer full ownership rights of traded items to us</li>
+      <li>Receive trade credit or other compensation as agreed</li>
+      <li>Maintain no further rights to traded items once accepted</li>
+    </ul>
+  </div>
+
+  <div class="license__section">
+    <p class="license__section--header">Content License</p>
+    <p>By submitting content to our platform (including product reviews, comments, and trade-in item descriptions), you:</p>
+    <ul>
+      <li>Grant us a worldwide, non-exclusive, royalty-free license to use the content</li>
+      <li>Confirm you have the right to grant such license</li>
+      <li>Allow us to modify or adapt the content for our platform</li>
+      <li>Permit us to use the content for marketing purposes</li>
+    </ul>
+  </div>
+
+  <div class="license__section">
+    <p class="license__section--header">Restrictions</p>
+    <p>You may not:</p>
+    <ul>
+      <li>Resell or commercially exploit our platform</li>
+      <li>Copy or reproduce any part of our platform</li>
+      <li>Modify or create derivative works</li>
+      <li>Use our platform for illegal purposes</li>
+      <li>Attempt to gain unauthorized access to our systems</li>
+    </ul>
+  </div>
+
+  <div class="license__section">
+    <p class="license__section--header">Ownership</p>
+    <p>All rights, title, and interest in the platform, including all intellectual property rights, remain with Rewwwind. This License does not transfer any ownership rights to you.</p>
+  </div>
+
+  <div class="license__section">
+    <p class="license__section--header">Termination</p>
+    <p>We may terminate or suspend your license and access to our platform:</p>
+    <ul>
+      <li>For violations of these terms</li>
+      <li>For fraudulent or illegal activity</li>
+      <li>To protect our platform or other users</li>
+      <li>At our discretion with reasonable notice</li>
+    </ul>
+  </div>
+
+  <div class="license__section">
+    <p class="license__section--header">Updates</p>
+    <p>We reserve the right to update this License at any time. Continued use of our platform after changes constitutes acceptance of the updated License.</p>
+  </div>
+
+  <div class="license__section">
+    <p class="license__section--header">Contact</p>
+    <p>For questions about this License, contact us at:</p>
+    <a href="mailto:rewwwindhelp@gmail.com">rewwwindhelp@gmail.com</a>
+    <p>180 Ang Mo Kio Ave 8, Singapore 569830</p>
+  </div>
+</div>
+{% endblock %}

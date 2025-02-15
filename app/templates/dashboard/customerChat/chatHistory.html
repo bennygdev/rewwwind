@@ -1,0 +1,131 @@
+{% extends "dashboard/base.html" %}
+{% set active_page = "customer_chat" %}
+{% block title %}Chat History{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/dashboard/customerChat/chatHistory.css') }}">
+{% endblock %}
+
+{% block content %}
+<h1 class="chatHistory__title">Chat History</h1>
+
+<a href="{{ url_for('customerChat.customer_chat') }}" class="back__link"><i class="fa-solid fa-chevron-left fa-sm"></i>Back</a>
+
+<!-- Flash validation -->
+{% include "components/flashValidation.html" %}
+
+<div class="search__wrapper">
+  <form method="get" action="{{ url_for('customerChat.chat_history') }}">
+    <!-- Preserve current filter values -->
+    {% if category_filter %}
+    <input type="hidden" name="category" value="{{ category_filter }}">
+    {% endif %}
+    {% if support_type_filter %}
+    <input type="hidden" name="support_type" value="{{ support_type_filter }}">
+    {% endif %}
+
+    <div class="search__container">
+      <input
+        type="text"
+        name="q"
+        id="search__bar"
+        class="search__bar"
+        placeholder="Search by chat ID..."
+        value="{{ search_query }}"
+        autocomplete="off"
+      >
+      <button type="submit" class="search__button" id="search__button">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </button>
+      {% if search_query %}
+        <a href="{{ url_for('customerChat.chat_history') }}" class="clear__button">
+          <i class="fa-solid fa-xmark fa-lg"></i>
+        </a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+
+<div class="content__filters">
+  <form id="filterForm" method="get" action="{{ url_for('customerChat.chat_history') }}" class="filters__form">
+    <!-- Preserve search query if exists -->
+    {% if search_query %}
+    <input type="hidden" name="q" value="{{ search_query }}">
+    {% endif %}
+    
+    <div class="filter__group">
+      <label for="category">Category:</label>
+      <select name="category" id="category" class="filter__select">
+        <option value="">All</option>
+        <option value="all_history" {% if category_filter == 'all_history' %}selected{% endif %}>All Chat History</option>
+        <option value="my_chats" {% if category_filter == 'my_chats' %}selected{% endif %}>Only My Chats</option>
+      </select>
+    </div>
+
+    <div class="filter__group">
+      <label for="support_type">Support Type:</label>
+      <select name="support_type" id="support_type" class="filter__select">
+        <option value="">All</option>
+        {% for value, label in support_type_choices %}
+        <option value="{{ value }}" {% if support_type_filter == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    {% if category_filter or support_type_filter %}
+    <a href="{{ url_for('customerChat.chat_history', q=search_query) }}" class="clear__filters">Clear Filters</a>
+    {% endif %}
+  </form>
+</div>
+
+<div class="chatHistory__posts">
+  <div class="posts__wrapper">
+    <div class="chatHistory__posts--list">
+      {% for chat in chats %}
+      <div class="chatHistory__posts--item">
+        <div class="chatHistory__post--content">
+          <a href="{{ url_for('customerChat.chat_history_content', id=chat.id) }}">
+            <h3>Chat #{{ chat.id }}</h3>
+          </a>
+          <p>
+            <strong>Support Type:</strong> {{ chat.support_type|title }} Support<br>
+            {% if chat.chat_summary %}
+            <strong>Customer:</strong> {{ chat.customer_name }}<br>
+            <strong>Representative:</strong> {{ chat.admin_name }}<br>
+            {% endif %}
+          </p>
+          <span class="chatHistory__post--date">{{ chat.created_at.strftime('%B %d, %Y %I:%M %p') }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="posts__pagination">
+  <ul>
+    {% if current_page > 1 %}
+    <li class="pagePrevious__button">
+      <a href="{{ url_for('customerChat.chat_history', page=current_page-1, q=search_query, category=category_filter, support_type=support_type_filter) }}">Previous</a>
+    </li>
+    {% endif %}
+    {% for p in range(1, total_pages + 1) %}
+    <li class="{% if p == current_page %}active{% endif %}">
+      <a href="{{ url_for('customerChat.chat_history', page=p, q=search_query, category=category_filter, support_type=support_type_filter) }}" class="page__button">{{ p }}</a>
+    </li>
+    {% endfor %}
+    {% if current_page < total_pages %}
+    <li class="pageNext__button">
+      <a href="{{ url_for('customerChat.chat_history', page=current_page+1, q=search_query, category=category_filter, support_type=support_type_filter) }}">Next</a>
+    </li>
+    {% endif %}
+  </ul>
+</div>
+{% endblock %}
+
+{% block body_scripts %}
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/dashboardFilters.js') }}"
+></script>
+{% endblock %}

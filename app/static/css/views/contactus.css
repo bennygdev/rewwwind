@@ -1,0 +1,35 @@
+.contact__container {
+  max-width: 750px;
+  margin-top: calc(80px + 100px);
+  justify-self: center;
+  padding: 0 1rem;
+}
+
+.contact__header {
+  font-family: "CharisSILBold";
+  text-align: center;
+  font-size: 2em;
+  margin-bottom: 2rem;
+}
+
+.contact__section {
+  margin-bottom: 2rem;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.contact__section:last-child {
+  padding-bottom: 10px;
+  border-bottom: none;
+}
+
+.contact__section--header {
+  font-family: "OpensansBold";
+  margin-bottom: 5px;
+}
+
+.contact__section--headerImportant {
+  font-family: "OpensansBold";
+  text-decoration: underline;
+  margin-bottom: 5px;
+}

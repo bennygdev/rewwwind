@@ -19,6 +19,7 @@
     <p>Browse through our specially curated selection of vouchers - from free shipping to amazing discounts, there's something for every music and book lover!</p>
   </div>
 
+  <!-- Vinyl vouchers -->
   <h2 class="reward__section--header">Vinyl Exclusive Vouchers</h2>
   <div class="reward__section">
     <div class="voucher__grid">
@@ -33,6 +34,9 @@
           <div><i class="far fa-clock"></i> Valid for 30 days</div>
           <div><i class="fas fa-record-vinyl"></i> Vinyl Only</div>
         </div>
+        <button class="voucher__details-btn" onclick="openVoucherModal('VINYLSHIP')">
+          View Details
+        </button>
       </div>
 
       <div class="voucher__card">
@@ -46,6 +50,9 @@
           <div><i class="far fa-clock"></i> Valid for 14 days</div>
           <div><i class="fas fa-record-vinyl"></i> Vinyl Only</div>
         </div>
+        <button class="voucher__details-btn" onclick="openVoucherModal('VINYL25')">
+          View Details
+        </button>
       </div>
 
       <div class="voucher__card">
@@ -59,6 +66,9 @@
           <div><i class="far fa-clock"></i> Valid for 7 days</div>
           <div><i class="fas fa-record-vinyl"></i> New Releases Only</div>
         </div>
+        <button class="voucher__details-btn" onclick="openVoucherModal('VINYLNEW15')">
+          View Details
+        </button>
       </div>
 
       <div class="voucher__card">
@@ -72,10 +82,14 @@
           <div><i class="far fa-clock"></i> Valid for 30 days</div>
           <div><i class="fas fa-record-vinyl"></i> Selected Vinyl Only</div>
         </div>
+        <button class="voucher__details-btn" onclick="openVoucherModal('VINYL2FOR1')">
+          View Details
+        </button>
       </div>
     </div>
   </div>
 
+  <!-- Book vouchers -->
   <h2 class="reward__section--header">Book Lovers' Specials</h2>
   <div class="reward__section">
     <div class="voucher__grid">
@@ -90,6 +104,9 @@
           <div><i class="far fa-clock"></i> Valid for 30 days</div>
           <div><i class="fas fa-book"></i> All Books</div>
         </div>
+        <button class="voucher__details-btn" onclick="openVoucherModal('BOOKWORM20')">
+          View Details
+        </button>
       </div>
 
       <div class="voucher__card">
@@ -103,6 +120,9 @@
           <div><i class="far fa-clock"></i> Valid for 14 days</div>
           <div><i class="fas fa-book"></i> Books Only</div>
         </div>
+        <button class="voucher__details-btn" onclick="openVoucherModal('BOOKSHIP')">
+          View Details
+        </button>
       </div>
 
       <div class="voucher__card">
@@ -116,6 +136,9 @@
           <div><i class="far fa-clock"></i> Valid for 30 days</div>
           <div><i class="fas fa-book"></i> All Books</div>
         </div>
+        <button class="voucher__details-btn" onclick="openVoucherModal('BOOK10OFF')">
+          View Details
+        </button>
       </div>
 
       <div class="voucher__card">
@@ -129,6 +152,79 @@
           <div><i class="far fa-clock"></i> Valid for 21 days</div>
           <div><i class="fas fa-book"></i> New Releases Only</div>
         </div>
+        <button class="voucher__details-btn" onclick="openVoucherModal('BOOKNEW')">
+          View Details
+        </button>
+      </div>
+    </div>
+  </div> 
+
+  <!-- Vouchers -->
+  <h2 class="reward__section--header">Special Vouchers</h2>
+  <div class="reward__section">
+    <div class="voucher__grid">
+      <div class="voucher__card">
+        <div class="voucher__type-icon">
+          <i class="fas fa-book"></i>
+        </div>
+        <span class="voucher__code">FIRSTOFF10</span>
+        <h3 class="voucher__title">10% Off Your First Order</h3>
+        <p class="voucher__description">Enjoy 10% off on your first order. Start your journey at Rewwwind!</p>
+        <div class="voucher__meta">
+          <div><i class="far fa-clock"></i> Valid for 30 days</div>
+          <div><i class="fas fa-star"></i> All Categories</div>
+        </div>
+        <button class="voucher__details-btn" onclick="openVoucherModal('FIRSTOFF10')">
+          View Details
+        </button>
+      </div>
+
+      <div class="voucher__card">
+        <div class="voucher__type-icon">
+          <i class="fas fa-truck"></i>
+        </div>
+        <span class="voucher__code">FREESHIP</span>
+        <h3 class="voucher__title">Free Shipping</h3>
+        <p class="voucher__description">Free shipping on your order above $50. Stock up on your reading list!</p>
+        <div class="voucher__meta">
+          <div><i class="far fa-clock"></i> Valid for 14 days</div>
+          <div><i class="fas fa-star"></i> All Categories</div>
+        </div>
+        <button class="voucher__details-btn" onclick="openVoucherModal('FREESHIP')">
+          View Details
+        </button>
+      </div>
+
+      <div class="voucher__card">
+        <div class="voucher__type-icon">
+          <i class="fas fa-tag"></i>
+        </div>
+        <span class="voucher__code">GET10OFF</span>
+        <h3 class="voucher__title">$15 Off Your Order</h3>
+        <p class="voucher__description">Take $10 off when you spend $100 or more.</p>
+        <div class="voucher__meta">
+          <div><i class="far fa-clock"></i> Valid for 30 days</div>
+          <div><i class="fas fa-star"></i> All Categories</div>
+        </div>
+        <button class="voucher__details-btn" onclick="openVoucherModal('GET10OFF')">
+          View Details
+        </button>
+      </div>
+
+      <div class="voucher__card">
+        <div class="voucher__type-icon">
+          <i class="fas fa-gift"></i>
+        </div>
+        <span class="voucher__code">BOOKNEW</span>
+        <h3 class="voucher__title">15% Off New Releases</h3>
+        <p class="voucher__description">Get 15% off on all new specials. Stay current with the latest titles!</p>
+        <div class="voucher__meta">
+          <div><i class="far fa-clock"></i> Valid for 21 days</div>
+          <div><i class="fas fa-star"></i> All New Specials</div>
+        </div>
+        <button class="voucher__details-btn" onclick="openVoucherModal('BOOKNEW')">
+          View Details
+        </button>
       </div>
     </div>
   </div>
@@ -145,8 +241,53 @@
       <p>Note: Some vouchers may have specific requirements or limitations. Please read the descriptions carefully.</p>
     </div>
     <div class="reward__section--right">
-      <img src="{{ url_for('static', filename='') }}" alt="How to use vouchers">
+      <img src="{{ url_for('static', filename='media/voucherman.png') }}" alt="How to use vouchers">
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="voucherModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>Voucher Details</h2>
+        <i class="fa fa-times close-icon fa-xl" onclick="toggleVoucherModal()"></i>
+      </div>
+      <div class="modal-content">
+        <div class="voucher-modal-info">
+          <div class="voucher-modal-code">
+            <span class="label">Code:</span>
+            <span id="modalVoucherCode"></span>
+          </div>
+          <div class="voucher-modal-title">
+            <span class="label">Offer:</span>
+            <span id="modalVoucherTitle"></span>
+          </div>
+          <div class="voucher-modal-description">
+            <span class="label">Description:</span>
+            <span id="modalVoucherDescription"></span>
+          </div>
+          <div class="voucher-modal-criteria">
+            <span class="label">How to get:</span>
+            <ul id="modalVoucherCriteria"></ul>
+          </div>
+          <div class="voucher-modal-validity">
+            <span class="label">Validity:</span>
+            <span id="modalVoucherValidity"></span>
+          </div>
+          <div class="voucher-modal-terms">
+            <span class="label">Terms & Conditions:</span>
+            <ul id="modalVoucherTerms"></ul>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="cancel-btn" onclick="toggleVoucherModal()">Close</button>
+      </div>
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block body_scripts %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/voucherModal.js') }}"></script>
 {% endblock %}

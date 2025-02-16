@@ -1,27 +1,18 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, abort, jsonify, current_app, session
-import requests
 from flask_login import login_required, current_user
-from .__init__ import csrf
-from sqlalchemy import cast, Float, Integer
 from sqlalchemy.orm.attributes import flag_modified
 from .roleDecorator import role_required
 from .models import Product, Order, OrderItem, Cart, PaymentInformation, BillingAddress
-from .forms import AddReviewForm, AddToCartForm, DeleteReviewForm
+from .forms import BillingAddressForm
 from . import db
-from math import ceil
 
 import stripe
 
 payment = Blueprint('payment', __name__)
 
-@payment.route('/checkout/product/<int:product_id>', methods=['POST'])
+@payment.route('/checkout/product/<int:product_id>', methods=['GET', 'POST'])
 @login_required
-def checkout_product(product_id):
-    # Prevent admins and owners from purchasing
-    if current_user.role_id in [2, 3]:
-        flash("Admins and owners are not allowed to purchase in order to avoid conflicts.\n\nPlease use a dummy customer account instead.", "info")
-        return redirect(url_for('productPagination.product_detail', product_id=product_id, not_customer=True))
-
+def create_temp_cart(product_id): # to prevent errors.
     # Retrieve the product
     product = Product.query.filter_by(id=product_id).first()
     if not product:
@@ -36,6 +27,44 @@ def checkout_product(product_id):
     condition = [con for con in product.conditions if con.get('condition') == getcondition]
     if not condition:
         abort(404)
+
+    temp_cart = Cart(
+        user_id=current_user.id,
+        product_id=product_id,
+        product_condition=condition[0],
+        quantity=1
+    )
+    db.session.add(temp_cart)
+    db.session.commit()
+
+    return redirect(url_for('payment.billing_info'))
+
+@payment.route('/checkout/billing_info', methods=['GET', 'POST'])
+@login_required
+def billing_info():
+    form = BillingAddressForm()
+
+    if form.validate_on_submit():
+        session['billing_info'] = {
+            'line1': form.address_one.data,
+            'line2': form.address_two.data,
+            'unit_number': form.unit_number.data,
+            'postal_code': form.postal_code.data,
+            'phone_number': form.phone_number.data,
+        }
+
+        return redirect(url_for('payment.checkout_cart'))
+
+    return render_template('/views/billing_info.html', form=form)
+
+
+@payment.route('/checkout/product/<int:product_id>', methods=['POST'])
+@login_required
+def checkout_product(product_id):
+    # Prevent admins and owners from purchasing
+    if current_user.role_id in [2, 3]:
+        flash("Admins and owners are not allowed to purchase in order to avoid conflicts.\n\nPlease use a dummy customer account instead.", "info")
+        return redirect(url_for('productPagination.product_detail', product_id=product_id, not_customer=True))
 
     try:
         # Create or retrieve the Stripe Customer
@@ -79,7 +108,7 @@ def checkout_product(product_id):
             ],
             mode='payment',
             success_url=url_for('payment.success', _external=True),
-            cancel_url=url_for('productPagination.product_pagination', _external=True),
+            cancel_url=url_for('payment.checkout_cancel', _external=True),
             adaptive_pricing={'enabled': True},
             customer=current_user.stripe_id,
             payment_intent_data={
@@ -91,16 +120,6 @@ def checkout_product(product_id):
             billing_address_collection='required',
             phone_number_collection={'enabled': True}
         )
-
-        # Add the product to the cart temporarily (if needed)
-        temp_cart = Cart(
-            user_id=current_user.id,
-            product_id=product_id,
-            product_condition=condition[0],
-            quantity=1
-        )
-        db.session.add(temp_cart)
-        db.session.commit()
 
     except Exception as e:
         db.session.rollback()
@@ -315,3 +334,14 @@ def success():
         db.session.rollback()
         print(str(e))
         return redirect(url_for('productPagination.product_pagination'))
+
+@payment.route('/checkout/cancel', methods=['GET'])
+@login_required
+def checkout_cancel():
+    # Retrieve the temp_cart for the current user
+    temp_cart = Cart.query.filter_by(user_id=current_user.id).first()
+    if temp_cart:
+        db.session.delete(temp_cart)
+        db.session.commit()
+        flash("Your cart has been cleared.", "info")
+    return redirect(url_for('productPagination.product_pagination'))

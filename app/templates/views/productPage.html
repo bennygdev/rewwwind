@@ -93,7 +93,7 @@
           {{ cartform.condition(value=selected_condition.condition) }}
           <button type="submit" class="filter">Add to Cart</button>
       </form>
-      <form action="{{ url_for('payment.checkout_product', product_id=product.id) }}" method="POST" class="cta-form">
+      <form action="{{ url_for('payment.create_temp_cart', product_id=product.id) }}" method="POST" class="cta-form">
           <input type="hidden" name="condition" value="{{ selected_condition.condition }}">
           <button type="submit" class="filter">Buy Now</button>
       </form>

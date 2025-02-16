@@ -1,0 +1,95 @@
+{% extends "views/base.html" %}
+{% set active_page = "products" %}
+{% block styles %}
+<style>
+    footer.footer {
+        margin-top: 0;
+    }
+    .content {
+        padding-top: 80px;
+        height: 100vh;
+        display: flex;
+        flex-direction: row;
+        gap: 30px;
+    }
+
+    .left {
+        width: 40%;
+    }
+
+    .left img {
+        height: 100%;
+        width: 100%;
+        object-fit: fill;
+    }
+
+    .right {
+        padding-top: 80px;
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .right .header h1 {
+        font-weight: bold;
+    }
+
+    .right .header span {
+        color: grey;
+    }
+
+    .right form {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .right form label {
+        margin-bottom: 5px;
+    }
+
+    .right form label span.req {
+        color: red;
+    }
+
+    .right form label span.opt {
+        color: grey;
+    }
+</style>
+{% endblock %}
+{% block title %}Fill Your Billing Information{% endblock %}
+
+{% block content %}
+<div class="left">
+    <img src="{{url_for('static', filename='media/green_placeholder.jpg')}}">
+</div>
+<div class="right">
+    <div class="header">
+        <h1>Fill Your Billing Information</h1>
+        <span>This is the address your ordered items will be shipped to.</span>
+    </div>
+    <form action="{{ url_for('payment.billing_info') }}" method="POST" >
+        <div class="input add1">
+            <label for="address_one" title="This is required.">Address Line 1 <span class="req">*</span></label>
+            {{ form.address_one(class='form-control', placeholder='Enter address line 1 here...') }}
+        </div>
+        <div class="input add2">
+            <label for="address_two">Address Line 2 <span class="opt">(if applicable)</span></label>
+            {{ form.address_one(class='form-control', placeholder='Enter address line 2 here...') }}
+        </div>
+        <div class="input unit">
+            <label for="unit_number">Unit Number <span class="opt">(if applicable)</span></label>
+            {{ form.address_one(class='form-control', placeholder='Enter unit number here...') }}
+        </div>
+        <div class="input postal">
+            <label for="postal_code" title="This is required.">Postal Code <span class="req">*</span></label>
+            {{ form.address_one(class='form-control', placeholder='Enter postal code here...') }}
+        </div>
+        <div class="input phone_number">
+            <label for="phone_number" title="This is required.">Phone Number <span class="req">*</span></label>
+            {{ form.address_one(class='form-control', placeholder='Enter phone number here...') }}
+        </div>
+        <button type="submit">Submit</button>
+    </form>
+</div>
+{% endblock %}

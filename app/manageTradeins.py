@@ -35,12 +35,12 @@ def delete_trade(trade_id):
     # Only owner (user of whoever made it) can delete sent requests
     if current_user.role_id == 1 and trade_item.trade_number != current_user.id:
         flash("You do not have permission to delete this trade-in.", "danger")
-
         return redirect(url_for('manageTradeins.manage_tradeins'))
 
     db.session.delete(trade_item)
     db.session.commit()
-    flash("Trade-in deleted successfully!", "success")
+    
+    flash("Trade-in deleted successfully!", "delete")
 
     return redirect(url_for('manageTradeins.manage_tradeins'))
 

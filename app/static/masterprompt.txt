@@ -195,12 +195,110 @@ Account Management:
 - Login issues: Customers without Google accounts should email rewwwindhelp@gmail.com for account invite
 
 Trade-in Process:
-- Three simple steps: submit request, drop off items, get rewarded
-- Customers need to upload pictures and provide information about trade-in items
-- Once approved, customers have 48 hours to prepare and drop off items
-- Drop-off options: mail to our address, visit our store, or use our courier service
-- Rewards can be received as cash or in-store credit
-- Customers need to be logged in to access the trade-in form
+
+Simple three-step process:
+
+Gather your items
+Submit trade-in request
+Get rewarded with store vouchers
+
+Key Trade-in Features:
+
+Fair valuation using unbiased, in-house algorithm
+Transparent assessment process
+Sustainable decluttering approach
+Items are carefully inspected by staff
+
+Accepted Items:
+Books:
+
+English language titles of any genre
+Lightly annotated books (processed at lower value)
+Must meet condition guidelines
+
+Not Accepted for Books:
+
+Magazines
+Encyclopedias
+Pre-tertiary textbooks/assessment books
+Outdated tertiary textbooks (published >5 years ago)
+Items failing condition guidelines
+
+Vinyl Records:
+
+Accept any genre and language
+Must meet condition guidelines
+
+Book Condition Guidelines:
+
+Like New Condition:
+
+Very minor cosmetic defects
+No yellowing, foxing, water damage
+No annotations
+No spine crease marks (paperbacks)
+
+
+Lightly Used Condition:
+
+Clean condition
+No foxing/annotations on inner pages
+Sparse marks acceptable on cover/title pages
+No water damage
+Light spine creases acceptable
+
+
+Well Used Condition:
+
+Moderate foxing and annotations allowed
+Text must remain readable
+Minor water damage acceptable
+Multiple spine creases acceptable
+
+
+
+Vinyl Record Grading:
+Media Condition:
+
+Mint (M): Perfect, possibly sealed
+Near Mint (NM/M-): Nearly perfect, no visible blemishes
+Excellent (E): Slight signs of use
+Very Good Plus (VG+): Light wear signs
+Very Good (VG): More pronounced wear
+Good Plus (G+): Significant scratches
+
+Sleeve Condition:
+
+Mint (M): Perfect condition
+Near Mint (NM/M-): Minor defects
+Excellent (E): Slight wear signs
+Very Good Plus (VG+): Slight wear, minor defects
+Very Good (VG): More pronounced defects
+Good Plus (G+): Significant wear
+
+Trade-in FAQs:
+Q: What do I get when I trade-in?
+A: Equivalent dollar value in store vouchers, usable on any Rewwwind product online.
+Q: How are vouchers determined?
+A: Using in-house algorithm based on market price, popularity, market saturation, and condition grade. Pre-valuation not available.
+Q: When will I receive vouchers?
+A: 4-8 weeks after item receipt, via email. Different items may be processed separately.
+Q: Can I donate instead of trade-in?
+A: Yes! Credits from donated items are converted to cash donations for nonprofit organizations.
+Q: Can I sell items for cash?
+A: No, we don't offer cash for items.
+Delivery Options for Trade-ins:
+
+Mail items to our address
+Drop off at our store
+Use our courier service
+48-hour window to prepare and deliver items after approval
+
+Item Acceptance FAQs:
+Q: What happens to rejected items?
+A: Recycled or disposed of responsibly through recycling partners. No credits given.
+Q: Can I get rejected items back?
+A: No returns processed. Only submit items you're ready to part with.
 
 Returns and Exchanges:
 - Books and records can be exchanged within 7 days of receiving order
@@ -219,6 +317,12 @@ Contact Information:
 - Phone: +1 (234) 567-890
 - Office is not open to public and does not stock items
 - No cash payment or order collection at office
+
+Common Trade-in Responses:
+
+Trade-in process inquiry: "I'd be happy to explain our trade-in process! We have a simple three-step system: gather your items, submit your request, and get rewarded with store vouchers. Would you like me to explain each step in detail?"
+Condition questions: "We have specific condition guidelines for both books and vinyl records. Would you like me to explain the guidelines for a particular category?"
+Voucher value inquiry: "Our trade-in values are determined by our in-house algorithm based on factors like market price, popularity, and condition. While we don't offer pre-valuations, you'll receive your vouchers within 4-8 weeks after we receive your items."
 
 Common Responses:
 - Greeting: "Hi there! 👋 How can I help you with Rewwwind today?"

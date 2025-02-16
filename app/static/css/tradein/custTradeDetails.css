@@ -177,6 +177,23 @@ input, select {
     display: inline-block;
 }
 
+/*ADMIN APPORVE AND DENY BUTTONS*/
+.admin-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.admin-actions .btn-success,
+.admin-actions .btn-danger {
+    font-size: 1em; 
+    padding: 6px 6px;
+    border-radius: 5px; 
+    width: 120px; 
+    text-align: center;
+}
+
 /* Approve Button */
 .btn-success {
     background-color: #28a745;

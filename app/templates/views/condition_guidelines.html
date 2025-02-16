@@ -1,0 +1,187 @@
+{% extends "views/base.html" %}
+{% set active_page = "condition_guidelines" %}
+{% block title %}Condition Guidelines{% endblock %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/views/condition_guidelines.css')}}">
+{% endblock %}
+
+{% block content %}
+<div class="about__menu">
+  <ul class="about__menu--links">
+    <li><a class="about__menu--link {{ 'about__link--active' if active_page == 'tradein' else '' }}" href="{{ url_for('views.trade_Onboard') }}">Trade-In</a></li>
+    <li><a class="about__menu--link {{ 'about__link--active' if active_page == 'condition_guidelines' else '' }}" href="{{ url_for('views.condition_guidelines') }}">Condition Guidelines</a></li>
+  </ul>
+</div>
+
+<div class="condition__container">
+  <h1 class="condition__header">Our Process</h1>
+
+  <div class="condition__introduction">
+    <p>Every item we receive is inspected by our staff, who carefully validates it and ascertain its condition.</p>
+  </div>
+
+  <div class="quick__links">
+    <a href="#book-condition" class="quick__link--button">Books</a>
+    <a href="#vinyl-condition" class="quick__link--button">Vinyl Records</a>
+  </div>
+
+  <h2 class="condition__subheader" id="book-condition">Book Condition Guidelines</h2>
+
+  <!-- Books -->
+  <div class="condition__section">
+    <div class="condition__section--wrapper">
+      <h2>Books in Like New Condition</h2>
+      <p>This book may contain very minor cosmetic defects, but it is in pristine condition. There should be no yellowing, no foxing, no water damage, and no annotations of any kind on the cover and the pages. For paperbacks, there should not be any crease marks on the spine. This book is good as - lucky you!</p>
+      <i><p>*Books may be missing bundle media (e.g. CD, e-book code), if included.</p></i>
+      <div class="condition__section--grid">
+        <div class="condition__section--item">
+          <img src="{{ url_for('static', filename='media/book-likenew-1.jpg') }}" alt="">
+          <h3>Pages</h3>
+        </div>
+        <div class="condition__section--item">
+          <img src="{{ url_for('static', filename='media/book-likenew-2.jpg') }}" alt="">
+          <h3>Edges</h3>
+        </div>
+        <div class="condition__section--item">
+          <img src="{{ url_for('static', filename='media/book-likenew-3.jpg') }}" alt="">
+          <h3>Spine</h3>
+        </div>
+      </div>
+    </div>
+
+    <div class="condition__section--wrapper">
+      <h2>Books in Lightly Used Condition</h2>
+      <p>This book has been used, but it is still in a clean condition. There should be no foxing or annotations of any kind on the inner pages, but a sparse amount may be present on the cover, title pages, or outside edges of the book. There should be no water damage of any kind. For paperbacks, there may be light crease marks on the spine.</p>
+      <i><p>*Books may be missing bundle media (e.g. CD, e-book code), if included.</p></i>
+      <div class="condition__section--grid">
+        <div class="condition__section--item">
+          <img src="{{ url_for('static', filename='media/book-lightlyused-1.jpeg') }}" alt="">
+          <h3>Pages</h3>
+          <p>Little to no foxing or annotations</p>
+        </div>
+        <div class="condition__section--item">
+          <img src="{{ url_for('static', filename='media/book-lightlyused-2.jpg') }}" alt="">
+          <h3>Edges</h3>
+          <p>Light foxing may be present</p>
+        </div>
+        <div class="condition__section--item">
+          <img src="{{ url_for('static', filename='media/book-lightlyused-3.jpeg') }}" alt="">
+          <h3>Edges</h3>
+          <p>Light annotations may be present</p>
+        </div>
+        <div class="condition__section--item">
+          <img src="{{ url_for('static', filename='media/book-lightlyused-4.jpeg') }}" alt="">
+          <h3>Spine</h3>
+          <p>Light crease marks may be present</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="condition__section--wrapper">
+      <h2>Books in Well Used Condition</h2>
+      <p>This is a well-read book, which means that the previous owner probably really enjoyed it! The cover and pages may include moderate foxing and annotations, but the text is not obscured and still readable. Moderate cosmetic defects and minor water damage may be present on the edges of the book. For paperbacks, there may be multiple crease marks on the spine.</p>
+      <i><p>*Books may be missing bundle media (e.g. CD, e-book code), if included.</p></i>
+      <div class="condition__section--grid">
+        <div class="condition__section--item">
+          <img src="{{ url_for('static', filename='media/book-wellused-1.jpg') }}" alt="">
+          <h3>Pages</h3>
+          <p>Moderate annotations may be present</p>
+        </div>
+        <div class="condition__section--item">
+          <img src="{{ url_for('static', filename='media/book-wellused-2.jpeg') }}" alt="">
+          <h3>Pages</h3>
+          <p>Moderate foxing may be present</p>
+        </div>
+        <div class="condition__section--item">
+          <img src="{{ url_for('static', filename='media/book-wellused-3.jpeg') }}" alt="">
+          <h3>Edges</h3>
+          <p>Moderate foxing or annotations may be present</p>
+        </div>
+        <div class="condition__section--item">
+          <img src="{{ url_for('static', filename='media/book-wellused-4.jpeg') }}" alt="">
+          <h3>Spine</h3>
+          <p>Multiple crease marks may be present</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vinyl Condition -->
+  <h2 class="condition__subheader" id="vinyl-condition">Vinyl Condition Guidelines</h2>
+  <p class="condition__subtitles">We grade the pre-loved records by both their Media Condition, and their Sleeve Condition using the following guidelines:</p>
+
+  <div class="condition__section">
+    <!-- Media -->
+    <div class="condition__section--mediaVinyl">
+      <h2>Media Condition</h2>
+      <div class="condition__section--row">
+        <div class="condition__section--rowContainer">
+          <h3>Mint (M)</h3>
+          <p>Absolutely perfect in every way. Certainly never been played, possibly even still sealed. Used sparingly as a grade, if at all.</p>
+        </div>
+        <div class="condition__section--rowContainer">
+          <h3>Near Mint (NM or M-)</h3>
+          <p>A nearly perfect record. A NM record should have no visible cosmetic blemishes, with no obvious signs of wear. This is the highest grading we give for our preloved records.</p>
+        </div>
+        <div class="condition__section--rowContainer">
+          <h3>Excellent (E)</h3>
+          <p>Record shows slight signs of use by a previous owner, such as minor scuffs or very light scratches. In general, if not for a couple of minor things wrong with it, this would be Near Mint.</p>
+        </div>
+      </div>
+      <div class="condition__section--row">
+        <div class="condition__section--rowContainer">
+          <h3>Very Good Plus (VG+)</h3>
+          <p>A VG+ record will show some signs that it was played and otherwise handled by a previous owner who took good care of it. These signs of wear include visible scuffs or scratches but are generally light and limited.</p>
+        </div>
+        <div class="condition__section--rowContainer">
+          <h3>Very Good (VG)</h3>
+          <p>Many of the defects found in a VG+ record will be more pronounced in a VG disc. Scuffs and scratches will be more visible and possibly deeper. Slight warps might be present.</p>
+        </div>
+        <div class="condition__section--rowContainer">
+          <h3>Good Plus (G+)</h3>
+          <p>Record shows significant scratches, and visible groove wear. It is likely that noticeable surface noise and "ticks" will almost certainly accompany the playback.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sleeve -->
+    <div class="condition__section--mediaVinyl">
+      <h2>Sleeve Condition</h2>
+      <div class="condition__section--row">
+        <div class="condition__section--rowContainer">
+          <h3>Mint (M)</h3>
+          <p>Absolutely perfect in every way. Certainly never been played, possibly even still sealed. Used sparingly as a grade, if at all.</p>
+        </div>
+        <div class="condition__section--rowContainer">
+          <h3>Near Mint (NM or M-)</h3>
+          <p>The sleeve should have very minor defects, with little to no sign of slight handling. An LP cover should have no creases, folds, seam splits, cut-out holes, or other noticeable similar defects. If present, the same should be true of any other inserts, such as posters, lyric sleeves, etc.</p>
+        </div>
+        <div class="condition__section--rowContainer">
+          <h3>Excellent (E)</h3>
+          <p>Cover shows slight signs of use by a previous owner, such as minor scuffs/scratches, and/or creases. In general, if not for a couple of minor things wrong with it, this would be Near Mint.</p>
+        </div>
+      </div>
+      <div class="condition__section--row">
+        <div class="condition__section--rowContainer">
+          <h3>Very Good Plus (VG+)</h3>
+          <p>Picture sleeves and inner sleeves will have some slight wear, slightly turned-up corners, or a slight seam split. An LP cover may have slight signs of wear, and may be marred by a cut-out hole, indentation, discolouration, or cut corner.</p>
+        </div>
+        <div class="condition__section--rowContainer">
+          <h3>Very Good (VG)</h3>
+          <p>Many of the defects found in a VG+ sleeve will be more pronounced. Labels may be marred by writing, or have tape or stickers (or their residue) attached. The same may be true of picture sleeves or LP covers.</p>
+        </div>
+        <div class="condition__section--rowContainer">
+          <h3>Good Plus (G+)</h3>
+          <p>A cover or sleeve will have seam splits especially at the bottom or on the spine. Tape, writing, label wear, or other defects will be present.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="condition__subtitles">*All items are visually graded. There is a possibility that the record may have surface noise, regardless of the grading. Please note that all accessories such as lyric sheets, inserts may not be included. As we include actual photos of the records, please see photos for confirmation before purchasing.</p>
+  </div>
+
+</div>
+
+{% endblock %}
+

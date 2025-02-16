@@ -7,56 +7,289 @@
 {% endblock %}
 
 {% block content %}
-<div>
-    <h1>It's as easy as 1,2,3!</h1>
+<div class="about__menu">
+  <ul class="about__menu--links">
+    <li><a class="about__menu--link {{ 'about__link--active' if active_page == 'tradein' else '' }}" href="{{ url_for('views.trade_Onboard') }}">Trade-In</a></li>
+    <li><a class="about__menu--link {{ 'about__link--active' if active_page == 'condition_guidelines' else '' }}" href="{{ url_for('views.condition_guidelines') }}">Condition Guidelines</a></li>
+  </ul>
 </div>
 
-<div class="steps">
-    <div class="text">
-        <h1>Submit a trade-in request with us</h1>
-        <p>Upload pictures of the requested angles of your product, <br>
-            and provide us the requested information of your trade-in.
-        </p>
+<div class="tradein__content">
+  <div class="tradein__section">
+    <div class="tradein__section--left">
+      <h2 class="tradein__section--header">Clean-Out with Rewwwind</h2>
+      <p>Trade in your books and vinyl records and more for Vouchers!</p>
+      <p>Have items around at home that no longer spark joy? It’s time to give these items a new life. Send them our way, and in return, get Rewwwind Vouchers to splurge on secondhand items you truly adore</p>
+      <a href="{{ url_for('views.trade_form') if current_user.is_authenticated else url_for('auth.login') }}">Trade In</a>
     </div>
-    <img src="icon-document.png" alt="Document Icon" class="step-image">
-</div>
+    <div class="tradein__section--right">
+      <img src="{{ url_for('static', filename='media/tradein-introduction.png') }}" alt="About Rewwwind" class="tradein__section--image">
+    </div>
+  </div>
 
-<div class="steps">
-    <div class="text">
-        <h1>Drop your items off</h1>
-        <p>Once your request is approved, you'll have 48 hours to prepare and drop your items off by either:</p>
-        <ul class="options">
-            <li>
-                <img src="icon-mail.png" alt="Mail Icon" class="icon"> Mailing it to us
-            </li>
-            <li>
-                <img src="icon-store.png" alt="Store Icon" class="icon"> Dropping by our store
-            </li>
-            <li>
-                <img src="icon-truck.png" alt="Truck Icon" class="icon"> Opting for our courier service
-            </li>
+  <div class="quick__links">
+    <a href="#acceptance-guidelines" class="quick__link--button">What Items We Accept</a>
+    <a href="#how-it-works" class="quick__link--button">How It Works</a>
+    <a href="#faq" class="quick__link--button">Trade-in FAQs</a>
+  </div>
+
+  <div class="tradein__section2">
+    <div class="tradein__section2--wrapper">
+      <div class="tradein__section2--icon"><i class="fa-regular fa-square-check fa-xl"></i></div>
+      <div class="tradein__section2--description">
+        <h3>Fair valuation</h3>
+        <p>Every item's trade-in value is calculated using our unbiased, in-house algorithm.</p>
+      </div>
+    </div>
+    <div class="tradein__section2--wrapper">
+      <div class="tradein__section2--icon"><i class="fa-regular fa-face-smile fa-xl"></i></div>
+      <div class="tradein__section2--description">
+        <h3>Transparent</h3>
+        <p>No hidden tricks or surprises, just honest assessments that you can count on.</p>
+      </div>
+    </div>
+    <div class="tradein__section2--wrapper">
+      <div class="tradein__section2--icon"><i class="fa-solid fa-recycle fa-xl"></i></div>
+      <div class="tradein__section2--description">
+        <h3>Sustainable</h3>
+        <p>Declutter sustainably, and rest assured that your items will not go to waste.</p>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="tradein__header2" id="how-it-works">How It Works</h2>
+
+  <div class="tradein__section">
+    <div class="tradein__section--left">
+      <img src="{{ url_for('static', filename='media/tradein-step1-indicator.svg') }}" alt="Step 1" class="tradein__section--indicator" class="tradein__section--image">
+      <h2 class="tradein__section--header">Gather Your Items</h2>
+      <p>We accept only books and vinyl records. Please see what's accepted before proceeding! Across all categories, we do not accept any counterfeit products.</p>
+      <p>Since your items will be heading to new homes, please only pass on those that are still lovable to keep the Rewwwind experience delightful for everyone in our community!</p>
+      <a href="{{ url_for('views.trade_form') if current_user.is_authenticated else url_for('auth.login') }}">Trade In</a>
+    </div>
+    <div class="tradein__section--right">
+      <img src="{{ url_for('static', filename='media/tradein-new-items.png') }}" alt="About Rewwwind">
+    </div>
+  </div>
+
+  <h3 class="tradein__subheader" id="acceptance-guidelines">Acceptance Guidelines</h3>
+  <p class="tradein__subtitles">Items that do not meet these guidelines will be rejected and recycled responsibly. If you want to find more about how we grade our items, visit <a href="{{ url_for('views.condition_guidelines') }}">Condition Guidelines</a></p>
+
+  <div class="guidelines__container">
+    <!-- Books Row -->
+    <div class="guidelines__row">
+      <div class="guidelines__box condition">
+        <h3 class="condition">Books</h3>
+        <img src="{{ url_for('static', filename='media/book-icon.png') }}" alt="Book icon" class="guidelines__box--image">
+      </div>
+      <div class="guidelines__box">
+        <h3>We Accept ✅</h3>
+        <ul>
+          <li><span class="guidelines__highlight">English language</span> titles of <span class="guidelines__highlight">any genre</span></li>
+          <li>Lightly annotated books while accepted, will be processed as lower in value.</li>
         </ul>
+      </div>
+      <div class="guidelines__box">
+        <h3>We Don't Accept ❌</h3>
+        <ul>
+          <li><span class="guidelines__highlight">No</span> magazines</li>
+          <li><span class="guidelines__highlight">No</span> encyclopedias</li>
+          <li><span class="guidelines__highlight">No</span> Pre-tertiary textbooks/ assessment books</li>
+          <li><span class="guidelines__highlight">No</span> outdated tertiary textbooks (published more than 5 years ago)</li>
+          <li>Items that <span class="guidelines__highlight">fail</span> to meet our condition guidelines:</li>
+        </ul>
+        <img src="{{ url_for('static', filename='media/book-trade-in-conditions.png') }}" alt="Book guidelines" class="guidelines__box--imageContent">
+      </div>
     </div>
-    <img src="icon-box.png" alt="Box Icon" class="step-image">
-</div>
-
-<div class="steps">
-    <div class="text">
-        <h1>Get rewarded</h1>
-        <p>Once we receive your items, you can choose to either receive cash or<br>
-            in-store credit to spend in our store!
-        </p>
+  
+    <!-- Vinyl Row -->
+    <div class="guidelines__row">
+      <div class="guidelines__box category">
+        <h3 class="condition">Vinyl Records</h3>
+        <img src="{{ url_for('static', filename='media/vinyl-icon.png') }}" alt="Vinyl icon" class="guidelines__box--image">
+      </div>
+      <div class="guidelines__box condition">
+        <h3>We Accept ✅</h3>
+        <ul>
+          <li>Any genre and language</li>
+        </ul>
+      </div>
+      <div class="guidelines__box">
+        <h3>We Don't Accept ❌</h3>
+        <ul>
+          <li>Items that <span class="guidelines__highlight">fail</span> to meet our condition guidelines:</li>
+        </ul>
+        <img src="{{ url_for('static', filename='media/vinyl-trade-in-conditions.png') }}" alt="Book guidelines" class="guidelines__box--imageContent">
+      </div>
     </div>
-    <img src="icon-document.png" alt="Document Icon" class="step-image">
+  </div>
+
+  <div class="tradein__section">
+    <div class="tradein__section--left">
+      <img src="{{ url_for('static', filename='media/tradein-step2-indicator.svg') }}" alt="Step 1" class="tradein__section--indicator">
+      <h2 class="tradein__section--header">Submit Your Trade-in Request</h2>
+      <p>Upload pictures of the request angles of your product, and provide us the request information of your trade-in.</p>
+      <p>Then once your request is approved, you'll have 48 hours to prepare and drop of your items either by:</p>
+      <p><i class="fa-solid fa-envelope fa-lg"></i>Mailing it to us</p>
+      <p><i class="fa-solid fa-box fa-lg"></i>Dropping by our store</p>
+      <p><i class="fa-solid fa-truck fa-lg"></i>Opting for our courier service</p>
+    </div>
+    <div class="tradein__section--right">
+      <img src="{{ url_for('static', filename='media/trade-in-2.png') }}" alt="About Rewwwind" class="tradein__section--image">
+    </div>
+  </div>
+
+  <div class="tradein__section">
+    <div class="tradein__section--left">
+      <img src="{{ url_for('static', filename='media/tradein-step3-indicator.svg') }}" alt="Step 1" class="tradein__section--indicator">
+      <h2 class="tradein__section--header">Get Rewarded</h2>
+      <p>Once we receive your items, you can receive store vouchers from us to spend in our store!</p>
+    </div>
+    <div class="tradein__section--right">
+      <img src="{{ url_for('static', filename='media/voucherman.png') }}" alt="About Rewwwind" class="tradein__section--image">
+    </div>
+  </div>
 </div>
 
-<div>
-    <h1>Ready to refresh your selection?</h1>
+<div class="tradein__cta">
+  <h2 class="tradein__cta--header">Ready to refresh your selection?</h2>
+  <a href="{{ url_for('views.trade_form') if current_user.is_authenticated else url_for('auth.login') }}" class="tradein__cta--button">Get Started</a>
 </div>
 
-<div class="cta">
-    <a href="{{ url_for('views.trade_form') if current_user.is_authenticated else url_for('auth.login') }}" class="btn">Get Started</a>
+<!-- FAQ -->
+<div class="faq__container" id="faq">
+  <div class="faq__wrapper">
+    <!-- Trade-in FAQ -->
+    <div class="faq__section" id="order-status">
+      <h2 class="faq__section--header">Trade-In FAQs</h2>
+      <div class="accordion accordion-flush" id="tradein_accordion">
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tradein1">
+              What do I get when I trade-in?
+            </button>
+          </h2>
+          <div id="tradein1" class="accordion-collapse collapse">
+            <div class="accordion-body">
+              When you trade-in with us, the equivalent dollar value of your trade-in will be given to you in <strong>Vouchers</strong>. Vouchers can be spent on any Rewwwind product in our online store only.
+
+              <br><br>
+              <i>If you can't find our email(s) / your credits, drop us an email at <a href="mailto:rewwwindhelp@gmail.com">rewwwindhelp@gmail.com</a>!</i>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tradein2">
+              How are my Vouchers determined?
+            </button>
+          </h2>
+          <div id="tradein2" class="accordion-collapse collapse">
+            <div class="accordion-body">
+              We use an in-house algorithm (based on current market price, popularity, market saturation and condition grade) to determine each item's trade-in value. At present, we do not offer pre-valuation.
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tradein3">
+              I've traded in my items, when and how will I get my vouchers?
+            </button>
+          </h2>
+          <div id="tradein3" class="accordion-collapse collapse">
+            <div class="accordion-body">
+              Look out for an email* or two from us, containing your vouchers and a breakdown of the value of your items, <strong>4 to 8 weeks</strong> after we receive your items. 
+              <br><br>
+              You may receive your credits across different emails, as due to the nature of our operations, different item types are processed separately.
+              <br><br>
+              <i>* Do check your spam/junk if you can't find our email(s)!</i>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tradein4">
+              I don't want to trade-in, can I donate my items instead?
+            </button>
+          </h2>
+          <div id="tradein4" class="accordion-collapse collapse">
+            <div class="accordion-body">
+              Of course! If you choose to donate your items, instead of trading them in for credits, we will in turn donate your credits as cash to nonprofit organisations and initiatives to support efforts in tackling urgent environmental or social issues, when they are sold.
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#tradein5">
+              Can I sell my items for cash?
+            </button>
+          </h2>
+          <div id="tradein5" class="accordion-collapse collapse">
+            <div class="accordion-body">
+              Unfortunately, we don’t offer cash for items.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Item Acceptance FAQ -->
+    <div class="faq__section" id="general">
+      <h2 class="faq__section--header">Item Acceptance FAQs</h2>
+      <div class="accordion accordion-flush" id="itemacceptance_accordion">
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#itemacceptance1">
+              What happens when my items get rejected?
+            </button>
+          </h2>
+          <div id="itemacceptance1" class="accordion-collapse collapse">
+            <div class="accordion-body">
+              The rejected items will be recycled or disposed of responsibly through our recycling partners
+              <br><br>
+              If you are trading in, this means that you will not receive any Thryft Credits for the rejected items.
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#itemacceptance2">
+              Can I get my items back if they are rejected?
+            </button>
+          </h2>
+          <div id="itemacceptance2" class="accordion-collapse collapse">
+            <div class="accordion-body">
+              Sorry, we do not process any returns. Please only pass us items that you are prepared to part with!
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
+<div class="tradein__section3">
+  <div class="tradein__section3--wrapper">
+    <div class="tradein__section3--icon"><i class="fa-solid fa-universal-access fa-xl"></i></div>
+    <div class="tradein__section3--description">
+      <h3>Convenient Service</h3>
+      <p>Send us your items, and we’ll do the work for you. Decluttering sustainably has never been easier.</p>
+    </div>
+  </div>
+  <div class="tradein__section3--wrapper">
+    <div class="tradein__section3--icon"><i class="fa-solid fa-recycle fa-xl"></i></div>
+    <div class="tradein__section3--description">
+      <h3>Sustainability First</h3>
+      <p>We strive to extend the life of each item through resale, reuse, and responsible recycling.</p>
+    </div>
+  </div>
+  <div class="tradein__section3--wrapper">
+    <div class="tradein__section3--icon"><i class="fa-regular fa-handshake fa-xl"></i></div>
+    <div class="tradein__section3--description">
+      <h3>Every Item for Good</h3>
+      <p>A portion of all our profits goes back to meaningful social causes close to home and around us.</p>
+    </div>
+  </div>
+</div>
 {% endblock %}
 

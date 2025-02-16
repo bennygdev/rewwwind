@@ -42,8 +42,22 @@ h1 {
   /* width: 50; */
 }
 
+.chatHistory__header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .chatHistory__conversation h2 {
   font-size: 1.4em;
+}
+
+.chatHistory__header a {
+  text-decoration: none;
+  color: #039752;
+  padding-bottom: 2px;
+  border-bottom: 1px solid #039752;
 }
 
 .chatHistory__messages {
@@ -54,7 +68,7 @@ h1 {
   flex-direction: column;
   gap: 1rem;
   padding: 20px 20px;
-  margin-top: 10px;
+  margin-top: 5px;
   overflow-y: auto;
 }
 

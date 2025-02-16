@@ -193,22 +193,28 @@ td.orderStock div {
 /* bottom */
 .bottom {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: space-between;
     gap: 40px;
 }
 
-.bottom > div {
-    flex-grow: 1;
+.bottom .misc_top, .bottom .misc_bot {
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+}
+
+.misc_top > div, .misc_bot > div {
     display: flex;
     flex-direction: column;
+    flex-grow: 1;
 }
 
 .bottom .body {
     background-color: #e6e6e6;
     border-radius: var(--bs-border-radius);
     padding: 10px 20px;
-    flex-grow: 1
+    flex-grow: 1;
 }
 
 /* order summary */

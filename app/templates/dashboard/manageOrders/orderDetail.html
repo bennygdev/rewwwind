@@ -98,7 +98,66 @@
         </div>
     </div>
     <div class="bottom">
-        <div class="left">
+        {% if user.role_id in [2,3] %}
+        <div class="misc_top">
+            <div class="user_info">
+                <div class="header">
+                    <h2>User Information</h2>
+                </div>
+                <div class="body">
+                    <div class="id">
+                        <h4><strong>Customer ID</strong></h4>
+                        <p>{{ order.user_id }}</p>
+                    </div>
+                    <div class="role">
+                        <h4><strong>Role</strong></h4>
+                        <p>{{ order.user.role.role_name }}</p>
+                    </div>
+                    <div class="username">
+                        <h4><strong>Username</strong></h4>
+                        <p>{{ order.user.username }}</p>
+                    </div>
+                    <div class="email">
+                        <h4><strong>Email Address</strong></h4>
+                        <p>{{ order.user.email }}</p>
+                    </div>
+                    <div class="payment">
+                        <h4><strong>Payment Method</strong></h4>
+                        <p>{{ order.payment_type.payment_type }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="billing_payment">
+                <div class="header">
+                    <h2>Billing &amp; Payment Information</h2>
+                </div>
+                <div class="body">
+                    <div class="name">
+                        <h4><strong>Name</strong></h4>
+                        <p>{{ order.user.first_name + ' ' + order.user.last_name }}</p>
+                    </div>
+                    <div class="address one">
+                        <h4><strong>Address 1</strong></h4>
+                        <p>{{ order.billing.address_one }}</p>
+                    </div>
+                    {% if order.billing.address_two %}
+                    <div class="address two">
+                        <h4><strong>Address 1</strong></h4>
+                        <p>{{ order.billing.address_one }}</p>
+                    </div>
+                    {% endif %}
+                    <div class="phone_number">
+                        <h4><strong>Phone Number</strong></h4>
+                        <p>{{ order.billing.phone_number }}</p>
+                    </div>
+                    <div class="payment">
+                        <h4><strong>Payment Method</strong></h4>
+                        <p>{{ order.payment_type.payment_type }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="misc_bot">
             <div class="order_summary">
                 <div class="header">
                     <h2>Order Summary</h2>
@@ -107,7 +166,7 @@
                     <table>
                         <tr class="subtotal">
                             <td>Subtotal</td>
-                            <td>{{ order_items|length }} items</td>
+                            <td>{{ order_items|length }} unique items</td>
                             <td>${{ order.total_amount }}</td>
                         </tr>
                         <!-- <tr class="discount"></tr> -->
@@ -126,8 +185,16 @@
                     </div>
                 </div>
             </div>
-            {% if user.role_id in [2,3] %}
             <div class="order_admin">
+                <div class="delivery_type">
+                    <div class="header">
+                        <h2>Delivery Type</h2>
+                    </div>
+                    <div class="body">
+                        <h2><i class="bi bi-truck fa-2xl"></i></h2>
+                        <h3>{{ order.delivery }}</h3>
+                    </div>
+                </div>
                 <div class="order_approval">
                     <div class="header">
                         <h2>{{ form.approved.label }}</h2>
@@ -146,76 +213,68 @@
                         </form>
                     </div>
                 </div>
-                <div class="delivery_type">
-                    <div class="header">
-                        <h2>Delivery Type</h2>
-                    </div>
-                    <div class="body">
-                        <h2><i class="bi bi-truck fa-2xl"></i></h2>
-                        <h3>{{ order.delivery }}</h3>
-                    </div>
-                </div>
             </div>
-            {% endif %}
         </div>
-        {% if user.role_id in [2,3] %}
-        <div class="user_info">
-            <div class="header">
-                <h2>User Information</h2>
+        {% else %}
+        <div class="misc_top">
+            <div class="billing_payment">
+                <div class="header">
+                    <h2>Billing &amp; Payment Information</h2>
+                </div>
+                <div class="body">
+                    <div class="name">
+                        <h4><strong>Name</strong></h4>
+                        <p>{{ order.user.first_name + ' ' + order.user.last_name }}</p>
+                    </div>
+                    <div class="address one">
+                        <h4><strong>Address 1</strong></h4>
+                        <p>{{ order.billing.address_one }}</p>
+                    </div>
+                    {% if order.billing.address_two %}
+                    <div class="address two">
+                        <h4><strong>Address 1</strong></h4>
+                        <p>{{ order.billing.address_one }}</p>
+                    </div>
+                    {% endif %}
+                    <div class="phone_number">
+                        <h4><strong>Phone Number</strong></h4>
+                        <p>{{ order.billing.phone_number }}</p>
+                    </div>
+                    <div class="payment">
+                        <h4><strong>Payment Method</strong></h4>
+                        <p>{{ order.payment_type.payment_type }}</p>
+                    </div>
+                </div>
             </div>
-            <div class="body">
-                <div class="id">
-                    <h4><strong>Customer ID</strong></h4>
-                    <p>{{ order.user_id }}</p>
+            <div class="order_summary">
+                <div class="header">
+                    <h2>Order Summary</h2>
                 </div>
-                <div class="role">
-                    <h4><strong>Role</strong></h4>
-                    <p>{{ order.user.role.role_name }}</p>
-                </div>
-                <div class="username">
-                    <h4><strong>Username</strong></h4>
-                    <p>{{ order.user.username }}</p>
-                </div>
-                <div class="email">
-                    <h4><strong>Email Address</strong></h4>
-                    <p>{{ order.user.email }}</p>
-                </div>
-                <div class="payment">
-                    <h4><strong>Payment Method</strong></h4>
-                    <p>{{ order.payment_type.payment_type }}</p>
+                <div class="body">
+                    <table>
+                        <tr class="subtotal">
+                            <td>Subtotal</td>
+                            <td>{{ order_items|length }} unique items</td>
+                            <td>${{ order.total_amount }}</td>
+                        </tr>
+                        <!-- <tr class="discount"></tr> -->
+                        <tr class="shipping">
+                            <td>Shipping</td>
+                            <td>Expedited Shipping</td>
+                            <td>$30.00</td>
+                        </tr>
+                        <tr class="total">
+                            <td><h3>Total</h3></td>
+                            <td></td>
+                            <td><h3>&dollar;{{ order.total_amount + 30 }}</h3></td>
+                        </tr>
+                    </table>
+                    <div class="total">
+                    </div>
                 </div>
             </div>
         </div>
         {% endif %}
-        <div class="billing_payment">
-            <div class="header">
-                <h2>Billing &amp; Payment Information</h2>
-            </div>
-            <div class="body">
-                <div class="name">
-                    <h4><strong>Name</strong></h4>
-                    <p>{{ order.user.first_name + ' ' + order.user.last_name }}</p>
-                </div>
-                <div class="address one">
-                    <h4><strong>Address 1</strong></h4>
-                    <p>{{ order.billing.address_one }}</p>
-                </div>
-                {% if order.billing.address_two %}
-                <div class="address two">
-                    <h4><strong>Address 1</strong></h4>
-                    <p>{{ order.billing.address_one }}</p>
-                </div>
-                {% endif %}
-                <div class="phone_number">
-                    <h4><strong>Phone Number</strong></h4>
-                    <p>{{ order.billing.phone_number }}</p>
-                </div>
-                <div class="payment">
-                    <h4><strong>Payment Method</strong></h4>
-                    <p>{{ order.payment_type.payment_type }}</p>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 {% if order.approval_date %}

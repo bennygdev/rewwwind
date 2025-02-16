@@ -284,3 +284,15 @@ input, select {
     font-size: 1.2em;
     color: #4E4D4D;
 }
+
+.admin-shipping-info {
+    text-align: center;
+    font-size: 1.2em;
+    color: #4E4D4D;
+    margin-top: 20px;
+  }
+  
+
+.hidden {
+    display: none;
+}

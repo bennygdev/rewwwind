@@ -12,16 +12,26 @@
 {% block content %}
 <div class="form-container">
     <h1>Image Upload</h1>
-    <div class="image-upload">
-        <label for="file-input" class="upload-button">Select from Files</label>
-        <input id="file-input" type="file" name="images" multiple style="display: none;">
-        <p>(or drag and drop your images here)</p>
+
+    <!-- Full Image Preview (Large Display) -->
+    <div id="full-image-preview-container">
+        <img id="full-image-preview" class="hidden">
     </div>
-    <div id="preview-container" class="preview-container"></div>
+
+    <!-- Carousel for Multiple Images with Delete & Navigation -->
+    <div class="carousel-container">
+        <div class="preview-container" id="preview-container"></div>
+    </div>
+
+    <!-- Image Upload Box (Only the Upload Button) -->
+    <div class="image-upload">
+        <input type="file" id="file-input" name="images" accept="image/*" multiple required>
+        <label for="file-input" class="upload-button">Select from Files</label>
+    </div>
 
     <h1>Item Information</h1>
 
-    <form id="tradeForm" action="" method="POST" enctype="multipart/form-data" novalidate> 
+    <form id="tradeForm" action="{{ url_for('views.trade_form') }}" method="POST" enctype="multipart/form-data" novalidate> 
         {{ form.hidden_tag() }}
 
         <div class="form-row">
@@ -95,14 +105,28 @@
             {{ form.isbn(class="form-control", id="isbn") }}
         </div>
 
+        <!-- Hidden Input for Image Paths -->
+        <input type="hidden" name="image_paths" id="image_paths">
+
         <div class="button-group">
             <button type="button" class="btnB">Back</button>
             {{ form.submit(class_="btnS") }}
         </div>
     </form>
 </div>
-{% endblock %}
 
 {% block scripts %}
-    <script src="{{ url_for('static', filename='js/tradein/tradeForm.js') }}"></script>
+<script src="{{ url_for('static', filename='js/tradein/tradeForm.js') }}"></script>
+<script>
+    document.getElementById("file-input").addEventListener("change", function(event) {
+        let files = event.target.files;
+        let imagePaths = [];
+        for (let i = 0; i < files.length; i++) {
+            imagePaths.push(files[i].name);
+        }
+        document.getElementById("image_paths").value = JSON.stringify(imagePaths);
+    });
+</script>
+{% endblock %}
+
 {% endblock %}

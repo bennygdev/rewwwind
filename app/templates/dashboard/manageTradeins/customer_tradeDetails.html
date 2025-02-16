@@ -4,6 +4,9 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/tradein/custTradeDetails.css') }}">
 {% endblock %}
 
+
+
+
 {% block content %}
 <div class="trade-details-container">
     <div class="trade-details-header">
@@ -41,8 +44,8 @@
         </div>
     </div>
 
-    <!-- Admin Approve/Deny Buttons -->
-    {% if current_user.role_id in [2, 3] %}
+    <!-- Admin Approve/Deny Buttons (Hidden when Approved) -->
+    {% if current_user.role_id in [2, 3] and trade_item.status != "Approved" %}
     <div class="admin-actions">
         <a href="{{ url_for('manageTradeins.update_trade_status', trade_id=trade_item.id, status='Approved') }}" 
            class="btn btn-success">Approve</a>
@@ -51,42 +54,72 @@
     </div>
     {% endif %}
 
-    <!-- Shipping & Payment (Only for Approved Trades) -->
+    <!-- Shipping & Payment for Approved Trades -->
     {% if trade_item.status == "Approved" %}
-    <div class="shipping-payment-section">
-        <h2>Shipping & Payment</h2>
-        <form action="{{ url_for('manageTradeins.save_shipping_payment', trade_id=trade_item.id) }}" method="POST">
-            <h3>Drop-off option</h3>
-            <div class="radio-group">
-                <label><input type="radio" name="shipping_option" value="Mail-in"> Mail-in</label>
-                <label><input type="radio" name="shipping_option" value="In-Store"> In-Store drop-off</label>
-                <label><input type="radio" name="shipping_option" value="Pick-up"> Pick-Up Service (Shipping: $5.00)</label>
+        {% if current_user.role_id in [2, 3] %}
+            <!-- Admins see this message on approved trade-ins -->
+            <div class="admin-shipping-info">
+                <p>Approved. Waiting for customer to submit shipping details.</p>
             </div>
-
-            <h3>Shipping Address</h3>
-            <input type="text" name="street_address" placeholder="Street Address" required>
-            <input type="text" name="house_block" placeholder="House / Block No." required>
-            <input type="text" name="zip_code" placeholder="Zip or Postal Code" required>
-            <input type="text" name="contact_number" placeholder="Contact Number" required>
-
-            <h3>Payment Option</h3>
-            <div class="payment-group">
-                <input type="text" name="card_number" placeholder="Card Number" required>
-                <input type="text" name="card_expiry" placeholder="Expiration Date (MM/YY)" required>
-                <input type="text" name="card_name" placeholder="Name on Card" required>
-                
-                <div class="checkbox-container">
-                    <input type="checkbox" name="save_payment" id="save-payment">
-                    <label for="save-payment">Save my payment information</label>
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-success">Save Details</button>
-        </form>
-    </div>
+        {% else %}
+            <!-- Customers see the shipping & payment form -->
+            <div class="shipping-payment-section">
+                <h2>Shipping & Payment</h2>
+                <form action="{{ url_for('manageTradeins.save_shipping_payment', trade_id=trade_item.id) }}" method="POST">
+                    <h3>Drop-off option</h3>
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="shipping_option" value="Mail-in"> Mail-in
+                        </label>
+                        <label>
+                            <input type="radio" name="shipping_option" value="In-Store"> In-Store drop-off
+                        </label>
+                        <label>
+                            <input type="radio" name="shipping_option" value="Pick-up"> Pick-Up Service (Shipping: $5.00)
+                        </label>
+                    </div>
+                    
+                    <!-- Tracking Number (Only for Mail-in) -->
+                    <div id="tracking-number-section" class="hidden">
+                        <h3>Tracking Number</h3>
+                        <input type="text" name="tracking_number" placeholder="Enter Tracking Number">
+                    </div>
+                    
+                    <!-- Shipping Address (Only for Pick-up) -->
+                    <div id="shipping-address-section" class="hidden">
+                        <h3>Shipping Address</h3>
+                        <input type="text" name="street_address" placeholder="Street Address">
+                        <input type="text" name="house_block" placeholder="House / Block No.">
+                        <input type="text" name="zip_code" placeholder="Zip or Postal Code">
+                        <input type="text" name="contact_number" placeholder="Contact Number">
+                    </div>
+                    
+                    <!-- Payment Information (Shown for all options) -->
+                    <div id="payment-section" class="hidden">
+                        <h3>Payment Option</h3>
+                        <div class="payment-group">
+                            <input type="text" name="card_number" placeholder="Card Number">
+                            <input type="text" name="card_expiry" placeholder="Expiration Date (MM/YY)">
+                            <input type="text" name="card_name" placeholder="Name on Card">
+                            <div class="checkbox-container">
+                                <input type="checkbox" name="save_payment" id="save-payment">
+                                <label for="save-payment">Save my payment information</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">Submit</button>
+                    
+        {% endif %}
     {% endif %}
 
     <!-- Back button -->
     <a href="{{ url_for('manageTradeins.manage_tradeins') }}" class="btn btn-secondary">Back to Dashboard</a>
 </div>
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/tradein/tradeDetails.js') }}"></script>
 {% endblock %}
+
+{% endblock %}
+

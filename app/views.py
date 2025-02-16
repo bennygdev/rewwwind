@@ -3,7 +3,7 @@ from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 import os
 import json
-from .forms import TradeItemForm, MailingListForm
+from .forms import TradeItemForm, MailingListForm, AddToCartForm
 from .models import Product, tradeDetail, MailingList
 from . import db
 from datetime import timedelta
@@ -17,11 +17,12 @@ def generate_unsubscribe_token():
 
 @views.route('/', methods=['GET', 'POST'])
 def home():
+  cart_form=AddToCartForm()
   mailing_list_form = MailingListForm()
 
 
   special_products = Product.query.filter_by(is_featured_special=True).all() # special (featured) products
-  home_special_products = special_products[:6] # max special to display in home
+  home_special_products = special_products[:8] # max special to display in home
   
   max_days = func.now() - timedelta(days=7)
   new_products = Product.query.filter(Product.created_at >= max_days).all() # product should be less than 7 days old to be new
@@ -69,7 +70,8 @@ def home():
     max_special = home_special_products, 
     max_new = home_new_products, 
     max_staff = home_staff_products,
-    mailing_list_form=mailing_list_form
+    mailing_list_form=mailing_list_form,
+    cart_form=cart_form
   )
 
 @views.route('/terms-of-service')

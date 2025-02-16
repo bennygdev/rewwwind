@@ -1,48 +1,490 @@
-.content {
+.about__menu {
+  margin-top: 80px;
+  border-top: 1px solid #ddd;
+}
+
+.about__menu--links {
+  font-family: "OpenSansRegular";
+  display: flex;
+  width: 93%;
+  margin: 0 auto;
+  flex-direction: row;
+  gap: 20px;
+  padding: 15px 20px;
+  list-style-type: none;
+  border-bottom: 1px solid #ddd;
+}
+
+.about__menu--link {
+  text-decoration: none;
+  color: #000;
+  font-size: 0.95em;
+}
+
+.about__link--active {
+  padding-bottom: 15px;
+  border-bottom: 2px solid #000;
+}
+
+.tradein__content {
+  margin-top: 60px;
+}
+
+.tradein__section {
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 80px;
+  padding: 0px 100px;
+}
+
+.tradein__section:first-child {
+  margin-bottom: 0;
+}
+
+.tradein__section .tradein__section--image {
+  width: 100%;
+  height: 500px;
+  object-fit: contain;
+  object-position: center;
+}
+
+.tradein__section--right, .tradein__section--left {
+  width: 50%;
+  height: 500px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
-  gap: 50px;
-  margin-top: 80px;
 }
 
-h1{
+.tradein__section--right .tradein__section--image, .tradein__section--left .tradein__section--image {
+  height: 100%;
+}
+
+.tradein__section--right:has(img), .tradein__section--left:has(img) {
+  overflow: hidden;
+}
+
+.tradein__section:last-child {
+  padding-bottom: 10px;
+  border-bottom: none;
+}
+
+.tradein__section--header, .tradein__cta--header {
   font-family: "CharisSILBold";
-  font-size: 3em;
+  margin-bottom: 10px;
 }
 
-p{
-  font-family: "OpenSansSemiBold";
+.tradein__section a {
+  display: block;
+  width: fit-content;
+  text-decoration: none;
+  color: #000;
+  padding-bottom: 3px;
+  border-bottom: 1px solid #000;
+}
+
+.tradein__section2 {
+  display: flex;
+  flex-direction: row;
+  gap: 45px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 80px;
+  padding: 80px 100px;
+  background-color: #f6f6f6;
+}
+
+.tradein__section3 {
+  display: flex;
+  flex-direction: row;
+  gap: 45px;
+  justify-content: center;
+  align-items: center;
+  padding: 80px 100px;
+  background-color: #ffffff;
+}
+
+.tradein__section2--wrapper, .tradein__section3--wrapper {
+  display: flex;
+  flex-direction: row;
+  width: 20%;
+  gap: 20px;
+}
+
+.tradein__section2--description, .tradein__section3--description {
+  display: flex;
+  flex-direction: column;
+}
+
+.tradein__section2--description h3, .tradein__section3--description h3 {
+  font-family: "CharisSILBold";
+  font-size: 1.4em;
+}
+
+.tradein__section2--description p, .tradein__section3--description p {
+  font-size: 0.95em;
+}
+
+.quick__links {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 60px;
+}
+
+.quick__links a {
+  text-decoration: none;
+  color: #000;
+  margin-top: 50px;
+  font-size: 0.95em;
+}
+
+.quick__link--button {
+  background-color: #F4F4F4;
+  padding: 10px 25px;
+  border: 1px solid #C3C3C3;
+  border-radius: 30px;
+  transition: 0.3s ease;
+}
+
+.quick__link--button:hover {
+  background-color: #EAEAEA;
+  transition: 0.3s ease;
+}
+
+.accordion-button:focus {
+  box-shadow: none;
+  border-color: rgba(0,0,0,.125);
+}
+
+.accordion {
+  border: 1px solid #ddd;
+}
+
+.tradein__header2 {
+  font-size: 2em;
+  font-family: "CharisSILBold";
+  text-align: center;
+}
+
+.tradein__section--indicator {
+  width: 50px;
+  margin-bottom: 30px;
+}
+
+.tradein__subheader {
+  font-size: 1.5em;
+  font-family: "CharisSILBold";
+  text-align: center;
+}
+
+.tradein__subtitles {
+  text-align: center;
+  font-size: 0.9em;
+  font-style: italic;
+}
+
+.tradein__section i {
+  margin-right: 10px;
+}
+/* Guidelines */
+.guidelines__row {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  padding: 20px 100px;
+  margin-bottom: 40px;
+}
+
+.guidelines__row:first-child {
+  margin-bottom: 0;
+}
+
+.guidelines__box {
+  flex: 1;
+  padding: 25px;
+  background-color: #f6f6f6;
+  border-radius: 8px;
+}
+
+.guidelines__box h3 {
+  font-family: "CharisSILBold";
   font-size: 1.2em;
-  color: #4E4D4D;
+  margin-bottom: 15px;
 }
 
-.steps {
-  display: flex;  
-  justify-content: space-between; 
-  align-items: flex-start; 
-  gap: 7em; 
+.guidelines__box .condition {
+  font-size: 1.6em;
 }
 
-.step-image {
-  flex-shrink: 0; 
-  width: 100px; 
-  height: 100px; 
-  object-fit: contain; 
+.guidelines__box ul li {
+  margin-bottom: 8px;
+  font-size: 0.95em;
 }
 
-.btn{
-  font-family: "OpenSansSemiBold";
+.guidelines__box--image {
+  width: 200px;
+}
+
+.guidelines__box--imageContent {
+  width: 100%;
+}
+
+.guidelines__highlight {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+/* CTA */
+.tradein__cta {
+  text-align: center;
+  margin-bottom: 100px;
+}
+
+.tradein__cta--header {
+  margin-bottom: 40px;
+}
+
+.tradein__cta--button {
   text-decoration: none;
-  color: white;
   background-color: #039752;
-  padding: 0.8em 4em;
-  border-radius: 50px;
+  color: #fff;
+  font-size: 1.1em;
+  padding: 12px 30px;
+  border-radius: 4px;
 }
 
-.btn:hover {
-  text-decoration: none;
-  color: white;
-  background-color: #039752; 
+/* FAQ */
+.faq__container {
+  background-color: #f6f6f6;
+  padding: 40px 0;
+}
+
+.faq__wrapper {
+  justify-self: center;
+  padding: 0 1rem;
+  max-width: 1200px;
+  margin: 0 auto; 
+}
+
+.faq__section:first-child {
+  margin-bottom: 80px;
+}
+
+.faq__section--header {
+  text-align: center;
+  font-family: "CharisSIL";
+  margin-bottom: 30px;
+}
+
+.accordion-button {
+  font-family: "CharisSILBold";
+  font-size: 0.5em;
+}
+
+.accordion {
+  --bs-accordion-bg: transparent;
+  border: 1px solid #ddd;
+  z-index: 0;
+}
+
+.accordion-button {
+  background-color: transparent !important;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: transparent !important;
+  color: inherit;
+}
+
+
+.accordion-body {
+  background-color: transparent !important;
+  font-size: 0.95em;
+}
+
+.footer {
+  margin-top: 0;
+}
+
+/* Media Queries */
+@media (max-width: 1200px) {
+  .tradein__section2,
+  .tradein__section3 {
+    padding: 60px 40px;
+    gap: 30px;
+  }
+
+  .tradein__section2--wrapper,
+  .tradein__section3--wrapper {
+    width: 30%;
+  }
+}
+
+@media (max-width: 1024px) {
+  .tradein__section {
+    padding: 0px 40px;
+    gap: 30px;
+  }
+
+  .tradein__section2--wrapper,
+  .tradein__section3--wrapper {
+    width: 33%;
+  }
+
+  .guidelines__row {
+    padding: 20px 40px;
+  }
+
+  .faq__wrapper {
+    padding: 0 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .about__menu--links {
+    width: 100%;
+    padding: 15px 10px;
+  }
+
+  .tradein__section {
+    flex-direction: column;
+    padding: 0px 20px;
+    margin-bottom: 40px;
+  }
+
+  .tradein__section--right,
+  .tradein__section--left {
+    width: 100%;
+    height: auto;
+    text-align: center;
+  }
+
+  .tradein__section a {
+    margin: 0 auto;
+  }
+
+  .tradein__section--indicator {
+    margin: 0 auto 30px;
+  }
+
+  .tradein__section2,
+  .tradein__section3 {
+    flex-direction: column;
+    padding: 40px 20px;
+    gap: 30px;
+  }
+
+  .tradein__section2--wrapper,
+  .tradein__section3--wrapper {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .guidelines__row {
+    flex-direction: column;
+    padding: 20px;
+    gap: 20px;
+  }
+
+  .guidelines__box {
+    text-align: center;
+  }
+
+  .guidelines__box ul {
+    text-align: left;
+  }
+
+  .tradein__header2 {
+    font-size: 1.8em;
+    padding: 0 20px;
+  }
+
+  .tradein__subheader {
+    font-size: 1.3em;
+    padding: 0 20px;
+  }
+
+  .tradein__subtitles {
+    padding: 0 20px;
+  }
+
+  .faq__wrapper {
+    padding: 0 1rem;
+  }
+
+  .tradein__cta {
+    padding: 0 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .about__menu--links {
+    gap: 10px;
+  }
+
+  .about__menu--link {
+    font-size: 0.9em;
+  }
+
+  .tradein__section {
+    padding: 0px 15px;
+  }
+
+  .tradein__section--header {
+    font-size: 1.6em;
+  }
+
+  .tradein__section img {
+    height: 200px;
+  }
+
+  .tradein__section2,
+  .tradein__section3 {
+    padding: 30px 15px;
+  }
+
+  .tradein__section2--description h3,
+  .tradein__section3--description h3 {
+    font-size: 1.2em;
+  }
+
+  .guidelines__box--image {
+    width: 150px;
+  }
+
+  .guidelines__box h3 {
+    font-size: 1.1em;
+  }
+
+  .tradein__header2 {
+    font-size: 1.6em;
+  }
+
+  .tradein__subheader {
+    font-size: 1.2em;
+  }
+
+  .tradein__cta--header {
+    font-size: 1.4em;
+  }
+
+  .tradein__cta--button {
+    font-size: 1em;
+    padding: 10px 25px;
+  }
+
+  .faq__section--header {
+    font-size: 1.4em;
+  }
+
+  .accordion-button {
+    font-size: 0.9em;
+    padding: 15px;
+  }
 }

@@ -98,6 +98,10 @@ def faq():
 def trade_Onboard(): 
   return render_template('views/tradeOnboarding.html')
 
+@views.route('/condition-guidelines')
+def condition_guidelines():
+  return render_template('views/condition_guidelines.html')
+
 @views.route('/about-us')
 def about_us():
   return render_template('views/aboutus.html')

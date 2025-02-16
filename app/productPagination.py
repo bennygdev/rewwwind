@@ -56,9 +56,11 @@ def pagination(featured=None):
         else:
             products_query = products_query.order_by(cast(Product.conditions[0]['price'], Float).asc())
     if rating_filter:
-        if type(rating_filter) is Integer:
-            products_query = products_query.filter(cast(Product.rating, Integer) == int(rating_filter[0]))
-        else:
+        try:
+            rating_filter = int(rating_filter)
+            products_query = products_query.filter(cast(Product.rating, Integer) == rating_filter)
+            rating_filter = str(rating_filter)
+        except ValueError:
             if 'highest' in rating_filter:
                 products_query = products_query.order_by(Product.rating.desc())
             else:

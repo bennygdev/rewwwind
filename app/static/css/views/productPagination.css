@@ -1,5 +1,5 @@
 .content {
-    padding: 80px 90px; /* please do remove this if each page is to have custom padding or margin -nelson */
+    padding: 100px 80px 30px 80px;
 }
 
 .content .listing__header {
@@ -165,6 +165,128 @@
     text-align: right;
 }
 
+.cta {
+    display: none;
+}
+
+/* List View */
+.products.list-view {
+display: flex;
+flex-direction: column;
+gap: 10px;
+}
+
+.products.list-view .product {
+display: flex;
+align-items: center;
+gap: 20px;
+cursor: pointer;
+}
+
+.products.list-view .thumbnail {
+flex: 1;
+}
+
+.products.list-view .thumbnail .rating {
+display: none;
+}
+
+.products.list-view .thumbnail .favourites, .products.list-view .thumbnail .cart {
+display: none;
+}
+
+.products.list-view .misc {
+display: flex;
+flex-direction: column;
+justify-content: space-between;
+height: 280px;
+width: 100%;
+}
+
+.products.list-view .info {
+flex: 2;
+font-size: 1.2em;
+}
+
+.products.list-view .info_left .rating {
+position: relative;
+top: auto;
+right: auto;
+background-color: transparent;
+padding: 0;
+margin-top: 6px;
+}
+
+.products.list-view .info_left .rating span {
+color: black;
+font-size: 0.95rem;
+}
+
+.products.list-view .misc .cta {
+display: block;
+}
+
+.cta-form button.filter {
+flex-wrap: wrap;
+border: 2px solid #039752;
+outline: none;
+text-align: center;
+width: 80%;
+font-size: 1.1em;
+font-weight: bold;
+display: block;
+cursor: pointer;
+margin: 15px auto;
+padding: 0.8rem 1rem;
+background-color: white;
+color: #039752;
+border-radius: 12px;
+transition: all 0.3s ease;
+}
+
+.cta-form button.filter:hover {
+background-color: rgb(2, 110, 58);
+color: white;
+box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+transform: scale(1.02);
+}
+
+.cta-form .filter {
+display: flex;
+position: relative;
+border-radius: 1.5em;
+background-color: #efefef;
+transition: background-color 0.3s, color 0.5s;
+padding: 0.4rem 1rem;
+cursor: pointer;
+-webkit-user-select: none;
+user-select: none;
+z-index: 1;
+}
+
+.cta-form .filter span {
+width: 100%;
+text-align: center;
+}
+
+.products .description {
+display: none;
+}
+
+.products.list-view .description {
+padding: 10px;
+background-color: #f5f5f5;
+display: flex;
+}
+
+.products.list-view .description p {
+margin-bottom: 0;
+}
+
+.products.list-view hr.description {
+    margin: 60px 0 50px 0;
+}
+
 /* Pagination */
 .products__pagination {
     display: flex;
@@ -226,8 +348,23 @@
   }
 
   /* no products */
+  .centralise {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  img.none {
+    height: 400px;
+  }
   h2.none {
-      margin-top: 30px;
+      margin: 30px 0 20px 0;
+  }
+  a.none {
+    text-decoration: none;
+    color: #fff;
+    background-color: #039752;
+    padding: 10px 20px;
+    border-radius: 8px;
   }
 
 /* media query */

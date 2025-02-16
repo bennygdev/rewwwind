@@ -4,28 +4,6 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/pageInteractions/multiFilter.css') }}">
 <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/views/productPagination.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/pageInteractions/filters.css') }}">
-<style>
-/* List View */
-.products.list-view {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.products.list-view .product {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.products.list-view .thumbnail {
-  flex: 1;
-}
-
-.products.list-view .info {
-  flex: 2;
-}
-</style>
 {% endblock %}
 {% block title %}Products{% endblock %}
 {% block content %}
@@ -129,8 +107,6 @@
           <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}"/>
           <!-- <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ product.image_thumbnail }}" alt="{{ product.name }}"/> -->
         </div>
-        <!-- <a href="{{ url_for('addToCart.add_to_cart', product_id=product.id)}}"> -->
-        <!-- </a> -->
         {% if current_user.role_id == 1 %}
         <div class="favourites" title="{% if current_user.wishlisted_items and product.id in current_user.wishlisted_items %}Favourited Product{% else %}Add Product to Favourites{% endif %}">
           <form action="{{ url_for('wishlist.add_favourite', product_id=product.id) }}" method="POST" class="cta-form">
@@ -154,17 +130,47 @@
         </div>
       </div>
     </a>
-    <div class="info">
-      <div class="info_left">
-        <h5 class="name">{{ product.name }}</h5>
-        <span>{{ product.creator }}</span>
+    <div class="misc">
+      <div class="info">
+        <div class="info_left">
+          <h5 class="name">{{ product.name }}</h5>
+          <span>{{ product.creator }}</span>
+          <div class="rating">
+            {% if product.reviews %}
+              {% if product.reviews|length > 1 %}
+              {% set count = ' reviewers' %}
+              {% else %}
+              {% set count = ' reviewer' %}
+              {% endif %}
+              {% set rating = product.rating ~ ' as rated by ' ~ product.reviews|length ~ count %}
+            {% else %}
+              {% set rating = "No rating yet" %}
+            {% endif %}
+            <span><i class="bi bi-star-fill"></i>&nbsp;{{ rating }}</span>
+          </div>
+        </div>
+        <div class="info_right">
+          <h5>&dollar;{{ '{:.2f}'.format(product.conditions[0].price) }}</h5>
+          <span><i class="bi bi-short-fill"></i>&nbsp;{{ product.category.category_name }}</span>
+        </div>
       </div>
-      <div class="info_right">
-        <h5>&dollar;{{ '{:.2f}'.format(product.conditions[0].price) }}</h5>
-        <span><i class="bi bi-short-fill"></i>&nbsp;{{ product.category.category_name }}</span>
+      <div class="cta">
+        <form action="{{ url_for('addToCart.add_to_cart', product_id=product.id) }}" method="POST" class="cta-form">
+          {{ form.hidden_tag() }}
+          {{ form.condition(value=product.conditions[0]) }}
+          <button type="submit" class="filter">Add to Cart</button>
+        </form>
+        <form action="{{ url_for('payment.checkout_product', product_id=product.id) }}" method="POST" class="cta-form">
+            <input type="hidden" name="condition" value="product.conditions[0]">
+            <button type="submit" class="filter">Buy Now</button>
+        </form>
       </div>
     </div>
   </div>
+  <div class="description">
+    <p style="text-wrap: wrap;">{{ product.description }}</p>
+  </div>
+  <hr class="description">
   {% endfor %}
 </div>
 <div class="products__pagination">
@@ -193,7 +199,11 @@
   </ul>
 </div>
 {% else %}
-<h2 class="none">Sorry, no products were found with the given search queries and/or filters.</h2>
+<div class="centralise">
+  <img src="{{ url_for('static', filename='media/filters_not_found.jpg') }}" class="none">
+  <h2 class="none">Sorry, no products were found with the given search queries and/or filters.</h2>
+  <a href="./" class="none">Try Again</a>
+</div>
 {% endif %}
 {% endblock %}
 
@@ -201,29 +211,4 @@
 <script type="text/javascript" src="{{ url_for('static', filename='js/dashboardFilters.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/pageInteractions/multiFilter.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/productPagination/productPagination.js') }}"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const gridViewButton = document.getElementById('gridViewButton');
-    const listViewButton = document.getElementById('listViewButton');
-    const productsContainer = document.querySelector('.products');
-  
-    // Event listener for Grid View button
-    gridViewButton.addEventListener('click', function () {
-      if (!gridViewButton.classList.contains('active')) {
-        gridViewButton.classList.add('active');
-        listViewButton.classList.remove('active');
-        productsContainer.classList.remove('list-view');
-      }
-    });
-  
-    // Event listener for List View button
-    listViewButton.addEventListener('click', function () {
-      if (!listViewButton.classList.contains('active')) {
-        listViewButton.classList.add('active');
-        gridViewButton.classList.remove('active');
-        productsContainer.classList.add('list-view');
-      }
-    });
-  });
-</script>
 {% endblock %}

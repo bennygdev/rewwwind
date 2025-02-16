@@ -12,6 +12,7 @@
   left: 0;
   background: #ffffff;
   z-index: 5;
+  border-bottom: 1px solid #aaa;
 }
 
 .nav__left {

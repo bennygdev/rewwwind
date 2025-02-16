@@ -349,6 +349,7 @@ def product_specials():
     products, total_products, total_pages, page, search_query, category_filter, category_choices, subcategory_filter, match_req, subcategory_choices, price_filter, price_choices, rating_filter, rating_choices = pagination('special')
     
     form = AddToCartForm()
+    mailing_list_form = MailingListForm()
 
     return render_template(
         "/views/productSpecials.html",
@@ -367,7 +368,8 @@ def product_specials():
         price_choices=price_choices,
         rating_filter=rating_filter,
         rating_choices=rating_choices,
-        form=form
+        form=form,
+        mailing_list_form=mailing_list_form
     )
 
 @productPagination.route('/featured/staff_picks')
@@ -375,6 +377,7 @@ def product_staff():
     products, total_products, total_pages, page, search_query, category_filter, category_choices, subcategory_filter, match_req, subcategory_choices, price_filter, price_choices, rating_filter, rating_choices = pagination('staff')
     
     form = AddToCartForm()
+    mailing_list_form = MailingListForm()
 
     return render_template(
         "/views/productStaff.html",
@@ -393,5 +396,6 @@ def product_staff():
         price_choices=price_choices,
         rating_filter=rating_filter,
         rating_choices=rating_choices,
-        form=form
+        form=form,
+        mailing_list_form=mailing_list_form
     )

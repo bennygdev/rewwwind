@@ -1,0 +1,150 @@
+
+footer.footer {
+    margin-top: 0;
+}
+
+.content {
+    padding-top: 80px;
+    display: flex;
+    flex-direction: row;
+    gap: 80px;
+    min-height: 100%;
+}
+
+.left {
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+}
+
+.left img {
+    flex-grow: 1;
+}
+
+.right {
+    padding-top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.path {
+    width: 300px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.circle {
+    text-decoration: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    color: black;
+    font-size: 32px;
+    z-index: 1;
+}
+
+.circle.active {
+    background-color: #039752;
+    color: white;
+    border: none;
+}
+
+.circle.past {
+    opacity: 50%;
+}
+
+.circle:not(:last-child) {
+    margin-right: 30px;
+}
+
+.path::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50px; 
+    right: 50px; 
+    height: 2px; 
+    background-color: #ccc; 
+    z-index: 0; 
+}
+
+.right .header h1 {
+    font-weight: bold;
+}
+
+.right .header span {
+    color: grey;
+}
+
+.right form {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.right form label {
+    margin-bottom: 5px;
+}
+
+.right form label span.req {
+    color: red;
+}
+
+.right form label span.opt {
+    color: grey;
+}
+
+.buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+}
+
+.buttons button, .buttons a {
+    all: unset;
+    padding: 8px 20px;
+    border-radius: 8px;
+    background-color: #039752;
+    color: white;
+    cursor: pointer;
+}
+
+.buttons a {
+    background-color: #dadada;
+    color: black;
+}
+
+.right form .err {
+    margin: 5px 0 0 0;
+    font-size: 0.8em;
+    color: red;
+}
+
+#del_type {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+#del_type label {
+    font-size: 1.5em;
+    cursor: pointer;
+}
+
+#del_type li {
+    margin-bottom: 20px;
+}
+
+#extra {
+    color: grey;
+}

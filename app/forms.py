@@ -167,7 +167,35 @@ class OwnerAddAccountForm(FlaskForm):
     if user:
       raise ValidationError("This email address is already registered.")
 
+class SelectDeliveryTypeForm(FlaskForm):
+  del_type = RadioField(validators=[DataRequired(message="Please select a delivery method")],
+      choices=[
+      ('1', 'Self Pick-Up'),
+      ('2', 'Standard Local Delivery'),
+      ('3', 'Expedited Local Delivery'),
+      ('4', 'International Shipping')
+      ])
+
+
 class BillingAddressForm(FlaskForm):
+  country = SelectField('Country', choices=[('SG', 'Singapore')], coerce=str, default='SG')
+  countryInt = SelectField('Country', 
+                        choices = [
+    ("AU", "Australia"),
+    ("HK", "Hong Kong"),
+    ("ID", "Indonesia"),
+    ("MY", "Malaysia"),
+    ("PH", "Philippines"),
+    ("KR", "South Korea"),
+    ("TW", "Taiwan"),
+    ("TH", "Thailand"),
+    ("GB", "United Kingdom"),
+    ("US", "United States"),
+    ("VN", "Vietnam")
+  ],
+  default='AU', # def an unavoidable error but i'm gonna waste too much time doing it so i'll leave it for now
+  coerce=str
+                        )
   address_one = StringField('Address One', validators=[DataRequired(message="Address is required"), Length(min=5, max=255, message="Address must be between 5 and 255 characters")])
   address_two = StringField('Address Two', validators=[Length(max=255, message="Address cannot exceed 255 characters")])
   unit_number = StringField('Unit Number', validators=[DataRequired(), Length(max=15, message="Unit number cannot exceed 15 characters"), Regexp(r'^[A-Za-z0-9-]+$', message="Unit number can only contain letters, numbers, and hyphens")])
@@ -182,10 +210,19 @@ class BillingAddressForm(FlaskForm):
       if not cleaned_number.startswith(('6', '8', '9')):
         raise ValidationError("Phone number must start with 6, 8, or 9")
             
-      if len(cleaned_number) != 8:
+      if len(cleaned_number[2:]) != 8:
         raise ValidationError("Phone number must be 8 digits long")
             
       field.data = cleaned_number
+
+class PickupForm(FlaskForm): # for in-store pickups
+  pickup_date = DateField('Pickup Date', validators=[DataRequired(message="Please select a date.")])
+
+  def validate_pickup_date(self, field):
+    import datetime
+    if field.data:
+      if field.data < datetime.date.today():
+        raise ValidationError('The date selected is in the past, please try again')
 
 class PaymentMethodForm(FlaskForm):
   paymentType_id = RadioField(

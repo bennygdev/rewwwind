@@ -30,7 +30,8 @@
   <!-- Chatbot -->
   {% include "components/chat.html" %}
 
-  {% if active_page != 'login' and active_page != 'register' and active_page != 'reset_password' and active_page != 'setUsername' %}
+  {% if active_page != 'login' and active_page != 'register' and active_page != 'reset_password' and active_page != 'setUsername'
+  and active_page != 'billing' %}
     {% include "components/footer.html" %}
   {% endif %}
 

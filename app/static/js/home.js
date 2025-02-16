@@ -1,3 +1,82 @@
+// Banner Carousel functionality
+document.addEventListener("DOMContentLoaded", function() {
+  const bannerSlides = document.querySelectorAll('.banner-slide');
+  const bannerIndicators = document.querySelectorAll('.banner-indicator');
+  const bannerIndicatorWrappers = document.querySelectorAll('.banner-indicator-wrapper');
+  const bannerPrevButton = document.querySelector('.banner-control.prev');
+  const bannerNextButton = document.querySelector('.banner-control.next');
+  
+  let currentBannerSlide = 0;
+  let bannerIntervalId;
+  const slideDuration = 8000;
+  
+  function showBannerSlide(index) {
+    // Hide all slides first
+    bannerSlides.forEach(slide => {
+      slide.classList.remove('active');
+      slide.style.display = 'none';
+    });
+    
+    bannerIndicators.forEach(indicator => {
+      indicator.classList.remove('active');
+      void indicator.offsetWidth;
+    });
+    
+    bannerSlides[index].classList.add('active');
+    bannerSlides[index].style.display = 'block';
+    bannerIndicators[index].classList.add('active');
+    
+    currentBannerSlide = index;
+  }
+  
+  if (bannerPrevButton) {
+    bannerPrevButton.addEventListener('click', () => {
+      let newIndex = currentBannerSlide - 1;
+      if (newIndex < 0) newIndex = bannerSlides.length - 1;
+      showBannerSlide(newIndex);
+      resetBannerInterval();
+    });
+  }
+  
+  if (bannerNextButton) {
+    bannerNextButton.addEventListener('click', () => {
+      let newIndex = currentBannerSlide + 1;
+      if (newIndex >= bannerSlides.length) newIndex = 0;
+      showBannerSlide(newIndex);
+      resetBannerInterval();
+    });
+  }
+  
+  bannerIndicatorWrappers.forEach((wrapper, index) => {
+    wrapper.addEventListener('click', () => {
+      showBannerSlide(index);
+      resetBannerInterval();
+    });
+  });
+  
+  function startBannerInterval() {
+    bannerIntervalId = setInterval(() => {
+      let newIndex = currentBannerSlide + 1;
+      if (newIndex >= bannerSlides.length) newIndex = 0;
+      showBannerSlide(newIndex);
+    }, slideDuration);
+  }
+  
+  function resetBannerInterval() {
+    clearInterval(bannerIntervalId);
+    startBannerInterval();
+  }
+  
+  if (bannerSlides.length > 0) {
+    bannerSlides.forEach(slide => {
+      slide.style.display = 'none';
+    });
+    
+    showBannerSlide(0);
+    startBannerInterval();
+  }
+});
+
 document.addEventListener("DOMContentLoaded", function () {
     const track = document.querySelector(".carousel-track");
     const slides = Array.from(track.children);

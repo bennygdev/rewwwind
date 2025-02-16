@@ -6,9 +6,111 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<div class="banner">
-  <img src="{{ url_for('static', filename='media/banner1.png') }}"> <!-- add more later, replace this with a new image later -->
+<!-- Banner carousel -->
+<div class="banner carousel">
+  <div class="banner-carousel-inner">
+    <!-- Slide 1 -->
+    <div class="banner-slide active">
+      <div class="banner-image" style="background-image: url('{{ url_for('static', filename='media/vinyl.png') }}');">
+        <div class="banner-overlay"></div>
+      </div>
+      <div class="banner-content">
+        <div class="banner-content-box">
+          <h2>Discover Our Collection</h2>
+          <p>Explore our hand-picked selection of unique products</p>
+          <a href="{{ url_for('productPagination.product_pagination') }}" class="banner-cta-button">Shop Now</a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Slide 2 -->
+    <div class="banner-slide">
+      <div class="banner-image" style="background-image: url('{{ url_for('static', filename='media/tradein.jpeg') }}');">
+        <div class="banner-overlay"></div>
+      </div>
+      <div class="banner-content">
+        <div class="banner-content-box">
+          <h2>Trade-In Program</h2>
+          <p>Turn what you have into what you want</p>
+          <a href="{{ url_for('views.trade_Onboard') }}" class="banner-cta-button">Learn More</a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Slide 3 -->
+    <div class="banner-slide">
+      <div class="banner-image" style="background-image: url('{{ url_for('static', filename='media/packaging.png') }}');">
+        <div class="banner-overlay"></div>
+      </div>
+      <div class="banner-content">
+        <div class="banner-content-box">
+          <h2>Our Sustainability Commitment</h2>
+          <p>Discover our environmentally conscious efforts</p>
+          <a href="{{ url_for('views.about_us') }}" class="banner-cta-button">Read More</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Controls -->
+  <button class="banner-control prev" aria-label="Previous slide">
+    <i class="bi bi-chevron-left"></i>
+  </button>
+  <button class="banner-control next" aria-label="Next slide">
+    <i class="bi bi-chevron-right"></i>
+  </button>
+  
+  <!-- Indicators -->
+  <div class="banner-indicators">
+    <div class="banner-indicator-wrapper" data-slide="0">
+      <div class="banner-indicator active" aria-label="Progress for slide 1"></div>
+    </div>
+    <div class="banner-indicator-wrapper" data-slide="1">
+      <div class="banner-indicator" aria-label="Progress for slide 2"></div>
+    </div>
+    <div class="banner-indicator-wrapper" data-slide="2">
+      <div class="banner-indicator" aria-label="Progress for slide 3"></div>
+    </div>
+  </div>
 </div>
+
+<!-- Promotion grid -->
+<div class="promo-grid">
+  <div class="promo-card beige">
+    <div class="promo-content">
+      <h2>RECEIVE </h2>
+      <p class="price">20%</p>
+      <h2>AFTER YOUR FIRST ORDER</h2>
+      <a href="{{ url_for('productPagination.product_pagination') }}" class="promo-link">Shop Now</a>
+    </div>
+    <div class="promo-image">
+      <img src="{{ url_for('static', filename='media/promotion-image-1.png') }}" alt="Vinyl Records">
+    </div>
+  </div>
+  
+  <div class="promo-card green">
+    <div class="promo-content">
+      <h2>Vintage and Rare Books From</h2>
+      <p class="price">$15</p>
+      <a href="{{ url_for('productPagination.product_pagination') }}" class="promo-link">Shop Now</a>
+    </div>
+    <div class="promo-image">
+      <img src="{{ url_for('static', filename='media/promotion-image-2.png') }}" alt="Vintage Books">
+    </div>
+  </div>
+  
+  <div class="promo-card beige">
+    <div class="promo-content">
+      <h2>Vinyl Records From</h2>
+      <p class="price">$12</p>
+      <a href="{{ url_for('productPagination.product_pagination') }}" class="promo-link">Shop Now</a>
+    </div>
+    <div class="promo-image">
+      <img src="{{ url_for('static', filename='media/promotion-image-3.png') }}" alt="Bestseller Books">
+    </div>
+  </div>
+</div>
+
 <div class="products__special featured">
   <h1 id="specials">Specials</h1>
   <div class="products">

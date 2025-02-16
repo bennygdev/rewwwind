@@ -9,7 +9,7 @@
 {% block content %}
 <div class="about__menu">
   <ul class="about__menu--links">
-    <li><a class="about__menu--link {{ 'about__link--active' if active_page == 'tradein' else '' }}" href="/about-us">Trade-In</a></li>
+    <li><a class="about__menu--link {{ 'about__link--active' if active_page == 'tradein' else '' }}" href="{{ url_for('views.trade_Onboard') }}">Trade-In</a></li>
     <li><a class="about__menu--link {{ 'about__link--active' if active_page == 'condition_guidelines' else '' }}" href="{{ url_for('views.condition_guidelines') }}">Condition Guidelines</a></li>
   </ul>
 </div>

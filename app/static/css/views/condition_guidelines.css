@@ -1,0 +1,218 @@
+.condition__header {
+  font-size: 2.5em;
+  font-family: "CharisSILBold";
+  text-align: center;
+  margin-top: 60px;
+}
+
+.condition__subheader {
+  font-size: 2em;
+  font-family: "CharisSILBold";
+  text-align: center;
+}
+
+.condition__introduction {
+  margin: 0 auto;
+  margin-bottom: 40px;
+  max-width: 1000px;
+  text-align: center;
+  font-size: 1.15em;
+}
+
+.about__menu {
+  margin-top: 80px;
+  border-top: 1px solid #ddd;
+}
+
+.about__menu--links {
+  font-family: "OpenSansRegular";
+  display: flex;
+  width: 93%;
+  margin: 0 auto;
+  flex-direction: row;
+  gap: 20px;
+  padding: 15px 20px;
+  list-style-type: none;
+  border-bottom: 1px solid #ddd;
+}
+
+.about__menu--link {
+  text-decoration: none;
+  color: #000;
+  font-size: 0.95em;
+}
+
+.about__link--active {
+  padding-bottom: 15px;
+  border-bottom: 2px solid #000;
+}
+
+.quick__links {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 60px;
+}
+
+.quick__links a {
+  text-decoration: none;
+  color: #000;
+  margin-top: 50px;
+  font-size: 0.95em;
+}
+
+.quick__link--button {
+  background-color: #F4F4F4;
+  padding: 10px 25px;
+  border: 1px solid #C3C3C3;
+  border-radius: 30px;
+  transition: 0.3s ease;
+}
+
+.quick__link--button:hover {
+  background-color: #EAEAEA;
+  transition: 0.3s ease;
+}
+
+.condition__subtitles {
+  text-align: center;
+}
+
+/* Book conditions grid */
+.condition__section {
+  width: 100%;
+  padding: 0 40px;
+}
+
+.condition__section--wrapper {
+  margin-bottom: 60px;
+}
+
+.condition__section--wrapper h2 {
+  font-family: "CharisSILBold";
+  font-size: 1.5em;
+  margin-bottom: 15px;
+}
+
+.condition__section--wrapper p {
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.condition__section--grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  margin-top: 40px;
+}
+
+.condition__section--item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.condition__section--item img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  margin-bottom: 15px;
+}
+
+.condition__section--item h3 {
+  font-family: "OpenSansBold";
+  font-size: 1.2em;
+  margin-bottom: 8px;
+}
+
+.condition__section--item p {
+  font-size: 0.9em;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* Vinyl condition */
+.condition__section--mediaVinyl {
+  margin-bottom: 60px;
+  padding: 0 40px;
+}
+
+.condition__section--mediaVinyl h2 {
+  font-family: "CharisSILBold";
+  font-size: 1.5em;
+  margin-bottom: 30px;
+}
+
+.condition__section--row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.condition__section--rowContainer {
+  background-color: #f8f8f8;
+  padding: 25px;
+  border-radius: 4px;
+}
+
+.condition__section--rowContainer h3 {
+  font-family: "OpenSansBold";
+  font-size: 1.2em;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.condition__section--rowContainer p {
+  font-size: 0.95em;
+  line-height: 1.6;
+  color: #555;
+}
+
+/* Media Queries */
+@media (max-width: 1024px) {
+  .condition__section--row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .condition__section--grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .condition__section--item img {
+    height: 300px;
+  }
+}
+
+@media (max-width: 640px) {
+  .condition__section--row {
+    grid-template-columns: 1fr;
+  }
+  
+  .condition__section--mediaVinyl {
+    padding: 0 20px;
+  }
+  
+  .condition__section--rowContainer {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .condition__section--grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .condition__section--item img {
+    height: 280px; 
+  }
+  
+  .condition__section {
+    padding: 0 20px; 
+  }
+}

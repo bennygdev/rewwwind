@@ -11,7 +11,7 @@
   top: 0;
   left: 0;
   background: #ffffff;
-  z-index: 5;
+  z-index: 50;
 }
 
 .nav__left {
@@ -183,7 +183,7 @@ img#mini_profile_img {
   height: 80px;
   top: 0;
   width: 100%;
-  z-index: 2;
+  z-index: 50;
   background-color: var(--primary-white);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   background-color: #fff;

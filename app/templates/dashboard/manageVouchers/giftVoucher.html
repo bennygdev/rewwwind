@@ -9,7 +9,7 @@
 {% block content %}
 <h1>Gift Voucher</h1>
 
-<a href="{{ url_for('manageVouchers.vouchers_listing') }}", class="back__link"><i class="fa-solid fa-chevron-left fa-sm"></i>Back</a>
+{% include "components/backLink.html" %}
 
 <div class="gift-voucher__container">
   <form id="giftVoucherForm" class="gift-voucher__form">
@@ -55,5 +55,9 @@
 <script
   type="text/javascript"
   src="{{ url_for('static', filename='js/dashboard/manageVouchers/giftVoucher.js') }}"
+></script>
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/backButton.js') }}"
 ></script>
 {% endblock %}

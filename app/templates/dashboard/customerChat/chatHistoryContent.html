@@ -41,7 +41,17 @@
 
   <div class="chatHistory__conversationWrapper">
     <div class="chatHistory__conversation">
-      <h2>Conversation</h2>
+      <div class="chatHistory__header">
+        <h2>Conversation</h2>
+        <a href="" onclick="navigateWithChatContext(
+          '{{ customer.id }}',
+          '{{ customer.username }}',
+          '{{ customer.email }}',
+          '{{ chat.created_at.strftime('%B %d, %Y %I:%M %p') }}',
+          '{{ chat.support_type|title }}',
+          '{{ chat.id }}'
+        ); return false;">Provide Compensation</a>
+      </div>
       <div class="chatHistory__messages">
         {% for message in chat.chat %}
           <div class="message {% if message.type == 'incoming' %}message--incoming{% else %}message--outgoing{% endif %}">
@@ -53,4 +63,11 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block body_scripts %}
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/dashboard/manageVouchers/giftVoucher.js') }}"
+></script>
 {% endblock %}

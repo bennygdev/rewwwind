@@ -96,11 +96,56 @@ h1 {
   margin-top: 10px;
 }
 
+/* Chat context */
+.chat-context {
+  margin-top: 2rem;
+  width: 30vw;
+}
+
+.chat-context__container {
+  background-color: #E0F0FF;
+  border: 1px solid #78B6FD;
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.chat-context__container h3 {
+  font-family: "OpenSansSemibold";
+  font-size: 1.1em;
+  margin-bottom: 0.75rem;
+}
+
+.chat-context__details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.chat-context__details p {
+  margin: 0;
+}
+
+.chat-context__link {
+  color: #039752;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chat-context__link:hover {
+  text-decoration: underline;
+}
+
 /* Media Queries */
 @media screen and (min-width: 1200px) {
   .search__input,
   .search__results {
     width: 300px;
+  }
+
+  .chat-context {
+    width: 400px;
   }
 }
 
@@ -116,6 +161,10 @@ h1 {
 
   .form__group {
     margin-bottom: 15px;
+  }
+
+  .chat-context {
+    width: 50vw;
   }
 }
 
@@ -159,5 +208,15 @@ h1 {
   .selected__button {
     width: 30px; 
     height: 30px;
+  }
+
+  .chat-context {
+    width: 100%;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .chat-context__container {
+    padding: 0.75rem;
   }
 }

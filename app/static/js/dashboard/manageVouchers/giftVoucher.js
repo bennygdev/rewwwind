@@ -173,3 +173,61 @@ document.getElementById('giftVoucherForm').addEventListener('submit', async func
     console.error('Error:', error);
   }
 });
+
+// pass chat context via URL parameters
+function navigateWithChatContext(customerId, customerName, customerEmail, chatDate, supportType, chatId) {
+  const params = new URLSearchParams({
+    customerId: customerId,
+    customerName: customerName,
+    customerEmail: customerEmail,
+    chatDate: chatDate,
+    supportType: supportType,
+    chatId: chatId,
+    fromChat: 'true'
+  });
+  
+  window.location.href = `/dashboard/gift-voucher?${params.toString()}`;
+}
+
+function displayChatContext() {
+  const params = new URLSearchParams(window.location.search);
+  
+  // only show context if coming from chat history
+  if (params.get('fromChat') === 'true') {
+    const contextDiv = document.createElement('div');
+    contextDiv.className = 'chat-context';
+    
+    contextDiv.innerHTML = `
+      <div class="chat-context__container">
+        <h3>Chat Context</h3>
+        <div class="chat-context__details">
+          <p><strong>Customer:</strong> ${params.get('customerName')} (${params.get('customerEmail')})</p>
+          <p><strong>Chat Date:</strong> ${params.get('chatDate')}</p>
+          <p><strong>Support Type:</strong> ${params.get('supportType')}</p>
+          <p><a href="/dashboard/chat-history/${params.get('chatId')}" class="chat-context__link">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> View Chat History
+          </a></p>
+        </div>
+      </div>
+    `;
+    
+    // Insert after the form
+    const form = document.getElementById('giftVoucherForm');
+    form.parentNode.insertBefore(contextDiv, form.nextSibling);
+    
+    // Auto-select the customer in the search
+    const userSearchInput = document.getElementById('userSearch');
+    if (userSearchInput) {
+      const selectEvent = {
+        id: params.get('customerId'),
+        username: params.get('customerName'),
+        email: params.get('customerEmail')
+      };
+      userSearch.selectItem(selectEvent);
+    }
+  }
+}
+
+if (document.getElementById('giftVoucherForm')) {
+  displayChatContext();
+}

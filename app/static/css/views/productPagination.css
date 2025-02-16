@@ -6,7 +6,11 @@
     display: flex;
     justify-content: space-between;
     gap: 50px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
+}
+
+.content .listing__header.bottom {
+    margin-bottom: 40px;
 }
 
 .content .header__left h1 {
@@ -28,6 +32,24 @@
 
 .filter__group a {
     background-color: #e6e6e6;
+}
+
+.view-toggle button {
+    all: unset;
+    font-size: 2rem;
+    opacity: 60%;
+    cursor: pointer;
+}
+
+.view-toggle button:first-child {
+    margin-right: 10px;
+}
+
+.view-toggle button.active {
+    border-bottom: 1px solid black;
+    color: #039752;
+    font-size: 2rem;
+    opacity: 100%;
 }
 
 /* product styles */
@@ -292,7 +314,7 @@ margin-bottom: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 30px;
+    margin: 30px 0 80px 0;
   }
   
   .products__pagination ul {
@@ -365,6 +387,70 @@ margin-bottom: 0;
     background-color: #039752;
     padding: 10px 20px;
     border-radius: 8px;
+  }
+
+  hr.last {
+    margin: 30px 0 80px 0;
+  }
+
+  /* Newsletter CTA */
+.newsletter {
+    text-align: center;
+    padding-bottom: 30px;
+  }
+  
+  .newsletter .message {
+    margin-top: 10px;
+    text-align: center;
+  }
+  
+  .newsletter .message.success {
+    color: green;
+  }
+  
+  .newsletter .message.error {
+    color: red;
+  }
+  
+  .newsletter__form {
+    position: relative;
+    width: 100%;
+    margin: 0 auto;
+  }
+  
+  .newsletter__form .form-group {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 30vw;
+    margin: 0 auto;
+  }
+  
+  .newsletter__form input[type="email"] {
+    width: 100%;
+    padding-right: 100px;
+    border-radius: 5px;
+  }
+  
+  .newsletter__form input[type="email"]:focus {
+    outline: none;
+    box-shadow: none; 
+  }
+  
+  #newsletter__submit {
+    background-color: #039752;
+    color: #fff;
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    padding: 0 15px;
+    border: 0;
+    border-radius: 5px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
   }
 
 /* media query */

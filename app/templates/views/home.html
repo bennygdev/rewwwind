@@ -111,131 +111,134 @@
   </div>
 </div>
 
-<div class="products__special featured">
-  <h1 id="specials">Specials</h1>
-  <div class="products">
-    {% for product in max_special %}
-    <div class="product">
-      <a href="{{ url_for('productPagination.product_detail', product_id = product.id) }}">
-        <div class="thumbnail">
-          <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}" />
-          <!-- <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ product.image_thumbnail }}" alt="{{ product.name }}"/> -->
-        </div>
-      </a>
-      <div class="info">
-        <p class="name">{{ product.name }}</p>
-        <p class="creator">{{ product.creator }}</p>
-        <p class="type">{{ product.category.category_name }}</p>
-        <p class="price">&dollar;{{ '{:.2f}'.format(product.conditions[0].price) }}</p>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-  <div class="view_more">
-    <a href="{{ url_for('productPagination.product_specials') }}">View All</a>
-  </div>
-</div>
-<div class="products__new featured">
-  <h1>New Arrivals</h1>
-  <div class="carousel-container">
-    <button class="carousel-control prev" aria-label="Previous"><i class="bi bi-caret-left-fill"></i></button>
-    <div class="carousel-track-container">
-      <div class="products carousel-track">
-        {% for product in max_new %}
-        <div class="product">
-          <a href="{{ url_for('productPagination.product_detail', product_id = product.id) }}">
-            <div class="thumbnail">
-              <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}" />
-              <!-- <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ product.image_thumbnail }}" alt="{{ product.name }}"/> -->
-            </div>
-          </a>
-          <div class="info">
-            <div class="info__left">
-              <p class="name">{{ product.name }}</p>
-              <p class="creator">{{ product.creator }}</p>
-            </div>
-            <div class="info__right">
-              <p class="price">&dollar;{{ '{:.2f}'.format(product.conditions[0].price) }}</p>
-              <p class="type">{{ product.category.category_name }}</p>
-            </div>
+<div class="products_list">
+  <div class="products__special featured">
+    <h1 id="specials">Specials</h1>
+    <div class="products">
+      {% for product in max_special %}
+      <div class="product">
+        <a href="{{ url_for('productPagination.product_detail', product_id = product.id) }}">
+          <div class="thumbnail">
+            <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}" />
+            <!-- <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ product.image_thumbnail }}" alt="{{ product.name }}"/> -->
           </div>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-    <button class="carousel-control next" aria-label="Next"><i class="bi bi-caret-right-fill"></i></button>
-    <button class="carousel-control go-to-start" aria-label="Go to Beginning"><i class="bi bi-arrow-counterclockwise"></i></button>
-  </div> 
-</div>
-<div class="products__special products__staff featured">
-  <h1 id="staff_picks">Staff Picks</h1>
-  <div class="products">
-    {% for product in max_staff[:3] %}
-    <div class="product">
-      <a href="{{ url_for('productPagination.product_detail', product_id = product.id) }}">
-        <div class="thumbnail">
-          <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}" />
-          <!-- <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ product.image_thumbnail }}" alt="{{ product.name }}"/> -->
-        </div>
-      </a>
-      <div class="info">
-        <div class="info__left">
+        </a>
+        <div class="info">
           <p class="name">{{ product.name }}</p>
           <p class="creator">{{ product.creator }}</p>
-        </div>
-        <div class="info__right">
-          <p class="price">&dollar;{{ '{:.2f}'.format(product.conditions[0].price) }}</p>
           <p class="type">{{ product.category.category_name }}</p>
+          <p class="price">&dollar;{{ '{:.2f}'.format(product.conditions[0].price) }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="view_more">
+      <a href="{{ url_for('productPagination.product_specials') }}">View All</a>
+    </div>
+  </div>
+  <div class="products__new featured">
+    <h1>New Arrivals</h1>
+    <div class="carousel-container">
+      <button class="carousel-control prev" aria-label="Previous"><i class="bi bi-caret-left-fill"></i></button>
+      <div class="carousel-track-container">
+        <div class="products carousel-track">
+          {% for product in max_new %}
+          <div class="product">
+            <a href="{{ url_for('productPagination.product_detail', product_id = product.id) }}">
+              <div class="thumbnail">
+                <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}" />
+                <!-- <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ product.image_thumbnail }}" alt="{{ product.name }}"/> -->
+              </div>
+            </a>
+            <div class="info">
+              <div class="info__left">
+                <p class="name">{{ product.name }}</p>
+                <p class="creator">{{ product.creator }}</p>
+              </div>
+              <div class="info__right">
+                <p class="price">&dollar;{{ '{:.2f}'.format(product.conditions[0].price) }}</p>
+                <p class="type">{{ product.category.category_name }}</p>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <button class="carousel-control next" aria-label="Next"><i class="bi bi-caret-right-fill"></i></button>
+      <button class="carousel-control go-to-start" aria-label="Go to Beginning"><i class="bi bi-arrow-counterclockwise"></i></button>
+    </div> 
+  </div>
+  <div class="products__special products__staff featured">
+    <h1 id="staff_picks">Staff Picks</h1>
+    <div class="products">
+      {% for product in max_staff[:3] %}
+      <div class="product">
+        <a href="{{ url_for('productPagination.product_detail', product_id = product.id) }}">
+          <div class="thumbnail">
+            <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}" />
+            <!-- <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ product.image_thumbnail }}" alt="{{ product.name }}"/> -->
+          </div>
+        </a>
+        <div class="info">
+          <div class="info__left">
+            <p class="name">{{ product.name }}</p>
+            <p class="creator">{{ product.creator }}</p>
+          </div>
+          <div class="info__right">
+            <p class="price">&dollar;{{ '{:.2f}'.format(product.conditions[0].price) }}</p>
+            <p class="type">{{ product.category.category_name }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="view_more">
+      <a href="{{ url_for('productPagination.product_staff') }}">View All</a>
+    </div>
+  </div>
+  <div class="discover featured">
+    <h1>Discover</h1>
+    <div class="categories">
+      <div class="category books">
+        <a href="{{ url_for('productPagination.product_pagination', type='book') }}">
+          <div class="thumbnail">
+            <img src="{{ url_for('static', filename='media/discover__books.png') }}" alt="Books" />
+          </div>
+        </a>
+        <div class="description">
+          <p class="category_name">Books</p>
+          <p class="sub">Stories and media to inspire you.</p>
+        </div>
+      </div>
+      <div class="category vinyl">
+        <a href="{{ url_for('productPagination.product_pagination', type='vinyl') }}">
+          <div class="thumbnail">
+            <img src="{{ url_for('static', filename='media/discover__vinyl.png') }}" alt="Vinyl" >
+          </div>
+        </a>
+        <div class="description">
+          <p class="category_name">Vinyl</p>
+          <p class="sub">Let the sonic intentions of yesterday&apos;s sounds move you.</p>
         </div>
       </div>
     </div>
-    {% endfor %}
   </div>
-  <div class="view_more">
-    <a href="{{ url_for('productPagination.product_staff') }}">View All</a>
-  </div>
-</div>
-<div class="discover featured"> <!-- if we're gonna colour-code categories i'll find other images -->
-  <h1>Discover</h1>
-  <div class="categories">
-    <div class="category books">
-      <a href="{{ url_for('productPagination.product_pagination', type='book') }}">
-        <div class="thumbnail">
-          <img src="{{ url_for('static', filename='media/discover__books.png') }}" alt="Books" />
+  <div class="newsletter featured">
+    <h1>Stay Updated</h1>
+    <div class="newsletter__content">
+      <p>Subscribe to our newsletter and be the first to know about new arrivals, special offers, and exclusive deals!</p>
+      <form id="newsletter__form" method="POST" action="{{ url_for('views.home') }}" class="newsletter__form">
+        {{ mailing_list_form.hidden_tag() }}
+        <div class="form-group">
+          {{ mailing_list_form.email(id="newsletter__email", class="form-control", placeholder="Enter your email") }}
+          {{ mailing_list_form.submit(id="newsletter__submit") }}
         </div>
-      </a>
-      <div class="description">
-        <p class="category_name">Books</p>
-        <p class="sub">Stories and media to inspire you.</p>
-      </div>
-    </div>
-    <div class="category vinyl">
-      <a href="{{ url_for('productPagination.product_pagination', type='vinyl') }}">
-        <div class="thumbnail">
-          <img src="{{ url_for('static', filename='media/discover__vinyl.png') }}" alt="Vinyl" >
-        </div>
-      </a>
-      <div class="description">
-        <p class="category_name">Vinyl</p>
-        <p class="sub">Let the sonic intentions of yesterday&apos;s sounds move you.</p>
-      </div>
+        <div id="newsletter__message" class="message"></div>
+      </form>
     </div>
   </div>
 </div>
-<div class="newsletter featured">
-  <h1>Stay Updated</h1>
-  <div class="newsletter__content">
-    <p>Subscribe to our newsletter and be the first to know about new arrivals, special offers, and exclusive deals!</p>
-    <form id="newsletter__form" method="POST" action="{{ url_for('views.home') }}" class="newsletter__form">
-      {{ mailing_list_form.hidden_tag() }}
-      <div class="form-group">
-        {{ mailing_list_form.email(id="newsletter__email", class="form-control", placeholder="Enter your email") }}
-        {{ mailing_list_form.submit(id="newsletter__submit") }}
-      </div>
-      <div id="newsletter__message" class="message"></div>
-    </form>
-  </div>
-</div>
+
 {% endblock %}
 
 {% block body_scripts %}

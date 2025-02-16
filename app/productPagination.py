@@ -4,7 +4,7 @@ from sqlalchemy import cast, Float, Integer, func
 from sqlalchemy.orm.attributes import flag_modified
 from .roleDecorator import role_required
 from .models import Product, Review, Category, SubCategory
-from .forms import AddReviewForm, AddToCartForm, DeleteReviewForm
+from .forms import AddReviewForm, AddToCartForm, DeleteReviewForm, MailingListForm
 from . import db
 from math import ceil
 
@@ -108,6 +108,7 @@ def pagination(featured=None):
 @productPagination.route('/')
 def product_pagination():    
     form = AddToCartForm()
+    mailing_list_form = MailingListForm()
     
     products, total_products, total_pages, page, search_query, category_filter, category_choices, subcategory_filter, match_req, subcategory_choices, price_filter, price_choices, rating_filter, rating_choices = pagination()
     # Render the template
@@ -128,7 +129,8 @@ def product_pagination():
         price_choices=price_choices,
         rating_filter=rating_filter,
         rating_choices=rating_choices,
-        form=form
+        form=form,
+        mailing_list_form=mailing_list_form
     )
 
 @productPagination.route('/product/<int:product_id>', methods=['GET', 'POST'])

@@ -273,7 +273,11 @@
     </ul>
 </div>
 {% else %}
-<h1 class="none">Sorry, no entries were found with the given search queries and/or filters.</h1>
+<div class="centralise">
+    <img src="{{ url_for('static', filename='media/filters_not_found.png') }}" class="none">
+    <h2 class="none">Sorry, no products were found with the given search queries and/or filters.</h2>
+    <a href="./manage-products" class="none">Try Again</a>
+</div>
 {% endif %}
   
 {% endblock %}

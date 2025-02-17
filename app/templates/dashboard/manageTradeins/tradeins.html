@@ -47,7 +47,11 @@
                     <td>
                         <a href="{{ url_for('manageTradeins.delete_trade', trade_id=item.id) }}" 
                            class="delete-btn {% if item.status in ['Approved', 'Rejected'] %} disabled-btn {% endif %}" 
-                           {% if item.status in ['Approved', 'Rejected'] %} aria-disabled="true" tabindex="-1" onclick="return false;" {% endif %}>
+                           {% if item.status in ['Approved', 'Rejected'] %} 
+                               aria-disabled="true" 
+                               tabindex="-1" 
+                               onclick="return false;" 
+                           {% endif %}>
                             Delete
                         </a>
                     </td>

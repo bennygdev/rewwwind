@@ -26,6 +26,9 @@ Benny:
 - Overview
     - Shows customer related data and metrics on a dashboard using ChartJS (Only viewable for Customers)
     - Shows admin related data and metrics on a dashboard using ChartJS (Only viewable for Admins, Owners)
+- Profile Page
+    - Shows user's recent orders
+    - Has a product recommendation algorithm that recommends products based on user's order history
 - User Settings
     - Edit personal information
         - Edit personal particulars, including profile picture
@@ -40,9 +43,10 @@ Benny:
         - Username suggestions when setting username
     - Ability to login normally or with google
     - Default identicon profile picture generation for new registered Accounts
-    - Reset password functionality using flask mail
+    - Reset password functionality using flask mail, with secure token URL
 - Manage Accounts
     - Account listing
+        - Ability to search, paginate and filter accounts
     - Account details viewing (Admin can only view customer accounts, whereas Owners can view both admin and customer accounts but except other owner accounts) with statistics using ChartJS
     - Account editing and deletion (Admin can only modify customer accounts, whereas Owners can modify both admin and customer accounts but except other owner accounts)
     - Account password change (Same for roles I described)
@@ -51,13 +55,16 @@ Benny:
     - Use of socket to faciliate communication between admin (as support representative) and customer
     - Typing indicators
     - Ability to save and summarise chat conversation, and view it later (Chat summary by Gemini AI)
-    - Ability to compensate vouchers to customers
+    - Chat History Page (To view previous chat conversations)
+        - Ability to search, paginate and filter chat conversations
+        - Ability to compensate vouchers to customers
 - Chat with AI
     - Ability to chat with AI, which will provide product recommendations and store-related inquiries. (Using Gemini AI)
 - Newsletter
     - Ability for users to subscribe to newsletter
     - Ability to search and delete users from mailing listing
     - Ability to send out emails to every person in the mailing list, which will create a post in the database
+    - Ability to search, paginate and filter newsletter posts
     - Ability to read and delete posted newsletters
     - Ability to unsubscribe from the link provided in the email
 

@@ -31,7 +31,7 @@
         {{ form.hidden_tag() }}
         <div class="input voucher">
             <label for="voucher" title="This is required.">Voucher <span class="req">*</span></label>
-            {{ form.voucher(class="form-select") }}
+            {{ form.voucher(class="form-select", value=default) }}
         </div>
         <div class="buttons">
             <div class="btn-container">
@@ -43,4 +43,17 @@
         </div>
     </form>
 </div>
+{% endblock %}
+
+{% block body_scripts %}
+<script>
+    const sel = document.getElementById('voucher');
+    const opt = Array.from(sel.children);
+    
+    opt.forEach((o) => {
+        if (o.value == '{{ default }}') {
+            o.setAttribute('selected', true);
+        }
+    })
+</script>
 {% endblock %}

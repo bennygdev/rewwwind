@@ -142,6 +142,10 @@ def billing_info():
 def select_voucher():
     form = VoucherSelectForm()
     
+    default = 0
+    if 'voucher' in session:
+        default = session.get('voucher', {})['id']
+    
     if request.method == 'POST':
         if form.validate_on_submit():
             session['voucher'] = {
@@ -151,7 +155,7 @@ def select_voucher():
         else:
             for err in form.errors:
                 print(err)
-    return render_template('/views/payment/select_vouch.html', form=form)
+    return render_template('/views/payment/select_vouch.html', form=form, default=default)
 
 @payment.route('/checkout/cart', methods=['GET'])
 @login_required

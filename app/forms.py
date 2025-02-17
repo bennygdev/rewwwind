@@ -175,6 +175,17 @@ class SelectDeliveryTypeForm(FlaskForm):
       ('3', 'Expedited Local Delivery'),
       ('4', 'International Shipping')
       ])
+  
+  def process(self, formdata=None, obj=None, data=None, **kwargs):
+    super(SelectDeliveryTypeForm, self).process(formdata, obj, data, **kwargs)
+
+    selected_voucher_id = session.get('voucher', {}).get('id', None)
+    if selected_voucher_id is not None:
+      voucher = Voucher.query.filter(Voucher.id==selected_voucher_id).first()
+      if voucher.voucherType_id == 3:
+        self.del_type.choices = [('2', 'Standard Local Delivery'),
+      ('3', 'Expedited Local Delivery'),
+      ('4', 'International Shipping')]
 
 
 class BillingAddressForm(FlaskForm):

@@ -30,7 +30,7 @@ def orders_listing():
   recency_filter = request.args.get('recency', '', type=str)
   if recency_filter:
     if '30' in recency_filter:
-      orders_query = Order.query.filter(Order.order_date >= datetime.now() - timedelta(days=30))
+      orders_query = orders_query.filter(Order.order_date >= datetime.now() - timedelta(days=30))
     elif 'first' in recency_filter:
       orders_query = orders_query.order_by(desc(Order.order_date))
     else:
@@ -39,13 +39,13 @@ def orders_listing():
   cost_filter = request.args.get('cost', '', type=str)
   if cost_filter:
     if 'highest' in cost_filter:
-      orders_query = Order.query.order_by(cast(Order.total_amount, Float).desc())
+      orders_query = orders_query.order_by(cast(Order.total_amount, Float).desc())
     else:
-      orders_query = Order.query.order_by(cast(Order.total_amount, Float).asc())
+      orders_query = orders_query.order_by(cast(Order.total_amount, Float).asc())
   
   status_filter = request.args.get('status', '', type=str)
   if status_filter:
-    orders_query = Order.query.filter(Order.status == status_filter.title())
+    orders_query = orders_query.filter(Order.status == status_filter.title())
 
 
   # pagination logic

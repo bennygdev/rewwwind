@@ -69,7 +69,6 @@
 {% endblock %}
 
 {% block content %}
-{% if orders.items %}
 <div class="header">
     <div class="content__filters header__left">
         <form id="filterForm" method="get" action="{{ url_for('manageProducts.products_listing') }}" class="filters__form">
@@ -117,6 +116,8 @@
         </form>
     </div>
 </div>
+
+{% if orders.items %}
 <div class="orders">
     <table>
         <thead>
@@ -136,7 +137,7 @@
                 <div class="name"><p>Order #{{ order.id }}</p><p>{{ order.order_items|length }} Items</p></div>
             </td>
             <td class="orderDate">{{ order.order_date.strftime('%Y-%m-%d') }}</td>
-            <td class="orderDelivery">{{ order.delivery }}</td>
+            <td class="orderDelivery">{{ order.delivery|title }}</td>
             <td class="orderPayment">{{ order.payment_type.payment_type }}</td>
             <td class="orderAvgPrice">&dollar;{{ '{:.2f}'.format(order.total_amount) }}</td>
             <td class="orderStock {{ order.status }}">

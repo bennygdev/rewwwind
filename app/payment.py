@@ -357,7 +357,7 @@ def success():
             methodId = 2
         else:
             methodId = 3
-        if filled_bd:
+        if dt_challenge['type'] != '1':
             d_type = ['standard', 'expedited', 'international'][int(dt_challenge['type'])-2]
             order = Order(
                 user_id=current_user.id,

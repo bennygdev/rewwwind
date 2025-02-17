@@ -67,11 +67,24 @@ def insert_users():
      role_id = 1
   )
 
+  clean_customer = User(
+    first_name = "dummy",
+    last_name = "5",
+    username = "dummy",
+    email = "dummy@gmail.com",
+    image = None,
+    google_account = False,
+    password = generate_password_hash("dummy", method='pbkdf2:sha256'),
+    orderCount = 0,
+    role_id = 1
+  )
+
   users = [
     ("admin1@gmail.com", admin1),
     ("admin2@gmail.com", admin2),
     ("owner@gmail.com", owner),
-    ("customer@gmail.com", customer)
+    ("customer@gmail.com", customer),
+    ("dummy@gmail.com", clean_customer)
   ]
 
   for email, user in users:
@@ -768,6 +781,15 @@ def insert_vouchers():
         voucher_id=new_voucher.id,
         expires_at=datetime.now() + timedelta(days=new_voucher.expiry_days)
       )
+
+      if new_voucher.voucher_code == 'FIRSTOFF10':
+        new_user_voucher2 = UserVoucher(
+        user_id=5,
+        voucher_id=new_voucher.id,
+        expires_at=datetime.now() + timedelta(days=new_voucher.expiry_days)
+        )
+        db.session.add(new_user_voucher2)
+        db.session.commit()
       db.session.add(new_user_voucher)
       db.session.commit()
   print('Inserted default vouchers into the database!')

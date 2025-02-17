@@ -89,9 +89,21 @@ def get_trade_frequency():
   ).order_by(
     func.strftime('%Y-%m', tradeDetail.created_at)
   ).all()
+  
+  # convert month to a more readable format
+  formatted_labels = []
+  for trade in trades:
+    try:
+      year_month = trade[0].split('-')
+      month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      month_idx = int(year_month[1]) - 1 
+      formatted_month = f"{month_names[month_idx]} {year_month[0]}"
+      formatted_labels.append(formatted_month)
+    except (IndexError, ValueError):
+      formatted_labels.append(trade[0])
     
   return {
-    'labels': [trade[0] for trade in trades] if trades else [],
+    'labels': formatted_labels if trades else [],
     'data': [trade[1] for trade in trades] if trades else []
   }
 
@@ -110,9 +122,21 @@ def get_buying_trend():
   ).order_by(
     func.strftime('%Y-%m', Order.order_date)
   ).all()
+  
+  # convert month to a more readable format
+  formatted_labels = []
+  for order in orders:
+    try:
+      year_month = order[0].split('-')
+      month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      month_idx = int(year_month[1]) - 1 
+      formatted_month = f"{month_names[month_idx]} {year_month[0]}"
+      formatted_labels.append(formatted_month)
+    except (IndexError, ValueError):
+      formatted_labels.append(order[0])
     
   return {
-    'labels': [order[0] for order in orders] if orders else [],
+    'labels': formatted_labels if orders else [],
     'data': [order[1] for order in orders] if orders else []
   }
 
@@ -153,8 +177,20 @@ def get_product_sales():
     func.strftime('%Y-%m', Order.approval_date)
   ).all()
     
+  # convert month to a more readable format
+  formatted_labels = []
+  for sale in sales:
+    try:
+      year_month = sale[0].split('-')
+      month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      month_idx = int(year_month[1]) - 1 
+      formatted_month = f"{month_names[month_idx]} {year_month[0]}"
+      formatted_labels.append(formatted_month)
+    except (IndexError, ValueError):
+      formatted_labels.append(sale[0])
+    
   return {
-    'labels': [sale[0] for sale in sales] if sales else [],
+    'labels': formatted_labels if sales else [],
     'data': [sale[1] for sale in sales] if sales else []
   }
 

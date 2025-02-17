@@ -303,9 +303,21 @@ def get_user_order_trend(user_id):
   ).order_by(
     func.strftime('%Y-%m', Order.approval_date)
   ).all()
+  
+  # convert month to a more readable format
+  formatted_labels = []
+  for order in orders:
+    try:
+      year_month = order[0].split('-')
+      month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      month_idx = int(year_month[1]) - 1 
+      formatted_month = f"{month_names[month_idx]} {year_month[0]}"
+      formatted_labels.append(formatted_month)
+    except (IndexError, ValueError):
+      formatted_labels.append(order[0])
     
   return {
-    'labels': [order[0] for order in orders] if orders else [],
+    'labels': formatted_labels if orders else [],
     'data': [order[1] for order in orders] if orders else []
   }
 
@@ -343,8 +355,20 @@ def get_user_review_trend(user_id):
   ).order_by(
     func.strftime('%Y-%m', Review.created_at)
   ).all()
+  
+  # convert month to a more readable format
+  formatted_labels = []
+  for review in reviews:
+    try:
+      year_month = review[0].split('-')
+      month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      month_idx = int(year_month[1]) - 1 
+      formatted_month = f"{month_names[month_idx]} {year_month[0]}"
+      formatted_labels.append(formatted_month)
+    except (IndexError, ValueError):
+      formatted_labels.append(review[0])
     
   return {
-    'labels': [review[0] for review in reviews] if reviews else [],
+    'labels': formatted_labels if reviews else [],
     'data': [review[1] for review in reviews] if reviews else []
   }

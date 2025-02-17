@@ -40,6 +40,9 @@ function createChart(canvasId, url, chartType, chartTitle) {
                 display: false,
                 text: chartTitle
               },
+              legend: {
+                display: chartType === 'line' ? false : true
+              },
               tooltip: {
                 callbacks: {
                   label: function(context) {
@@ -87,7 +90,7 @@ function createChart(canvasId, url, chartType, chartTitle) {
 function initializeCharts(roleId) {
   if (roleId === 1) {
     createChart('tradeFrequencyChart', '/dashboard/api/customer/trade-frequency', 'line', 'Trade-ins');
-    createChart('buyingTrendChart', '/dashboard/api/customer/buying-trend', 'bar', 'Orders');
+    createChart('buyingTrendChart', '/dashboard/api/customer/buying-trend', 'line', 'Orders');
     createChart('topCategoriesChart', '/dashboard/api/customer/top-categories', 'pie', 'Purchase Categories');
   } else if (roleId === 2 || roleId === 3) {
     createChart('weeklySignupsChart', '/dashboard/api/admin/monthly-signups', 'line', 'Weekly Sign-ups');

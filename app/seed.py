@@ -74,7 +74,7 @@ def insert_users():
     email = "dummy@gmail.com",
     image = None,
     google_account = False,
-    password = generate_password_hash("dummyy", method='pbkdf2:sha256'),
+    password = generate_password_hash("testtest", method='pbkdf2:sha256'),
     orderCount = 0,
     role_id = 1
   )

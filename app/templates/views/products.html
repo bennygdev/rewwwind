@@ -196,7 +196,7 @@
             {{ p }}
             </a>
           </li>
-      {% endfor %}
+      {% endfor %}a
       {% if current_page < total_pages %}
           <li class="pageNext__button">
             <a href="{{ url_for('productPagination.product_pagination', page=current_page+1, q=search_query if search_query else None, category=category_filter if category_filter else None, subcategory=subcategory_filter if subcategory_filter else None, price=price_filter if price_filter else None, rating=rating_filter if rating_filter else None) }}">

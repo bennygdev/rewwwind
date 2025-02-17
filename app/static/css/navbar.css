@@ -134,7 +134,7 @@
   border-bottom: none;
 }
 
-.nav__right .search__button {
+.nav__right .search__button, .nav__right .image_search {
   background-color: transparent;
   padding: 12px;
   color: #039572;
@@ -156,6 +156,10 @@
   transform: translateY(-50%);
   cursor: pointer;
   border: 0;
+}
+
+.nav__right .image_search {
+  right: 30px;
 }
 
 /* Profile */

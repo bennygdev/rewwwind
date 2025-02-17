@@ -55,10 +55,6 @@ function createChart(canvasId, url, chartType, chartTitle) {
                   }
                 }
               },
-              legend: {
-                display: chartType === 'pie' ? true : false,
-                position: 'right'
-              }
             }
           }
         };

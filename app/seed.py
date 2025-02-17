@@ -887,14 +887,15 @@ def insert_vouchers():
       db.session.add(new_user_voucher)
       db.session.commit()
 
-    if new_voucher.voucher_code == 'GET10OFF':
-        new_user_voucher2 = UserVoucher(
-            user_id=5,
-            voucher_id=new_voucher.id,
-            expires_at=datetime.now() + timedelta(days=new_voucher.expiry_days)
-        )
-        db.session.add(new_user_voucher2)
-        db.session.commit()
+      if new_voucher.voucher_code == 'GET10OFF':
+          new_user_voucher2 = UserVoucher(
+              user_id=5,
+              voucher_id=new_voucher.id,
+              expires_at=datetime.now() + timedelta(days=new_voucher.expiry_days)
+          )
+          db.session.add(new_user_voucher2)
+          db.session.commit()
+        
     db.session.add(new_user_voucher)
     db.session.commit()
 

@@ -62,17 +62,6 @@ def google_callback():
       db.session.commit()
       print('First-time purchase voucher assigned to Google user')
 
-    freeship_voucher = Voucher.query.filter_by(voucher_code='FREESHIP').first()
-    if freeship_voucher:
-      user_voucher = UserVoucher(
-        user_id=user.id,
-        voucher_id=freeship_voucher.id,
-        expires_at=datetime.now() + timedelta(days=freeship_voucher.expiry_days)
-      )
-      db.session.add(user_voucher)
-      db.session.commit()
-      print('Free-ship purchase voucher assigned to Google user')
-
   login_user(user, remember=True)
   # flash('Logged in successfully!', 'success')
   return redirect(url_for('views.home'))

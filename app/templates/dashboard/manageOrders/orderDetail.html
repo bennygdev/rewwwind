@@ -395,8 +395,26 @@
     </a>
 </div>
 {% endif %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    <div class="overlay" style="display: block;"></div>
+    <div class="modal" style="display: flex;">
+        {% for category, message in messages %}
+        <div class="success">
+            <i class="bi bi-x-lg fa-2xl"></i>
+            <i class="bi bi-check-circle fa-2xl"></i>
+            <h2>{{ message }}</h2>
+            <div class="button-wrapper">
+                <input id="cancel" name="cancel" type="button" value="Exit">
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endwith %}
 
 {% endblock %}
 
 {% block body_scripts %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/dashboard/manageOrders/ordersListing.js') }}"></script>
 {% endblock %}

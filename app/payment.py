@@ -15,6 +15,11 @@ payment = Blueprint('payment', __name__)
 @payment.route('/temp/<int:product_id>', methods=['POST'])
 @login_required
 def create_temp_cart(product_id): # to prevent errors.
+    # Prevent admins and owners from purchasing
+    if current_user.role_id in [2, 3]:
+        flash("Admins and owners are not allowed to purchase in order to avoid conflicts.\n\nPlease use a dummy customer account instead.", "info")
+        return redirect(url_for('productPagination.product_detail', product_id=1, not_customer=True))
+    
     if request.method == 'POST':
         # Retrieve the product
         product = Product.query.filter_by(id=product_id).first()
@@ -56,6 +61,11 @@ def create_temp_cart(product_id): # to prevent errors.
 @payment.route('/checkout/select_shipping', methods=['GET', 'POST']) # step 1 form
 @login_required
 def select_ship():
+    # Prevent admins and owners from purchasing
+    if current_user.role_id in [2, 3]:
+        flash("Admins and owners are not allowed to purchase in order to avoid conflicts.\n\nPlease use a dummy customer account instead.", "info")
+        return redirect(url_for('productPagination.product_detail', product_id=1, not_customer=True))
+    
     form = SelectDeliveryTypeForm()
     show = None
     if 'delivery_type' in session:
@@ -146,11 +156,6 @@ def select_voucher():
 @payment.route('/checkout/cart', methods=['GET'])
 @login_required
 def checkout_cart():
-    # Prevent admins and owners from purchasing
-    if current_user.role_id in [2, 3]:
-        flash("Admins and owners are not allowed to purchase in order to avoid conflicts.\n\nPlease use a dummy customer account instead.", "info")
-        return redirect(url_for('productPagination.product_detail', product_id=1, not_customer=True))
-
     # Check if the cart is empty
     cart = current_user.cart_items
     if not cart:
@@ -413,6 +418,7 @@ def success():
         session.pop('voucher', None)
 
         print("Order placed successfully!")
+        flash("Order placed successfully!\nThank you for shopping with us!", "success")
         return redirect(url_for('manageOrders.order_detail', order_id=order.id))
 
     except Exception as e:

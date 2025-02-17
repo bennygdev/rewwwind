@@ -27,6 +27,21 @@ def manage_tradeins():
         trade_items=trade_items
     )
 
+@manageTradeins.route('/trade/<int:trade_id>/update-status', methods=['GET'])
+@login_required
+@role_required(2, 3)
+def update_trade_status(trade_id):
+    trade = tradeDetail.query.get_or_404(trade_id)
+    
+    new_status = request.args.get("status")
+    
+    if new_status in ["Approved", "Rejected"]:
+        trade.status = new_status
+        db.session.commit()
+        flash(f"Trade-in Request #{trade.id} has been {new_status.lower()}.", "success")
+    
+    return redirect(url_for('manageTradeins.manage_tradeins'))
+
 @manageTradeins.route('/delete-trade/<int:trade_id>', methods=['GET'])
 @login_required
 @role_required(1, 2, 3)  
@@ -102,21 +117,6 @@ def view_all_requests():
         trade_requests=trade_requests
     )
 
-@manageTradeins.route('/trade/<int:trade_id>/update-status', methods=['GET'])
-@login_required
-@role_required(2, 3)
-def update_trade_status(trade_id):
-    trade = tradeDetail.query.get_or_404(trade_id)
-    
-    new_status = request.args.get("status")
-    
-    if new_status in ["Approved", "Rejected"]:
-        trade.status = new_status
-        db.session.commit()
-        flash(f"Trade-in Request #{trade.id} has been {new_status.lower()}.", "success")
-    
-    return redirect(url_for('manageTradeins.manage_tradeins'))
-
 @manageTradeins.route('/trade/<int:trade_id>/save-shipping-payment', methods=['POST'])
 @login_required
 def save_shipping_payment(trade_id):
@@ -128,35 +128,33 @@ def save_shipping_payment(trade_id):
 
     form = ShippingPaymentForm(request.form)
 
-    if form.validate_on_submit():
-        # Store shipping option
+    # Disable tracking number validation if not Mail-in
+    if form.shipping_option.data != "Mail-in":
+        form.tracking_number.validators = []  # Remove all validators
+
+    if form.shipping_option.data != "Pick-Up Service":
+        form.street_address.validators = []
+        form.house_block.validators = []
+        form.zip_code.validators = []
+        form.contact_number.validators = []
+
+    if form.validate_on_submit():  # Ensures form validation before saving
         trade.shipping_option = form.shipping_option.data
-
-        # Store only relevant details
-        if trade.shipping_option == "Mail-in":
-            trade.tracking_number = form.tracking_number.data
-            trade.street_address = trade.house_block = trade.zip_code = trade.contact_number = None  # Reset fields
-
-        elif trade.shipping_option == "Pick-Up Service":
-            trade.street_address = form.street_address.data
-            trade.house_block = form.house_block.data
-            trade.zip_code = form.zip_code.data
-            trade.contact_number = form.contact_number.data
-            trade.tracking_number = None  # Reset tracking number
-
-        else:  # In-Store Drop-off (No extra fields needed)
-            trade.tracking_number = None
-            trade.street_address = trade.house_block = trade.zip_code = trade.contact_number = None
-
-        # Store payment details
-        trade.card_number = form.card_number.data[-4:]  # Store only last 4 digits for security
+        trade.tracking_number = form.tracking_number.data
+        trade.street_address = form.street_address.data
+        trade.house_block = form.house_block.data
+        trade.zip_code = form.zip_code.data
+        trade.contact_number = form.contact_number.data
+        trade.card_number = form.card_number.data[-4:]  # Store only last 4 digits
         trade.card_expiry = form.card_expiry.data
         trade.card_name = form.card_name.data
 
         db.session.commit()
-
         flash("Shipping and payment details saved successfully!", "success")
         return redirect(url_for('manageTradeins.view_trade_details', trade_id=trade.id))
 
-    flash("There were errors in your submission. Please check and try again.", "danger")
-    return redirect(url_for('manageTradeins.view_trade_details', trade_id=trade.id))
+    # Debugging: print form errors
+    print("🚨 Form Errors:", form.errors)
+
+    flash("There was an error processing your request. Please check your input.", "danger")
+    return render_template("dashboard/manageTradeins/customer_tradeDetails.html", form=form, trade_item=trade, timedelta=timedelta)

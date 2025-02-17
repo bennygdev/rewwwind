@@ -339,6 +339,10 @@
   border-radius: 0.4em;
 }
 
+.rating i.fa-star {
+  color: #FFA600;
+}
+
 /* Cart Button */
 .cart {
   position: absolute;

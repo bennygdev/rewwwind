@@ -1,5 +1,5 @@
 # seed.py
-from .models import Product, Category, SubCategory, Order, OrderItem, PaymentInformation, BillingAddress, db, User, Voucher, VoucherType, UserVoucher
+from .models import Product, Category, SubCategory, Order, OrderItem, PaymentInformation, BillingAddress, db, User, Voucher, VoucherType, UserVoucher, Review
 from werkzeug.security import generate_password_hash
 from datetime import datetime, timedelta
 
@@ -513,6 +513,27 @@ def insert_products():
 
   print("Inserted products.")
 
+def insert_reviews():
+  products = Product.query.all()
+  from random import randint
+  from sqlalchemy.orm.attributes import flag_modified
+
+  for product in products:
+    for x in range(randint(1,7)):
+      rev = Review(
+        show_username=[True, False][randint(0,1)],
+        rating=randint(3,5),
+        description='This is a dummy review.',
+        product_id=product.id,
+        user_id=4
+      )
+      db.session.add(rev)
+    if not product.rating:
+      product.update_rating()
+      flag_modified(product, 'rating')
+
+  db.session.commit()
+
 def insert_orders():
   payment_info = PaymentInformation(
       user_id=4,
@@ -551,11 +572,11 @@ def insert_orders():
   #   }
   # )
   
-  for x in range(10):
+  for x in range(4):
     order = Order(
         user_id=4,
         total_amount=0,
-        delivery='Standard',
+        delivery='standard',
         payment_type_id=1,
         payment_information_id=payment_info.id,
         billing_id=billing_info.id
@@ -571,7 +592,7 @@ def insert_orders():
         order_id=order.id,
         product_id=product.id,
         product_condition=product.conditions[i],
-        quantity=randint(1,10),
+        quantity=randint(1,2),
         unit_price=product.conditions[i]['price']
       )
       db.session.add(item)
@@ -602,13 +623,13 @@ def insert_orders():
   db.session.add(billing_info)
   db.session.commit()
   
-  for x in range(10):
+  for x in range(5):
     from datetime import datetime,timedelta
     order = Order(
         user_id=4,
         order_date=datetime.now()-timedelta(days=randint(20, 40)),
         total_amount=0,
-        delivery='Expedited',
+        delivery='expedited',
         payment_type_id=2,
         payment_information_id=payment_info.id,
         billing_id=billing_info.id
@@ -624,7 +645,7 @@ def insert_orders():
         order_id=order.id,
         product_id=product.id,
         product_condition=product.conditions[i],
-        quantity=randint(1,10),
+        quantity=randint(1,2),
         unit_price=product.conditions[i]['price']
       )
       db.session.add(item)

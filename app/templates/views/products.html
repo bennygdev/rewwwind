@@ -7,6 +7,9 @@
 {% endblock %}
 {% block title %}Products{% endblock %}
 {% block content %}
+<div class="header">
+  <p><a href="{{ url_for('views.home') }}">Home</a> &gt; Products</p>
+</div>
 <div class="listing__header top">
   <!-- Preserve current filter values -->
   {% if category_filter %}
@@ -223,6 +226,40 @@
       </div>
       <div id="newsletter__message" class="message"></div>
     </form>
+  </div>
+</div>
+<div class="overlay" id="overlay" style="display: none;"></div>
+<div class="modal" id="modal" style="display: none;">
+    <div class="success">
+      <i class="bi bi-x-lg fa-2xl"></i>
+      <h1>Upload an Image to<br>Find a Matching Product</h1>
+      <form action="{{ url_for('productPagination.upload_image') }}" method="POST" enctype="multipart/form-data" id="upload-form">
+        <div class="upload-container">
+          <!-- Drag and Drop Area -->
+          <div class="drag-drop-area" id="drag-drop-area">
+            <p>Drag & Drop an image here</p>
+            <p>or</p>
+            <label for="file-input" class="file-input-label">Browse</label>
+            <input type="file" id="file-input" name="file" accept="image/*" required style="display: none;">
+          </div>
+      
+          <!-- Image Preview -->
+          <div class="image-preview" id="image-preview">
+            <img id="preview-image" src="#" alt="Preview" style="display: none;">
+            <p id="preview-text">No image selected</p>
+          </div>
+        </div>
+      
+        <!-- Buttons -->
+        <div class="buttons">
+          <div class="button-wrapper">
+            <input id="cancel" name="cancel" type="button" value="Exit">
+          </div>
+          <div class="button-wrapper">
+            <button type="submit">Search</button>
+          </div>
+        </div>
+      </form>
   </div>
 </div>
 {% endblock %}

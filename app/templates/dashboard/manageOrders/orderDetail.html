@@ -23,10 +23,12 @@
             <span>{{ 'Arriving' if order.delivery != 'self-pickup' else 'Picking Up At' }}</span>
             {% if order.delivery != 'self-pickup' %}
             <p><strong>
-                {% if order.approval_date %}
+                {% if order.status == 'Approved' %}
                 {{ (order.approval_date + timedelta(days=7)).strftime('%d %B') }} 
                 &minus; 
                 {{ (order.approval_date + timedelta(days=10)).strftime('%d %B') }}
+                {% elif order.status == 'Rejected' %}
+                Rejected
                 {% else %}
                 Pending
                 {% endif %}
@@ -42,7 +44,7 @@
         </div>
         <div class="right">
             <span>Approval</span>
-            <p><strong>{{ order.status if order.status in ['Approved', 'Pending'] }}</strong></p>
+            <p><strong>{{ order.status if order.status in ['Approved', 'Pending', 'Rejected'] }}</strong></p>
         </div>
     </div>
     {% if order.delivery != 'self-pickup' %}
@@ -52,7 +54,11 @@
         </div>
         <div class="right">
             <span>Delivery</span>
-            <p><strong>{{ order.status if order.status == 'Approved' else 'Pending' }}</strong></p>
+            {% if order.status == 'Approved' %}
+            <p><strong>Out for Delivery</strong></p>
+            {% else %}
+            <p><strong>{{ order.status }}</strong></p>
+            {% endif %}
         </div>
     </div>
     {% endif %}
@@ -149,8 +155,8 @@
                     </div>
                     {% if order.billing.address_two %}
                     <div class="address two">
-                        <h4><strong>Address 1</strong></h4>
-                        <p>{{ order.billing.address_one }}</p>
+                        <h4><strong>Address 2</strong></h4>
+                        <p>{{ order.billing.address_two }}</p>
                     </div>
                     {% endif %}
                     <div class="phone_number">
@@ -296,8 +302,8 @@
                     </div>
                     {% if order.billing.address_two %}
                     <div class="address two">
-                        <h4><strong>Address 1</strong></h4>
-                        <p>{{ order.billing.address_one }}</p>
+                        <h4><strong>Address 2</strong></h4>
+                        <p>{{ order.billing.address_two }}</p>
                     </div>
                     {% endif %}
                     <div class="phone_number">
@@ -395,8 +401,26 @@
     </a>
 </div>
 {% endif %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    <div class="overlay" style="display: block;"></div>
+    <div class="modal" style="display: flex;">
+        {% for category, message in messages %}
+        <div class="success">
+            <i class="bi bi-x-lg fa-2xl"></i>
+            <i class="bi bi-check-circle fa-2xl"></i>
+            <h2>{{ message }}</h2>
+            <div class="button-wrapper">
+                <input id="cancel" name="cancel" type="button" value="Exit">
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endwith %}
 
 {% endblock %}
 
 {% block body_scripts %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/dashboard/manageOrders/ordersListing.js') }}"></script>
 {% endblock %}

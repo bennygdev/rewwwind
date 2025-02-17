@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash, abort, jsonify
+from flask import Blueprint, render_template, redirect, url_for, request, flash, abort, jsonify, current_app
 from flask_login import login_required, current_user
 from sqlalchemy import cast, Float, Integer, func
 from sqlalchemy.orm.attributes import flag_modified
@@ -8,7 +8,101 @@ from .forms import AddReviewForm, AddToCartForm, DeleteReviewForm, MailingListFo
 from . import db
 from math import ceil
 
+from PIL import Image
+import numpy as np
+from transformers import CLIPProcessor, CLIPModel
+import torch
+import os
+from scipy.spatial.distance import cdist
+
 productPagination = Blueprint('productPagination', __name__)
+
+# Initialize the CLIP model and processor
+model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+
+# Function to extract image embedding using CLIP
+def extract_image_embedding(image_path):
+    image = Image.open(image_path).convert('RGB')
+    inputs = processor(images=image, return_tensors="pt")
+    with torch.no_grad():
+        embeddings = model.get_image_features(**inputs)
+    return embeddings.squeeze().numpy()
+
+# Precompute embeddings for all product images
+def precompute_product_embeddings():
+    product_embeddings = {}
+    for product in Product.query.all():
+        if product.images:
+            for image_path in product.images:
+                full_image_path = os.path.join(current_app.static_folder, 'media', 'uploads', image_path)
+                if os.path.exists(full_image_path):
+                    embedding = extract_image_embedding(full_image_path)
+                    product_embeddings[image_path] = embedding
+    return product_embeddings
+
+# Function to find the closest matching product image
+def find_matching_product(uploaded_image_path):
+    # Extract embedding for the uploaded image
+    query_embedding = extract_image_embedding(uploaded_image_path)
+    product_embeddings = current_app.config['PRODUCT_EMBEDDINGS']
+    
+    # Compute distances between the query embedding and all precomputed embeddings
+    image_paths = list(product_embeddings.keys())
+    embeddings_array = np.array(list(product_embeddings.values()))
+    distances = cdist([query_embedding], embeddings_array, metric='cosine')[0]
+    
+    # Find the closest match
+    closest_index = np.argmin(distances)
+    closest_image_path = image_paths[closest_index]
+    closest_distance = distances[closest_index]
+    
+    return closest_image_path, closest_distance
+
+@productPagination.route('/upload_image', methods=['GET', 'POST'])
+def upload_image():
+    SIMILARITY_THRESHOLD = 0.4
+
+    if request.method == 'POST':
+        uploaded_image = request.files['file']
+        if uploaded_image:
+            # Save the uploaded image
+            uploaded_image_path = os.path.join(current_app.static_folder, 'media', 'challenge', "uploaded_image.jpg")
+            uploaded_image.save(uploaded_image_path)
+            
+            # Access embeddings from app config
+            product_embeddings = current_app.config['PRODUCT_EMBEDDINGS']
+            image_paths = list(product_embeddings.keys())
+            embeddings_array = np.array(list(product_embeddings.values()))
+            
+            # Find the closest matching product image
+            query_embedding = extract_image_embedding(uploaded_image_path)
+            distances = cdist([query_embedding], embeddings_array, metric='cosine')[0]
+            closest_index = np.argmin(distances)
+            closest_image_path = image_paths[closest_index]
+            closest_distance = distances[closest_index]
+
+            print(f"Closest Image Path: {closest_image_path}")
+            print(f"Closest Distance: {closest_distance}")
+
+            # Check if the closest match meets the similarity threshold
+            if closest_distance < SIMILARITY_THRESHOLD:
+                # Query the product that contains the closest image path
+                product = Product.query.filter(
+                    Product.images.like(f"%{closest_image_path}%")
+                ).first()
+
+                if product:
+                    print(f"Found matching product: {product.name} (Distance: {closest_distance:.4f})", "success")
+                    return redirect(url_for('productPagination.product_pagination', q=product.name))
+                else:
+                    print("No matching products were found.")
+                    return redirect(url_for('productPagination.product_pagination', q='Nothing found.'))
+            else:
+                print("No matches meet the similarity threshold.")
+                return redirect(url_for('productPagination.product_pagination', q='Nothing found.'))
+
+    return render_template("views/upload_image.html")
 
 def pagination(featured=None):
     # Base query

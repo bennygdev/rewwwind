@@ -64,6 +64,9 @@ def create_app():
   app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'media', 'uploads') # temporary image upload folder
   if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
+  app.config['UPLOAD_CHALLENGE_FOLDER'] = os.path.join(app.root_path, 'static', 'media', 'challenge') # image search challenge
+  if not os.path.exists(app.config['UPLOAD_CHALLENGE_FOLDER']):
+    os.makedirs(app.config['UPLOAD_CHALLENGE_FOLDER'])
 
   # Cloudinary (uncomment only before, to save on credits.)    
   cloudinary.config( 
@@ -150,7 +153,7 @@ def create_app():
 
   # Product Pages
   from .productPagination import productPagination
-
+  csrf.exempt(productPagination)
   app.register_blueprint(productPagination, url_prefix="/products")
 
   # Cart Pages
@@ -199,16 +202,18 @@ def create_app():
   def fromjson_filter(value):
     return json.loads(value)
   
+  
   return app
   
 def create_database(app):
   with app.app_context():
+
     if not path.exists('instance/' + DB_NAME):
       db.create_all()
       print('Created Database!')
       # insert_categories()
 
-      from .seed import insert_categories, insert_products, insert_users, insert_payment_types, insert_default_roles, insert_subcategories, insert_orders, insert_voucher_types, insert_vouchers
+      from .seed import insert_categories, insert_products, insert_reviews, insert_users, insert_payment_types, insert_default_roles, insert_subcategories, insert_orders, insert_voucher_types, insert_vouchers
 
       insert_default_roles()
       insert_payment_types()
@@ -216,6 +221,11 @@ def create_database(app):
       insert_categories()
       insert_subcategories()
       insert_products()
+      insert_reviews()
       insert_orders()
       insert_voucher_types()
       insert_vouchers()
+      
+    from .productPagination import precompute_product_embeddings
+    product_embeddings = precompute_product_embeddings()
+    app.config['PRODUCT_EMBEDDINGS'] = product_embeddings

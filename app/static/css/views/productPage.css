@@ -2,6 +2,14 @@
     padding: 100px 80px 30px 80px;
 }
 
+.header p {
+    font-size: 1.2em;
+}
+
+.header a {
+    color: #039752;
+}
+
 /* CTA styles extending from filters */
 .cta-form button.filter {
     flex-wrap: wrap;

@@ -26,6 +26,9 @@
           <button type="submit" class="search__button" id="search__button">
               <i class="fa-solid fa-magnifying-glass"></i>
           </button>
+          <div class="image_search" id="image_search" style="right: {% if search_query %}50px{% else %}30px{% endif %};">
+            <i class="fa-solid fa-camera"></i>
+          </div>
           {% if search_query %}
               <a href="{{ url_for('productPagination.product_pagination') }}" class="clear__button">
                   <i class="fa-solid fa-xmark fa-lg"></i>

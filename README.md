@@ -62,11 +62,52 @@ Benny:
     - Ability to unsubscribe from the link provided in the email
 
 Nelson:
+- Products Pagination
+    - Products filter
+    - Similar image search using openai/clip-vit-base-patch32
+        - Matches closest product within a specified threshold
+        - Returns none if no matches are found
+    - List and grid view
+    - Product-Specific Pages
+        - Dynamic pricing according to selected condition
+        - Add Review
+            - Rate products
+            - Optional annonymity (Hides the username)
+            - Optional comments
+        - Update Review
+        - Delete Review
+- Manage Products (Viewable by Admins & Owners Only)
+    - Add Products
+        - Basic product information
+        - Condition selector
+        - Image(s) are upload to the cloud (Cloudinary)
+            - All images are obtained from Cloudinary
+            - Automatic deletion of images from Cloudinary
+        - Filled information is temporarily stored upon exit
+    - Update Products
+        - All of the above
+    - Delete Products
+        - Deletes product and all related information
+        - Aborts when product is matched in an ongoing order
+- Manage Orders
+    - View Orders (Viewable by All Roles)
+        - Summary of Order
+        - Invoice Generation (Only when approved by admin)
+    - Update Orders (Viewable by Admins & Owners Only)
+        - Update Approval Status
+- Checkout / Payment
+    - Pre-Payment
+        - Delivery Type (Method)
+        - Pick-Up Information or Billing Information (Depending on delivery type chosen)
+        - Voucher Selection (If any)
+    - Payment via Stripe
+        - Payment information securely stored in Stripe
+        - Automatic retrieval of saved payment information upon checkout
+    - Persistent Information Throughout Checkout Process (until cancellation or success)
 
-(fill in what you have done)
 
 Ryan:
--Drafted the overall UI/UX for the Storefront, Trade-in, and Condition Guidelines onboarding pages.
+- Drafted the overall UI/UX for the Storefront, Trade-in, and Condition Guidelines onboarding pages.
 - Trade in request form and Dashboard (For both Customer and Admin sides)
    - Customers can send in trade-in requests where Admin can approve or reject their request
    - For approved requests, customers can input their payment details and method of drop-off

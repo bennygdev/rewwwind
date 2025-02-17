@@ -67,6 +67,7 @@ instance/
 migrations/
 app/static/profile_pics/*
 app/static/media/uploads/*
+app/static/media/challenge/*
 !app/static/media/uploads/1984.png
 !app/static/media/uploads/a_night_at_the_opera.png
 !app/static/media/uploads/abbey_road_vinyl_only.png

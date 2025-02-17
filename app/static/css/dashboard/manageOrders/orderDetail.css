@@ -265,6 +265,10 @@ td.orderStock div {
 }
 
 .order_approval p:nth-child(2) input[type="radio"] {
+    accent-color: orange;
+}
+
+.order_approval p:nth-child(3) input[type="radio"] {
     accent-color: red;
 }
 
@@ -320,6 +324,69 @@ td.orderStock div {
 .footer a.btn-primary:hover {
     color: white;
     background-color: #039752;
+}
+
+/* messages modal */
+.overlay {
+    display: none;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    opacity: 70%;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 6;
+}
+
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    max-height: 300px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    border-radius: var(--bs-border-radius);
+}
+
+.modal .success {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 100%;
+}
+
+.success i.bi-x-lg, .delete i.bi-x-lg {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.success h2, .delete h2 {
+    font-weight: bold;
+}
+
+.success i.bi-check-circle {
+    font-size: 4.5em;
+    color: #039752;
+}
+
+.modal .button-wrapper input {
+    all: unset;
+    font-size: 1.1em;
+    padding: 0.2em 0.7em;
+    background-color: #d9d9d9;
+    color: black;
+    border-radius: var(--bs-border-radius);
+    cursor: pointer;
 }
 
 @media (max-width: 1400px) {

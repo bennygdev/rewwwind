@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Trade-Ins</title>
+</head>
+<body>
+    <h1>Your Trade-Ins</h1>
+
+    <ul>
+        {% for tradein in tradeins %}
+        <li>
+            <p><strong>ID:</strong> {{ tradein.id }}</p>
+            <p><strong>Title:</strong> {{ tradein.title }}</p>
+            <p><strong>Item Type:</strong> {{ tradein.item_type }}</p>
+            <p><strong>Condition:</strong> {{ tradein.item_condition }}</p>
+            <p><strong>Author/Artist:</strong> {{ tradein.author_artist }}</p>
+            <p><strong>Genre:</strong> {{ tradein.genre }}</p>
+            <p><strong>ISBN/Cat#:</strong> {{ tradein.isbn_or_cat }}</p>
+            <p><strong>Images:</strong></p>
+            <ul>
+                {% for image_path in tradein.images %}
+                <li>
+                    <img src="{{ url_for('static', filename=image_path) }}" alt="Image for Trade-In" width="200">
+                </li>
+                {% endfor %}
+            </ul>
+        </li>
+        <hr>
+        {% else %}
+        <p>No trade-ins found.</p>
+        {% endfor %}
+    </ul>
+</body>
+</html>

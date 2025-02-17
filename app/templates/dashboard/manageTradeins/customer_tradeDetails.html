@@ -1,0 +1,240 @@
+{% extends "views/base.html" %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tradein/custTradeDetails.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="trade-details-container">
+    <div class="trade-details-header">
+        <h1>Trade-in Request #{{ "%03d"|format(trade_item.id) }}</h1>
+        <span class="status {{ trade_item.status.lower().replace(',', '').replace(' ', '-') }}">
+            {{ trade_item.status }}
+        </span>
+    </div>
+
+    <div class="trade-details-info">
+        <div class="info-box">
+            <p>Estimated Review</p>
+            <span>{{ (trade_item.created_at + timedelta(days=3)).strftime('%d %b %Y') }}</span>
+        </div>
+        <div class="info-box">
+            <p>Delivery Method</p>
+            <span>{{ "Drop-off" if trade_item.item_condition in ["Brand New", "Like New"] else "Pick-up" }}</span>
+        </div>
+    </div>
+
+    <div class="items-section">
+        <h2>Items</h2>
+        <div class="item-details">
+            <div class="item-image">
+                <p>No Image Available</p>
+            </div>
+            <div class="item-info">
+                <p><strong>Title:</strong> {{ trade_item.title }}</p>
+                <p><strong>Item Type:</strong> {{ trade_item.item_type }}</p>
+                <p><strong>Genre:</strong> {{ trade_item.genre }}</p>
+                <p><strong>Author:</strong> {{ trade_item.author_artist }}</p>
+                <p><strong>ISBN:</strong> {{ trade_item.isbn_or_cat }}</p>
+                <p><strong>Condition:</strong> {{ trade_item.item_condition }}</p>
+            </div>
+        </div>
+    </div>
+
+    {% if current_user.role_id in [2, 3] and trade_item.status == "Pending" %}
+    <div class="admin-actions">
+        <a href="{{ url_for('manageTradeins.update_trade_status', trade_id=trade_item.id, status='Approved') }}" class="btn btn-success">Approve</a>
+        <a href="{{ url_for('manageTradeins.update_trade_status', trade_id=trade_item.id, status='Rejected') }}" class="btn btn-danger">Reject</a>
+    </div>
+    {% endif %}
+
+    {% if trade_item.status == "Approved" %}
+        <div class="shipping-payment-section">
+            <h2>Shipping & Payment</h2>
+
+            {% if trade_item.shipping_option %}
+                <div class="submitted-details">
+                    <h3>Shipping Option</h3>
+                    <p>{{ trade_item.shipping_option }}</p>
+
+                    {% if trade_item.shipping_option == "Mail-in" %}
+                        <h3>Tracking Number</h3>
+                        <p>{{ trade_item.tracking_number }}</p>
+                    {% elif trade_item.shipping_option == "Pick-Up Service" %}
+                        <h3>Shipping Address</h3>
+                        <p>{{ trade_item.street_address }}, {{ trade_item.house_block }}, {{ trade_item.zip_code }}</p>
+                        <p>Contact: {{ trade_item.contact_number }}</p>
+                    {% endif %}
+
+                    <h3>Payment Option</h3>
+                    <p>Card Ending: ****{{ trade_item.card_number[-4:] }}</p>
+                    <p>Exp: {{ trade_item.card_expiry }}</p>
+                    <p>Name on Card: {{ trade_item.card_name }}</p>
+                </div>
+            {% else %}
+                {% if current_user.role_id == 1 %}
+                <form action="{{ url_for('manageTradeins.save_shipping_payment', trade_id=trade_item.id) }}" method="POST" novalidate>
+
+                    {{ form.hidden_tag() }}
+
+                    <h3>Shipping Option</h3>
+                    <div class="radio-group">
+                        {% for subfield in form.shipping_option %}
+                            <label for="{{ subfield.id }}">
+                                {{ subfield }} {{ subfield.label.text }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                    {% if form.shipping_option.errors %}
+                        <span class="form-error">
+                            {% for error in form.shipping_option.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </span>
+                    {% endif %}
+
+                    <!-- Tracking Number Section -->
+                    <div id="tracking-number-section" class="hidden">
+                        <h3>Tracking Number</h3>
+                        {{ form.tracking_number(class="form-control", placeholder="Enter Tracking Number") }}
+                        {% if form.tracking_number.errors %}
+                            <span class="form-error">
+                                {% for error in form.tracking_number.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Shipping Address Section -->
+                    <div id="shipping-address-section" class="hidden">
+                        <h3>Shipping Address</h3>
+                    
+                        <div class="form-group">
+                            <label for="street_address">Street Address</label>
+                            {{ form.street_address(class="form-control", placeholder="Street Address") }}
+                            {% if form.street_address.errors %}
+                                <span class="form-error">
+                                    {% for error in form.street_address.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </span>
+                            {% endif %}
+                        </div>
+                    
+                        <div class="form-group">
+                            <label for="house_block">House / Block No.</label>
+                            {{ form.house_block(class="form-control", placeholder="House / Block No.") }}
+                            {% if form.house_block.errors %}
+                                <span class="form-error">
+                                    {% for error in form.house_block.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </span>
+                            {% endif %}
+                        </div>
+                    
+                        <div class="form-group">
+                            <label for="zip_code">Zip or Postal Code</label>
+                            {{ form.zip_code(class="form-control", placeholder="Zip or Postal Code") }}
+                            {% if form.zip_code.errors %}
+                                <span class="form-error">
+                                    {% for error in form.zip_code.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </span>
+                            {% endif %}
+                        </div>
+                    
+                        <div class="form-group">
+                            <label for="contact_number">Contact Number</label>
+                            {{ form.contact_number(class="form-control", placeholder="Contact Number") }}
+                            {% if form.contact_number.errors %}
+                                <span class="form-error">
+                                    {% for error in form.contact_number.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <h3>Payment Option</h3>
+
+                    <div class="form-group">
+                        <label for="card_number">Card Number</label>
+                        {{ form.card_number(class="form-control", placeholder="Card Number") }}
+                        {% if form.card_number.errors %}
+                            <span class="form-error">
+                                {% for error in form.card_number.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="card_expiry">Expiration Date (MM/YY)</label>
+                        {{ form.card_expiry(class="form-control", placeholder="Expiration Date (MM/YY)") }}
+                        {% if form.card_expiry.errors %}
+                            <span class="form-error">
+                                {% for error in form.card_expiry.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="card_name">Name on Card</label>
+                        {{ form.card_name(class="form-control", placeholder="Name on Card") }}
+                        {% if form.card_name.errors %}
+                            <span class="form-error">
+                                {% for error in form.card_name.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn btn-success">Submit</button>
+                </form>
+                {% else %}
+                <p class="admin-shipping-info">Waiting for customer to submit shipping details.</p>
+                {% endif %}
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <a href="{{ url_for('manageTradeins.manage_tradeins') }}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/tradein/tradeDetails.js') }}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const trackingNumberSection = document.getElementById("tracking-number-section");
+        const shippingAddressSection = document.getElementById("shipping-address-section");
+
+        function updateVisibility() {
+            const selectedShippingOption = document.querySelector('input[name="shipping_option"]:checked')?.value;
+
+            trackingNumberSection.classList.add("hidden");
+            shippingAddressSection.classList.add("hidden");
+
+            if (selectedShippingOption === "Mail-in") {
+                trackingNumberSection.classList.remove("hidden");
+            } else if (selectedShippingOption === "Pick-Up Service") {
+                shippingAddressSection.classList.remove("hidden");
+            }
+        }
+
+        document.querySelectorAll('input[name="shipping_option"]').forEach(option => {
+            option.addEventListener("change", updateVisibility);
+        });
+
+        updateVisibility();  // Run on page load
+    });
+</script>
+{% endblock %}
+
+{% endblock %}

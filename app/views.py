@@ -10,10 +10,15 @@ from datetime import timedelta
 from sqlalchemy import func
 from secrets import token_urlsafe
 import uuid
+from sqlalchemy.orm.attributes import flag_modified
 
 views = Blueprint('views', __name__)
 
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+UPLOAD_FOLDER = os.path.join(os.getcwd(), 'static/uploads')
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)  
+
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -133,51 +138,56 @@ def trade_form():
         flash("Admins and owners are not allowed to trade in items to avoid conflicts.\nPlease use a dummy customer account instead.", "info")
         return redirect(url_for('auth.login'))
 
-    UPLOAD_FOLDER = os.path.join(current_app.root_path, 'static/uploads')
-    
-    if not os.path.exists(UPLOAD_FOLDER):
-        os.makedirs(UPLOAD_FOLDER)  # Ensure the directory exists
+    if form.validate_on_submit():  
+        try:
+            # Create trade item
+            trade = tradeDetail(
+                item_type=form.item_type.data,
+                item_condition=form.item_condition.data,
+                title=form.title.data,
+                author_artist=form.author.data,
+                genre=form.genre.data,
+                isbn_or_cat=form.isbn.data,
+                user=current_user
+            )
 
-    if form.validate_on_submit():
-        item_type = form.item_type.data
-        item_condition = form.item_condition.data
-        title = form.title.data
-        author = form.author.data
-        genre = form.genre.data
-        isbn = form.isbn.data
-        images = request.files.getlist('images')
+            # Handle image uploads
+            files = request.files.getlist('images')
+            uploaded_file_paths = []
+            upload_folder = current_app.config['UPLOAD_FOLDER']
 
-        image_paths = []
-        for file in images:
-            if file and file.filename:
-                filename = secure_filename(f"{uuid.uuid4()}_{file.filename}")
-                file_path = os.path.join(UPLOAD_FOLDER, filename)
-                file.save(file_path)
-                image_paths.append(f'static/uploads/{filename}')  # Store relative path
+            # Ensure upload folder exists
+            os.makedirs(upload_folder, exist_ok=True)
 
-        images_json = json.dumps(image_paths)  # Convert list to JSON string
+            print(f"Uploading {len(files)} images...")  # Debugging output
 
-        new_item = tradeDetail(
-            item_type=item_type,
-            item_condition=item_condition,
-            title=title,
-            author_artist=author,
-            genre=genre,
-            isbn_or_cat=isbn,
-            images=images_json,
-            trade_number=current_user.id
-        )
+            for file in files:
+                if file and allowed_file(file.filename):  
+                    filename = secure_filename(file.filename)
+                    file_path = os.path.join(upload_folder, filename)
+                    file.save(file_path)
+                    uploaded_file_paths.append(filename)  # Save filename for DB
 
-        db.session.add(new_item)
-        db.session.commit()
+            # Store images as JSON list (ensure correct format)
+            if uploaded_file_paths:
+                trade.images = json.dumps(uploaded_file_paths)  # Convert to JSON string
+            else:
+                trade.images = "[]"  # Ensure an empty list if no images
 
-        flash('Trade item submitted successfully!', 'success')
-        return redirect(url_for('manageTradeins.manage_tradeins'))
+            flag_modified(trade, "images")  
+
+            # Debugging: Print stored data
+            print("Images stored in DB:", trade.images)
+
+            # Commit changes
+            db.session.add(trade)
+            db.session.commit()
+
+            flash('Trade item submitted successfully!', 'success')
+            return redirect(url_for('manageTradeins.manage_tradeins'))
+
+        except Exception as e:
+            flash(f"An error occurred: {str(e)}", "danger")
+            return redirect(url_for('views.trade_form'))
 
     return render_template('views/tradeForm.html', form=form)
-
-
-
-    
-
-

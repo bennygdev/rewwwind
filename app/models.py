@@ -269,7 +269,7 @@ class tradeDetail(db.Model):
     __tablename__ = 'trade_details'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    images = db.Column(db.JSON, nullable=False)  
+    images = db.Column(db.JSON, nullable=False, default="[]")  
     item_type = db.Column(db.String(100), nullable=False)
     item_condition = db.Column(db.String(100), nullable=False)
     title = db.Column(db.String(255), nullable=False)
@@ -281,8 +281,8 @@ class tradeDetail(db.Model):
 
     user = db.relationship('User', backref='trade_items', lazy=True)
 
-    created_at = db.Column(db.DateTime(timezone=True), default=func.now())
-    updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
+    created_at = db.Column(db.DateTime(timezone=True), default=db.func.now())
+    updated_at = db.Column(db.DateTime(timezone=True), default=db.func.now(), onupdate=db.func.now())
 
     # For shipping and payment NEW!!
     shipping_option = db.Column(db.String(50))
@@ -295,6 +295,14 @@ class tradeDetail(db.Model):
     card_number = db.Column(db.String(4))  
     card_expiry = db.Column(db.String(10))
     card_name = db.Column(db.String(255))
+
+
+    def add_image(self, filename):
+        """ Helper function to add an image filename to the images list """
+        if not self.images:
+            self.images = []
+        self.images.append(filename)
+        db.session.commit()
 
 
 

@@ -1,8 +1,9 @@
 # seed.py
-from .models import Product, Category, SubCategory, Order, OrderItem, PaymentInformation, BillingAddress, db, User, Voucher, VoucherType, UserVoucher, Review
+from .models import Product, Category, SubCategory, Order, OrderItem, PaymentInformation, BillingAddress, db, User, Voucher, VoucherType, UserVoucher, Review, tradeDetail
 from werkzeug.security import generate_password_hash
 from datetime import datetime, timedelta
 import random
+from app.models import tradeDetail
 
 def insert_default_roles():
   from .models import Role
@@ -875,3 +876,80 @@ def insert_vouchers():
       db.session.add(new_user_voucher)
       db.session.commit()
   print('Inserted default vouchers into the database!')
+
+import random
+from datetime import datetime
+from .models import tradeDetail, db, User
+
+def insert_trade_ins():
+    users = User.query.filter_by(role_id=1).all()  # Select customers only
+    if not users:
+        print("No users found! Make sure to run insert_users first.")
+        return
+
+    existing_trade_count = tradeDetail.query.count()  # Count existing records
+
+    trade_ins = [
+        {
+            "title": "The Great Gatsby",
+            "item_type": "book",
+            "genre": "Classic",
+            "author_artist": "F. Scott Fitzgerald",
+            "isbn_or_cat": "9780743273565",
+            "item_condition": "Brand New",
+            "status": "Pending",
+        },
+        {
+            "title": "To Kill a Mockingbird",
+            "item_type": "book",
+            "genre": "Fiction",
+            "author_artist": "Harper Lee",
+            "isbn_or_cat": "9780061120084",
+            "item_condition": "Like New",
+            "status": "Pending",
+        },
+        {
+            "title": "1984",
+            "item_type": "book",
+            "genre": "Dystopian",
+            "author_artist": "George Orwell",
+            "isbn_or_cat": "9780451524935",
+            "item_condition": "Lightly Used",
+            "status": "Pending",
+        },
+        {
+            "title": "The Catcher in the Rye",
+            "item_type": "book",
+            "genre": "Fiction",
+            "author_artist": "J.D. Salinger",
+            "isbn_or_cat": "9780316769488",
+            "item_condition": "Well Used",
+            "status": "Approved",
+        },
+        {
+            "title": "Brave New World",
+            "item_type": "book",
+            "genre": "Dystopian",
+            "author_artist": "Aldous Huxley",
+            "isbn_or_cat": "9780060850524",
+            "item_condition": "Brand New",
+            "status": "Approved",
+        },
+    ]
+
+    for index, trade in enumerate(trade_ins, start=existing_trade_count + 1):
+        trade_in_entry = tradeDetail(
+            title=trade["title"],
+            item_type=trade["item_type"],
+            genre=trade["genre"],
+            author_artist=trade["author_artist"],
+            isbn_or_cat=trade["isbn_or_cat"],
+            item_condition=trade["item_condition"],
+            status=trade["status"],
+            trade_number=index,  # ✅ Generate unique trade_number
+            created_at=datetime.utcnow(),
+        )
+        db.session.add(trade_in_entry)
+
+    db.session.commit()
+    print("Inserted 5 trade-in listings!")

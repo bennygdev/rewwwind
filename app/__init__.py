@@ -13,6 +13,7 @@ from flask_socketio import SocketIO
 import stripe
 import cloudinary
 import cloudinary.uploader
+from werkzeug.utils import secure_filename
 socketio = SocketIO()
 
 migrate = Migrate()
@@ -24,6 +25,12 @@ mail = Mail()
 oauth = OAuth()
 
 load_dotenv()
+
+UPLOAD_FOLDER = os.path.join(os.getcwd(), "static", "media", "uploads")
+  
+if not os.path.exists(UPLOAD_FOLDER):
+  os.mkdir(UPLOAD_FOLDER)
+  print(f"Created upload folder: {UPLOAD_FOLDER}")
 
 def update_user_order_counts(app):
   with app.app_context():
@@ -42,8 +49,15 @@ def create_app():
   app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
   app.config['MAIL_PORT'] = 465
   app.config['MAIL_USE_SSL'] = True
+
+  app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+  
+
   # app.config['MAIL_USERNAME'] = os.getenv('EMAIL_USER')
   # app.config['MAIL_PASSWORD'] = os.getenv('EMAIL_PASS') 
+
+  
 
   def update_mail_config(email_type='default'):
     if email_type == 'auth':
@@ -204,15 +218,19 @@ def create_app():
   
   
   return app
-  
+
+
+
 def create_database(app):
+  
   with app.app_context():
     if not path.exists('instance/' + DB_NAME):
       db.create_all()
       print('Created Database!')
       # insert_categories()
 
-      from .seed import insert_categories, insert_products, insert_reviews, insert_users, insert_payment_types, insert_default_roles, insert_subcategories, insert_orders, insert_voucher_types, insert_vouchers, insert_dummy_users
+      from .seed import insert_categories, insert_products, insert_reviews, insert_users, insert_payment_types, insert_default_roles, insert_subcategories, insert_orders, insert_voucher_types, insert_vouchers, insert_dummy_users, insert_trade_ins
+     
 
       insert_default_roles()
       insert_payment_types()
@@ -225,6 +243,7 @@ def create_database(app):
       insert_orders()
       insert_voucher_types()
       insert_vouchers()
+      insert_trade_ins()
       
     from .productPagination import precompute_product_embeddings
     product_embeddings = precompute_product_embeddings()

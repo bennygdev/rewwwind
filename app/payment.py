@@ -439,5 +439,6 @@ def checkout_cancel():
     session.pop('delivery_type', None)
     session.pop('billing_info', None)
     session.pop('pickup_date', None)
+    session.pop('voucher', None)
 
     return redirect(url_for('productPagination.product_pagination'))

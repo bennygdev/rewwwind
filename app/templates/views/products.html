@@ -7,6 +7,9 @@
 {% endblock %}
 {% block title %}Products{% endblock %}
 {% block content %}
+<div class="header">
+  <p><a href="{{ url_for('views.home') }}">Home</a> &gt; Products</p>
+</div>
 <div class="listing__header top">
   <!-- Preserve current filter values -->
   {% if category_filter %}

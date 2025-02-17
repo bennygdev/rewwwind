@@ -77,6 +77,7 @@ def orders_listing():
   status_choices = [
     ('pending', 'Pending'),
     ('approved', 'Approved'),
+    ('rejected', 'Rejected')
   ]
     
   return render_template(

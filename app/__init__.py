@@ -213,7 +213,7 @@ def create_database(app):
       print('Created Database!')
       # insert_categories()
 
-      from .seed import insert_categories, insert_products, insert_users, insert_payment_types, insert_default_roles, insert_subcategories, insert_orders, insert_voucher_types, insert_vouchers
+      from .seed import insert_categories, insert_products, insert_reviews, insert_users, insert_payment_types, insert_default_roles, insert_subcategories, insert_orders, insert_voucher_types, insert_vouchers
 
       insert_default_roles()
       insert_payment_types()
@@ -221,6 +221,7 @@ def create_database(app):
       insert_categories()
       insert_subcategories()
       insert_products()
+      insert_reviews()
       insert_orders()
       insert_voucher_types()
       insert_vouchers()

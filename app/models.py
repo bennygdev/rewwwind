@@ -120,12 +120,9 @@ class Product(db.Model):
   def update_rating(self):
     if self.reviews:
       total_rating = sum(review.rating for review in self.reviews)
-      self.rating = total_rating / len(self.reviews)
+      self.rating = round(total_rating / len(self.reviews), 2)
     else:
       self.rating = 0
-    
-    session = Session.object_session(self)
-    session.commit()
 
 class Review(db.Model):
   __tablename__ = 'reviews'

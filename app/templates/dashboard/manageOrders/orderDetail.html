@@ -42,7 +42,7 @@
         </div>
         <div class="right">
             <span>Approval</span>
-            <p><strong>{{ order.status if order.status in ['Approved', 'Pending'] }}</strong></p>
+            <p><strong>{{ order.status if order.status in ['Approved', 'Pending', 'Rejected'] }}</strong></p>
         </div>
     </div>
     {% if order.delivery != 'self-pickup' %}
@@ -52,7 +52,11 @@
         </div>
         <div class="right">
             <span>Delivery</span>
-            <p><strong>{{ order.status if order.status == 'Approved' else 'Pending' }}</strong></p>
+            {% if order.status == 'Approved' %}
+            <p><strong>Out for Delivery</strong></p>
+            {% else %}
+            <p><strong>{{ order.status }}</strong></p>
+            {% endif %}
         </div>
     </div>
     {% endif %}
@@ -149,8 +153,8 @@
                     </div>
                     {% if order.billing.address_two %}
                     <div class="address two">
-                        <h4><strong>Address 1</strong></h4>
-                        <p>{{ order.billing.address_one }}</p>
+                        <h4><strong>Address 2</strong></h4>
+                        <p>{{ order.billing.address_two }}</p>
                     </div>
                     {% endif %}
                     <div class="phone_number">
@@ -296,8 +300,8 @@
                     </div>
                     {% if order.billing.address_two %}
                     <div class="address two">
-                        <h4><strong>Address 1</strong></h4>
-                        <p>{{ order.billing.address_one }}</p>
+                        <h4><strong>Address 2</strong></h4>
+                        <p>{{ order.billing.address_two }}</p>
                     </div>
                     {% endif %}
                     <div class="phone_number">

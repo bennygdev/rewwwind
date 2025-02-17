@@ -20,7 +20,7 @@ NOTE: I've moved the instructions to run and contribute to `HOWTORUN.md`, same e
 
 Benny:
 - Project environment and setup
-- Designed Home landing page, Footer, About pages, Rewards page, Legal pages, Error (401, 403, 404) pages
+- Designed and drafted UI/UX for Storefront, Footer, About pages, Rewards page, Legal pages, Error (401, 403, 404) pages
 - 3 Account Role levels (Customer, Admin, Owner (superuser))
 - Dashboard system that houses for all business functions
     - Dashboard pages are shown accordingly to role levels
@@ -116,7 +116,7 @@ Nelson:
 
 
 Ryan:
-- Drafted the overall UI/UX for the Storefront, Trade-in, and Condition Guidelines onboarding pages.
+- Drafted the overall UI/UX for the Trade-in, and Condition Guidelines onboarding pages.
 - Trade in request form and Dashboard (For both Customer and Admin sides)
    - Customers can send in trade-in requests where Admin can approve or reject their request
    - For approved requests, customers can input their payment details and method of drop-off

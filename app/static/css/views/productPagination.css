@@ -459,6 +459,146 @@ margin-bottom: 0;
   border-bottom-left-radius: 0;
 }
 
+/* messages modal */
+.overlay {
+  display: none;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  opacity: 70%;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 51;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60%;
+  max-height: 500px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  border-radius: var(--bs-border-radius);
+}
+
+.modal h1 {
+  text-align: center;
+  font-family: "CharisSILBold";
+}
+
+.modal .success {
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  height: 100%;
+}
+
+.success i.bi-x-lg, .delete i.bi-x-lg {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.success h2, .delete h2 {
+  font-weight: bold;
+}
+
+.success i.bi-check-circle {
+  font-size: 4.5em;
+  color: #039752;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.modal .button-wrapper input, .modal .button-wrapper button {
+  all: unset;
+  font-size: 1.1em;
+  padding: 0.2em 0.7em;
+  background-color: #d9d9d9;
+  color: black;
+  border-radius: var(--bs-border-radius);
+  cursor: pointer;
+}
+
+.modal .button-wrapper button {
+  background-color: #039752;
+  color: white;
+}
+
+/* Upload Container */
+.upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+/* Drag and Drop Area */
+.drag-drop-area {
+  width: 300px;
+  height: 150px;
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.drag-drop-area:hover {
+  border-color: #007bff;
+}
+
+.drag-drop-area p {
+  margin: 5px 0;
+  color: #666;
+}
+
+.file-input-label {
+  color: #007bff;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* Image Preview */
+.image-preview {
+  width: 300px;
+  height: 150px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+#preview-image {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 10px;
+}
+
+#preview-text {
+  color: #666;
+}
+
 /* media query */
 @media (max-width: 1400px) {
     .thumbnail {

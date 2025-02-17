@@ -17,6 +17,10 @@ wishlist = Blueprint('wishlist', __name__)
 def favourites():
     form = AddToCartForm()
 
+    if current_user.role_id in [2, 3]:
+        flash("Admins and owners are not allowed to wishlist items to avoid conflicts.\nPlease use a dummy customer account instead.", "info")
+        return redirect(url_for('auth.login'))
+
     products_query = Product.query
 
     # Search logic
@@ -40,6 +44,9 @@ def favourites():
 @wishlist.route('/wishlist/add-item/<int:product_id>', methods=['POST'])
 @login_required
 def add_favourite(product_id):
+    if current_user.role_id in [2, 3]:
+        flash("Admins and owners are not allowed to trade in items to avoid conflicts.\nPlease use a dummy customer account instead.", "info")
+        return redirect(url_for('auth.login'))
 
     if request.method == 'POST':
         if current_user.wishlisted_items is None:
@@ -54,6 +61,10 @@ def add_favourite(product_id):
 @wishlist.route('/wishlist/remove-item/<int:product_id>', methods=['GET', 'POST'])
 @login_required
 def remove_favourite(product_id):
+    if current_user.role_id in [2, 3]:
+        flash("Admins and owners are not allowed to trade in items to avoid conflicts.\nPlease use a dummy customer account instead.", "info")
+        return redirect(url_for('auth.login'))
+
     if current_user.wishlisted_items is None:
         current_user.wishlisted_items = []
     current_user.wishlisted_items.remove(product_id)

@@ -28,7 +28,6 @@ class User(db.Model, UserMixin):
     # Relationship to Cart
     cart_items = db.relationship('Cart', back_populates='user', lazy=True)
 
-    favorite_items = db.relationship('Favorite', back_populates='user', lazy=True)
 
     # Relationship to Orders
     orders = db.relationship('Order', back_populates='user', lazy=True)
@@ -116,8 +115,6 @@ class Product(db.Model):
   order_items = db.relationship('OrderItem', backref='product', lazy=True, cascade='all, delete-orphan')  # otm orderItem
 
   cart_entries = db.relationship('Cart', back_populates='product', lazy=True)
-  favorite_entries = db.relationship('Favorite', back_populates='product', lazy=True)
-
   reviews = db.relationship('Review', back_populates='product', lazy=True, cascade='all, delete-orphan')
   rating = db.Column(db.Float, default=0, nullable=True)
   def update_rating(self):
@@ -268,14 +265,7 @@ class Cart(db.Model):
     product = db.relationship('Product', back_populates='cart_entries')  # Product can appear in multiple carts
 
 
-class Favorite(db.Model):
-    __tablename__ = 'favorites'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
 
-    user = db.relationship('User', back_populates='favorite_items')
-    product = db.relationship('Product', back_populates='favorite_entries')
 
 
 class tradeDetail(db.Model):

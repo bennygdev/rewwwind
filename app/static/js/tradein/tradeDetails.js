@@ -29,3 +29,22 @@ document.addEventListener("DOMContentLoaded", function () {
     // Run on page load in case there is a pre-selected option
     updateFormDisplay();
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Close flash message when clicking the close button
+    document.querySelectorAll(".close-flash").forEach(button => {
+        button.addEventListener("click", function () {
+            this.parentElement.style.display = "none";
+        });
+    });
+
+    // Auto-hide flash message after 5 seconds
+    setTimeout(() => {
+        document.querySelectorAll(".flash-message").forEach(message => {
+            message.style.opacity = "0";
+            setTimeout(() => {
+                message.style.display = "none";
+            }, 500);
+        });
+    }, 5000); // 5 seconds
+});

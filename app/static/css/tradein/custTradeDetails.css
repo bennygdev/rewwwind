@@ -304,3 +304,72 @@ input, select {
     margin-top: 5px;
     display: block; 
 }
+
+/* Flash Message Popup */
+.flash-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+/* General Flash Message Styling */
+.flash-message {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #d4edda; /* Light green */
+    color: #155724;
+    padding: 12px 16px;
+    border-radius: 5px;
+    border: 1px solid #c3e6cb;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    min-width: 300px;
+    max-width: 500px;
+    width: auto;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    opacity: 1;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Success Message */
+.flash-message.flash-success {
+    background-color: #f0fff4; /* Light green */
+    border: 2px solid #28a745; /* Green outline */
+    color: #155724; /* Dark green text */
+}
+
+/* Error / Danger Message */
+.flash-message.flash-danger {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+/* Close Button for Flash Message */
+.close-flash {
+    background: none;
+    border: none;
+    color: #721c24;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+/* Fade-In Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -1,10 +1,25 @@
 {% extends "views/base.html" %}
+{% set active_page = "manage_tradeins" %}
 
 {% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/tradein/custTradeDetails.css') }}">
 {% endblock %}
 
 {% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flash-container">
+            {% for category, message in messages %}
+                <div class="flash-message flash-{{ category }}">
+                    <span>{{ message }}</span>
+                    <button class="close-flash">&times;</button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
 <div class="trade-details-container">
     <div class="trade-details-header">
         <h1>Trade-in Request #{{ "%03d"|format(trade_item.id) }}</h1>

@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app, jsonify, abort
 from flask_login import login_required, current_user
 from .forms import UpdatePersonalInformation, ChangePasswordForm, BillingAddressForm, PaymentMethodForm, ChangeEmailForm
-from .models import User, BillingAddress, PaymentInformation, PaymentType, Review, Cart, Order, UserVoucher, MailingList
+from .models import User, BillingAddress, PaymentInformation, PaymentType, Review, Cart, Order, UserVoucher, MailingList, Product, OrderItem
 from .roleDecorator import role_required
 from . import db
 import secrets
@@ -28,7 +28,10 @@ def user_profile():
 
   orders = Order.query.filter_by(user_id=current_user.id).order_by(Order.order_date.desc()).limit(6).all()
 
-  return render_template("dashboard/profile/profile.html", user=current_user, image_file=image_file, orders=orders)
+  # Get recommended products
+  recommended_products = get_recommended_products(current_user.id)
+
+  return render_template("dashboard/profile/profile.html", user=current_user, image_file=image_file, orders=orders, recommended_products=recommended_products)
 
 @dashboard.route('/settings')
 @login_required
@@ -395,3 +398,86 @@ def toggle_marketing_emails():
   except Exception as e:
     db.session.rollback()
     return jsonify({'success': False, 'error': str(e)}), 500
+  
+
+# PRODUCT RECOMMENDATION ALGORITHM
+# HOW THIS WORKS: It analyses the user order history first regardless if it's approved or not. 
+# It calculates the ratio of vinyl to books purchased
+# It then suggests products based on this ratio, with a maximum of 5 recommendations
+# It then ensures the minority category gets at least one recommendation if it's more than 1% of purchases
+# It shows products from only one category if the user has only ordered from that category
+def get_recommended_products(user_id):
+  from collections import defaultdict
+  from sqlalchemy import and_
+  
+  # Get all order items for the user
+  orders = Order.query.filter_by(user_id=user_id).all()
+  if not orders:
+    return None  # No orders, no recommendations
+  
+  # Count products by category
+  category_counts = defaultdict(int)
+  order_ids = [order.id for order in orders]
+  order_items = OrderItem.query.filter(OrderItem.order_id.in_(order_ids)).all()
+  
+  for item in order_items:
+    product = Product.query.get(item.product_id)
+    if product:
+      category_counts[product.category_id] += item.quantity
+  
+  # Calculate ratios
+  total_products = sum(category_counts.values())
+  if total_products == 0:
+    return None
+  
+  vinyl_count = category_counts.get(1, 0)  # Vinyl category ID = 1
+  book_count = category_counts.get(2, 0)   # Book category ID = 2
+  
+  # Calculate percentage of each category
+  vinyl_percentage = (vinyl_count / total_products) * 100 if total_products > 0 else 0
+  book_percentage = (book_count / total_products) * 100 if total_products > 0 else 0
+  
+  # Determine number of recommendations for each category
+  max_recommendations = 5
+  vinyl_recommendations = 0
+  book_recommendations = 0
+  
+  # If only one category has been ordered
+  if vinyl_count > 0 and book_count == 0:
+    vinyl_recommendations = max_recommendations
+  elif book_count > 0 and vinyl_count == 0:
+    book_recommendations = max_recommendations
+  else:
+    # Enforce minimum of 1 product for minority category if it's at least 1%
+    if 1 <= vinyl_percentage < 20:
+      vinyl_recommendations = 1
+      book_recommendations = min(max_recommendations - vinyl_recommendations, 4)
+    elif 1 <= book_percentage < 20:
+      book_recommendations = 1
+      vinyl_recommendations = min(max_recommendations - book_recommendations, 4)
+    else:
+      # Calculate recommendations based on percentages
+      vinyl_recommendations = round((vinyl_percentage / 100) * max_recommendations)
+      book_recommendations = max_recommendations - vinyl_recommendations
+      
+      # Adjust if rounding error exceeds max_recommendations
+      if vinyl_recommendations + book_recommendations > max_recommendations:
+        if vinyl_percentage >= book_percentage:
+          vinyl_recommendations = max_recommendations - book_recommendations
+        else:
+          book_recommendations = max_recommendations - vinyl_recommendations
+  
+  # Get recommended products
+  recommended_products = []
+  
+  # Get vinyl recommendations
+  if vinyl_recommendations > 0:
+    vinyl_products = Product.query.filter_by(category_id=1).order_by(Product.created_at.desc()).limit(vinyl_recommendations).all()
+    recommended_products.extend(vinyl_products)
+  
+  # Get book recommendations
+  if book_recommendations > 0:
+    book_products = Product.query.filter_by(category_id=2).order_by(Product.created_at.desc()).limit(book_recommendations).all()
+    recommended_products.extend(book_products)
+  
+  return recommended_products

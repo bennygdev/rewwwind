@@ -1,75 +1,230 @@
 {% extends "views/base.html" %}
 {% set active_page = "cart" %}
 
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/cart.css') }}">
+{% endblock %}
+
 {% block title %} Your Cart {% endblock %}
 
 {% block content %}
-<style>
-    .content {
-        padding: 80px 90px;
-    }
-</style>
-<h1>Your Cart</h1>
+<div class="content">
+    <h1>Your Cart</h1>
 
-    <!-- If the cart is empty -->
     {% if not cart_items %}
-    <p>Your cart is empty! <a href="/products">Continue shopping</a>.</p>
+        <div class="empty-cart">
+            <p>Your cart is empty! <a href="/products">Continue shopping</a>.</p>
+
+            <!-- "You Might Also Like" Section -->
+            <div class="suggested-products">
+                <h2>You Might Also Like</h2>
+                <div class="products-container">
+                    {% for product in suggested_products %}
+                        <div class="product-card">
+                            <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}" class="product-image">
+                            <h3>{{ product.name }}</h3>
+
+                            <select name="condition" id="condition-{{ product.id }}"
+                                    class="condition-dropdown" onchange="updatePrice('{{ product.id }}')">
+                                {% for condition in product.conditions %}
+                                <option value="{{ loop.index0 }}" data-price="{{ condition.price }}">
+                                    <!--drop down list can add the corresponding price for each condition as well -->
+                                    {{ condition.condition }}
+                                </option>
+                                {% endfor %}
+                            </select>
+
+                            <!-- Displayed Price -->
+                            <p>Price: $<span id="price-{{ product.id }}">
+                                {{ product.conditions[0].price if product.conditions else "N/A" }}
+                            </span></p>
+
+                            <!-- Add to Cart Form -->
+                            <form action="/add-to-cart/{{ product.id }}" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="condition" id="selected-condition-{{ product.id }}" value="0">
+                                <button type="submit" class="btn-add">Add to Cart</button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
     {% else %}
 
+    <form id="update-cart-form" action="{{ url_for('addToCart.update_cart') }}" method="POST" style="display: none;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    </form>
 
-    <!-- Cart Table -->
-    <table>
-        <thead>
-            <tr>
-                <th>Product</th>
-                <th>Quantity</th>
-                <th>Price</th>
-                <th>Total</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
+
+        <div class="cart-container">
             {% for item in cart_items %}
-            <tr>
-                <td>{{ item.product.name }}</td>
-                <td>
-                    <form action="/update-cart/{{ item.product_id }}" method="POST">
-                        <input type="number" name="quantity" value="{{ item.quantity }}" min="1">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <button type="submit">Update</button>
-                    </form>
-                </td>
-                <td>${{ item.product.price }}</td>
-                <td>${{ item.quantity * item.product_condition['price'] }}</td>
-                <td>
-                    <form action="/remove-from-cart/{{ item.product_id }}" method="POST">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <button type="submit" class="remove-btn">Remove</button>
-                    </form>
-                </td>
-            </tr>
+                <div class="cart-item" data-product-id="{{ item.product_id }}">
+                    <img src="{{ url_for('static', filename='media/uploads/' + item.product.image_thumbnail) }}" alt="{{ item.product.name }}" class="product-image">
+                    <div class="product-details">
+                        <h3>{{ item.product.name }}</h3>
+                         <p>Condition: <b>{{ item.product_condition['condition'] }}</b></p>
+                        <p>Price: ${{ item.product_condition['price'] }}</p>
+
+                        <!-- Quantity Input -->
+                        <label for="quantity-{{ item.product_id }}">Quantity:</label>
+                        <input
+                            type="number"
+                            id="quantity-{{ item.product_id }}"
+                            name="quantities[{{ item.product_id }}]"
+                            class="quantity-input"
+                            value="{{ item.quantity }}"
+                            min="1"
+                            form="update-cart-form"> <!-- Link the input to the hidden form -->
+
+                        <!-- Total for this Item -->
+                        <p>Sub Total: $<span class="item-total">{{ item.quantity * item.product_condition['price'] }}</span></p>
+
+                            <div class="cart-actions">
+                                <!-- Heart Button -->
+                                <button type="button" class="favorite-btn" data-product-id="{{ item.product_id }}" onclick="toggleFavorite(this)">
+                                    <i class="bi bi-heart{% if item.favorite %}-fill{% endif %}"></i>
+                                </button>
+
+
+                        <!-- Remove Icon -->
+                                <form action="/remove-from-cart/{{ item.product_id }}" method="POST" class="remove-form">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="remove-icon-btn">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                    </div>
+                </div>
             {% endfor %}
-        </tbody>
-    </table>
+        </div>
+        <!-- Update Cart Button -->
+        <div class="cart-summary">
+          <h3>Cart Total: $<span id="cart-total">{{ cart_total }}</span></h3>
 
-    <!-- Cart Summary -->
-    <div class="cart-summary">
-        <h3>Cart Total: ${{ cart_total }}</h3>
-        <form action="{{ url_for('payment.select_ship') }}" method="POST" class="cta-form">
-            <button type="submit" class="filter">Checkout</button>
-        </form>
-    </div>
+            <!-- Voucher Selection -->
+          <div class=voucher-container">
+            <form id="voucher-form">
+                <select id="voucher-code" name="voucher">
+                    <option value="">Select a Voucher</option>
+                    {% for voucher in vouchers %}
+                    <option value="{{ voucher.voucher_code }}"
+                            data-discount="{{ voucher.discount_value }}"
+                            data-min-purchase="{{ voucher.min_purchase }}"
+                            data-type="{% if voucher.voucherType_id == 1 %}percentage{% elif voucher.voucherType_id == 2 %}fixed_amount{% elif voucher.voucherType_id == 3 %}free_shipping{% endif %}">
+                        {{ voucher.voucher_code }} - {% if voucher.voucherType_id == 1 %}
+                        {{ voucher.discount_value }}% Off
+                        {% elif voucher.voucherType_id == 2 %}
+                        ${{ voucher.discount_value }} Off
+                        {% elif voucher.voucherType_id == 3 %}
+                        Free Shipping
+                        {% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+                <button type="button" class="btn-primary" onclick="applyVoucher()">Apply</button>
+            </form>
+          </div>
 
-    {%endif%}
+              <!-- Discount Display -->
+            <p id="discount-message" style="color: green; display: none;"></p>
 
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <ul class="flash-messages">
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
+            <button type="button" class="btn-primary" id="update-cart-btn">Update Cart</button>
+            <a href="/checkout" class="btn-primary">Proceed to Checkout</a>
+        </div>
     {% endif %}
-{% endwith %}
 
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flash-messages">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+</div>
+
+<script>
+
+    document.getElementById('update-cart-btn').addEventListener('click', function () {
+        // Trigger the submission of the hidden update-cart-form
+        document.getElementById('update-cart-form').submit();
+
+    });
+    function updatePrice(productId) {
+        let conditionDropdown = document.getElementById('condition-' + productId);
+        let selectedIndex = conditionDropdown.selectedIndex;
+        let selectedOption = conditionDropdown.options[selectedIndex];
+
+        // Update price display
+        document.getElementById('price-' + productId).textContent = selectedOption.getAttribute('data-price');
+
+        // Set selected condition index for the form
+        document.getElementById('selected-condition-' + productId).value = selectedOption.value;
+    }
+
+    function toggleFavorite(button) {
+        let productId = button.getAttribute('data-product-id');
+        let icon = button.querySelector('i');
+        let isFavorited = icon.classList.contains('bi-heart-fill');
+
+        fetch(`/toggle-favorite/${productId}`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                icon.classList.toggle('bi-heart-fill', !isFavorited);
+                icon.classList.toggle('bi-heart', isFavorited);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+function applyVoucher() {
+    let voucherDropdown = document.getElementById('voucher-code');
+    let selectedOption = voucherDropdown.options[voucherDropdown.selectedIndex];
+
+    if (!selectedOption.value) {
+        alert("Please select a voucher.");
+        return;
+    }
+
+    let voucherId = selectedOption.value;
+
+    fetch('/apply-voucher', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ voucher: voucherId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "success") {
+            // Update the displayed cart total
+            let cartTotalElement = document.getElementById('cart-total');
+            cartTotalElement.innerText = data.new_total.toFixed(2);
+
+            // Show success message
+            let discountMessage = document.getElementById('discount-message');
+            discountMessage.innerText = `Discount Applied! New Total: $${data.new_total.toFixed(2)}`;
+            discountMessage.style.display = "block";
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+
+
+</script>
 {% endblock %}
+

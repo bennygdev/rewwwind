@@ -55,7 +55,9 @@
     <!-- Cart Summary -->
     <div class="cart-summary">
         <h3>Cart Total: ${{ cart_total }}</h3>
-        <a href="/checkout" class="btn btn-primary">Proceed to Checkout</a>
+        <form action="{{ url_for('payment.select_ship') }}" method="POST" class="cta-form">
+            <button type="submit" class="filter">Checkout</button>
+        </form>
     </div>
 
     {%endif%}

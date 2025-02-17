@@ -20,7 +20,8 @@
             <i class="bi bi-calendar-check-fill fa-2xl"></i>
         </div>
         <div class="right">
-            <span>Arriving</span>
+            <span>{{ 'Arriving' if order.delivery != 'self-pickup' else 'Picking Up At' }}</span>
+            {% if order.delivery != 'self-pickup' %}
             <p><strong>
                 {% if order.approval_date %}
                 {{ (order.approval_date + timedelta(days=7)).strftime('%d %B') }} 
@@ -30,6 +31,9 @@
                 Pending
                 {% endif %}
             </strong></p>
+            {% else %}
+            <p><strong>{{ order.pickup.pickup_date.strftime('%Y-%m-%d') }}</strong></p>
+            {% endif %}
         </div>
     </div>
     <div class="header__item status">
@@ -41,15 +45,17 @@
             <p><strong>{{ order.status if order.status in ['Approved', 'Pending'] }}</strong></p>
         </div>
     </div>
+    {% if order.delivery != 'self-pickup' %}
     <div class="header__item delivery">
         <div class="left">
             <i class="bi bi-truck fa-2xl"></i>
         </div>
         <div class="right">
             <span>Delivery</span>
-            <p><strong>{{ order.status if order.status == 'Out for Delivery' else 'Pending' }}</strong></p>
+            <p><strong>{{ order.status if order.status == 'Approved' else 'Pending' }}</strong></p>
         </div>
     </div>
+    {% endif %}
 </div>
 <div class="body">
     <div class="order_date">
@@ -77,8 +83,8 @@
                     <tr item-id="{{ item.id }}">
                         <td class="orderName">
                             <div class="thumbnail">
-                                <img src="{{ url_for('static', filename='media/uploads/' + item.product.image_thumbnail) }}" alt="{{ item.product.name }}"/>
-                                <!-- <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ item.product.image_thumbnail }}" alt="{{ item.product.name }}"/> -->
+                                <!-- <img src="{{ url_for('static', filename='media/uploads/' + item.product.image_thumbnail) }}" alt="{{ item.product.name }}"/> -->
+                                <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ item.product.image_thumbnail }}" alt="{{ item.product.name }}"/>
                             </div>
                             <div class="name"><p>{{ item.product.name }}</p><p>ID: {{ item.product.id }}</p></div>
                         </td>
@@ -98,7 +104,77 @@
         </div>
     </div>
     <div class="bottom">
-        <div class="left">
+        {% if user.role_id in [2,3] %}
+        <div class="misc_top">
+            <div class="user_info">
+                <div class="header">
+                    <h2>User Information</h2>
+                </div>
+                <div class="body">
+                    <div class="id">
+                        <h4><strong>Customer ID</strong></h4>
+                        <p>{{ order.user_id }}</p>
+                    </div>
+                    <div class="role">
+                        <h4><strong>Role</strong></h4>
+                        <p>{{ order.user.role.role_name }}</p>
+                    </div>
+                    <div class="username">
+                        <h4><strong>Username</strong></h4>
+                        <p>{{ order.user.username }}</p>
+                    </div>
+                    <div class="email">
+                        <h4><strong>Email Address</strong></h4>
+                        <p>{{ order.user.email }}</p>
+                    </div>
+                    <div class="payment">
+                        <h4><strong>Payment Method</strong></h4>
+                        <p>{{ order.payment_type.payment_type }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="billing_payment">
+                <div class="header">
+                    <h2>{% if order.delivery != 'self-pickup' %}Billing &amp; Payment Information{% else %}Pick-Up &amp; Payment Information{% endif %}</h2>
+                </div>
+                <div class="body">
+                    {% if order.delivery != 'self-pickup' %}
+                    <div class="name">
+                        <h4><strong>Name</strong></h4>
+                        <p>{{ order.user.first_name + ' ' + order.user.last_name }}</p>
+                    </div>
+                    <div class="address one">
+                        <h4><strong>Address 1</strong></h4>
+                        <p>{{ order.billing.address_one }}</p>
+                    </div>
+                    {% if order.billing.address_two %}
+                    <div class="address two">
+                        <h4><strong>Address 1</strong></h4>
+                        <p>{{ order.billing.address_one }}</p>
+                    </div>
+                    {% endif %}
+                    <div class="phone_number">
+                        <h4><strong>Phone Number</strong></h4>
+                        <p>{{ order.billing.phone_number }}</p>
+                    </div>
+                    {% else %}
+                    <div class="location">
+                        <h4><strong>Location</strong></h4>
+                        <p>Nanyang Polytechnic</p>
+                    </div>
+                    <div class="date">
+                        <h4><strong>Pick-Up Date</strong></h4>
+                        <p>{{ order.pickup.pickup_date.strftime('%Y-%m-%d') }}</p>
+                    </div>
+                    {% endif %}
+                    <div class="payment">
+                        <h4><strong>Payment Method</strong></h4>
+                        <p>{{ order.payment_type.payment_type }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="misc_bot">
             <div class="order_summary">
                 <div class="header">
                     <h2>Order Summary</h2>
@@ -107,27 +183,80 @@
                     <table>
                         <tr class="subtotal">
                             <td>Subtotal</td>
-                            <td>{{ order_items|length }} items</td>
+                            <td>{{ order_items|length }} unique items</td>
                             <td>${{ order.total_amount }}</td>
                         </tr>
+                        {% if order.voucher_id and order.voucher.voucherType_id != 3 %}
+                        {% if order.voucher.voucherType_id == 2 %}
+                        <tr class="voucher">
+                            <td>Voucher Discount</td>
+                            <td>{{ order.voucher.voucher_code }}</td>
+                            {% set disc = order.total_amount|float * order.voucher.discount_value/100 %}
+                            <td>{{ '{:.2f}'.format(disc) }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td>Voucher Discount</td>
+                            <td>{{ order.voucher.voucher_code }}</td>
+                            {% set disc = order.total_amount|float * order.voucher.discount_value/100 %}
+                            <td>&minus; &dollar;{{ '{:.2f}'.format(disc) }}</td>
+                        </tr>
+                        {% endif %}
+                        {% endif %}
                         <!-- <tr class="discount"></tr> -->
+                        {% if order.delivery != 'self-pickup' %}
+                        {% set ship_tot = 0 %}
                         <tr class="shipping">
                             <td>Shipping</td>
-                            <td>Expedited Shipping</td>
+                            {% if order.delivery == 'international' %}
+                            <td>International Shipping</td>
                             <td>$30.00</td>
+                            {% set ship_tot = 30 %}
+                            {% elif order.delivery == 'standard' %}
+                            <td>Standard Local Shipping</td>
+                            <td>$4.00</td>
+                            {% set ship_tot = 4 %}
+                            {% elif order.delivery == 'expedited' %}
+                            <td>Expedited Local Shipping</td>
+                            <td>&dollar;10.00</td>
+                            {% set ship_tot = 10 %}
+                            {% endif %}
                         </tr>
+                        {% endif %}
+                        {% if order.voucher_id and order.voucher.voucherType_id == 3 %}
+                        <tr class="voucher">
+                            <td>Voucher Discount</td>
+                            <td>{{ order.voucher.voucher_code }}</td>
+                            {% set ship_tot = 0 %}
+                            {% if order.delivery == 'international' %}
+                            <td>&minus; &dollar;30.00</td>
+                            {% elif order.delivery == 'standard' %}
+                            <td>&minus; &dollar;4.00</td>
+                            {% else %}
+                            <td>&minus; &dollar;10.00</td>
+                            {% endif %}
+                        </tr>
+                        {% endif %}
                         <tr class="total">
                             <td><h3>Total</h3></td>
                             <td></td>
-                            <td><h3>&dollar;{{ order.total_amount + 30 }}</h3></td>
+                            <td><h3>&dollar;{{ '{:.2f}'.format(order.total_amount|float + (ship_tot if ship_tot else 0) - (disc if disc else 0)) }}</h3></td>
                         </tr>
                     </table>
                     <div class="total">
                     </div>
                 </div>
             </div>
-            {% if user.role_id in [2,3] %}
             <div class="order_admin">
+                <div class="delivery_type">
+                    <div class="header">
+                        <h2>Delivery Type</h2>
+                    </div>
+                    <div class="body">
+                        <h2><i class="bi bi-truck fa-2xl"></i></h2>
+                        <h3>{{ order.delivery|title }}</h3>
+                    </div>
+                </div>
                 <div class="order_approval">
                     <div class="header">
                         <h2>{{ form.approved.label }}</h2>
@@ -146,76 +275,115 @@
                         </form>
                     </div>
                 </div>
-                <div class="delivery_type">
-                    <div class="header">
-                        <h2>Delivery Type</h2>
-                    </div>
-                    <div class="body">
-                        <h2><i class="bi bi-truck fa-2xl"></i></h2>
-                        <h3>{{ order.delivery }}</h3>
-                    </div>
-                </div>
             </div>
-            {% endif %}
         </div>
-        {% if user.role_id in [2,3] %}
-        <div class="user_info">
-            <div class="header">
-                <h2>User Information</h2>
+        {% else %}
+        <div class="misc_top">
+            <div class="billing_payment">
+                
+                <div class="header">
+                    <h2>{% if order.delivery != 'self-pickup' %}Billing &amp; Payment Information{% else %}Pick-Up &amp; Payment Information{% endif %}</h2>
+                </div>
+                <div class="body">
+                    {% if order.delivery != 'self-pickup' %}
+                    <div class="name">
+                        <h4><strong>Name</strong></h4>
+                        <p>{{ order.user.first_name + ' ' + order.user.last_name }}</p>
+                    </div>
+                    <div class="address one">
+                        <h4><strong>Address 1</strong></h4>
+                        <p>{{ order.billing.address_one }}</p>
+                    </div>
+                    {% if order.billing.address_two %}
+                    <div class="address two">
+                        <h4><strong>Address 1</strong></h4>
+                        <p>{{ order.billing.address_one }}</p>
+                    </div>
+                    {% endif %}
+                    <div class="phone_number">
+                        <h4><strong>Phone Number</strong></h4>
+                        <p>{{ order.billing.phone_number }}</p>
+                    </div>
+                    {% else %}
+                    <div class="location">
+                        <h4><strong>Location</strong></h4>
+                        <p>Nanyang Polytechnic</p>
+                    </div>
+                    <div class="date">
+                        <h4><strong>Pick-Up Date</strong></h4>
+                        <p>{{ order.pickup.pickup_date.strftime('%Y-%m-%d') }}</p>
+                    </div>
+                    {% endif %}
+                    <div class="payment">
+                        <h4><strong>Payment Method</strong></h4>
+                        <p>{{ order.payment_type.payment_type }}</p>
+                    </div>
+                </div>
             </div>
-            <div class="body">
-                <div class="id">
-                    <h4><strong>Customer ID</strong></h4>
-                    <p>{{ order.user_id }}</p>
+            <div class="order_summary">
+                <div class="header">
+                    <h2>Order Summary</h2>
                 </div>
-                <div class="role">
-                    <h4><strong>Role</strong></h4>
-                    <p>{{ order.user.role.role_name }}</p>
-                </div>
-                <div class="username">
-                    <h4><strong>Username</strong></h4>
-                    <p>{{ order.user.username }}</p>
-                </div>
-                <div class="email">
-                    <h4><strong>Email Address</strong></h4>
-                    <p>{{ order.user.email }}</p>
-                </div>
-                <div class="payment">
-                    <h4><strong>Payment Method</strong></h4>
-                    <p>{{ order.payment_type.payment_type }}</p>
+                <div class="body">
+                    <table>
+                        <tr class="subtotal">
+                            <td>Subtotal</td>
+                            <td>{{ order_items|length }} unique items</td>
+                            <td>${{ order.total_amount }}</td>
+                        </tr>
+                        {% if order.voucher_id and order.voucher.voucherType_id != 3 %}
+                        <tr class="voucher">
+                            <td>Voucher Discount</td>
+                            <td>{{ order.voucher.voucher_code }}</td>
+                            <td>{{ '{:.2f}'.format(order.voucher.discount_value) }}</td>
+                        </tr>
+                        {% endif %}
+                        <!-- <tr class="discount"></tr> -->
+                        {% if order.delivery != 'self-pickup' %}
+                        {% set ship_tot = 0 %}
+                        <tr class="shipping">
+                            <td>Shipping</td>
+                            {% if order.delivery == 'international' %}
+                            <td>International Shipping</td>
+                            <td>$30.00</td>
+                            {% set ship_tot = 30 %}
+                            {% elif order.delivery == 'standard' %}
+                            <td>Standard Local Shipping</td>
+                            <td>$4.00</td>
+                            {% set ship_tot = 4 %}
+                            {% elif order.delivery == 'expedited' %}
+                            <td>Expedited Local Shipping</td>
+                            <td>&dollar;10.00</td>
+                            {% set ship_tot = 10 %}
+                            {% endif %}
+                        </tr>
+                        {% endif %}
+                        {% if order.voucher_id and order.voucher.voucherType_id == 3 %}
+                        <tr class="voucher">
+                            <td>Voucher Discount</td>
+                            <td>{{ order.voucher.voucher_code }}</td>
+                            {% set ship_tot = 0 %}
+                            {% if order.delivery == 'international' %}
+                            <td>&minus; &dollar;30.00</td>
+                            {% elif order.delivery == 'standard' %}
+                            <td>&minus; &dollar;4.00</td>
+                            {% else %}
+                            <td>&minus; &dollar;10.00</td>
+                            {% endif %}
+                        </tr>
+                        {% endif %}
+                        <tr class="total">
+                            <td><h3>Total</h3></td>
+                            <td></td>
+                            <td><h3>&dollar;{{ '{:.2f}'.format(order.total_amount + (ship_tot if ship_tot else 0)) }}</h3></td>
+                        </tr>
+                    </table>
+                    <div class="total">
+                    </div>
                 </div>
             </div>
         </div>
         {% endif %}
-        <div class="billing_payment">
-            <div class="header">
-                <h2>Billing &amp; Payment Information</h2>
-            </div>
-            <div class="body">
-                <div class="name">
-                    <h4><strong>Name</strong></h4>
-                    <p>{{ order.user.first_name + ' ' + order.user.last_name }}</p>
-                </div>
-                <div class="address one">
-                    <h4><strong>Address 1</strong></h4>
-                    <p>{{ order.billing.address_one }}</p>
-                </div>
-                {% if order.billing.address_two %}
-                <div class="address two">
-                    <h4><strong>Address 1</strong></h4>
-                    <p>{{ order.billing.address_one }}</p>
-                </div>
-                {% endif %}
-                <div class="phone_number">
-                    <h4><strong>Phone Number</strong></h4>
-                    <p>{{ order.billing.phone_number }}</p>
-                </div>
-                <div class="payment">
-                    <h4><strong>Payment Method</strong></h4>
-                    <p>{{ order.payment_type.payment_type }}</p>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 {% if order.approval_date %}

@@ -1,1 +1,7 @@
 /* BASE FILE FOR VIEWS/AUTH BASE.HTML */
+body {
+    height: 100vh;
+}
+
+.footer {
+}

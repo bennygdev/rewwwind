@@ -1,0 +1,46 @@
+{% extends "views/base.html" %}
+{% set active_page = "billing" %}
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/views/pre-payment.css') }}">
+{% endblock %}
+{% block title %}Select a Voucher{% endblock %}
+
+{% block content %}
+
+<div class="left">
+    <img src="{{url_for('static', filename='media/green_placeholder.jpg')}}">
+</div>
+<div class="right">
+    <div class="path">
+        <a href="{{ url_for('payment.select_ship') }}" class="circle active past">
+            <span>1</span>
+        </a>
+        <a href="{{ url_for('payment.billing_info') }}" class="circle active past">
+            <span>2</span>
+        </a>
+        <div class="circle active">
+            <span>3</span>
+        </div>
+    </div>
+    <div class="header">
+        <h1>Select A Voucher</h1>
+        <span>The options available are based on eligibility criterias<br>Please take note that you can only user one voucher per purchase.
+            <br>See your currently available vouchers <a href="{{ url_for('manageVouchers.vouchers_listing') }}">here</a>.</span>
+    </div>
+    <form action="{{ url_for('payment.select_voucher') }}" method="POST">
+        {{ form.hidden_tag() }}
+        <div class="input voucher">
+            <label for="voucher" title="This is required.">Voucher <span class="req">*</span></label>
+            {{ form.voucher(class="form-select") }}
+        </div>
+        <div class="buttons">
+            <div class="btn-container">
+                <a href="{{ url_for('payment.billing_info') }}">Previous</a>
+            </div>
+            <div class="btn-container">
+                <button type="submit">Next</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

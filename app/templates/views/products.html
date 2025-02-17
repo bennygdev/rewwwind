@@ -7,7 +7,7 @@
 {% endblock %}
 {% block title %}Products{% endblock %}
 {% block content %}
-<div class="listing__header">
+<div class="listing__header top">
   <!-- Preserve current filter values -->
   {% if category_filter %}
   <input type="hidden" name="category" value="{{ category_filter }}">
@@ -24,7 +24,9 @@
       <p>Showing <span class="productPerPage">{{ 16 * current_page - 15 }}</span> &minus; <span class="productPerPage">{{ 16 * current_page if 16 * current_page < total_products else total_products  }}</span> of {{ total_products }} results</p>
       {% endif %}
   </div>
-  <div class="header__right">
+</div>
+<div class="listing__header bottom">
+  <div class="header__left">
     <form id="filterForm" method="get" action="{{ url_for('productPagination.product_pagination') }}" class="filters__form">
       <!-- Preserve search query if exists -->
       {% if search_query %}
@@ -40,7 +42,7 @@
               {% endfor %}
           </select>
       </div>
-
+    
       <div class="filter__group">
         <label for="genre">Genre</label>
         <select name="genre[]" id="genre" class="filter__select" multiple>
@@ -53,7 +55,7 @@
             {% endfor %}
         </select>
       </div>
-  
+    
       <div class="filter__group">
           <label for="price">Price</label>
           <select name="price" id="price" class="filter__select">
@@ -63,7 +65,7 @@
               {% endfor %}
           </select>
       </div>
-
+    
       <div class="filter__group">
           <label for="rating">Rating</label>
           <select name="rating" id="rating" class="filter__select">
@@ -73,15 +75,25 @@
               {% endfor %}
           </select>
       </div>
-      
       {% if category_filter or subcategory_filter or price_filter or rating_filter %}
       <div class="filter__group">
       <a href="{{ url_for('productPagination.product_pagination', q=search_query) }}" class="clear__filters">Clear Filters</a>
       {% endif %}
       </div>
-  </form>
+    </form>
+  </div>
+  <div class="header__right">
+    <div class="view-toggle">
+      <button id="gridViewButton" class="active" title="Grid View">
+        <i class="bi bi-grid-fill"></i>
+      </button>
+      <button id="listViewButton" title="List View">
+        <i class="bi bi-list"></i>
+      </button>
+    </div>
   </div>
 </div>
+
 {% if products.items %}
 <div class="products">
   {% for product in products %}
@@ -100,8 +112,6 @@
           <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}"/>
           <!-- <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ product.image_thumbnail }}" alt="{{ product.name }}"/> -->
         </div>
-        <!-- <a href="{{ url_for('addToCart.add_to_cart', product_id=product.id)}}"> -->
-        <!-- </a> -->
         {% if current_user.role_id == 1 %}
         <div class="favourites" title="{% if current_user.wishlisted_items and product.id in current_user.wishlisted_items %}Remove from Favourites{% else %}Add to Favourites{% endif %}">
           <form action="{{ url_for('wishlist.remove_favourite', product_id=product.id) if current_user.wishlisted_items and product.id in current_user.wishlisted_items else url_for('wishlist.add_favourite', product_id=product.id) }}" method="POST" class="cta-form">
@@ -125,17 +135,47 @@
         </div>
       </div>
     </a>
-    <div class="info">
-      <div class="info_left">
-        <h5 class="name">{{ product.name }}</h5>
-        <span>{{ product.creator }}</span>
+    <div class="misc">
+      <div class="info">
+        <div class="info_left">
+          <h5 class="name">{{ product.name }}</h5>
+          <span>{{ product.creator }}</span>
+          <div class="rating">
+            {% if product.reviews %}
+              {% if product.reviews|length > 1 %}
+              {% set count = ' reviewers' %}
+              {% else %}
+              {% set count = ' reviewer' %}
+              {% endif %}
+              {% set rating = product.rating ~ ' as rated by ' ~ product.reviews|length ~ count %}
+            {% else %}
+              {% set rating = "No rating yet" %}
+            {% endif %}
+            <span><i class="bi bi-star-fill"></i>&nbsp;{{ rating }}</span>
+          </div>
+        </div>
+        <div class="info_right">
+          <h5>&dollar;{{ '{:.2f}'.format(product.conditions[0].price) }}</h5>
+          <span><i class="bi bi-short-fill"></i>&nbsp;{{ product.category.category_name }}</span>
+        </div>
       </div>
-      <div class="info_right">
-        <h5>&dollar;{{ '{:.2f}'.format(product.conditions[0].price) }}</h5>
-        <span><i class="bi bi-short-fill"></i>&nbsp;{{ product.category.category_name }}</span>
+      <div class="cta">
+        <form action="{{ url_for('addToCart.add_to_cart', product_id=product.id) }}" method="POST" class="cta-form">
+          {{ form.hidden_tag() }}
+          {{ form.condition(value=product.conditions[0]) }}
+          <button type="submit" class="filter">Add to Cart</button>
+        </form>
+        <form action="{{ url_for('payment.create_temp_cart', product_id=product.id) }}" method="POST" class="cta-form">
+            <input type="hidden" name="condition" value="{{ product.conditions[0]['condition'] }}">
+            <button type="submit" class="filter">Buy Now</button>
+        </form>
       </div>
     </div>
   </div>
+  <div class="description">
+    <p style="text-wrap: wrap;">{{ product.description }}</p>
+  </div>
+  <hr class="description">
   {% endfor %}
 </div>
 <div class="products__pagination">
@@ -164,9 +204,29 @@
   </ul>
 </div>
 {% else %}
-<h2 class="none">Sorry, no products were found with the given search queries and/or filters.</h2>
+<div class="centralise">
+  <img src="{{ url_for('static', filename='media/filters_not_found.png') }}" class="none">
+  <h2 class="none">Sorry, no products were found with the given search queries and/or filters.</h2>
+  <a href="./" class="none">Try Again</a>
+</div>
 {% endif %}
+<hr class="last separator">
+<div class="newsletter featured">
+  <h1>Stay Updated</h1>
+  <div class="newsletter__content">
+    <p>Subscribe to our newsletter and be the first to know about new arrivals, special offers, and exclusive deals!</p>
+    <form id="newsletter__form" method="POST" action="{{ url_for('views.home') }}" class="newsletter__form">
+      {{ mailing_list_form.hidden_tag() }}
+      <div class="form-group">
+        {{ mailing_list_form.email(id="newsletter__email", class="form-control", placeholder="Enter your email") }}
+        {{ mailing_list_form.submit(id="newsletter__submit") }}
+      </div>
+      <div id="newsletter__message" class="message"></div>
+    </form>
+  </div>
+</div>
 {% endblock %}
+
 
 {% block body_scripts %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/dashboardFilters.js') }}"></script>

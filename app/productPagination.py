@@ -4,7 +4,7 @@ from sqlalchemy import cast, Float, Integer, func
 from sqlalchemy.orm.attributes import flag_modified
 from .roleDecorator import role_required
 from .models import Product, Review, Category, SubCategory
-from .forms import AddReviewForm, AddToCartForm, DeleteReviewForm
+from .forms import AddReviewForm, AddToCartForm, DeleteReviewForm, MailingListForm
 from . import db
 from math import ceil
 
@@ -56,9 +56,11 @@ def pagination(featured=None):
         else:
             products_query = products_query.order_by(cast(Product.conditions[0]['price'], Float).asc())
     if rating_filter:
-        if type(rating_filter) is Integer:
-            products_query = products_query.filter(cast(Product.rating, Integer) == int(rating_filter[0]))
-        else:
+        try:
+            rating_filter = int(rating_filter)
+            products_query = products_query.filter(cast(Product.rating, Integer) == rating_filter)
+            rating_filter = str(rating_filter)
+        except ValueError:
             if 'highest' in rating_filter:
                 products_query = products_query.order_by(Product.rating.desc())
             else:
@@ -106,6 +108,7 @@ def pagination(featured=None):
 @productPagination.route('/')
 def product_pagination():    
     form = AddToCartForm()
+    mailing_list_form = MailingListForm()
     
     products, total_products, total_pages, page, search_query, category_filter, category_choices, subcategory_filter, match_req, subcategory_choices, price_filter, price_choices, rating_filter, rating_choices = pagination()
     # Render the template
@@ -126,7 +129,8 @@ def product_pagination():
         price_choices=price_choices,
         rating_filter=rating_filter,
         rating_choices=rating_choices,
-        form=form
+        form=form,
+        mailing_list_form=mailing_list_form
     )
 
 @productPagination.route('/product/<int:product_id>', methods=['GET', 'POST'])
@@ -345,6 +349,7 @@ def product_specials():
     products, total_products, total_pages, page, search_query, category_filter, category_choices, subcategory_filter, match_req, subcategory_choices, price_filter, price_choices, rating_filter, rating_choices = pagination('special')
     
     form = AddToCartForm()
+    mailing_list_form = MailingListForm()
 
     return render_template(
         "/views/productSpecials.html",
@@ -363,7 +368,8 @@ def product_specials():
         price_choices=price_choices,
         rating_filter=rating_filter,
         rating_choices=rating_choices,
-        form=form
+        form=form,
+        mailing_list_form=mailing_list_form
     )
 
 @productPagination.route('/featured/staff_picks')
@@ -371,6 +377,7 @@ def product_staff():
     products, total_products, total_pages, page, search_query, category_filter, category_choices, subcategory_filter, match_req, subcategory_choices, price_filter, price_choices, rating_filter, rating_choices = pagination('staff')
     
     form = AddToCartForm()
+    mailing_list_form = MailingListForm()
 
     return render_template(
         "/views/productStaff.html",
@@ -389,5 +396,6 @@ def product_staff():
         price_choices=price_choices,
         rating_filter=rating_filter,
         rating_choices=rating_choices,
-        form=form
+        form=form,
+        mailing_list_form=mailing_list_form
     )

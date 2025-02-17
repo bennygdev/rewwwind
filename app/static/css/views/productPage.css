@@ -1,35 +1,34 @@
 .content {
-    padding: 90px; /* please do remove this if each page is to have custom padding or margin in base.css -nelson */
+    padding: 100px 80px 30px 80px;
 }
 
 /* CTA styles extending from filters */
 .cta-form button.filter {
     flex-wrap: wrap;
-    border: 2px solid #039752; /* Green border */
+    border: 2px solid #039752;
     outline: none;
     text-align: center;
-    width: 80%; /* Adjust button width */
+    width: 80%;
     font-size: 1.1em;
     font-weight: bold;
     display: block;
     cursor: pointer;
-    padding: 0.8rem 1rem; /* Padding for a larger button */
-    margin: 10px auto; /* Center the button */
-    background-color: white; /* White background */
-    color: #039752; /* Green text */
-    border-radius: 12px; /* Rounded corners */
-    transition: all 0.3s ease; /* Smooth hover transition */
+    padding: 0.8rem 1rem;
+    margin: 10px auto;
+    background-color: white;
+    color: #039752;
+    border-radius: 12px;
+    transition: all 0.3s ease;
 }
 
-/* Hover effect for buttons */
+
 .cta-form button.filter:hover {
-    background-color: rgb(2, 110, 58); /* Green background on hover */
-    color: white; /* White text on hover */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow for depth */
-    transform: scale(1.02); /* Slight enlargement on hover */
+    background-color: rgb(2, 110, 58);
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transform: scale(1.02);
 }
 
-/* Respects existing .filter styles */
 .cta-form .filter {
     display: flex;
     position: relative;

@@ -1,0 +1,119 @@
+{% extends "views/base.html" %}
+{% set active_page = "billing" %}
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/views/pre-payment.css') }}">
+{% endblock %}
+{% block title %}
+{% if show != '1' %}
+Fill In Your Billing Information
+{% else %}
+Select a Pick Up Date
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="left">
+    <img src="{{ url_for('static', filename='media/green_placeholder.jpg') }}">
+</div>
+<div class="right">
+    <div class="path">
+        <a href="{{ url_for('payment.select_ship') }}" class="circle active past">
+            <span>1</span>
+        </a>
+        <div class="circle active">
+            <span>2</span>
+        </div>
+        <div class="circle">
+            <span>3</span>
+        </div>
+    </div>
+    <div class="header">
+        <h1>{% if show != '1' %}
+            Fill In Your Billing Information
+            {% else %}
+            Select a Pick Up Date
+            {% endif %}</h1>
+        <span>{% if show != '1' %}
+            This is the address your ordered items will be shipped to.
+            {% else %}
+            More details will be sent to you via email once we are ready.
+            {% endif %}</span>
+    </div>
+    <form action="{{ url_for('payment.billing_info') }}" method="POST">
+        {{ form.hidden_tag() }}
+        {% if show != '1' %}
+        <div class="input country">
+            <label for="country" title="This is required.">Country <span class="req">*</span></label>
+            {% if show == '2' or show == '3' %}
+            {{ form.country(class='form-select', disabled=True) }}
+            {% elif show == '4' %}
+            {{ form.countryInt(class='form-select') }}
+            {% endif %}
+        </div>
+        <div class="input add1">
+            <label for="address_one" title="This is required.">Address Line 1 <span class="req">*</span></label>
+            {{ form.address_one(class='form-control', placeholder='Enter address line 1 here...') }}
+            {% if form.address_one.errors %}
+            {% for error in form.address_one.errors %}
+                <p class="err">{{ error }}</p>
+            {% endfor %}
+            {% endif %}
+        </div>
+        <div class="input add2">
+            <label for="address_two">Address Line 2 <span class="opt">(if applicable)</span></label>
+            {{ form.address_two(class='form-control', placeholder='Enter address line 2 here...') }}
+            {% if form.address_two.errors %}
+            {% for error in form.address_two.errors %}
+                <p class="err">{{ error }}</p>
+            {% endfor %}
+            {% endif %}
+        </div>
+        <div class="input unit">
+            <label for="unit_number" title="This is required.">Unit Number <span class="req">*</span></label>
+            {{ form.unit_number(class='form-control', placeholder='Enter unit number here...') }}
+            {% if form.unit_number.errors %}
+            {% for error in form.unit_number.errors %}
+                <p class="err">{{ error }}</p>
+            {% endfor %}
+            {% endif %}
+        </div>
+        <div class="input postal">
+            <label for="postal_code" title="This is required.">Postal Code <span class="req">*</span></label>
+            {{ form.postal_code(class='form-control', placeholder='Enter postal code here...') }}
+            {% if form.postal_code.errors %}
+            {% for error in form.postal_code.errors %}
+                <p class="err">{{ error }}</p>
+            {% endfor %}
+            {% endif %}
+        </div>
+        <div class="input phone_number">
+            <label for="phone_number" title="This is required.">Phone Number <span class="req">*</span></label>
+            {{ form.phone_number(class='form-control', placeholder='Enter phone number here...') }}
+            {% if form.phone_number.errors %}
+            {% for error in form.phone_number.errors %}
+                <p class="err">{{ error }}</p>
+            {% endfor %}
+            {% endif %}
+        </div>
+        {% elif show == '1' %}
+        <div class="input pickup_date">
+            <label for="pickup_date" title="This is required.">Pickup Date <span class="req">*</span></label><br>
+            {{ form.pickup_date(class='form-date') }}
+            {% if form.pickup_date.errors %}
+            {% for error in form.pickup_date.errors %}
+                <p class="err">{{ error }}</p>
+            {% endfor %}
+            {% endif %}
+        </div>
+        {% endif %}
+        <div class="buttons">
+            <div class="btn-container">
+                <a href="{{ url_for('payment.select_ship') }}">Previous</a>
+            </div>
+            <div class="btn-container">
+                <button type="submit">Next</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

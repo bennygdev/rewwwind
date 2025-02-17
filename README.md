@@ -66,10 +66,10 @@ Nelson:
 (fill in what you have done)
 
 Ryan:
-- Designed Trade-in and Condition guidelines onboarding pages
-- Trade in application, request
-- Trade in 
-(fill in what you have done)
+-Drafted the overall UI/UX for the Storefront, Trade-in, and Condition Guidelines onboarding pages.
+- Trade in request form and Dashboard (For both Customer and Admin sides)
+   - Customers can send in trade-in requests where Admin can approve or reject their request
+   - For approved requests, customers can input their payment details and method of drop-off
 
 Femina:
 - Wishlist creation

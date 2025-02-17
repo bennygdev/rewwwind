@@ -103,8 +103,8 @@
         <!-- <a href="{{ url_for('addToCart.add_to_cart', product_id=product.id)}}"> -->
         <!-- </a> -->
         {% if current_user.role_id == 1 %}
-        <div class="favourites" title="{% if current_user.wishlisted_items and product.id in current_user.wishlisted_items %}Favourited Product{% else %}Add Product to Favourites{% endif %}">
-          <form action="{{ url_for('wishlist.add_favourite', product_id=product.id) }}" method="POST" class="cta-form">
+        <div class="favourites" title="{% if current_user.wishlisted_items and product.id in current_user.wishlisted_items %}Remove from Favourites{% else %}Add to Favourites{% endif %}">
+          <form action="{{ url_for('wishlist.remove_favourite', product_id=product.id) if current_user.wishlisted_items and product.id in current_user.wishlisted_items else url_for('wishlist.add_favourite', product_id=product.id) }}" method="POST" class="cta-form">
             {{ form.hidden_tag() }}
             {{ form.condition() }}
             <button type="submit">

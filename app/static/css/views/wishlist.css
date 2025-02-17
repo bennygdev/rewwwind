@@ -1,0 +1,170 @@
+.content {
+  padding: 80px 90px;
+}
+
+.content .listing__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 50px;
+  margin-bottom: 20px;
+}
+
+.content .header__left h1 {
+  font-family: "CharisSILBold";
+  font-size: 2.5em;
+}
+
+/* product styles */
+.products {
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+.product {
+  flex: 0 0 auto;
+}
+
+.product a {
+  text-decoration: none;
+  color: black;
+}
+
+.product:last-child {
+  margin-right: 0;
+}
+
+.thumbnail {
+  display: grid;
+  width: 350px;
+  height: 350px;
+  background-color: #f5f5f5;
+  position: relative;
+}
+
+.thumbnail .image img {
+  max-width: 250px;
+  max-height: 250px;
+}
+
+.rating {
+  padding: 0.2em 0.5em;
+  font-size: 0.8em;
+  background-color: #d8d8d8;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border-radius: 0.4em;
+}
+
+.rating i.bi-star-fill {
+  color: #FFA600;
+}
+
+.image {
+  position: absolute;
+  align-self: center;
+  justify-self: center;
+}
+
+.cart, .favourites {
+  position: absolute;
+  bottom: 15px;
+  border-radius: 100%;
+  padding: 1em;
+  font-size: 1em;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.cart {
+  right: 15px;
+  background-color: #039752;
+  color: white;
+}
+
+.cart form button, .favourites form button {
+  all: unset;
+}
+
+.favourites {
+  left: 15px;
+  background-color: #ffffff;
+  opacity: 0%;
+  transition: 0.5s opacity;
+}
+
+.product:hover .favourites {
+  opacity: 100%;
+}
+
+.heart-container {
+  position: relative;
+}
+
+.heart-container i {
+  top: 0;
+  left: 0;
+}
+
+.heart-container i.bi-heart {
+  z-index: 1;
+}
+
+.heart-container i.bi-heart-fill {
+  color: white;
+  transition: 0.5s color;
+  position: absolute;
+  z-index: -1;
+}
+
+.favourites form:hover i.bi-heart-fill, .heart-container i.fav {
+  color: red;
+}
+
+.info {
+  display: flex;
+  justify-content: space-between;
+}
+
+.info_left h5, .info_right h5 {
+  font-size: 1.32em;
+  margin: 0.4em 0 0.1em 0;
+  font-weight: bolder;
+}
+
+.info_left span, .info_right span {
+  font-size: 0.95em;
+  color: #978f8f;
+}
+
+.info_right {
+  text-align: right;
+}
+
+/* no products */
+h2.none {
+  margin-top: 30px;
+}
+
+/* media query */
+@media (max-width: 1400px) {
+  .thumbnail {
+      width: 268px;
+      height: 268px;
+  }
+  
+  .thumbnail .image img {
+      max-width: 166px;
+      max-height: 166px;
+  }
+}
+
+@media (max-width: 1350px) {
+  .content .listing__header {
+      flex-direction: column;
+      justify-content: start;
+      gap: 10px;
+  }
+}

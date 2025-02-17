@@ -777,3 +777,82 @@ class NewsletterForm(FlaskForm):
   title = StringField('Newsletter Title', validators=[DataRequired(message='Title is required'), Length(min=5, max=100, message='Title must be between 5 and 100 characters')])
   description = TextAreaField('Newsletter Content', validators=[DataRequired(message='Newsletter content is required'), Length(min=20, max=2000, message='Content must be between 20 and 2000 characters')])
   submit = SubmitField('Send Newsletter')
+
+class ShippingPaymentForm(FlaskForm):
+    shipping_option = RadioField(
+        'Shipping Option',
+        choices=[
+            ('Mail-in', 'Mail-in'),
+            ('In-Store Drop-off', 'In-Store Drop-off'),
+            ('Pick-Up Service', 'Pick-Up Service (Shipping: $5.00)')
+        ],
+        validators=[DataRequired(message="Please select a shipping option.")]
+    )
+
+    tracking_number = StringField(
+        'Tracking Number',
+        validators=[Length(min=3, max=50, message="Tracking number must be between 3 and 50 characters.")]
+    )
+
+    street_address = StringField(
+        'Street Address',
+        validators=[Length(min=5, max=255, message="Address must be between 5 and 255 characters.")]
+    )
+
+    house_block = StringField(
+        'House / Block No.',
+        validators=[Length(min=1, max=50, message="House/Block number cannot exceed 50 characters.")]
+    )
+
+    zip_code = StringField(
+        'Zip or Postal Code',
+        validators=[Regexp(r"^\d{5,6}$", message="Postal code must be 5 or 6 digits.")]
+    )
+
+    contact_number = StringField(
+        'Contact Number',
+        validators=[Regexp(r"^\d{8,15}$", message="Contact number must be between 8 and 15 digits.")]
+    )
+
+    card_number = StringField(
+        'Card Number',
+        validators=[DataRequired(message="Card number is required"), Regexp(r"^\d{15,16}$", message="Card number must be 15 or 16 digits.")]
+    )
+
+    card_expiry = StringField(
+        'Expiration Date (MM/YY)',
+        validators=[DataRequired(message="Expiration date is required"), Regexp(r"^(0[1-9]|1[0-2])\/\d{2}$", message="Expiration date must be in MM/YY format.")]
+    )
+
+    card_name = StringField(
+        'Name on Card',
+        validators=[DataRequired(message="Cardholder name is required"), Length(min=2, max=255, message="Name must be between 2 and 255 characters.")]
+    )
+
+    submit = SubmitField('Submit')
+
+    def validate(self, extra_validators=None):
+        """ Custom validation method to dynamically enforce required fields """
+        rv = FlaskForm.validate(self, extra_validators)  # Run base validation first
+        if not rv:
+            return False  # Stop if base validation fails
+
+        # Only validate tracking number if 'Mail-in' is selected
+        if self.shipping_option.data == "Mail-in" and not self.tracking_number.data:
+            self.tracking_number.errors.append("Tracking number is required for Mail-in shipping.")
+            return False
+
+        # Only validate address fields if 'Pick-Up Service' is selected
+        if self.shipping_option.data == "Pick-Up Service":
+            required_fields = [
+                (self.street_address, "Street address is required for Pick-Up Service."),
+                (self.house_block, "House / Block number is required for Pick-Up Service."),
+                (self.zip_code, "Zip code is required for Pick-Up Service."),
+                (self.contact_number, "Contact number is required for Pick-Up Service.")
+            ]
+            for field, error_msg in required_fields:
+                if not field.data:
+                    field.errors.append(error_msg)
+                    return False
+
+        return True  # If no validation errors, return True

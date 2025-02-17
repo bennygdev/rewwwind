@@ -143,7 +143,7 @@ def create_app():
   app.register_blueprint(manageTradeins, url_prefix="/dashboard")
   app.register_blueprint(customerChat, url_prefix="/dashboard")
   app.register_blueprint(manageProducts, url_prefix="/dashboard")
-  app.register_blueprint(wishlist, url_prefix="/dashboard")
+  app.register_blueprint(wishlist, url_prefix="/")
   app.register_blueprint(manageVouchers, url_prefix="/dashboard")
   app.register_blueprint(manageAccounts, url_prefix="/dashboard")
   app.register_blueprint(newsletter, url_prefix="/dashboard")

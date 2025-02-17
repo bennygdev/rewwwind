@@ -9,8 +9,14 @@ from . import db
 from datetime import timedelta
 from sqlalchemy import func
 from secrets import token_urlsafe
+import uuid
 
 views = Blueprint('views', __name__)
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def generate_unsubscribe_token():
   return token_urlsafe(16)
@@ -123,12 +129,16 @@ def rewards_page():
 def trade_form():
     form = TradeItemForm()
 
-    if current_user.role_id in [2,3]:
-      flash("Admins and owners are not allowed to trade in items to avoid conflicts.\nPlease use a dummy customer account instead.", "info")
-      return redirect(url_for('auth.login'))
+    if current_user.role_id in [2, 3]:
+        flash("Admins and owners are not allowed to trade in items to avoid conflicts.\nPlease use a dummy customer account instead.", "info")
+        return redirect(url_for('auth.login'))
+
+    UPLOAD_FOLDER = os.path.join(current_app.root_path, 'static/uploads')
+    
+    if not os.path.exists(UPLOAD_FOLDER):
+        os.makedirs(UPLOAD_FOLDER)  # Ensure the directory exists
 
     if form.validate_on_submit():
-
         item_type = form.item_type.data
         item_condition = form.item_condition.data
         title = form.title.data
@@ -139,13 +149,13 @@ def trade_form():
 
         image_paths = []
         for file in images:
-            if file:
-                filename = secure_filename(file.filename)
-                file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+            if file and file.filename:
+                filename = secure_filename(f"{uuid.uuid4()}_{file.filename}")
+                file_path = os.path.join(UPLOAD_FOLDER, filename)
                 file.save(file_path)
-                image_paths.append(file_path)
+                image_paths.append(f'static/uploads/{filename}')  # Store relative path
 
-        images_json = json.dumps(image_paths)
+        images_json = json.dumps(image_paths)  # Convert list to JSON string
 
         new_item = tradeDetail(
             item_type=item_type,
@@ -157,6 +167,7 @@ def trade_form():
             images=images_json,
             trade_number=current_user.id
         )
+
         db.session.add(new_item)
         db.session.commit()
 
@@ -164,6 +175,7 @@ def trade_form():
         return redirect(url_for('manageTradeins.manage_tradeins'))
 
     return render_template('views/tradeForm.html', form=form)
+
 
 
     

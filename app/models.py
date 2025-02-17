@@ -299,6 +299,7 @@ class tradeDetail(db.Model):
 
     # For shipping and payment NEW!!
     shipping_option = db.Column(db.String(50))
+    tracking_number = db.Column(db.String(50), nullable=True)
     street_address = db.Column(db.String(255))
     house_block = db.Column(db.String(50))
     zip_code = db.Column(db.String(20))

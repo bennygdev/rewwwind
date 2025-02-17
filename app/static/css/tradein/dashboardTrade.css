@@ -164,3 +164,12 @@
     font-weight: bold;
     margin-left: 10px;
 }
+
+/* Disabled Delete Button */
+.disabled-btn {
+    background-color: gray !important;
+    color: white !important;
+    cursor: not-allowed !important;
+    pointer-events: none;  /* Prevents clicking */
+    opacity: 0.6;
+}

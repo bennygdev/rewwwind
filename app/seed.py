@@ -571,12 +571,25 @@ def insert_orders():
   #     'phone': billing_info.phone_number
   #   }
   # )
+  import random
+  from datetime import datetime, timedelta
   
-  for x in range(4):
+  for x in range(10):
+
+    start_date = datetime(2024, 8, 1).date()
+    end_date = datetime.now().date()
+    delta = (end_date - start_date).days
+
+    random_days = random.randint(0, delta)
+    random_date = start_date + timedelta(days=random_days)
+
     order = Order(
         user_id=4,
+        order_date=random_date,
+        approval_date=random_date,
         total_amount=0,
         delivery='standard',
+        status='Approved',
         payment_type_id=1,
         payment_information_id=payment_info.id,
         billing_id=billing_info.id
@@ -624,12 +637,19 @@ def insert_orders():
   db.session.commit()
   
   for x in range(5):
-    from datetime import datetime,timedelta
+    start_date = datetime(2024, 8, 1).date()
+    end_date = datetime.now().date()
+    delta = (end_date - start_date).days
+
+    random_days = random.randint(0, delta)
+    random_date = start_date + timedelta(days=random_days)
+
     order = Order(
         user_id=4,
-        order_date=datetime.now()-timedelta(days=randint(20, 40)),
+        order_date=random_date,
         total_amount=0,
         delivery='expedited',
+        status='Pending',
         payment_type_id=2,
         payment_information_id=payment_info.id,
         billing_id=billing_info.id

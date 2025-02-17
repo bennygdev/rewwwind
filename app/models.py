@@ -5,6 +5,9 @@ from sqlalchemy import event
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
 from itsdangerous import URLSafeTimedSerializer as Serializer
+import random
+from datetime import datetime, timedelta
+from werkzeug.security import check_password_hash, generate_password_hash
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
@@ -21,6 +24,11 @@ class User(db.Model, UserMixin):
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)  # role table
     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
     updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
+
+    # 2FA fields
+    two_factor_enabled = db.Column(db.Boolean, default=False, nullable=False)
+    two_factor_secret = db.Column(db.String(100), nullable=True)
+    two_factor_expiry = db.Column(db.DateTime(timezone=True), nullable=True)
     
     # favourites
     wishlisted_items = db.Column(db.JSON, nullable=True)
@@ -50,6 +58,19 @@ class User(db.Model, UserMixin):
         return None
 
       return User.query.get(user_id)
+    
+    def generate_2fa_code(self):
+        code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+        self.two_factor_secret = generate_password_hash(code, method='pbkdf2:sha256')
+        self.two_factor_expiry = datetime.now() + timedelta(minutes=5)
+        return code
+    
+    def verify_2fa_code(self, code):
+        if not self.two_factor_secret or not self.two_factor_expiry:
+            return False
+        if datetime.now() > self.two_factor_expiry:
+            return False
+        return check_password_hash(self.two_factor_secret, code)
     
 class BillingAddress(db.Model):
   __tablename__ = 'billing_addresses'

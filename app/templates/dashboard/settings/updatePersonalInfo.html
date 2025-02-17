@@ -57,9 +57,6 @@
   <div class="profile__right">
     <div class="profile__buttons">
       <a href="{{ url_for('dashboard.update_personal_information_form') }}" class="account__editButton">Edit</a>
-      {% if not user.google_account %}
-        <a href="{{ url_for('dashboard.change_password') }}" class="account__editButton2">Change Password</a>
-      {% endif %}
     </div>
   </div>
 </div>

@@ -94,6 +94,21 @@
   margin-bottom: 10px;
 }
 
+.cancel__button {
+  width: 20vw;
+  height: 45px;
+  background-color: #FF4C24;
+  border: 0;
+  font-family: "OpenSansSemibold";
+  color: #fff;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  text-decoration: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .login__google {
   width: 20vw;
   height: 45px;
@@ -190,6 +205,30 @@
 .reset__button--loading {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.error {
+  font-size: 0.8em;
+  color: red;
+  margin-top: 5px;
+  display: block;
 }
 
 /* Animations */

@@ -81,6 +81,17 @@ class ResetPasswordForm(FlaskForm):
   def validate_password(self, field):
     if check_password_hash(self.user.password, field.data):
       raise ValidationError("New password cannot be the same as the previous password")
+    
+class Enable2FAForm(FlaskForm):
+  submit = SubmitField('Enable Two-Factor Authentication')
+
+class Verify2FAForm(FlaskForm):
+  code = StringField('Verification Code', validators=[
+    DataRequired(message="Verification code is required"),
+    Length(min=6, max=6, message="Verification code must be 6 digits"),
+    Regexp('^[0-9]*$', message="Verification code must contain only digits")
+  ])
+  submit = SubmitField('Verify')
 
 class UpdatePersonalInformation(FlaskForm):
   firstName = StringField('First Name', validators=[DataRequired(), Length(max=150, message="First name cannot exceed 150 characters.")])

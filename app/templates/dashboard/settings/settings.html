@@ -23,6 +23,13 @@
     <p class="settings__paragraph">Update your name, email, phone number, and other account details to help us better serve you.</p>
     <a href="{{ url_for('dashboard.update_personal_information') }}" class="settings__button">View Personal Information</a>
   </div>
+  {% if not user.google_account %}
+  <div class="settings__container">
+    <p class="settings__title">Security</p>
+    <p class="settings__paragraph">Manage two-factor authentication and other security features to keep your account safe.</p>
+    <a href="{{ url_for('dashboard.security_settings') }}" class="settings__button">View Security Settings</a>
+  </div>
+  {% endif %}
   <div class="settings__container">
     <p class="settings__title">Billing Address</p>
     <p class="settings__paragraph">Add or modify the address where you receive invoices and billing-related communications.</p>

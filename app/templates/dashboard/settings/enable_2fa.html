@@ -1,0 +1,39 @@
+{% extends "dashboard/base.html" %}
+{% set active_page = "settings" %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/settings/settings.css') }}">
+{% endblock %}
+
+{% block title %}Enable Two-Factor Authentication{% endblock %}
+
+{% block headerContent %}
+<div class="settings__header">
+  <h1 id="settings__title">Enable Two-Factor Authentication</h1>
+  <p id="settings__subtitles">Set up an additional layer of security for your account.</p>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="settings__content">
+  {% include "components/flashValidation.html" %}
+
+  <a href="{{ url_for('dashboard.security_settings') }}" class="back__link"><i class="fa-solid fa-chevron-left fa-sm"></i>Back</a>
+
+  <div class="settings__container">
+    <p class="settings__paragraph">Two-factor authentication adds an extra layer of security to your account. Once enabled, you'll need to enter a verification code sent to your email each time you log in.</p>
+    
+    <p class="settings__paragraph"><strong>How it works:</strong></p>
+    <ol class="settings__paragraph">
+      <li>You'll receive a verification code via email</li>
+      <li>Enter the 6-digit code to complete setup</li>
+      <li>Once enabled, you'll need to verify your identity each time you log in</li>
+    </ol>
+    
+    <form method="POST">
+      {{ form.hidden_tag() }}
+      {{ form.submit(class="settings__button") }}
+    </form>
+  </div>
+</div>
+{% endblock %}

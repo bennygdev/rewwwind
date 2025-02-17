@@ -62,5 +62,37 @@
       <p class="orders__empty">No orders found.</p>
     {% endif %}
   </div>
+
+  <!-- Recommended Products Section -->
+  <div class="profile__recommendations">
+    <div class="profile__recommendations-header">
+      <h2 class="profile__recommendations-title">Recommended For You</h2>
+    </div>
+    
+    {% if recommended_products %}
+      <div class="recommendations__scroll">
+        <div class="recommendations__container">
+          {% for product in recommended_products %}
+            <a href="{{ url_for('productPagination.product_detail', product_id = product.id) }}" class="recommendation__card">
+              <div class="recommendation__image">
+                <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}">
+              </div>
+              <div class="recommendation__details">
+                <div class="recommendation__name">{{ product.name }}</div>
+                <div class="recommendation__creator">{{ product.creator }}</div>
+                {% if product.conditions %}
+                  <div class="recommendation__price">${{ '{:.2f}'.format(product.conditions[0]['price']) }}</div>
+                {% endif %}
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    {% elif orders %}
+      <p class="recommendations__more">We're personalizing your recommendations based on your order history!</p>
+    {% else %}
+      <p class="recommendations__empty">Start ordering to receive recommendations</p>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}

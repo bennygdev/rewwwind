@@ -27,11 +27,8 @@ oauth = OAuth()
 load_dotenv()
 
 UPLOAD_FOLDER = os.path.join(os.getcwd(), "static", "media", "uploads")
+print(UPLOAD_FOLDER)
   
-if not os.path.exists(UPLOAD_FOLDER):
-  os.mkdir(UPLOAD_FOLDER)
-  print(f"Created upload folder: {UPLOAD_FOLDER}")
-
 def update_user_order_counts(app):
   with app.app_context():
     from .models import User, Order

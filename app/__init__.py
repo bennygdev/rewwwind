@@ -207,9 +207,6 @@ def create_app():
   
 def create_database(app):
   with app.app_context():
-    from .productPagination import precompute_product_embeddings
-    product_embeddings = precompute_product_embeddings()
-    app.config['PRODUCT_EMBEDDINGS'] = product_embeddings
 
     if not path.exists('instance/' + DB_NAME):
       db.create_all()
@@ -227,3 +224,7 @@ def create_database(app):
       insert_orders()
       insert_voucher_types()
       insert_vouchers()
+      
+    from .productPagination import precompute_product_embeddings
+    product_embeddings = precompute_product_embeddings()
+    app.config['PRODUCT_EMBEDDINGS'] = product_embeddings

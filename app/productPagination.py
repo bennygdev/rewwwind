@@ -61,6 +61,8 @@ def find_matching_product(uploaded_image_path):
 
 @productPagination.route('/upload_image', methods=['GET', 'POST'])
 def upload_image():
+    SIMILARITY_THRESHOLD = 0.4
+
     if request.method == 'POST':
         uploaded_image = request.files['file']
         if uploaded_image:
@@ -79,24 +81,27 @@ def upload_image():
             closest_index = np.argmin(distances)
             closest_image_path = image_paths[closest_index]
             closest_distance = distances[closest_index]
-            # print(1, image_paths)
-            # print(2, embeddings_array)
-            # print(3, closest_index)
-            # print(4, closest_image_path)
-            # print(5, closest_distance)
-            
-            # Query the product that contains the closest image path
-            product = Product.query.filter(
-                Product.images.like(f"%{closest_image_path}%")
-            ).first()
-            
-            if product:
-                print(f"Found matching product: {product.name} (Distance: {closest_distance:.4f})", "success")
-                return redirect(url_for('productPagination.product_pagination', q=product.name))
+
+            print(f"Closest Image Path: {closest_image_path}")
+            print(f"Closest Distance: {closest_distance}")
+
+            # Check if the closest match meets the similarity threshold
+            if closest_distance < SIMILARITY_THRESHOLD:
+                # Query the product that contains the closest image path
+                product = Product.query.filter(
+                    Product.images.like(f"%{closest_image_path}%")
+                ).first()
+
+                if product:
+                    print(f"Found matching product: {product.name} (Distance: {closest_distance:.4f})", "success")
+                    return redirect(url_for('productPagination.product_pagination', q=product.name))
+                else:
+                    print("No matching products were found.")
+                    return redirect(url_for('productPagination.product_pagination', q='Nothing found.'))
             else:
-                print("No matching products were found.")
+                print("No matches meet the similarity threshold.")
                 return redirect(url_for('productPagination.product_pagination', q='Nothing found.'))
-    
+
     return render_template("views/upload_image.html")
 
 def pagination(featured=None):

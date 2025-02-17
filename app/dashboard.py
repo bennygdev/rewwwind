@@ -65,6 +65,10 @@ def change_email():
   if current_user.google_account:
     abort(404)
 
+  if current_user.two_factor_enabled:
+    flash("Please turn off 2FA before you change your email.", "info")
+    return redirect(url_for('dashboard.user_settings'))
+
   if form.validate_on_submit():
     try:
       current_user.email = form.email.data

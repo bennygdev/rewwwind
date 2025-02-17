@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from flask_wtf.file import FileField, FileAllowed
+from flask_wtf.file import FileField, FileAllowed, MultipleFileField
 from flask import request, flash, session
 from flask_login import current_user
 from werkzeug.utils import secure_filename

@@ -48,3 +48,44 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }, 5000); // 5 seconds
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("✅ tradeDetails.js Loaded - Carousel Initialized");
+
+    let images = JSON.parse('{{ trade_item.images | tojson | safe }}');  // Extract images safely
+    let currentIndex = 0;
+
+    const imageElement = document.getElementById("trade-image");
+    const prevBtn = document.getElementById("prev-image");
+    const nextBtn = document.getElementById("next-image");
+
+    console.log("Loaded images:", images);  // Debugging: Show loaded images
+
+    function updateImage() {
+        console.log(`Displaying image ${currentIndex}: ${images[currentIndex]}`); 
+        if (images.length > 0) {
+            imageElement.src = "{{ url_for('static', filename='media/uploads/') }}" + images[currentIndex];
+        }
+    }
+
+    if (!prevBtn || !nextBtn) {
+        console.error("❌ Error: Buttons not found in DOM!");
+        return;
+    } else {
+        console.log("✅ Buttons Found - Adding Event Listeners");
+    }
+
+    prevBtn.addEventListener("click", function () {
+        console.log("⬅️ Prev button clicked");
+        currentIndex = (currentIndex - 1 + images.length) % images.length;
+        updateImage();
+    });
+
+    nextBtn.addEventListener("click", function () {
+        console.log("➡️ Next button clicked");
+        currentIndex = (currentIndex + 1) % images.length;
+        updateImage();
+    });
+
+    updateImage(); // Load the first image on page load
+});

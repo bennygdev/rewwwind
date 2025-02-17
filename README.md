@@ -23,6 +23,7 @@ Benny:
 - Designed Home landing page, Footer, About pages, Rewards page, Legal pages, Error (401, 403, 404) pages
 - 3 Account Role levels (Customer, Admin, Owner (superuser))
 - Dashboard system that houses for all business functions
+    - Dashboard pages are shown accordingly to role levels
 - Overview
     - Shows customer related data and metrics on a dashboard using ChartJS (Only viewable for Customers)
     - Shows admin related data and metrics on a dashboard using ChartJS (Only viewable for Admins, Owners)
@@ -42,6 +43,7 @@ Benny:
     - Ability to register normally or with google
         - Username suggestions when setting username
     - Ability to login normally or with google
+    - Two-Factor Authentication (2FA) via email. Users can activate and deactivate 2FA via settings. 6 Digit code is provided for verification.
     - Default identicon profile picture generation for new registered Accounts
     - Reset password functionality using flask mail, with secure token URL
 - Manage Accounts

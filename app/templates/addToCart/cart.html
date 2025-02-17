@@ -131,7 +131,7 @@
             <p id="discount-message" style="color: green; display: none;"></p>
 
             <button type="button" class="btn-primary" id="update-cart-btn">Update Cart</button>
-            <a href="/checkout" class="btn-primary">Proceed to Checkout</a>
+            <a href="{{ url_for('payment.select_ship') }}" class="btn-primary">Proceed to Checkout</a>
         </div>
     {% endif %}
 

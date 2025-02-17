@@ -95,8 +95,11 @@
 }
 
 h1 {
+    font-family: "CharisSILBold";
     text-align: center;
-    color: #039752;
+    font-size: 3em;
+    margin-bottom: 2rem;
+
 }
 
 .cart-container {
@@ -168,12 +171,13 @@ h1 {
 }
 
 .cart-summary {
+    font-family: "Helvetica", "Arial", sans-serif;
     margin-top: 20px;
     text-align: right;
 }
 
 .cart-summary h3 {
-    color: #039752;
+    color: #000000;
     font-size: 1.5em;
     margin-bottom: 10px;
 }
@@ -344,4 +348,53 @@ h1 {
   display: flex;
   gap: 10px;
   align-items: center;
+}
+
+.cart-header {
+    display: flex;
+    justify-content: center; /* Center everything */
+    align-items: center;
+    position: relative;
+    width: 100%;
+}
+
+.cart-title {
+    flex-grow: 1;
+    text-align: center; /* Center the title */
+}
+
+.voucher-btn {
+    text-decoration: none;
+    background-color: #026e3a; /* Yellow */
+    color: #ffffff;
+    padding: 10px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    position: absolute;
+    right: 0; /* Keep button at the right */
+}
+
+.voucher-btn:hover {
+    background-color: rgba(2, 110, 58, 0.95); /* Darker yellow */
+}
+
+.voucher-btn i {
+    margin-right: 5px;
+    font-size: 20px;
+}
+
+.cart-total {
+    font-size: 24px; /* Increase font size */
+    font-weight: bold; /* Make it bold */
+    color: #000; /* Ensure it's black for emphasis */
+    margin-top: 10px;
+}
+
+.sub-total {
+    font-size: 12px;
 }

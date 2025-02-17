@@ -123,6 +123,9 @@ Ryan:
 
 Femina:
 - Wishlist creation
+    - favourite items from products page to wishlist page 
+    - display all wishlited/favourited items
+    - from wishlisted page able to add to cart 
 - Cart page
     - Ability to add and remove products from cart
     - Ability to adjust quantity
@@ -130,4 +133,5 @@ Femina:
 - Voucher CRUD for admin-side
 - Voucher listing for both customers and admins
 - Voucher Gifting to customers
-(fill in what you have done)
+    - must have met the requirements in order to apply the voucher
+

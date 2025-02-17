@@ -4,14 +4,11 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/tradein/custTradeDetails.css') }}">
 {% endblock %}
 
-
-
-
 {% block content %}
 <div class="trade-details-container">
     <div class="trade-details-header">
         <h1>Trade-in Request #{{ "%03d"|format(trade_item.id) }}</h1>
-        <span class="status {{ trade_item.status.lower() }}">
+        <span class="status {{ trade_item.status.lower().replace(',', '').replace(' ', '-') }}">
             {{ trade_item.status }}
         </span>
     </div>
@@ -44,76 +41,83 @@
         </div>
     </div>
 
-    <!-- Admin Approve/Deny Buttons (Hidden when Approved) -->
-    {% if current_user.role_id in [2, 3] and trade_item.status != "Approved" %}
+    <!-- Admin Approve/Deny Buttons -->
+    {% if current_user.role_id in [2, 3] and trade_item.status == "Pending" %}
     <div class="admin-actions">
         <a href="{{ url_for('manageTradeins.update_trade_status', trade_id=trade_item.id, status='Approved') }}" 
-           class="btn btn-success">Approve</a>
+            class="btn btn-success">Approve</a>
         <a href="{{ url_for('manageTradeins.update_trade_status', trade_id=trade_item.id, status='Rejected') }}" 
-           class="btn btn-danger">Reject</a>
+            class="btn btn-danger">Reject</a>
     </div>
     {% endif %}
 
-    <!-- Shipping & Payment for Approved Trades -->
-    {% if trade_item.status == "Approved" %}
-        {% if current_user.role_id in [2, 3] %}
-            <!-- Admins see this message on approved trade-ins -->
-            <div class="admin-shipping-info">
-                <p>Approved. Waiting for customer to submit shipping details.</p>
-            </div>
-        {% else %}
-            <!-- Customers see the shipping & payment form -->
-            <div class="shipping-payment-section">
-                <h2>Shipping & Payment</h2>
+    {% if trade_item.status in ["Approved", "APPROVED, PENDING DELIVERY"] %}
+        <div class="shipping-payment-section">
+            <h2>Shipping & Payment</h2>
+
+            {% if trade_item.shipping_option %}
+                <div class="submitted-details">
+                    <h3>Shipping Option</h3>
+                    <p>{{ trade_item.shipping_option }}</p>
+
+                    {% if trade_item.shipping_option == "Mail-in" %}
+                        <h3>Tracking Number</h3>
+                        <p>{{ trade_item.tracking_number }}</p>
+                    {% elif trade_item.shipping_option == "Pick-Up Service" %}
+                        <h3>Shipping Address</h3>
+                        <p>{{ trade_item.street_address }}, {{ trade_item.house_block }}, {{ trade_item.zip_code }}</p>
+                        <p>Contact: {{ trade_item.contact_number }}</p>
+                    {% endif %}
+
+                    <h3>Payment Option</h3>
+                    <p>Card Ending: ****{{ trade_item.card_number[-4:] }}</p>
+                    <p>Exp: {{ trade_item.card_expiry }}</p>
+                    <p>Name on Card: {{ trade_item.card_name }}</p>
+                </div>
+            {% else %}
+                {% if current_user.role_id not in [2, 3] %}
+                <!-- Shipping Form (Only for Customers) -->
                 <form action="{{ url_for('manageTradeins.save_shipping_payment', trade_id=trade_item.id) }}" method="POST">
-                    <h3>Drop-off option</h3>
+                    {{ form.hidden_tag() }}
+
+                    <h3>Shipping Option</h3>
                     <div class="radio-group">
-                        <label>
-                            <input type="radio" name="shipping_option" value="Mail-in"> Mail-in
-                        </label>
-                        <label>
-                            <input type="radio" name="shipping_option" value="In-Store"> In-Store drop-off
-                        </label>
-                        <label>
-                            <input type="radio" name="shipping_option" value="Pick-up"> Pick-Up Service (Shipping: $5.00)
-                        </label>
+                        {% for subfield in form.shipping_option %}
+                            <label>
+                                {{ subfield }} {{ subfield.label.text }}
+                            </label>
+                        {% endfor %}
                     </div>
-                    
-                    <!-- Tracking Number (Only for Mail-in) -->
+
                     <div id="tracking-number-section" class="hidden">
                         <h3>Tracking Number</h3>
-                        <input type="text" name="tracking_number" placeholder="Enter Tracking Number">
+                        {{ form.tracking_number(class="form-control", placeholder="Enter Tracking Number") }}
                     </div>
-                    
-                    <!-- Shipping Address (Only for Pick-up) -->
+
                     <div id="shipping-address-section" class="hidden">
                         <h3>Shipping Address</h3>
-                        <input type="text" name="street_address" placeholder="Street Address">
-                        <input type="text" name="house_block" placeholder="House / Block No.">
-                        <input type="text" name="zip_code" placeholder="Zip or Postal Code">
-                        <input type="text" name="contact_number" placeholder="Contact Number">
+                        {{ form.street_address(class="form-control", placeholder="Street Address") }}
+                        {{ form.house_block(class="form-control", placeholder="House / Block No.") }}
+                        {{ form.zip_code(class="form-control", placeholder="Zip or Postal Code") }}
+                        {{ form.contact_number(class="form-control", placeholder="Contact Number") }}
                     </div>
-                    
-                    <!-- Payment Information (Shown for all options) -->
-                    <div id="payment-section" class="hidden">
-                        <h3>Payment Option</h3>
-                        <div class="payment-group">
-                            <input type="text" name="card_number" placeholder="Card Number">
-                            <input type="text" name="card_expiry" placeholder="Expiration Date (MM/YY)">
-                            <input type="text" name="card_name" placeholder="Name on Card">
-                            <div class="checkbox-container">
-                                <input type="checkbox" name="save_payment" id="save-payment">
-                                <label for="save-payment">Save my payment information</label>
-                            </div>
-                        </div>
+
+                    <h3>Payment Option</h3>
+                    <div id="payment-section">
+                        {{ form.card_number(class="form-control", placeholder="Card Number") }}
+                        {{ form.card_expiry(class="form-control", placeholder="Expiration Date (MM/YY)") }}
+                        {{ form.card_name(class="form-control", placeholder="Name on Card") }}
                     </div>
-                    
+
                     <button type="submit" class="btn btn-success">Submit</button>
-                    
-        {% endif %}
+                </form>
+                {% else %}
+                <p class="admin-shipping-info">Waiting for customer to submit shipping details.</p>
+                {% endif %}
+            {% endif %}
+        </div>
     {% endif %}
 
-    <!-- Back button -->
     <a href="{{ url_for('manageTradeins.manage_tradeins') }}" class="btn btn-secondary">Back to Dashboard</a>
 </div>
 
@@ -122,4 +126,3 @@
 {% endblock %}
 
 {% endblock %}
-

@@ -1,41 +1,53 @@
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("tradeDetails.js Loaded!");
+    console.log("tradeDetails.js loaded!");
 
+    const form = document.querySelector("form");
     const shippingOptions = document.querySelectorAll('input[name="shipping_option"]');
-    const trackingSection = document.getElementById("tracking-number-section");
+    const trackingNumberSection = document.getElementById("tracking-number-section");
     const shippingAddressSection = document.getElementById("shipping-address-section");
-    const paymentSection = document.getElementById("payment-section");
 
-    // Initially hide all sections
-    trackingSection.classList.add("hidden");
-    shippingAddressSection.classList.add("hidden");
-    paymentSection.classList.add("hidden");
+    function updateFormDisplay() {
+        let selectedOption = document.querySelector('input[name="shipping_option"]:checked');
 
-    // Function to handle visibility based on selection
-    function handleShippingSelection(event) {
-        const selectedValue = event.target.value;
-        console.log("Selected Shipping Option:", selectedValue);
+        if (!selectedOption) return;
 
-        // Hide all sections initially
-        trackingSection.classList.add("hidden");
+        trackingNumberSection.classList.add("hidden");
         shippingAddressSection.classList.add("hidden");
-        paymentSection.classList.add("hidden");
 
-        // Show relevant sections based on the selected shipping option
-        if (selectedValue === "Mail-in") {
-            trackingSection.classList.remove("hidden");  // Show Tracking Number
-            paymentSection.classList.remove("hidden");   // Show Payment Section
-        } else if (selectedValue === "In-Store") {
-            paymentSection.classList.remove("hidden");   // Show Payment Section
-        } else if (selectedValue === "Pick-up") {
-            shippingAddressSection.classList.remove("hidden"); // Show Shipping Address
-            paymentSection.classList.remove("hidden");   // Show Payment Section
+        if (selectedOption.value === "Mail-in") {
+            trackingNumberSection.classList.remove("hidden");
+        } 
+        else if (selectedOption.value === "Pick-Up Service") {
+            shippingAddressSection.classList.remove("hidden");
         }
     }
 
-    // Attach event listeners to all radio buttons
     shippingOptions.forEach(option => {
-        option.addEventListener("change", handleShippingSelection);
+        option.addEventListener("change", updateFormDisplay);
+    });
+
+    updateFormDisplay();
+
+    form.addEventListener("submit", function (event) {
+        let errors = document.querySelectorAll(".form-error");
+        errors.forEach(error => error.remove());
+
+        let inputs = document.querySelectorAll("input");
+        let hasErrors = false;
+
+        inputs.forEach(input => {
+            if (!input.checkValidity()) {
+                let errorMessage = input.validationMessage;
+                let errorSpan = document.createElement("span");
+                errorSpan.classList.add("form-error");
+                errorSpan.textContent = errorMessage;
+                input.insertAdjacentElement("afterend", errorSpan);
+                hasErrors = true;
+            }
+        });
+
+        if (hasErrors) {
+            event.preventDefault();
+        }
     });
 });
-

@@ -674,3 +674,25 @@ class NewsletterForm(FlaskForm):
   description = TextAreaField('Newsletter Content', validators=[DataRequired(message='Newsletter content is required'), Length(min=20, max=2000, message='Content must be between 20 and 2000 characters')])
   submit = SubmitField('Send Newsletter')
 
+
+class ShippingPaymentForm(FlaskForm):
+    shipping_option = RadioField(
+        'Drop-off option',
+        choices=[
+            ('Mail-in', 'Mail-in'),
+            ('In-Store Drop-off', 'In-Store Drop-off'),
+            ('Pick-Up Service', 'Pick-Up Service (Shipping: $5.00)')
+        ],
+        validators=[Optional()]  # Removed DataRequired
+    )
+
+    tracking_number = StringField('Tracking Number', validators=[Optional()])
+    street_address = StringField('Street Address', validators=[Optional()])
+    house_block = StringField('House / Block No.', validators=[Optional()])
+    zip_code = StringField('Zip or Postal Code', validators=[Optional()])
+    contact_number = StringField('Contact Number', validators=[Optional()])
+    card_number = StringField('Card Number', validators=[Optional()])
+    card_expiry = StringField('Expiration Date (MM/YY)', validators=[Optional()])
+    card_name = StringField('Name on Card', validators=[Optional()])
+    
+    submit = SubmitField('Submit')

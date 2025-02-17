@@ -80,7 +80,7 @@ def add_to_cart(product_id):
         db.session.add(new_item)
 
     db.session.commit()
-    flash("Item added to cart!", "success")
+    #flash("Item added to cart!", "success")
     return redirect(url_for('addToCart.view_cart'))
 
 

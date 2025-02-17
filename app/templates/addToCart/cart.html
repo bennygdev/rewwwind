@@ -9,7 +9,16 @@
 
 {% block content %}
 <div class="content">
-    <h1>Your Cart</h1>
+    <div class="cart-header">
+        <div class="cart-title">
+            <h1>Your Cart</h1>
+        </div>
+        <a href="{{ url_for('views.rewards_page') }}" class="voucher-btn">
+            <i class="bi bi-ticket"></i> Vouchers
+        </a>
+    </div>
+
+
 
     {% if not cart_items %}
         <div class="empty-cart">
@@ -79,29 +88,27 @@
 
                         <!-- Total for this Item -->
                         <p>Sub Total: $<span class="item-total">{{ item.quantity * item.product_condition['price'] }}</span></p>
-
-                            <div class="cart-actions">
-                                <!-- Heart Button -->
-                                <button type="button" class="favorite-btn" data-product-id="{{ item.product_id }}" onclick="toggleFavorite(this)">
-                                    <i class="bi bi-heart{% if item.favorite %}-fill{% endif %}"></i>
-                                </button>
-
-
-                        <!-- Remove Icon -->
-                                <form action="/remove-from-cart/{{ item.product_id }}" method="POST" class="remove-form">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <button type="submit" class="remove-icon-btn">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
                     </div>
+
+                    <div class="cart-actions">
+                        <!-- Remove Icon -->
+                        <form action="/remove-from-cart/{{ item.product_id }}" method="POST" class="remove-form">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="remove-icon-btn">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                                <!-- Heart Button -->
+                                <!--<button type="button" class="favorite-btn" data-product-id="{{ item.product_id }}" onclick="toggleFavorite(this)">
+                                    <i class="bi bi-heart{% if item.favorite %}-fill{% endif %}"></i>
+                                </button>-->
+
                 </div>
             {% endfor %}
         </div>
         <!-- Update Cart Button -->
         <div class="cart-summary">
-          <h3>Cart Total: $<span id="cart-total">{{ cart_total }}</span></h3>
 
           <!-- Voucher Selection -->
           <!-- Voucher Selection -->
@@ -117,7 +124,7 @@
                 <i class="bi bi-x-circle"></i>
               </button>
             </div>
-          
+
             <!-- Voucher Input Form -->
             <form id="voucher-form">
               {{ voucher_form.csrf_token }}
@@ -129,15 +136,16 @@
               <p id="error-message" style="color: #ff0000; display: none;"></p>
             </form>
           </div>
-          
+
           <!-- Update the cart summary section -->
           <div class="cart-summary">
-            <h3>Subtotal: $<span id="original-total">{{ cart_total }}</span></h3>
+
+            <h3 class="sub-total">Subtotal: $<span id="original-total">{{ cart_total }}</span></h3>
             
             <h3 id="discount-line" style="display: none;" class="discount">Discount: -$<span id="discount-amount">0.00</span></h3>
-            
-            <h3>Final Total: $<span id="final-total">{{ cart_total }}</span></h3>
-            
+
+            <h3 class="cart-total">Total: $<span id="final-total">{{ cart_total }}</span></h3>
+
             <button type="button" class="btn-primary" id="update-cart-btn">Update Cart</button>
             <a href="{{ url_for('payment.select_ship') }}" class="btn-primary">Proceed to Checkout</a>
           </div>
@@ -161,6 +169,7 @@
         {% endif %}
     {% endwith %}
 </div>
+
 
 <script>
     document.getElementById('update-cart-btn').addEventListener('click', function () {
@@ -200,6 +209,7 @@
         })
         .catch(error => console.error('Error:', error));
     }
+
 
     function applyVoucher() {
       let voucherInput = document.getElementById('voucher-code');

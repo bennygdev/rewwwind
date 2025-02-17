@@ -1,4 +1,3 @@
-
 # Rewwwind
 
 Rewwwind is a store that sells second-hand refurbished books and records, which allows customers to access affordable and unique literary and musical content while promoting sustainability by reducing waste and extending lifespan of pre-loved items. 
@@ -21,6 +20,7 @@ NOTE: I've moved the instructions to run and contribute to `HOWTORUN.md`, same e
 
 Benny:
 - Project environment and setup
+- Designed Home landing page, Footer, About pages, Rewards page, Legal pages, Error (401, 403, 404) pages
 - 3 Account Role levels (Customer, Admin, Owner (superuser))
 - Dashboard system that houses for all business functions
 - Overview
@@ -37,6 +37,7 @@ Benny:
     - Ability to subscribe and unsubscribe to newsletter notifications
 - Authentication
     - Ability to register normally or with google
+        - Username suggestions when setting username
     - Ability to login normally or with google
     - Default identicon profile picture generation for new registered Accounts
     - Reset password functionality using flask mail
@@ -48,7 +49,9 @@ Benny:
     - Owner has the ability to add any role-level accounts
 - Customer Chat
     - Use of socket to faciliate communication between admin (as support representative) and customer
+    - Typing indicators
     - Ability to save and summarise chat conversation, and view it later (Chat summary by Gemini AI)
+    - Ability to compensate vouchers to customers
 - Chat with AI
     - Ability to chat with AI, which will provide product recommendations and store-related inquiries. (Using Gemini AI)
 - Newsletter
@@ -63,12 +66,18 @@ Nelson:
 (fill in what you have done)
 
 Ryan:
+- Designed Trade-in and Condition guidelines onboarding pages
 - Trade in application, request
 - Trade in 
-
+(fill in what you have done)
 
 Femina:
 - Wishlist creation
+- Cart page
+    - Ability to add and remove products from cart
+    - Ability to adjust quantity
+    - Abililty to apply Vouchers
 - Voucher CRUD for admin-side
 - Voucher listing for both customers and admins
 - Voucher Gifting to customers
+(fill in what you have done)

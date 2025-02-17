@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, abort, make_response
 from flask_login import login_required, current_user
 from .roleDecorator import role_required
-from .models import Order
+from .models import Order, Product
 from .forms import UpdateOrderForm
 from . import db
 from sqlalchemy import desc, asc, cast, Float
+from sqlalchemy.orm.attributes import flag_modified
 from datetime import datetime, timedelta
 from fpdf import FPDF
 from math import ceil
@@ -122,7 +123,7 @@ def update_order(order_id):
   form = UpdateOrderForm()
 
   if form.validate_on_submit():
-    if form.approved.data.title() in ['Approved', 'Not Approved']:
+    if form.approved.data.title() in ['Approved', 'Rejected']:
       if form.approved.data.title() == 'Not Approved':
         order.status = 'Pending'
       else:
@@ -131,8 +132,20 @@ def update_order(order_id):
     db.session.commit()
 
     order.update_approval()
-    print(order.approval_date)
     db.session.commit()
+
+    if order.status == 'Approved':
+      for i in order.order_items:
+        product = Product.query.filter(Product.id==i.product_id).first()
+        sel_idx = next(
+          (index for index, condition in enumerate(product.conditions) if condition['condition'] == i.product_condition['condition']),
+          None
+        )
+        product.conditions[sel_idx]['stock'] -= i.quantity
+        print(product.conditions[sel_idx]['stock'])
+        flag_modified(product, 'conditions')
+        db.session.commit()
+
     
     flash("Order was updated successfully!", "success")
 

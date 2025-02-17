@@ -83,6 +83,7 @@ Nelson:
         - Image(s) are upload to the cloud (Cloudinary)
             - All images are obtained from Cloudinary
             - Automatic deletion of images from Cloudinary
+        - Filled information is temporarily stored upon exit
     - Update Products
         - All of the above
     - Delete Products
@@ -99,9 +100,10 @@ Nelson:
         - Delivery Type (Method)
         - Pick-Up Information or Billing Information (Depending on delivery type chosen)
         - Voucher Selection (If any)
-        - Payment via Stripe
-            - Payment information securely stored in Stripe
-            - Automatic retrieval of saved payment information upon checkout
+    - Payment via Stripe
+        - Payment information securely stored in Stripe
+        - Automatic retrieval of saved payment information upon checkout
+    - Persistent Information Throughout Checkout Process (until cancellation or success)
 
 
 Ryan:

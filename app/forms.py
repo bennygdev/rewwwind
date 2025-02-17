@@ -547,7 +547,7 @@ class DeleteReviewForm(FlaskForm):
 
 # Order-related Forms
 class UpdateOrderForm(FlaskForm):
-  approved = RadioField('Approve Order', choices=['Approved', 'Not Approved'], default='Not Approved')
+  approved = RadioField('Approve Order', choices=['Approved', 'Not Approved', 'Rejected'], default='Not Approved')
   submit = SubmitField('Update Approval')
 
 # Cart-related Forms

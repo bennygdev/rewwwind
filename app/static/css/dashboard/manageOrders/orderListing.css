@@ -214,6 +214,11 @@ td.Approved div {
     background-color: #039752;
 }
 
+td.Rejected div {
+    color: white;
+    background-color: red;
+}
+
 .orders tr:not(:last-child) {
     border-bottom: 1px solid rgb(175, 175, 175);
 }

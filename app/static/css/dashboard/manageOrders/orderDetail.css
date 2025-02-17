@@ -265,6 +265,10 @@ td.orderStock div {
 }
 
 .order_approval p:nth-child(2) input[type="radio"] {
+    accent-color: orange;
+}
+
+.order_approval p:nth-child(3) input[type="radio"] {
     accent-color: red;
 }
 

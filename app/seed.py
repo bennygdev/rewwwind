@@ -572,11 +572,11 @@ def insert_orders():
   #   }
   # )
   
-  for x in range(10):
+  for x in range(4):
     order = Order(
         user_id=4,
         total_amount=0,
-        delivery='Standard',
+        delivery='standard',
         payment_type_id=1,
         payment_information_id=payment_info.id,
         billing_id=billing_info.id
@@ -592,7 +592,7 @@ def insert_orders():
         order_id=order.id,
         product_id=product.id,
         product_condition=product.conditions[i],
-        quantity=randint(1,10),
+        quantity=randint(1,2),
         unit_price=product.conditions[i]['price']
       )
       db.session.add(item)
@@ -623,13 +623,13 @@ def insert_orders():
   db.session.add(billing_info)
   db.session.commit()
   
-  for x in range(10):
+  for x in range(5):
     from datetime import datetime,timedelta
     order = Order(
         user_id=4,
         order_date=datetime.now()-timedelta(days=randint(20, 40)),
         total_amount=0,
-        delivery='Expedited',
+        delivery='expedited',
         payment_type_id=2,
         payment_information_id=payment_info.id,
         billing_id=billing_info.id
@@ -645,7 +645,7 @@ def insert_orders():
         order_id=order.id,
         product_id=product.id,
         product_condition=product.conditions[i],
-        quantity=randint(1,10),
+        quantity=randint(1,2),
         unit_price=product.conditions[i]['price']
       )
       db.session.add(item)

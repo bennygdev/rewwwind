@@ -23,10 +23,12 @@
             <span>{{ 'Arriving' if order.delivery != 'self-pickup' else 'Picking Up At' }}</span>
             {% if order.delivery != 'self-pickup' %}
             <p><strong>
-                {% if order.approval_date %}
+                {% if order.status == 'Approved' %}
                 {{ (order.approval_date + timedelta(days=7)).strftime('%d %B') }} 
                 &minus; 
                 {{ (order.approval_date + timedelta(days=10)).strftime('%d %B') }}
+                {% elif order.status == 'Rejected' %}
+                Rejected
                 {% else %}
                 Pending
                 {% endif %}

@@ -1,40 +1,83 @@
 # Rewwwind
 
-App development project
+Rewwwind is a store that sells second-hand refurbished books and records, which allows customers to access affordable and unique literary and musical content while promoting sustainability by reducing waste and extending lifespan of pre-loved items. 
 
-### Team Members
+In addition, customers have the option to trade in their used books and records, with the condition depending of the incentive offered, such as cash, credits, discounts, or exclusive rewards.
 
-- Benny
-- Nelson
-- Ryan
-- Femina
+Members:
+- Benny Goh (Users, Customer Experience)
+- Nelson Jonathan (Products, Orders, Checkout)
+- Ryan Yeo (Trade-ins)
+- Femina Jasmin (Wishlist, Vouchers)
 
-### Prerequisites
+# Features
+WIP (will be updated before presentation)
 
-- Above python 3.10 should do
+# Contributions
+What features did we do? (Paste all contents of this file into readme.so to view editing live)
 
-### How to run
+NOTE: I've moved the instructions to run and contribute to `HOWTORUN.md`, same exact content.
 
-**IMPORTANT: Run the project in virutal environment when testing, and please read "How to commit changes" (scroll down) before making any changes.**
-1. Clone this repository: `git clone https://github.com/bennygdev/rewwwind.git`
-2. Open this project: cd into the directory and do `code .`
-3. Install dependencies: Run `pip install -r requirements.txt` in project **virtual environment**. To access virutal environment, create a virtual environment (if you do not have a venv folder) by running `python -m venv .venv` then activate venv by running `.venv\Scripts\activate`, then run the installation command. To exit, run `deactivate` inside of **virtual environment**.
-5. Run the project: In the **virtual environment**, Run `python main.py` to run the website.
-If you would like the email and google functionality to actually work, create a `.env` file by copying the contents from `.env.template`. Then you need to PM me for the credentials and you can paste them into the file to get it working.
+Benny:
+- Project environment and setup
+- Designed Home landing page, Footer, About pages, Rewards page, Legal pages, Error (401, 403, 404) pages
+- 3 Account Role levels (Customer, Admin, Owner (superuser))
+- Dashboard system that houses for all business functions
+- Overview
+    - Shows customer related data and metrics on a dashboard using ChartJS (Only viewable for Customers)
+    - Shows admin related data and metrics on a dashboard using ChartJS (Only viewable for Admins, Owners)
+- User Settings
+    - Edit personal information
+        - Edit personal particulars, including profile picture
+        - Change email
+        - Change Password
+        - Delete Account and related information
+    - Add/Edit/Delete Billing information
+    - Add/Edit/Delete Payment information
+    - Ability to subscribe and unsubscribe to newsletter notifications
+- Authentication
+    - Ability to register normally or with google
+        - Username suggestions when setting username
+    - Ability to login normally or with google
+    - Default identicon profile picture generation for new registered Accounts
+    - Reset password functionality using flask mail
+- Manage Accounts
+    - Account listing
+    - Account details viewing (Admin can only view customer accounts, whereas Owners can view both admin and customer accounts but except other owner accounts) with statistics using ChartJS
+    - Account editing and deletion (Admin can only modify customer accounts, whereas Owners can modify both admin and customer accounts but except other owner accounts)
+    - Account password change (Same for roles I described)
+    - Owner has the ability to add any role-level accounts
+- Customer Chat
+    - Use of socket to faciliate communication between admin (as support representative) and customer
+    - Typing indicators
+    - Ability to save and summarise chat conversation, and view it later (Chat summary by Gemini AI)
+    - Ability to compensate vouchers to customers
+- Chat with AI
+    - Ability to chat with AI, which will provide product recommendations and store-related inquiries. (Using Gemini AI)
+- Newsletter
+    - Ability for users to subscribe to newsletter
+    - Ability to search and delete users from mailing listing
+    - Ability to send out emails to every person in the mailing list, which will create a post in the database
+    - Ability to read and delete posted newsletters
+    - Ability to unsubscribe from the link provided in the email
 
-### To save new installed libraries to virtual environment
-1. Go into the project **virtual environment** via terminal
-2. Install necessary packages
-3. Do `pip freeze > requirements.txt` after you are done installing packages
-4. Update and commit requirements.txt to github, by doing `git add .` and doing `git commit -m "message"`
-5. After that, please do let everyone know new packages are added so everyone's version is not outdated.
+Nelson:
 
-### How to commit changes (IMPORTANT)
-**NOTE: Before running the app in a new branch, please do so in a virtual environment.**
-1. Before you make any changes, please **create a new branch** from the main branch by doing `git checkout -B yourname` in your terminal
-2. Proceed to open the project by doing `code .` this should open your branch of the project.
-3. To save changes, do `git add .` > `git commit -m "message"` > `git push origin yourbranchname`
-4. Go to the Github, to the team repository and go to your branch. There should be a box saying that you have recent pushes. There should be a button that says **"Compare & Pull Request"**. Click on it to make a new request for the leader to approve and make suggestions to. 
-5. If there is a suggestion, you can make changes to your project branch again and update the push with git add etc. in the pull request, the change should **remain in the same pull request**.
-6. After your pull request has been approved and merged, **delete the branch** and switch back to the main repository. Do `git pull` on the main branch to update your vscode with the latest changes and you can run the website from there, but remember **do not edit the main branch if you are editing/making changes**.
-More information can be found on here. https://bennygoh.notion.site/Github-and-git-guide-1312b1075fb3801f8434c4e371db5ac7?pvs=74
+(fill in what you have done)
+
+Ryan:
+-Drafted the overall UI/UX for the Storefront, Trade-in, and Condition Guidelines onboarding pages.
+- Trade in request form and Dashboard (For both Customer and Admin sides)
+   - Customers can send in trade-in requests where Admin can approve or reject their request
+   - For approved requests, customers can input their payment details and method of drop-off
+
+Femina:
+- Wishlist creation
+- Cart page
+    - Ability to add and remove products from cart
+    - Ability to adjust quantity
+    - Abililty to apply Vouchers
+- Voucher CRUD for admin-side
+- Voucher listing for both customers and admins
+- Voucher Gifting to customers
+(fill in what you have done)

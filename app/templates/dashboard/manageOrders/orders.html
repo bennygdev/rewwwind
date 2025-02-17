@@ -69,7 +69,6 @@
 {% endblock %}
 
 {% block content %}
-{% if orders %}
 <div class="header">
     <div class="content__filters header__left">
         <form id="filterForm" method="get" action="{{ url_for('manageProducts.products_listing') }}" class="filters__form">
@@ -117,6 +116,8 @@
         </form>
     </div>
 </div>
+
+{% if orders.items %}
 <div class="orders">
     <table>
         <thead>
@@ -136,7 +137,7 @@
                 <div class="name"><p>Order #{{ order.id }}</p><p>{{ order.order_items|length }} Items</p></div>
             </td>
             <td class="orderDate">{{ order.order_date.strftime('%Y-%m-%d') }}</td>
-            <td class="orderDelivery">{{ order.delivery }}</td>
+            <td class="orderDelivery">{{ order.delivery|title }}</td>
             <td class="orderPayment">{{ order.payment_type.payment_type }}</td>
             <td class="orderAvgPrice">&dollar;{{ '{:.2f}'.format(order.total_amount) }}</td>
             <td class="orderStock {{ order.status }}">
@@ -157,7 +158,6 @@
         {% endfor %}
     </table>
 </div>
-
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
     <div class="overlay" style="display: block;"></div>
@@ -201,8 +201,19 @@
     </ul>
 </div>
 {% else %}
-<h1>You have not placed any orders yet!</h1>
-<a href="{{ url_for('productPagination.product_pagination') }}"><h3>Continue Shopping</h3></a>
+{% if user.orders or user.role_id != 1 %}
+<div class="centralise">
+    <img src="{{ url_for('static', filename='media/filters_not_found.png') }}" class="none">
+    <h2 class="none">Sorry, no orders were found with the given search queries and/or filters.</h2>
+    <a href="./manage-orders" class="none">Try Again</a>
+</div>
+{% else %}
+<div class="centralise">
+    <img src="{{ url_for('static', filename='media/people_shopping.png') }}" class="none">
+    <h2 class="none">You have not placed any orders yet !</h2>
+    <a href="../products" class="none">Continue Shopping</a>
+</div>
+{% endif %}
 {% endif %}
 {% endblock %}
 

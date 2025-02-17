@@ -1,0 +1,33 @@
+{% extends "views/base.html" %}
+{% set active_page = "contact_us" %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/views/contactus.css') }}">
+{% endblock %}
+
+{% block title %}Contact Us{% endblock %}
+
+{% block content %}
+<div class="contact__container">
+  <h1 class="contact__header">Contact Us</h1>
+
+  <div class="contact__section">
+    <p>If you require help, please reach out to us at <a href="mailto:rewwwindhelp@gmail.com">rewwwindhelp@gmail.com</a>.</p>
+  </div>
+
+  <div class="contact__section">
+    <p class="contact__section--headerImportant">IMPORTANT:</p>
+    <p>Our office is not open to pubic. We do not stock any items at our office.</p>
+    <p>Strictly no cash payment or order collection at our office.</p>    
+    
+    <br><br>
+    <p class="contact__section--header">Rewwwind</p>
+    <p>180 Ang Mo Kio Ave 8</p>
+    <p>Block L, #03-012</p>
+    <p>Singapore 569830</p>
+
+    <br><br>
+    <p>For other enquiries/corporate or bulk purchases, please reach out to us at <a href="mailto:rewwwindhelp@gmail.com">rewwwindhelp@gmail.com</a>.</p>
+  </div>
+</div>
+{% endblock %}

@@ -1,11 +1,19 @@
 const socket = io();
 let currentRoom = null;
 
+const chatInputArea = document.querySelector('.chat-input-area');
+const saveStatusDiv = document.createElement('div');
+
+let adminTypingTimeout;
+
+saveStatusDiv.className = 'save-status mt-2 text-center';
+chatInputArea.appendChild(saveStatusDiv);
+
 // Add chat controls to header
 document.querySelector('.chat-header').innerHTML += `
   <div class="chat-controls">
-    <button class="btn btn-secondary" id="backBtn">Back</button>
-    <button class="btn btn-danger" id="endChatBtn">End Chat</button>
+    <button id="backBtn">Back</button>
+    <button id="endChatBtn">End Chat</button>
   </div>
 `;
 
@@ -49,8 +57,8 @@ socket.on('connect', () => {
 socket.on('admin_joined', (data) => {
   console.log('Successfully joined room:', data);
   const messageHtml = `
-    <div class="message system mb-3">
-      <div class="message-content bg-success text-white p-2 rounded">
+    <div class="message system">
+      <div class="message-content">
         ${data.message}
       </div>
     </div>
@@ -60,6 +68,21 @@ socket.on('admin_joined', (data) => {
 
 // Handle sending messages
 document.getElementById('sendMessage').addEventListener('click', sendMessage);
+document.getElementById('adminChatInput').addEventListener('input', (e) => {
+  const input = e.target;
+  
+  if (currentRoom) {
+    socket.emit('admin_typing', { room_id: currentRoom });
+    
+    clearTimeout(adminTypingTimeout);
+    
+    // set new timeout
+    adminTypingTimeout = setTimeout(() => {
+      socket.emit('admin_stopped_typing', { room_id: currentRoom });
+    }, 1000); // delay 1 second
+  }
+});
+
 document.getElementById('adminChatInput').addEventListener('keypress', (e) => {
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
@@ -71,6 +94,9 @@ function sendMessage() {
   const messageInput = document.getElementById('adminChatInput');
   const message = messageInput.value.trim();
   if (message && currentRoom) {
+    clearTimeout(adminTypingTimeout);
+    socket.emit('admin_stopped_typing', { room_id: currentRoom });
+
     console.log('Sending message to room:', currentRoom);
     socket.emit('chat_message', {
       room_id: currentRoom,
@@ -79,11 +105,11 @@ function sendMessage() {
       
     // Add message to chat
     const messageHtml = `
-      <div class="message outgoing mb-3">
-        <div class="message-content bg-primary text-white p-2 rounded">
+      <div class="message outgoing">
+        <div class="message-content">
           ${message}
         </div>
-        <small class="text-muted">${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</small>
+        <small class="message-time">${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</small>
       </div>
     `;
     document.querySelector('.chat-messages').insertAdjacentHTML('beforeend', messageHtml);
@@ -102,11 +128,11 @@ socket.on('new_message', (data) => {
   console.log('Received message:', data);
   if (data.sender_type === 'customer') {
     const messageHtml = `
-      <div class="message incoming mb-3">
-        <div class="message-content bg-light p-2 rounded">
+      <div class="message incoming">
+        <div class="message-content">
           ${data.message}
         </div>
-        <small class="text-muted">${data.timestamp}</small>
+        <small class="message-time">${data.timestamp}</small>
       </div>
     `;
     document.querySelector('.chat-messages').insertAdjacentHTML('beforeend', messageHtml);
@@ -127,7 +153,7 @@ socket.on('chat_history', (data) => {
     data.messages.forEach(msg => {
       const messageHtml = `
         <div class="message ${msg.type === 'outgoing' ? 'outgoing' : 'incoming'} mb-3">
-          <div class="message-content ${msg.type === 'outgoing' ? 'bg-primary text-white' : 'bg-light'} p-2 rounded">
+          <div class="message-content">
             ${msg.message}
           </div>
           <small class="text-muted">${msg.timestamp}</small>
@@ -180,17 +206,82 @@ socket.on('chat_ended', (data) => {
     </div>
   `;
   document.querySelector('.chat-messages').insertAdjacentHTML('beforeend', messageHtml);
-  
-  // For both customer and admin ended cases
-  // Redirect to main chat page after delay
-  setTimeout(() => {
-    window.location.href = '/dashboard/customer-chat';
-  }, 3000);
 
-  // Remove from active chats if admin ended it
+  // remove from active chats if admin ended it
   if (data.ended_by === 'admin') {
+    // keep the input enabled until we receive chat_history_saved
+    document.getElementById('endChatBtn').style.display = 'none';
     socket.emit('remove_chat_request', {
-      room_id: currentRoom
+        room_id: currentRoom
     });
+  } else {
+    document.getElementById('adminChatInput').disabled = true;
+    document.getElementById('endChatBtn').style.display = 'none';
+  }
+});
+
+socket.on('saving_chat_history', () => {
+  saveStatusDiv.textContent = 'Saving chat history...';
+  saveStatusDiv.className = 'save-status mt-2 text-center text-warning';
+
+  const chatMessages = document.querySelector('.chat-messages');
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+});
+
+socket.on('chat_history_saved', (data) => {
+  if (data.error) {
+    saveStatusDiv.textContent = 'Error saving chat history';
+    saveStatusDiv.className = 'save-status mt-2 text-center text-danger';
+  } else {
+    saveStatusDiv.textContent = 'Chat history successfully saved';
+    saveStatusDiv.className = 'save-status mt-2 text-center text-success';
+      
+    const currentURL = window.location.pathname;
+    if (currentURL.includes('/chat-room/')) {
+      document.getElementById('adminChatInput').disabled = true;
+    }
+  }
+  
+  const chatMessages = document.querySelector('.chat-messages');
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+  
+  // hide the message after 5 seconds
+  setTimeout(() => {
+    saveStatusDiv.textContent = '';
+    saveStatusDiv.className = 'save-status mt-2 text-center';
+      
+    // redirect admin back to chat list after successful save if they ended the chat
+    if (!data.error && currentURL.includes('/chat-room/')) {
+      window.location.href = '/dashboard/customer-chat';
+    }
+  }, 5000);
+});
+
+socket.on('join_error', (data) => {
+  window.location.href = '/dashboard/customer-chat';
+});
+
+// Typing indicators
+socket.on('customer_typing', () => {
+  const chatMessages = document.querySelector('.chat-messages');
+  let typingIndicator = document.querySelector('.typing-indicator');
+  
+  if (!typingIndicator) {
+    const indicatorHtml = `
+      <div class="message incoming typing-indicator">
+        <div class="message-content">
+          Customer is typing...
+        </div>
+      </div>
+    `;
+    chatMessages.insertAdjacentHTML('beforeend', indicatorHtml);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+});
+
+socket.on('customer_stopped_typing', () => {
+  const typingIndicator = document.querySelector('.typing-indicator');
+  if (typingIndicator) {
+    typingIndicator.remove();
   }
 });

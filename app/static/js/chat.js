@@ -17,9 +17,51 @@ let chatEndedByAdmin = false;
 let userMessage;
 let inputInitHeight;
 
+let typingTimeout;
+
 const setInitialHeight = () => {
   inputInitHeight = chatInput.scrollHeight;
 };
+
+const saveAIChatHistory = () => {
+  if (!isSupportChat) {
+    const chatMessages = [];
+    document.querySelectorAll('.chatbox .chat').forEach(li => {
+      const messageText = li.querySelector('p').textContent;
+      const isOutgoing = li.classList.contains('outgoing');
+      chatMessages.push({
+        message: messageText,
+        type: isOutgoing ? 'outgoing' : 'incoming'
+      });
+    });
+    
+    localStorage.setItem('aiChatHistory', JSON.stringify(chatMessages));
+  }
+}
+
+const loadAIChatHistory = () => {
+  const savedHistory = localStorage.getItem('aiChatHistory');
+  if (savedHistory && !isSupportChat) {
+    const chatMessages = JSON.parse(savedHistory);
+    chatbox.innerHTML = '';
+    
+    chatMessages.forEach(msg => {
+      const messageElement = createChatLi(msg.message, msg.type);
+      chatbox.appendChild(messageElement);
+    });
+    
+    // Show chat interface if there's history
+    if (chatMessages.length > 0) {
+      document.getElementById('chatChoice').style.display = 'none';
+      document.querySelector('.chatbox').style.display = 'block';
+      document.querySelector('.chat-input').style.display = 'flex';
+      switchToSupportLink.style.display = 'block';
+      backBtn.style.display = 'block';
+    }
+    
+    chatbox.scrollTo(0, chatbox.scrollHeight);
+  }
+}
 
 chatInput.addEventListener("input", () => {
   if (!inputInitHeight) {
@@ -28,6 +70,17 @@ chatInput.addEventListener("input", () => {
   
   chatInput.style.height = `${inputInitHeight}px`;
   chatInput.style.height = `${chatInput.scrollHeight}px`;
+
+  if (isSupportChat && currentRoom) {
+    socket.emit('customer_typing', { room_id: currentRoom });
+    
+    clearTimeout(typingTimeout);
+    
+    // set new timeout
+    typingTimeout = setTimeout(() => {
+      socket.emit('customer_stopped_typing', { room_id: currentRoom });
+    }, 1000); // delay 1 second
+  }
 });
 
 document.getElementById('supportBtn').addEventListener('click', async () => {
@@ -79,9 +132,14 @@ document.getElementById('chatbotBtn').addEventListener('click', () => {
   switchToSupportLink.style.display = 'block';
   backBtn.style.display = 'block';
 
-  const greetingMessage = createChatLi('Hi there 👋\nHow can I help you today?', 'incoming');
-  chatbox.innerHTML = ''; // Clear any existing messages
-  chatbox.appendChild(greetingMessage);
+  if (chatbox.children.length === 0) {
+    const greetingMessage = createChatLi('Hi there 👋\nHow can I help you today?', 'incoming');
+    chatbox.innerHTML = ''; // Clear any existing messages
+    chatbox.appendChild(greetingMessage);
+    
+    // Save initial greeting
+    saveAIChatHistory();
+  }
 });
 
 const chatHeader = document.querySelector('.chatbot header');
@@ -193,8 +251,8 @@ function showLeaveWarning() {
       <div class="warning-text">Are you sure you want to leave this support chat?</div>
       <div class="warning-text">This will end your current chat session.</div>
       <div class="warning-buttons">
-        <button class="warning-btn leave-btn">Leave Chat</button>
-        <button class="warning-btn stay-btn">Stay in Chat</button>
+        <button class="leave-btn">Leave Chat</button>
+        <button class="stay-btn">Stay in Chat</button>
       </div>
     </div>
   `;
@@ -292,6 +350,8 @@ const generateResponse = async (incomingChatLi) => {
   } finally {
     chatbox.scrollTo(0, chatbox.scrollHeight);
   }
+
+  return Promise.resolve();
 }
 
 const handleChat = () => {
@@ -302,6 +362,11 @@ const handleChat = () => {
   // Clear input and reset height
   chatInput.value = "";
   chatInput.style.height = `${inputInitHeight}px`
+
+  if (isSupportChat && currentRoom) {
+    clearTimeout(typingTimeout);
+    socket.emit('customer_stopped_typing', { room_id: currentRoom });
+  }
 
   // append user message to chatbox
   chatbox.appendChild(createChatLi(userMessage, "outgoing"));
@@ -319,15 +384,21 @@ const handleChat = () => {
         const incomingChatLi = createChatLi("Thinking...", "incoming");
         chatbox.appendChild(incomingChatLi);
         chatbox.scrollTo(0, chatbox.scrollHeight);
-        generateResponse(incomingChatLi);
+        generateResponse(incomingChatLi).then(() => {
+          saveAIChatHistory();
+        });
     }, 600);
+
+    saveAIChatHistory();
   }
 }
 
 // Add reconnection logic when page loads
 window.addEventListener('load', () => {
   if (isSupportChat) {
-      socket.emit('customer_reconnect');
+    socket.emit('customer_reconnect');
+  } else {
+    loadAIChatHistory();
   }
 });
 
@@ -547,6 +618,8 @@ function resetChat() {
   chatEndedByAdmin = false;
   isShowingWarning = false;
 
+  localStorage.removeItem('aiChatHistory');
+
   const chatChoice = document.getElementById('chatChoice');
   document.querySelector('.chatbox').style.display = 'none';
   document.querySelector('.chat-input').style.display = 'none';
@@ -563,3 +636,22 @@ function resetChat() {
 
   chatbox.innerHTML = '';
 }
+
+// Typing indicators
+socket.on('admin_typing', () => {
+  const existingIndicator = document.querySelector('.typing-indicator');
+  if (!existingIndicator) {
+    const typingLi = document.createElement("li");
+    typingLi.classList.add("chat", "incoming", "typing-indicator");
+    typingLi.innerHTML = `<span><i class="fa-solid fa-headset"></i></span><p>Support representative is typing...</p>`;
+    chatbox.appendChild(typingLi);
+    chatbox.scrollTo(0, chatbox.scrollHeight);
+  }
+});
+
+socket.on('admin_stopped_typing', () => {
+  const typingIndicator = document.querySelector('.typing-indicator');
+  if (typingIndicator) {
+    typingIndicator.remove();
+  }
+});

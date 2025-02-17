@@ -63,6 +63,12 @@ class BillingAddress(db.Model):
   created_at = db.Column(db.DateTime(timezone=True), default=func.now())
   updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
 
+class Pickup(db.Model):
+  __tablename__ = 'pickup'
+  id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+  user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+  pickup_date = db.Column(db.DateTime(timezone=True), nullable=False)
+
 class PaymentInformation(db.Model):
   __tablename__ = 'payment_information'
   id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -166,6 +172,9 @@ class Order(db.Model):
   delivery = db.Column(db.String(100), nullable=False)
   total_amount = db.Column(db.Numeric(10, 2), nullable=False, default=0)
   status = db.Column(db.String(50), default='Pending', nullable=False)
+
+  voucher_id = db.Column(db.Integer, db.ForeignKey('vouchers.id'), nullable=True)
+  voucher = db.relationship('Voucher', backref='orders', lazy=True)
   
   user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
   user = db.relationship('User', back_populates='orders', lazy=True)
@@ -178,6 +187,9 @@ class Order(db.Model):
 
   billing_id = db.Column(db.Integer, db.ForeignKey('billing_addresses.id'), nullable=True)
   billing = db.relationship('BillingAddress', backref='orders', lazy=True)
+
+  pickup_id = db.Column(db.Integer, db.ForeignKey('pickup.id'), nullable=True)
+  pickup = db.relationship('Pickup', backref='orders', lazy=True)
 
   order_items = db.relationship('OrderItem', backref='order', lazy=True) # otm orderitems
 
@@ -277,6 +289,7 @@ class tradeDetail(db.Model):
 
     # For shipping and payment NEW!!
     shipping_option = db.Column(db.String(50))
+    tracking_number = db.Column(db.String(50), nullable=True)
     street_address = db.Column(db.String(255))
     house_block = db.Column(db.String(50))
     zip_code = db.Column(db.String(20))
@@ -303,3 +316,17 @@ class MailingPost(db.Model):
   description = db.Column(db.Text, nullable=False)
   created_at = db.Column(db.DateTime(timezone=True), default=func.now())
   updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
+
+class ChatHistory(db.Model):
+  __tablename__ = 'chat_histories'
+  id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+  chat = db.Column(db.JSON, nullable=False) 
+  admin_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+  user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+  support_type = db.Column(db.String(50), nullable=False)
+  chat_summary = db.Column(db.Text, nullable=True)
+  created_at = db.Column(db.DateTime(timezone=True), default=func.now())
+    
+  # Relationships
+  admin = db.relationship('User', foreign_keys=[admin_id], backref='admin_chats')
+  user = db.relationship('User', foreign_keys=[user_id], backref='user_chats')

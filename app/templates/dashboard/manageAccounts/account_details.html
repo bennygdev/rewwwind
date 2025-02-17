@@ -36,13 +36,14 @@
         </span>
       </div>
     </div>
+    {% if selectedUser.google_account %}
     <div class="statistic__box">
-      <i class="fa-solid fa-globe fa-xl"></i>
+      <i class="fa-brands fa-google fa-xl"></i>
       <div class="user__statistic">
-        <p class="statistic__label">Status</p>
-        <span class="statistic__text">Online/offline</span>
+        <p class="statistic__label">Google Account</p>
       </div>
     </div>
+    {% endif %}
   </div>
 </div>
 {% endblock %}
@@ -175,7 +176,7 @@
   {% if not (current_user.role_id == 3 and selectedUser.role_id == 3) %}
     <form id="deleteForm-{{ selectedUser.id }}" action="{{ url_for('manageAccounts.delete_account', id=selectedUser.id) }}" method="POST" onsubmit="event.preventDefault(); openDeleteModal({{ selectedUser.id }})">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <button type="button" id="account__deleteButton" onclick="openDeleteModal({{ selectedUser.id }})">Delete</button>
+      <button type="button" id="account__deleteButton" onclick="openDeleteModal({{ selectedUser.id }})">Delete Account</button>
     </form>
   {% endif %}
 </div>

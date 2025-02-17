@@ -1,0 +1,74 @@
+{% extends "views/base.html" %}
+{% set active_page = "wishlist" %}
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/views/wishlist.css') }}">
+{% endblock %}
+{% block title %}Wishlist{% endblock %}
+
+{% block content %}
+<div class="listing__header">
+    <div class="header__left">
+        <h1>Wishlist</h1>
+        {% if products %}
+        <p>Showing {{ total_products }} items in your wishlist</p>
+        {% endif %}
+    </div>
+</div>
+
+{% if products %}
+<div class="products">
+    {% for product in products %}
+    <div class="product">
+        <div class="thumbnail">
+            <div class="rating">
+                {% if product.reviews %}
+                    {% set rating = product.rating %}
+                {% else %}
+                    {% set rating = "No rating yet" %}
+                {% endif %}
+                <span><i class="bi bi-star-fill"></i>&nbsp;{{ rating }}</span>
+            </div>
+            <div class="image">
+                <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}"/>
+            </div>
+            <div class="favourites">
+                <form action="{{ url_for('wishlist.remove_favourite', product_id=product.id) }}" method="get">
+                    <button type="submit">
+                        <div class="heart-container">
+                            <i class="bi bi-heart fa-xl"></i>
+                            <i class="bi bi-heart-fill fa-xl fav"></i>
+                        </div>
+                    </button>
+                </form>
+            </div>
+            <div class="cart">
+                <form action="{{ url_for('addToCart.add_to_cart', product_id=product.id) }}" method="POST" class="cta-form">
+                    {{ form.hidden_tag() }}
+                    {{ form.condition() }}
+                    <button type="submit"><i class="fa-solid fa-cart-shopping fa-xl"></i></button>
+                </form>
+            </div>
+        </div>
+        <a href="{{ url_for('productPagination.product_detail', product_id = product.id) }}">
+            <div class="info">
+                <div class="info_left">
+                    <h5 class="name">{{ product.name }}</h5>
+                    <span>{{ product.creator }}</span>
+                </div>
+                <div class="info_right">
+                    <h5>&dollar;{{ '{:.2f}'.format(product.conditions[0].price) }}</h5>
+                    <span><i class="bi bi-short-fill"></i>&nbsp;{{ product.category.category_name }}</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<h2 class="none">You have no items in your wishlist yet. <a href="{{ url_for('productPagination.product_pagination') }}" style="color: #039752;">Continue shopping here!</a></h2>
+{% endif %}
+{% endblock %}
+
+{% block body_scripts %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/productPagination/productPagination.js') }}"></script>
+{% endblock %}

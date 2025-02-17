@@ -8,26 +8,55 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-  <div class="row">
-    <!-- Active Chats Sidebar -->
-    <div class="col-md-3 border-right">
-      <h4 class="mb-4">Active Requests</h4>
+<!-- Flash validation -->
+{% include "components/flashValidation.html" %}
+
+<h1>Active Requests</h1>
+<a href="{{ url_for('customerChat.chat_history') }}" class="back__link">View Chat History</a>
+<div class="chat-container">
+  {% if active_chats %}
+    <div class="chat-sidebar">
       <div class="chat-requests">
         {% for chat in active_chats %}
-        <div class="chat-request-card mb-3 p-3 border rounded" data-room-id="{{ chat.room_id }}">
-          <div class="d-flex justify-content-between align-items-center">
-            <h5 class="mb-1">{{ chat.customer_name }}</h5>
+        <div class="chat-request-card {% if chat.status == 'active' %}active{% endif %}" data-room-id="{{ chat.room_id }}">
+          <div class="chat-request-header">
+            <h5>{{ chat.customer_name }}</h5>
+            <span class="status-badge status-{{ chat.status }}">
+              {% if chat.status == 'active' and chat.admin_name %}
+                Active - {{ chat.admin_name }}
+              {% elif chat.status == 'active' %}
+                Active
+              {% else %}
+                Waiting
+              {% endif %}
+            </span>
             <small>{{ chat.start_time }}</small>
           </div>
-          <button class="btn btn-primary btn-sm join-chat" data-room-id="{{ chat.room_id }}" data-customer="{{ chat.customer_name }}">
-            Join Chat
-          </button>
+          <div class="support-type">
+            <p>Support Type: 
+              {% if chat.supportType == 'technical' %}
+                Technical Support
+              {% elif chat.supportType == 'billing' %}
+                Billing Support
+              {% elif chat.supportType == 'account' %}
+                Account Support
+              {% else %}
+                General Inquiry
+              {% endif %}
+            </p>
+          </div>
+          <button class="join-chat-btn" data-room-id="{{ chat.room_id }}"  data-customer="{{ chat.customer_name }}" {% if chat.status == 'active' %}disabled{% endif %}>Join Chat</button>
         </div>
         {% endfor %}
       </div>
     </div>
-  </div>
+  {% else %}
+    <div class="empty-chat-state">
+      <img src="{{ url_for('static', filename='media/chat-empty.png') }}" alt="No active chats">
+      <h2>No Active Chats</h2>
+      <p>There are currently no customers waiting for support.</p>
+    </div>
+  {% endif %}
 </div>
 {% endblock %}
 

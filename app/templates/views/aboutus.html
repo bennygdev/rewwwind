@@ -1,0 +1,91 @@
+{% extends "views/base.html" %}
+{% set active_page = "about" %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/views/aboutus.css') }}">
+{% endblock %}
+
+{% block title %}About{% endblock %}
+
+{% block content %}
+<div class="about__menu">
+  <ul class="about__menu--links">
+    <li><a class="about__menu--link {{ 'about__link--active' if active_page == 'about' else '' }}" href="/about-us">About</a></li>
+    <li><a class="about__menu--link {{ 'about__link--active' if active_page == 'our_impact' else '' }}" href="/our-impact">Impact</a></li>
+  </ul>
+</div>
+
+<div class="about__container">
+  <h1 class="about__header">About Rewwwind</h1>
+
+  <div class="about__introduction">
+    <p>Hello! We're an online thrift store built and based in Singapore, making shopping seconhand an easy choice for you!</p>
+  </div>
+
+  <div class="about__section">
+    <div class="about__section--left">
+      <h2 class="about__section--header">Our journey began in 2018...</h2>
+      <p>...when a bunch of us — students from Nanyang Polytechnic — decided to shake things up.</p>
+      <p>We were eager to create a circular economy of good and saw the potential of e-commerce for preloved items. With a mission to unlock value for our users and community, we crammed as many books as we could into our garage rooms and launched our first pilot right on the NYP Atrium.</p>
+      <p>And the rest is history!</p>
+    </div>
+    <div class="about__section--right">
+      <img src="{{ url_for('static', filename='media/warehouse1.jpg') }}" alt="Our warehouse">
+    </div>
+  </div>
+
+  <div class="about__section">
+    <div class="about__section--left">
+      <img src="{{ url_for('static', filename='media/warehouse2.jpg') }}" alt="Our warehouse">
+    </div>
+    <div class="about__section--right">
+      <h2 class="about__section--header">Making thrifting a breeze</h2>
+      <p>We've spent years bouncing between the drawing board and real-life tests, building, tweaking, and perfecting our platform.</p>
+      <p>Our mission? To make secondhand shopping accessible, convenient, and super simple for everyone.</p>
+    </div>
+  </div>
+
+  <div class="about__section">
+    <div class="about__section--left">
+      <h2 class="about__section--header">Doing our best for the planet</h2>
+      <p>When you shop with Thryft, you're not just getting awesome preloved books and clothes—you’re also saving thousands of trees and millions of liters of water!</p>
+      <p>Plus, we’re all about sustainable packaging. We even gift wrap local orders without tape, because we know shopping sustainably online can be a challenge. It takes a bit more time, but it's worth it for the environment!</p>
+    </div>
+    <div class="about__section--right">
+      <img src="{{ url_for('static', filename='media/sustainable packaging.jpg') }}" alt="Our warehouse">
+    </div>
+  </div>
+
+  <div class="about__section">
+    <div class="about__section--left">
+      <img src="{{ url_for('static', filename='media/recycling.png') }}" alt="Our warehouse">
+    </div>
+    <div class="about__section--right">
+      <h2 class="about__section--header">Recycling responsibly</h2>
+      <p>We want you to have an amazing thrifting experience with us. That’s why we’re picky about the quality of the books, clothes, and items we offer. But don’t worry — we do our best to recycle anything that doesn’t make the cut. We responsibly send those items to our recycling partners, making sure nothing goes to waste!</p>
+    </div>
+  </div>
+
+  <div class="about__section">
+    <div class="about__section--left">
+      <h2 class="about__section--header">Giving back to our community</h2>
+      <p>When you donate your items to us, you're not just decluttering—you’re making a real difference!</p>
+      <p>We convert the credits from your donated items into cash after they are sold, and donate to nonprofit organizations and initiatives tackling urgent environmental and social issues in our region.</p>
+    </div>
+    <div class="about__section--right">
+      <img src="{{ url_for('static', filename='media/givingback.png') }}" alt="Our warehouse">
+    </div>
+  </div>
+
+  <div class="about__cta">
+    <div class="about__cta--left">
+      <h2 class="about__cta--header">Your secondhand journey awaits</h2>
+      <p>Time for you to make a change, one preloved item at a time.</p>
+      <a class="about__cta--link" href="/products">Shop Now</a>
+    </div>
+    <div class="about__cta--right">
+      <img src="{{ url_for('static', filename='media/itemsart.png') }}" alt="Our warehouse">
+    </div>
+  </div>
+</div>
+{% endblock %}

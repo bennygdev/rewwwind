@@ -12,6 +12,7 @@ import json
 from flask_socketio import SocketIO
 import stripe
 import cloudinary
+import cloudinary.uploader
 socketio = SocketIO()
 
 migrate = Migrate()
@@ -65,12 +66,12 @@ def create_app():
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
   # Cloudinary (uncomment only before, to save on credits.)    
-  # cloudinary.config( 
-  #     cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"), 
-  #     api_key = os.getenv("CLOUDINARY_PUBLIC_KEY"), 
-  #     api_secret = os.getenv("CLOUDINARY_SECRET_KEY"),
-  #     secure=True
-  # )
+  cloudinary.config( 
+      cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME"), 
+      api_key = os.getenv("CLOUDINARY_PUBLIC_KEY"), 
+      api_secret = os.getenv("CLOUDINARY_SECRET_KEY"),
+      secure=True
+  )
 
   app.config['OAUTH2_CLIENT_ID'] = os.getenv('GOOGLE_CLIENT_ID')
   app.config['OAUTH2_CLIENT_SECRET'] = os.getenv('GOOGLE_CLIENT_SECRET')
@@ -142,7 +143,7 @@ def create_app():
   app.register_blueprint(manageTradeins, url_prefix="/dashboard")
   app.register_blueprint(customerChat, url_prefix="/dashboard")
   app.register_blueprint(manageProducts, url_prefix="/dashboard")
-  app.register_blueprint(wishlist, url_prefix="/dashboard")
+  app.register_blueprint(wishlist, url_prefix="/")
   app.register_blueprint(manageVouchers, url_prefix="/dashboard")
   app.register_blueprint(manageAccounts, url_prefix="/dashboard")
   app.register_blueprint(newsletter, url_prefix="/dashboard")
@@ -207,7 +208,7 @@ def create_database(app):
       print('Created Database!')
       # insert_categories()
 
-      from .seed import insert_categories, insert_products, insert_users, insert_payment_types, insert_default_roles, insert_subcategories, insert_orders, insert_voucher_types
+      from .seed import insert_categories, insert_products, insert_users, insert_payment_types, insert_default_roles, insert_subcategories, insert_orders, insert_voucher_types, insert_vouchers
 
       insert_default_roles()
       insert_payment_types()
@@ -217,3 +218,4 @@ def create_database(app):
       insert_products()
       insert_orders()
       insert_voucher_types()
+      insert_vouchers()

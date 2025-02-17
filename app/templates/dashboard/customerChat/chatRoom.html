@@ -4,16 +4,16 @@
 {% block title %}Chat Room{% endblock %}
 
 {% block styles %}
-<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/customerChat/customerChat.css') }}">
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/customerChat/chatRoom.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-  <div class="col-md-12">
+<div class="chat-container">
+  <div class="chat-main">
     <div id="chatArea">
-      <div class="chat-header border-bottom mb-3 p-3">
+      <div class="chat-header">
         <h4 id="currentCustomer">Chat with {{ customer_name }}</h4>
-        <span class="support-type-badge support-type-{{ support_type|default('general') }}">
+        <span class="support-type-badge {{ 'support-type-' + support_type|default('general') }}">
           {% if support_type == 'technical' %}
             Technical Support
           {% elif support_type == 'billing' %}
@@ -25,13 +25,13 @@
           {% endif %}
         </span>
       </div>
-      <div class="chat-messages p-3" style="height: 60vh; overflow-y: auto;">
+      <div class="chat-messages">
         <!-- Messages will be inserted here -->
       </div>
-      <div class="chat-input-area p-3 border-top">
-        <div class="input-group">
-          <textarea class="form-control" id="adminChatInput" rows="2" placeholder="Type your message..."></textarea>
-          <button class="btn btn-primary" id="sendMessage">Send</button>
+      <div class="chat-input-area">
+        <div class="input-wrapper">
+          <textarea id="adminChatInput" placeholder="Type your message..."></textarea>
+          <button id="sendMessage">Send</button>
         </div>
       </div>
     </div>

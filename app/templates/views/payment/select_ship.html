@@ -1,0 +1,73 @@
+{% extends "views/base.html" %}
+{% set active_page = "billing" %}
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/views/pre-payment.css') }}">
+{% endblock %}
+{% block title %}Select A Delivery Method{% endblock %}
+
+{% block content %}
+<div class="left">
+    <img src="{{url_for('static', filename='media/green_placeholder.jpg')}}">
+</div>
+<div class="right">
+    <div class="path">
+        <div class="circle active">
+            <span>1</span>
+        </div>
+        <div class="circle">
+            <span>2</span>
+        </div>
+        <div class="circle">
+            <span>3</span>
+        </div>
+    </div>
+    <div class="header">
+        <h1>Select A Delivery Method</h1>
+        <span>You may choose to pick them up from us, or have them delivered.</span>
+    </div>
+    <form action="{{ url_for('payment.select_ship') }}" method="POST">
+        {{ form.hidden_tag() }}
+        {{ form.del_type(show=show) }}
+        <div class="buttons">
+            <div class="btn-container">
+                <button type="submit">Next</button>
+            </div>
+        </div>
+        
+    </form>
+</div>
+{% endblock %}
+
+{% block body_scripts %}
+<script>
+    const list = document.getElementById('del_type');
+    const show = list.getAttribute('show');
+    const items = Array.from(list.children);
+
+    function display(i) {
+        if (document.getElementById('extra')) {
+            document.getElementById('extra').remove()
+        }
+        const text = [
+        'We are currently located at Nanyang Polytechnic, Singapore.<br>More details will be shared through email.',
+        'For within-the-week deliveries within Singapore only.<br>For orders with a cost below S$30, a shipping fee of S$4 will be charged.<br>Otherwise, shipping is free!',
+        'For next-day deliveries.<br>A shipping fee of $10 will be charged.',
+        `We only deliver to selected countries. Learn more <a href="{{ url_for('views.faq') }}#shipping-information">here</a>.`,
+        ]
+        
+        const extra = document.createElement('p');
+        extra.id = 'extra';
+        extra.innerHTML = text[i];
+        items[i].appendChild(extra);
+    };
+
+    items.forEach((item, index) => {
+        item.addEventListener('click', () => display(index));
+    });
+
+    if (isFinite(show)) {
+        console.log(show);
+        display(Number(show) - 1);
+    }
+</script>
+{% endblock %}

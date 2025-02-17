@@ -1,0 +1,73 @@
+{% extends "dashboard/base.html" %}
+{% set active_page = "customer_chat" %}
+{% block title %}Chat History Details{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/dashboard/customerChat/chatHistoryContent.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="chatHistory__content">
+  <h1>Chat History #{{ chat.id }}</h1>
+
+  <a href="{{ url_for('customerChat.chat_history') }}" class="back__link"><i class="fa-solid fa-chevron-left fa-sm"></i>Back</a>
+
+  <div class="chatHistory__wrapper">
+    <div class="chatHistory__meta">
+      <div class="chatHistory__meta-item">
+        <span class="chatHistory__meta-label">Date:</span>
+        <span class="chatHistory__meta-value">{{ chat.created_at.strftime('%B %d, %Y %I:%M %p') }}</span>
+      </div>
+      <div class="chatHistory__meta-item">
+        <span class="chatHistory__meta-label">Customer:</span>
+        <span class="chatHistory__meta-value">{{ customer.first_name }} {{ customer.last_name }}</span>
+      </div>
+      <div class="chatHistory__meta-item">
+        <span class="chatHistory__meta-label">Support Representative:</span>
+        <span class="chatHistory__meta-value">{{ admin.first_name }} {{ admin.last_name }}</span>
+      </div>
+      <div class="chatHistory__meta-item">
+        <span class="chatHistory__meta-label">Support Type:</span>
+        <span class="chatHistory__meta-value">{{ chat.support_type|title }} Support</span>
+      </div>
+    </div>
+    {% if chat.chat_summary %}
+    <div class="chat__summary">
+      <h3>Chat Summary</h3>
+      <p>{{ chat.chat_summary }}</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="chatHistory__conversationWrapper">
+    <div class="chatHistory__conversation">
+      <div class="chatHistory__header">
+        <h2>Conversation</h2>
+        <a href="" onclick="navigateWithChatContext(
+          '{{ customer.id }}',
+          '{{ customer.username }}',
+          '{{ customer.email }}',
+          '{{ chat.created_at.strftime('%B %d, %Y %I:%M %p') }}',
+          '{{ chat.support_type|title }}',
+          '{{ chat.id }}'
+        ); return false;">Provide Compensation</a>
+      </div>
+      <div class="chatHistory__messages">
+        {% for message in chat.chat %}
+          <div class="message {% if message.type == 'incoming' %}message--incoming{% else %}message--outgoing{% endif %}">
+            {{ message.message }}
+            <div class="message__timestamp">{{ message.timestamp }}</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block body_scripts %}
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='js/dashboard/manageVouchers/giftVoucher.js') }}"
+></script>
+{% endblock %}

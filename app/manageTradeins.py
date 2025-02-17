@@ -4,6 +4,7 @@ from .roleDecorator import role_required
 from .models import tradeDetail  
 from datetime import timedelta
 from . import db
+from .forms import ShippingPaymentForm
 
 manageTradeins = Blueprint('manageTradeins', __name__)
 
@@ -26,6 +27,21 @@ def manage_tradeins():
         trade_items=trade_items
     )
 
+@manageTradeins.route('/trade/<int:trade_id>/update-status', methods=['GET'])
+@login_required
+@role_required(2, 3)
+def update_trade_status(trade_id):
+    trade = tradeDetail.query.get_or_404(trade_id)
+    
+    new_status = request.args.get("status")
+    
+    if new_status in ["Approved", "Rejected"]:
+        trade.status = new_status
+        db.session.commit()
+        flash(f"Trade-in Request #{trade.id} has been {new_status.lower()}.", "success")
+    
+    return redirect(url_for('manageTradeins.manage_tradeins'))
+
 @manageTradeins.route('/delete-trade/<int:trade_id>', methods=['GET'])
 @login_required
 @role_required(1, 2, 3)  
@@ -35,28 +51,29 @@ def delete_trade(trade_id):
     # Only owner (user of whoever made it) can delete sent requests
     if current_user.role_id == 1 and trade_item.trade_number != current_user.id:
         flash("You do not have permission to delete this trade-in.", "danger")
-
         return redirect(url_for('manageTradeins.manage_tradeins'))
 
     db.session.delete(trade_item)
     db.session.commit()
-    flash("Trade-in deleted successfully!", "success")
+    
+    flash("Trade-in deleted successfully!", "delete")
 
     return redirect(url_for('manageTradeins.manage_tradeins'))
 
 from datetime import timedelta
 
-@manageTradeins.route('/view-trade/<int:trade_id>', methods=['GET'])
+@manageTradeins.route('/view-trade/<int:trade_id>', methods=['GET', 'POST'])
 @login_required
 @role_required(1, 2, 3)
 def view_trade_details(trade_id):
-
     trade_item = tradeDetail.query.get_or_404(trade_id)
-    
+    form = ShippingPaymentForm()
+
     return render_template(
         "dashboard/manageTradeins/customer_tradeDetails.html",
         trade_item=trade_item,
-        timedelta=timedelta  
+        form=form,
+        timedelta=timedelta
     )
 
 @manageTradeins.route('/edit-trade/<int:trade_id>', methods=['GET', 'POST'])
@@ -100,42 +117,44 @@ def view_all_requests():
         trade_requests=trade_requests
     )
 
-@manageTradeins.route('/trade/<int:trade_id>/update-status', methods=['GET'])
-@login_required
-@role_required(2, 3)
-def update_trade_status(trade_id):
-    trade = tradeDetail.query.get_or_404(trade_id)
-    
-    new_status = request.args.get("status")
-    
-    if new_status in ["Approved", "Rejected"]:
-        trade.status = new_status
-        db.session.commit()
-        flash(f"Trade-in Request #{trade.id} has been {new_status.lower()}.", "success")
-    
-    return redirect(url_for('manageTradeins.view_trade_details', trade_id=trade.id))
-
 @manageTradeins.route('/trade/<int:trade_id>/save-shipping-payment', methods=['POST'])
 @login_required
 def save_shipping_payment(trade_id):
     trade = tradeDetail.query.get_or_404(trade_id)
 
-    # Only goes thru if everything's ok
     if trade.status != "Approved":
         flash("Only approved trade-ins can proceed with shipping and payment.", "warning")
         return redirect(url_for('manageTradeins.view_trade_details', trade_id=trade.id))
 
-    trade.shipping_option = request.form.get("shipping_option")
-    trade.street_address = request.form.get("street_address")
-    trade.house_block = request.form.get("house_block")
-    trade.zip_code = request.form.get("zip_code")
-    trade.contact_number = request.form.get("contact_number")
-    
-    trade.card_number = request.form.get("card_number")[-4:]  # Save only last 4 digits... 
-    trade.card_expiry = request.form.get("card_expiry")
-    trade.card_name = request.form.get("card_name")
+    form = ShippingPaymentForm(request.form)
 
-    db.session.commit()
+    # Disable tracking number validation if not Mail-in
+    if form.shipping_option.data != "Mail-in":
+        form.tracking_number.validators = []  # Remove all validators
 
-    flash("Shipping and payment details saved successfully!", "success")
-    return redirect(url_for('manageTradeins.view_trade_details', trade_id=trade.id))
+    if form.shipping_option.data != "Pick-Up Service":
+        form.street_address.validators = []
+        form.house_block.validators = []
+        form.zip_code.validators = []
+        form.contact_number.validators = []
+
+    if form.validate_on_submit():  # Ensures form validation before saving
+        trade.shipping_option = form.shipping_option.data
+        trade.tracking_number = form.tracking_number.data
+        trade.street_address = form.street_address.data
+        trade.house_block = form.house_block.data
+        trade.zip_code = form.zip_code.data
+        trade.contact_number = form.contact_number.data
+        trade.card_number = form.card_number.data[-4:]  # Store only last 4 digits
+        trade.card_expiry = form.card_expiry.data
+        trade.card_name = form.card_name.data
+
+        db.session.commit()
+        flash("Shipping and payment details saved successfully!", "success")
+        return redirect(url_for('manageTradeins.view_trade_details', trade_id=trade.id))
+
+    # Debugging: print form errors
+    print("🚨 Form Errors:", form.errors)
+
+    flash("There was an error processing your request. Please check your input.", "danger")
+    return render_template("dashboard/manageTradeins/customer_tradeDetails.html", form=form, trade_item=trade, timedelta=timedelta)

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app, jsonify
 from . import db, mail, oauth
 from .models import User
 from .forms import LoginForm, RegisterForm, UsernameForm, RequestResetForm, ResetPasswordForm
@@ -8,6 +8,7 @@ from flask_mail import Message
 from dotenv import load_dotenv
 import os
 from secrets import token_urlsafe
+from .identicon import create_identicon
 
 auth = Blueprint('auth', __name__)
 
@@ -120,6 +121,29 @@ def register():
 
     return render_template("auth/register.html", user=current_user, form=form)
 
+def generate_user_identicon(username):
+  filename = f"identicon_{username}.png"
+    
+  static_folder = os.path.join(current_app.root_path, 'static', 'profile_pics')
+    
+  os.makedirs(static_folder, exist_ok=True)
+    
+  filepath = os.path.join(static_folder, filename)
+    
+  try:
+    create_identicon(
+      username=username,
+      filename=filepath,
+      avatar_size=5, # 5x5 grid
+      img_size_per_cell=100 # 100 pixels per cell
+    )
+        
+    # Return just the filename
+    return filename
+  except Exception as e:
+    print(f"Error generating identicon: {e}")
+    return 'profile_image_default.jpg'
+
 @auth.route('/register-2', methods=['GET', 'POST'])
 def register_step2():
   form = UsernameForm()
@@ -139,6 +163,9 @@ def register_step2():
       # update
       user.username = form.username.data
 
+      identicon_path = generate_user_identicon(user.username)
+      user.image = identicon_path
+
       db.session.commit()
       session.pop('user_id', None)
       flash("Account created successfully! Please log in with your new account.", "success")
@@ -147,7 +174,7 @@ def register_step2():
       db.session.rollback()
       flash("An unexpected error occurred. Please try again.", "error")
 
-  return render_template("auth/setUsername.html", user=current_user, form=form)
+  return render_template("auth/setUsername.html", user=None, form=form)
 
 def send_reset_email(user):
   current_app.config['UPDATE_MAIL_CONFIG']('auth')
@@ -156,23 +183,25 @@ def send_reset_email(user):
 
   reset_link = url_for('auth.reset_token', token=token, _external=True)
 
-  personalized_body = f'''To reset your password, visit the following link:
-  <a href='{reset_link}'>Reset Password</a>
+  # image_path = os.path.join(current_app.root_path, 'static', 'media', 'abstractheader1.jpg')
 
-  <br><br>
-  The link will expire in 30 minutes.
-
-  <br><br>
-  If you did not make this request then simply ignore this email and no changes will be made.
-  '''
+  html_body = render_template('email/reset_password.html', user=user,reset_link=reset_link)
 
   msg = Message(
     'Password Reset Request', 
     sender=('Rewwwind Help', current_app.config['MAIL_USERNAME']), 
     recipients=[user.email],
-    body=personalized_body,
-    html=personalized_body
+    html=html_body
   )
+
+  # with open(image_path, 'rb') as img:
+  #   msg.attach(
+  #     'abstractheader1.jpg',
+  #     'image/jpeg',
+  #     img.read(),
+  #     'inline',
+  #     headers={'Content-ID': '<header_image>'} 
+  #   )
   mail.send(msg)
 
 @auth.route('/reset-password', methods=['GET', 'POST'])
@@ -186,9 +215,23 @@ def reset_password_request():
     try:
       send_reset_email(form.user)
       flash('An email has been sent with instructions to reset your password.', 'info')
+      if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({'success': True})
       return redirect(url_for('auth.login'))
     except Exception as e:
+      print(e)
+      if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({
+          'success': False,
+          'message': 'Failed to send reset email'
+        })
       flash('An unexpected error occurred. Please try again.', 'error')
+  elif request.method == 'POST':
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+      return jsonify({
+        'success': False,
+        'errors': {field: errors for field, errors in form.errors.items()}
+      })
 
   return render_template("auth/resetPasswordRequest.html", user=current_user, form=form)
 

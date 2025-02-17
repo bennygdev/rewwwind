@@ -409,9 +409,26 @@ td.Approved div {
     color: #000;
   }
 
-  /* if no orders */
-  h1.none {
+  /* no orders */
+  .centralise {
     margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  img.none {
+    height: 400px;
+  }
+  h2.none {
+      margin: 30px 0 20px 0;
+      font-weight: normal;
+  }
+  a.none {
+    text-decoration: none;
+    color: #fff;
+    background-color: #039752;
+    padding: 10px 20px;
+    border-radius: 8px;
   }
 
 @media screen and (max-width: 1500px) {

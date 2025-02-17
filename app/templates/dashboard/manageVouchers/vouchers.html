@@ -9,21 +9,33 @@
 
 {% block headerContent %}
 <div class="vouchers__header">
-  <h1 id="vouchers__title">Manage Vouchers</h1>
-  <a href="{{ url_for('manageVouchers.add_voucher') }}" >Add New Voucher</a>
+  <h1 id="vouchers__title">
+    {% if is_customer %}
+      My Vouchers
+    {% else %}
+      Manage Vouchers
+    {% endif %}
+  </h1>
+  {% if not is_customer %}
+    <a href="{{ url_for('manageVouchers.add_voucher') }}" >Add New Voucher</a>
+    <a href="{{ url_for('manageVouchers.gift_voucher_page') }}" >Gift Voucher</a>
+  {% endif %}
   <div class="extraPadding"></div>
   <div class="voucherSearch__wrapper">
     <form method="get" action="{{ url_for('manageVouchers.vouchers_listing') }}">
       <div class="search__container">
         <!-- Preserve current filter values -->
-        {% if expiry_filter %}
-        <input type="hidden" name="expiry" value="{{ expiry_filter }}">
-        {% endif %}
-        {% if type_filter %}
-        <input type="hidden" name="type" value="{{ type_filter }}">
-        {% endif %}
         {% if status_filter %}
         <input type="hidden" name="status" value="{{ status_filter }}">
+        {% endif %}
+        
+        {% if not is_customer %}
+          {% if expiry_filter %}
+          <input type="hidden" name="expiry" value="{{ expiry_filter }}">
+          {% endif %}
+          {% if type_filter %}
+          <input type="hidden" name="type" value="{{ type_filter }}">
+          {% endif %}
         {% endif %}
 
         <input
@@ -60,6 +72,17 @@
     <input type="hidden" name="q" value="{{ search_query }}">
     {% endif %}
     
+    {% if is_customer %}
+    <div class="filter__group">
+      <label for="status">Status:</label>
+      <select name="status" id="status" class="filter__select">
+        <option value="">All</option>
+        {% for value, label in status_choices %}
+        <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% else %}
     <div class="filter__group">
       <label for="expiry">Expiry:</label>
       <select name="expiry" id="expiry" class="filter__select">
@@ -89,14 +112,77 @@
         {% endfor %}
       </select>
     </div>
+    {% endif %}
 
-    {% if expiry_filter or type_filter or status_filter %}
-    <a href="{{ url_for('manageVouchers.vouchers_listing', q=search_query) }}" class="clear__filters">Clear Filters</a>
+    {% if is_customer %}
+      {% if status_filter %}
+      <a href="{{ url_for('manageVouchers.vouchers_listing', q=search_query) }}" class="clear__filters">Clear Filters</a>
+      {% endif %}
+    {% else %}
+      {% if expiry_filter or type_filter or status_filter %}
+      <a href="{{ url_for('manageVouchers.vouchers_listing', q=search_query) }}" class="clear__filters">Clear Filters</a>
+      {% endif %}
     {% endif %}
   </form>
 </div>
 
 <div class="vouchers__grid">
+  {% if is_customer %}
+    {% for user_voucher in vouchers %}
+    <div class="voucher__card">
+      <div class="voucher__card--top">
+        <i class="fa-solid 
+          {% if user_voucher.voucher.voucherType_id == 1 %}
+            fa-percent
+          {% elif user_voucher.voucher.voucherType_id == 2 %}
+            fa-dollar-sign
+          {% else %}
+            fa-truck-fast
+          {% endif %} 
+          type-icon">
+        </i>
+        <div class="voucher__display">
+          <div class="voucher__status 
+            {% if user_voucher.is_used %}
+              used
+            {% elif user_voucher.expires_at < now %}
+              expired
+            {% else %}
+              active
+            {% endif %}">
+            {% if user_voucher.is_used %}
+              Used
+            {% elif user_voucher.expires_at < now %}
+              Expired
+            {% else %}
+              Active
+            {% endif %}
+          </div>
+          <div class="voucher__types">
+            {% if user_voucher.voucher.voucherType_id == 1 %}
+              {{ user_voucher.voucher.discount_value }}% Off
+            {% elif user_voucher.voucher.voucherType_id == 2 %}
+              ${{ user_voucher.voucher.discount_value }} Off
+            {% else %}
+              Free Shipping
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="voucher__card--bottom">
+        <div class="voucher__info">
+          <p class="voucher__code">{{ user_voucher.voucher.voucher_code }}</p>
+          <p class="voucher__expiry">Expires: {{ user_voucher.expires_at.strftime('%Y-%m-%d') }}</p>
+        </div>
+        <div class="controls">
+          <a href="#" onclick="viewVoucherDetails({{ user_voucher.voucher.id }}); return false;">
+            <i class="fa-solid fa-eye"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
   {% for voucher in vouchers %}
   <div class="voucher__card">
     <div class="voucher__card--top">
@@ -111,8 +197,10 @@
         {% endif %} 
         type-icon">
       </i>
-      <div class="voucher__status {{ 'active' if voucher.is_active else 'inactive' }}">
-        {{ 'Active' if voucher.is_active else 'Inactive' }}
+      <div class="voucher__display">
+        <div class="voucher__status {{ 'active' if voucher.is_active else 'inactive' }}">
+          {{ 'Active' if voucher.is_active else 'Inactive' }}
+        </div>
       </div>
     </div>
     <div class="voucher__card--bottom">
@@ -145,6 +233,7 @@
     </div>
   </div>
   {% endfor %}
+  {% endif %}
 </div>
 
 <div class="vouchers__pagination">
@@ -195,6 +284,20 @@
         <strong>Eligible Categories:</strong>
         <span id="modal__voucher--categories"></span>
       </div>
+      {% if is_customer %}
+      <div class="voucher__detail">
+        <strong>Claim Date:</strong>
+        <span id="modal__voucher--claim-date"></span>
+      </div>
+      <div class="voucher__detail">
+        <strong>Expiry Date:</strong>
+        <span id="modal__voucher--expiry-date"></span>
+      </div>
+      <div class="voucher__detail">
+        <strong>Status:</strong>
+        <span id="modal__voucher--status"></span>
+      </div>
+      {% else %}
       <div class="voucher__detail">
         <strong>Expiry:</strong>
         <span id="modal__voucher--expiry"></span>
@@ -207,6 +310,7 @@
         <strong>Created At:</strong>
         <span id="modal__voucher--created"></span>
       </div>
+      {% endif %}
       <div class="voucher__detail">
         <strong>Criteria:</strong>
         <pre id="modal__voucher--criteria"></pre  >
@@ -233,6 +337,7 @@
 document.addEventListener('DOMContentLoaded', function() {
   const modal = document.getElementById('voucherDetailsModal');
   const closeModal = document.querySelector('.close-modal');
+  const isCustomer = {{ 'true' if is_customer else 'false' }};
 
   const formatCriteria = (criteria) => {
     if (!criteria || criteria.length === 0) return 'No specific criteria';
@@ -256,7 +361,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const options = { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    };
     return new Intl.DateTimeFormat('en-US', options).format(date);
   };
 
@@ -283,12 +394,17 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('modal__voucher--categories').textContent = 
           voucher.eligible_categories ? voucher.eligible_categories.join(', ') : 'N/A';
         
-        document.getElementById('modal__voucher--expiry').textContent = `${voucher.expiry_days} days`;
-        document.getElementById('modal__voucher--status').textContent = voucher.is_active ? 'Active' : 'Inactive';
-        
-        document.getElementById('modal__voucher--created').textContent = formatDate(voucher.created_at);
-        
         document.getElementById('modal__voucher--criteria').textContent = formatCriteria(voucher.criteria);
+        
+        if (isCustomer) {
+          document.getElementById('modal__voucher--claim-date').textContent = formatDate(voucher.claim_date);
+          document.getElementById('modal__voucher--expiry-date').textContent = formatDate(voucher.expiry_date);
+          document.getElementById('modal__voucher--status').textContent = voucher.status;
+        } else {
+          document.getElementById('modal__voucher--expiry').textContent = `${voucher.expiry_days} days`;
+          document.getElementById('modal__voucher--status').textContent = voucher.is_active ? 'Active' : 'Inactive';
+          document.getElementById('modal__voucher--created').textContent = formatDate(voucher.created_at);
+        }
         
         modal.style.display = 'flex';
       })

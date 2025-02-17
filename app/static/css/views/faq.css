@@ -1,0 +1,89 @@
+.faq__container {
+  max-width: 1200px;
+  margin-top: calc(80px + 100px);
+  justify-self: center;
+  padding: 0 1rem;
+}
+
+.faq__header {
+  font-family: "CharisSILBold";
+  text-align: center;
+  font-size: 2em;
+  margin-bottom: 2rem;
+}
+
+.faq__section {
+  margin-top: 80px;
+  margin-bottom: 20px;
+}
+
+/* .faq__section h2 {
+  text-align: center;
+  font-family: "CharisSIL";
+} */
+
+.faq__section--header {
+  text-align: center;
+  font-family: "CharisSIL";
+  margin-bottom: 30px;
+}
+
+.accordion-button {
+  font-family: "CharisSILBold";
+  font-size: 0.5em;
+}
+
+.accordion {
+  z-index: 0;
+}
+
+.accordion-body {
+  font-size: 0.95em;
+}
+
+.faq__description {
+  text-align: center;
+}
+
+.quick__links {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.quick__links a {
+  text-decoration: none;
+  color: #000;
+  margin-top: 50px;
+  font-size: 0.95em;
+}
+
+.quick__link--button {
+  background-color: #F4F4F4;
+  padding: 10px 25px;
+  border: 1px solid #C3C3C3;
+  border-radius: 30px;
+  transition: 0.3s ease;
+}
+
+.quick__link--button:hover {
+  background-color: #EAEAEA;
+  transition: 0.3s ease;
+}
+
+
+.faq__section:last-child {
+  padding-bottom: 10px;
+  border-bottom: none;
+}
+
+.accordion-button:focus {
+  box-shadow: none;
+  border-color: rgba(0,0,0,.125);
+}
+
+.accordion {
+  border: 1px solid #ddd;
+}

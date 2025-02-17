@@ -154,6 +154,10 @@ def apply_voucher():
         
     if not voucher.is_active:
       return jsonify({"status": "error", "message": "This voucher is no longer active."}), 400
+    
+    session['voucher'] = {
+        'id': voucher.id
+    }
 
     # Check if user has this voucher
     user_voucher = UserVoucher.query.filter_by(user_id=current_user.id, voucher_id=voucher.id, is_used=False).first()

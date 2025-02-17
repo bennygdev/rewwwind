@@ -1,13 +1,14 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, current_app, jsonify, abort
 from flask_login import login_required, current_user
-from .forms import UpdatePersonalInformation, ChangePasswordForm, BillingAddressForm, PaymentMethodForm, ChangeEmailForm
+from .forms import UpdatePersonalInformation, ChangePasswordForm, BillingAddressForm, PaymentMethodForm, ChangeEmailForm, Enable2FAForm, Verify2FAForm
 from .models import User, BillingAddress, PaymentInformation, PaymentType, Review, Cart, Order, UserVoucher, MailingList, Product, OrderItem
 from .roleDecorator import role_required
-from . import db
+from . import db, mail
 import secrets
 import os
 from PIL import Image
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_mail import Message
 
 dashboard = Blueprint('dashboard', __name__)
 # Profile page, settings page
@@ -63,6 +64,10 @@ def change_email():
 
   if current_user.google_account:
     abort(404)
+
+  if current_user.two_factor_enabled:
+    flash("Please turn off 2FA before you change your email.", "info")
+    return redirect(url_for('dashboard.user_settings'))
 
   if form.validate_on_submit():
     try:
@@ -173,7 +178,7 @@ def change_password():
       current_user.password = generate_password_hash(form.password.data, method='pbkdf2:sha256')
       db.session.commit()
       flash("Password updated successfully!", "success")
-      return redirect(url_for('dashboard.update_personal_information'))
+      return redirect(url_for('dashboard.security_settings'))
     except Exception as e:
       db.session.rollback()
       flash("An unexpected error occurred. Please try again.", "error")
@@ -481,3 +486,98 @@ def get_recommended_products(user_id):
     recommended_products.extend(book_products)
   
   return recommended_products
+
+@dashboard.route('/settings/security')
+@login_required
+@role_required(1, 2, 3)
+def security_settings():
+  # no google accounts
+  if current_user.google_account:
+    flash('Two-factor authentication is not available for Google accounts.', 'warning')
+    return redirect(url_for('dashboard.user_settings'))
+    
+  return render_template("dashboard/settings/security.html", user=current_user)
+
+@dashboard.route('/settings/security/enable-2fa', methods=['GET', 'POST'])
+@login_required
+@role_required(1, 2, 3)
+def enable_2fa():
+  # Only allow non-Google users to access 2FA settings
+  if current_user.google_account:
+    flash('Two-factor authentication is not available for Google accounts.', 'warning')
+    return redirect(url_for('dashboard.user_settings'))
+    
+  form = Enable2FAForm()
+    
+  if form.validate_on_submit():
+    if current_user.two_factor_enabled:
+      flash('Two-factor authentication is already enabled.', 'info')
+      return redirect(url_for('dashboard.security_settings'))
+        
+    # Generate a 6-digit code
+    code = current_user.generate_2fa_code()
+        
+    # Send email with code
+    send_2fa_setup_email(current_user, code)
+        
+    db.session.commit()
+    flash('A verification code has been sent to your email. Please verify to enable 2FA.', 'info')
+    return redirect(url_for('dashboard.verify_2fa_setup'))
+    
+  return render_template("dashboard/settings/enable_2fa.html", user=current_user, form=form)
+
+@dashboard.route('/settings/security/verify-2fa', methods=['GET', 'POST'])
+@login_required
+@role_required(1, 2, 3)
+def verify_2fa_setup():
+  # Only non-google can
+  if current_user.google_account:
+    flash('Two-factor authentication is not available for Google accounts.', 'warning')
+    return redirect(url_for('dashboard.user_settings'))
+    
+  form = Verify2FAForm()
+    
+  if form.validate_on_submit():
+    if current_user.verify_2fa_code(form.code.data):
+      current_user.two_factor_enabled = True
+      current_user.two_factor_secret = None
+      current_user.two_factor_expiry = None
+      db.session.commit()
+      flash('Two-factor authentication has been successfully enabled.', 'success')
+      return redirect(url_for('dashboard.security_settings'))
+    else:
+      flash('Invalid or expired verification code. Please try again.', 'error')
+    
+  return render_template("dashboard/settings/verify_2fa.html", user=current_user, form=form)
+
+@dashboard.route('/settings/security/disable-2fa', methods=['POST'])
+@login_required
+@role_required(1, 2, 3)
+def disable_2fa():
+  # Only non google can
+  if current_user.google_account:
+    flash('Two-factor authentication is not available for Google accounts.', 'warning')
+    return redirect(url_for('dashboard.user_settings'))
+    
+  if current_user.two_factor_enabled:
+    current_user.two_factor_enabled = False
+    current_user.two_factor_secret = None
+    current_user.two_factor_expiry = None
+    db.session.commit()
+    flash('Two-factor authentication has been disabled.', 'success')
+    
+  return redirect(url_for('dashboard.security_settings'))
+
+def send_2fa_setup_email(user, code):
+  current_app.config['UPDATE_MAIL_CONFIG']('auth')
+  
+  html_body = render_template('email/2fa_setup.html', user=user, code=code)
+  
+  msg = Message(
+    'Set Up Two-Factor Authentication', 
+    sender=('Rewwwind Help', current_app.config['MAIL_USERNAME']), 
+    recipients=[user.email],
+    html=html_body
+  )
+  
+  mail.send(msg)

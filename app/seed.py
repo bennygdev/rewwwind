@@ -1,7 +1,9 @@
 # seed.py
-from .models import Product, Category, SubCategory, Order, OrderItem, PaymentInformation, BillingAddress, db, User, Voucher, VoucherType, UserVoucher, Review
+from .models import Product, Category, SubCategory, Order, OrderItem, PaymentInformation, BillingAddress, db, User, Voucher, VoucherType, UserVoucher, Review, tradeDetail
 from werkzeug.security import generate_password_hash
 from datetime import datetime, timedelta
+import random
+from app.models import tradeDetail
 
 def insert_default_roles():
   from .models import Role
@@ -16,6 +18,7 @@ def insert_default_roles():
   db.session.commit()
   print('Inserted default roles into the database!')
 
+# Real users
 def insert_users():
   from .models import User
   admin1 = User(
@@ -74,7 +77,7 @@ def insert_users():
     email = "dummy@gmail.com",
     image = None,
     google_account = False,
-    password = generate_password_hash("dummyy", method='pbkdf2:sha256'),
+    password = generate_password_hash("testtest", method='pbkdf2:sha256'),
     orderCount = 0,
     role_id = 1
   )
@@ -107,6 +110,44 @@ def insert_payment_types():
     
   db.session.commit()
   print('Inserted payment types into the database!')
+
+# Dummy users
+def insert_dummy_users():
+  first_names = ["John", "Jane", "Alice", "Bob", "Charlie", "Diana", "Edward", "Fiona", "George", "Hannah", "Michael", "Sarah", "David", "Emily", "Matthew", "Rebecca", "Jason", "Olivia", "Daniel", "Sophia"]
+  last_names = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez", "Wilson", "Thompson", "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson", "Garcia"]
+    
+  # Date range (June 2024 - Feb 2025)
+  start_date = datetime(2024, 6, 1)
+  end_date = datetime(2025, 2, 28)
+    
+  for i in range(20):
+    # Generate a random date within the range
+    random_days = random.randint(0, (end_date - start_date).days)
+    signup_date = start_date + timedelta(days=random_days)
+        
+    username = f"{first_names[i].lower()}{random.randint(100, 999)}"
+    email = f"{username}@example.com"
+        
+    # Check if user already exists
+    existing_user = User.query.filter_by(email=email).first()
+    if not existing_user:
+      new_user = User(
+        first_name=first_names[i],
+        last_name=last_names[i],
+        username=username,
+        email=email,
+        image=None,
+        google_account=False,
+        password=generate_password_hash(f"password{i+1}", method='pbkdf2:sha256'),
+        orderCount=random.randint(0, 5),
+        role_id=1,
+        created_at=signup_date,
+        updated_at=signup_date
+      )
+      db.session.add(new_user)
+    
+  db.session.commit()
+  print('Inserted 20 dummy users!')
 
 def insert_categories():
     categories = []
@@ -571,12 +612,25 @@ def insert_orders():
   #     'phone': billing_info.phone_number
   #   }
   # )
+  import random
+  from datetime import datetime, timedelta
   
-  for x in range(4):
+  for x in range(10):
+
+    start_date = datetime(2024, 8, 1).date()
+    end_date = datetime.now().date()
+    delta = (end_date - start_date).days
+
+    random_days = random.randint(0, delta)
+    random_date = start_date + timedelta(days=random_days)
+
     order = Order(
         user_id=4,
+        order_date=random_date,
+        approval_date=random_date,
         total_amount=0,
         delivery='standard',
+        status='Approved',
         payment_type_id=1,
         payment_information_id=payment_info.id,
         billing_id=billing_info.id
@@ -624,12 +678,19 @@ def insert_orders():
   db.session.commit()
   
   for x in range(5):
-    from datetime import datetime,timedelta
+    start_date = datetime(2024, 8, 1).date()
+    end_date = datetime.now().date()
+    delta = (end_date - start_date).days
+
+    random_days = random.randint(0, delta)
+    random_date = start_date + timedelta(days=random_days)
+
     order = Order(
         user_id=4,
-        order_date=datetime.now()-timedelta(days=randint(20, 40)),
+        order_date=random_date,
         total_amount=0,
         delivery='expedited',
+        status='Pending',
         payment_type_id=2,
         payment_information_id=payment_info.id,
         billing_id=billing_info.id
@@ -805,12 +866,13 @@ def insert_vouchers():
 
       if new_voucher.voucher_code == 'FIRSTOFF10':
         new_user_voucher2 = UserVoucher(
-        user_id=5,
-        voucher_id=new_voucher.id,
-        expires_at=datetime.now() + timedelta(days=new_voucher.expiry_days)
+          user_id=5,
+          voucher_id=new_voucher.id,
+          expires_at=datetime.now() + timedelta(days=new_voucher.expiry_days)
         )
         db.session.add(new_user_voucher2)
         db.session.commit()
+        
       db.session.add(new_user_voucher)
       db.session.commit()
 
@@ -836,5 +898,135 @@ def insert_vouchers():
     db.session.add(new_user_voucher)
     db.session.commit()
 
-
   print('Inserted default vouchers into the database!')
+
+import random
+from datetime import datetime
+from .models import tradeDetail, db, User
+
+def insert_trade_ins():
+    customer = User.query.filter_by(id=4).first()
+    if not customer:
+        print("Customer with ID 4 not found! Make sure to run insert_users first.")
+        return
+
+    existing_trade_count = tradeDetail.query.count()  # Count existing records
+
+    # random date
+    start_date = datetime(2024, 6, 1)
+    end_date = datetime(2025, 1, 31)
+
+    trade_ins = [
+        {
+            "title": "The Great Gatsby",
+            "item_type": "book",
+            "genre": "Classic",
+            "author_artist": "F. Scott Fitzgerald",
+            "isbn_or_cat": "9780743273565",
+            "item_condition": "Brand New",
+            "status": "Pending",
+        },
+        {
+            "title": "To Kill a Mockingbird",
+            "item_type": "book",
+            "genre": "Fiction",
+            "author_artist": "Harper Lee",
+            "isbn_or_cat": "9780061120084",
+            "item_condition": "Like New",
+            "status": "Pending",
+        },
+        {
+            "title": "1984",
+            "item_type": "book",
+            "genre": "Dystopian",
+            "author_artist": "George Orwell",
+            "isbn_or_cat": "9780451524935",
+            "item_condition": "Lightly Used",
+            "status": "Pending",
+        },
+        {
+            "title": "The Catcher in the Rye",
+            "item_type": "book",
+            "genre": "Fiction",
+            "author_artist": "J.D. Salinger",
+            "isbn_or_cat": "9780316769488",
+            "item_condition": "Well Used",
+            "status": "Approved",
+        },
+        {
+            "title": "Brave New World",
+            "item_type": "book",
+            "genre": "Dystopian",
+            "author_artist": "Aldous Huxley",
+            "isbn_or_cat": "9780060850524",
+            "item_condition": "Brand New",
+            "status": "Approved",
+        },
+        {
+            "title": "Harry Potter and the Sorcerer's Stone",
+            "item_type": "book",
+            "genre": "Fantasy",
+            "author_artist": "J.K. Rowling",
+            "isbn_or_cat": "9780590353427",
+            "item_condition": "Like New",
+            "status": "Pending",
+        },
+        {
+            "title": "The Hobbit",
+            "item_type": "book",
+            "genre": "Fantasy",
+            "author_artist": "J.R.R. Tolkien",
+            "isbn_or_cat": "9780618260300",
+            "item_condition": "Lightly Used",
+            "status": "Approved",
+        },
+        {
+            "title": "Pride and Prejudice",
+            "item_type": "book",
+            "genre": "Romance",
+            "author_artist": "Jane Austen",
+            "isbn_or_cat": "9780141439518",
+            "item_condition": "Well Used",
+            "status": "Pending",
+        },
+        {
+            "title": "The Lord of the Rings",
+            "item_type": "book",
+            "genre": "Fantasy",
+            "author_artist": "J.R.R. Tolkien",
+            "isbn_or_cat": "9780618640157",
+            "item_condition": "Like New",
+            "status": "Approved",
+        },
+        {
+            "title": "Animal Farm",
+            "item_type": "book",
+            "genre": "Satire",
+            "author_artist": "George Orwell",
+            "isbn_or_cat": "9780451526342",
+            "item_condition": "Brand New",
+            "status": "Pending",
+        },
+    ]
+
+    for index, trade in enumerate(trade_ins, start=existing_trade_count + 1):
+        days_range = (end_date - start_date).days
+        random_days = random.randint(0, days_range)
+        random_date = start_date + timedelta(days=random_days)
+        
+        trade_in_entry = tradeDetail(
+            title=trade["title"],
+            item_type=trade["item_type"],
+            genre=trade["genre"],
+            author_artist=trade["author_artist"],
+            isbn_or_cat=trade["isbn_or_cat"],
+            item_condition=trade["item_condition"],
+            status=trade["status"],
+            trade_number=customer.id,
+            created_at=random_date,
+            updated_at=random_date,
+        )
+        db.session.add(trade_in_entry)
+
+    db.session.commit()
+    print("Inserted 10 trade-in listings!")

@@ -1,0 +1,48 @@
+{% extends "dashboard/base.html" %}
+{% set active_page = "settings" %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/settings/settings.css') }}">
+{% endblock %}
+
+{% block title %}Security Settings{% endblock %}
+
+{% block headerContent %}
+<div class="settings__header">
+  <h1 id="settings__title">Security Settings</h1>
+  <p id="settings__subtitles">Manage your account security settings and two-factor authentication.</p>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="settings__content">
+  {% include "components/flashValidation.html" %}
+  <a href="{{ url_for('dashboard.user_settings') }}" class="back__link"><i class="fa-solid fa-chevron-left fa-sm"></i>Back</a>
+
+  <div class="settings__container">
+    <p class="settings__title">Two-Factor Authentication (2FA)</p>
+    <p class="settings__paragraph">Add an extra layer of security to your account by enabling two-factor authentication. When enabled, you'll be asked to enter a verification code sent to your email when logging in.</p>
+    
+    {% if user.google_account %}
+      <p class="settings__paragraph"><em>Two-factor authentication is not available for Google accounts as Google already provides its own security measures.</em></p>
+    {% else %}
+      {% if user.two_factor_enabled %}
+        <p class="settings__paragraph"><strong>Status: Enabled</strong></p>
+        <form action="{{ url_for('dashboard.disable_2fa') }}" method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="settings__button" style="background-color: #ff4c24;">Disable Two-Factor Authentication</button>
+        </form>
+      {% else %}
+        <p class="settings__paragraph"><strong>Status: Disabled</strong></p>
+        <a href="{{ url_for('dashboard.enable_2fa') }}" class="settings__button">Enable Two-Factor Authentication</a>
+      {% endif %}
+    {% endif %}
+  </div>
+  
+  <div class="settings__container">
+    <p class="settings__title">Password</p>
+    <p class="settings__paragraph">Change your password to keep your account secure.</p>
+    <a href="{{ url_for('dashboard.change_password') }}" class="settings__button">Change Password</a>
+  </div>
+</div>
+{% endblock %}

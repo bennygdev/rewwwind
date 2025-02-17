@@ -245,7 +245,7 @@ def generate_invoice(order_id):
   # ship disc
   if order.voucher and order.voucher.voucherType_id == 3:
     pdf.set_font('Arial', 'B', 12) 
-    pdf.cell(30, 10, "Shipping Discount:", 0, 0) 
+    pdf.cell(30, 10, "Discount:", 0, 0) 
     pdf.set_font('Arial', '', 12) 
     if order.billing:
       if order.delivery == 'international':

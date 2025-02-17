@@ -11,28 +11,28 @@
 
 {% block content %}
 <div class="form-container">
-    <h1>Image Upload</h1>
+    <h1>Trade-in Item Submission</h1>
 
-    <!-- Full Image Preview (Large Display) -->
-    <div id="full-image-preview-container">
-        <img id="full-image-preview" class="hidden">
-    </div>
-
-    <!-- Carousel for Multiple Images with Delete & Navigation -->
-    <div class="carousel-container">
-        <div class="preview-container" id="preview-container"></div>
-    </div>
-
-    <!-- Image Upload Box (Only the Upload Button) -->
-    <div class="image-upload">
-        <input type="file" id="file-input" name="images" accept="image/*" multiple required>
-        <label for="file-input" class="upload-button">Select from Files</label>
-    </div>
-
-    <h1>Item Information</h1>
-
-    <form id="tradeForm" action="{{ url_for('views.trade_form') }}" method="POST" enctype="multipart/form-data" novalidate> 
+    <form id="tradeForm" action="{{ url_for('views.trade_form') }}" method="POST" enctype="multipart/form-data" novalidate>
         {{ form.hidden_tag() }}
+
+        <!-- Full Image Preview (Large Display) -->
+        <div id="full-image-preview-container" class="hidden">
+        <img id="full-image-preview">
+        </div>
+
+        <!-- Image Upload & Previews -->
+        <div class="image-upload-section">
+        <label for="file-input" class="upload-button">Select Images</label>
+        <input type="file" id="file-input" name="images" accept="image/*" multiple required>
+
+        <!-- Carousel for Image Previews -->
+        <div class="preview-container" id="preview-container"></div>
+        </div>
+
+        <h2>Item Information</h2>
+
+   
 
         <div class="form-row">
             <div class="form-group">
@@ -47,69 +47,45 @@
 
         <!-- TITLE FIELD -->
         <div class="form-group">
-            <div class="label-container">
-                <label for="title">Title</label>
-                {% if form.title.errors %}
-                    <span class="form-error">
-                        {% for error in form.title.errors %}
-                            {{ error }}
-                        {% endfor %}
-                    </span>
-                {% endif %}
-            </div>
+            <label for="title">Title</label>
             {{ form.title(class="form-control", id="title") }}
+            {% if form.title.errors %}
+                <span class="form-error">{{ form.title.errors[0] }}</span>
+            {% endif %}
         </div>
 
         <!-- AUTHOR FIELD -->
         <div class="form-group">
-            <div class="label-container">
-                <label for="author">Author / Artist</label>
-                {% if form.author.errors %}
-                    <span class="form-error">
-                        {% for error in form.author.errors %}
-                            {{ error }}
-                        {% endfor %}
-                    </span>
-                {% endif %}
-            </div>
+            <label for="author">Author / Artist</label>
             {{ form.author(class="form-control", id="author") }}
+            {% if form.author.errors %}
+                <span class="form-error">{{ form.author.errors[0] }}</span>
+            {% endif %}
         </div>
 
         <!-- GENRE FIELD -->
         <div class="form-group">
-            <div class="label-container">
-                <label for="genre">Genre</label>
-                {% if form.genre.errors %}
-                    <span class="form-error">
-                        {% for error in form.genre.errors %}
-                            {{ error }}
-                        {% endfor %}
-                    </span>
-                {% endif %}
-            </div>
+            <label for="genre">Genre</label>
             {{ form.genre(class="form-control", id="genre") }}
+            {% if form.genre.errors %}
+                <span class="form-error">{{ form.genre.errors[0] }}</span>
+            {% endif %}
         </div>
 
         <!-- ISBN FIELD -->
         <div class="form-group">
-            <div class="label-container">
-                <label for="isbn">ISBN / Cat#</label>
-                {% if form.isbn.errors %}
-                    <span class="form-error">
-                        {% for error in form.isbn.errors %}
-                            {{ error }}
-                        {% endfor %}
-                    </span>
-                {% endif %}
-            </div>
+            <label for="isbn">ISBN / Cat#</label>
             {{ form.isbn(class="form-control", id="isbn") }}
+            {% if form.isbn.errors %}
+                <span class="form-error">{{ form.isbn.errors[0] }}</span>
+            {% endif %}
         </div>
 
         <!-- Hidden Input for Image Paths -->
         <input type="hidden" name="image_paths" id="image_paths">
 
         <div class="button-group">
-            <button type="button" class="btnB">Back</button>
+            <button type="button" class="btnB" onclick="history.back()">Back</button>
             {{ form.submit(class_="btnS") }}
         </div>
     </form>
@@ -117,16 +93,6 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/tradein/tradeForm.js') }}"></script>
-<script>
-    document.getElementById("file-input").addEventListener("change", function(event) {
-        let files = event.target.files;
-        let imagePaths = [];
-        for (let i = 0; i < files.length; i++) {
-            imagePaths.push(files[i].name);
-        }
-        document.getElementById("image_paths").value = JSON.stringify(imagePaths);
-    });
-</script>
 {% endblock %}
 
 {% endblock %}

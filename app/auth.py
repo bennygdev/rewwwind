@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app, jsonify
 from . import db, mail, oauth
 from .models import User, UserVoucher, Voucher
-from .forms import LoginForm, RegisterForm, UsernameForm, RequestResetForm, ResetPasswordForm
+from .forms import LoginForm, RegisterForm, UsernameForm, RequestResetForm, ResetPasswordForm, Verify2FAForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, logout_user, current_user
 from flask_mail import Message
@@ -83,7 +83,22 @@ def login():
   form = LoginForm()
   if form.validate_on_submit():
     try:
-      login_user(form.user, remember=True)
+      user = form.user
+      
+      # Check if user has 2FA enabled
+      if user.two_factor_enabled and not user.google_account:
+        # Generate and send 2FA code via email
+        code = user.generate_2fa_code()
+        send_2fa_login_email(user, code)
+        db.session.commit()
+        
+        # Store user_id in session temporarily for 2FA verification
+        session['pending_user_id'] = user.id
+        flash('A verification code has been sent to your email.', 'info')
+        return redirect(url_for('auth.verify_2fa'))
+      
+      # No 2FA, proceed with normal login
+      login_user(user, remember=True)
       return redirect(url_for('views.home'))
     except Exception as e:
       flash('An unexpected error occurred. Please try again.', 'error')
@@ -296,3 +311,48 @@ def reset_token(token):
       flash("An unexpected error occurred. Please try again.", "error")
   
   return render_template("auth/reset_token.html", user=current_user, form=form)
+
+# 2FA
+@auth.route('/verify-2fa', methods=['GET', 'POST'])
+def verify_2fa():
+  # Check if user has pending 2FA verification
+  if 'pending_user_id' not in session:
+    return redirect(url_for('auth.login'))
+  
+  form = Verify2FAForm()
+  
+  if form.validate_on_submit():
+    user = User.query.get(session['pending_user_id'])
+    
+    if not user:
+      flash('An error occurred. Please try logging in again.', 'error')
+      return redirect(url_for('auth.login'))
+    
+    if user.verify_2fa_code(form.code.data):
+      # Clear 2FA verification data
+      user.two_factor_secret = None
+      user.two_factor_expiry = None
+      db.session.commit()
+      
+      # Complete login
+      login_user(user, remember=True)
+      session.pop('pending_user_id', None)
+      return redirect(url_for('views.home'))
+    else:
+      flash('Invalid or expired verification code. Please try again.', 'error')
+  
+  return render_template("auth/verify_2fa.html", form=form)
+
+def send_2fa_login_email(user, code):
+  current_app.config['UPDATE_MAIL_CONFIG']('auth')
+  
+  html_body = render_template('email/2fa_login.html', user=user, code=code)
+  
+  msg = Message(
+    'Login Verification Code', 
+    sender=('Rewwwind Help', current_app.config['MAIL_USERNAME']), 
+    recipients=[user.email],
+    html=html_body
+  )
+  
+  mail.send(msg)

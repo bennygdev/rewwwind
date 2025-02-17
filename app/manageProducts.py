@@ -286,6 +286,10 @@ def add_product():
                 # Set a session flag to prevent immediate re-saving
                 session['product_added'] = True
 
+                from .productPagination import precompute_product_embeddings
+                product_embeddings = precompute_product_embeddings()
+                current_app.config['PRODUCT_EMBEDDINGS'] = product_embeddings
+
                 # Return a success response
                 flash("The product has been added successfully.", "success")
                 return jsonify({'success': True, 'message': 'Product added successfully!'})
@@ -434,6 +438,9 @@ def update_product(product_id):
             product.image_thumbnail = product.images[int(form.productThumbnail.data)]
 
             # print(vars(product))
+            from .productPagination import precompute_product_embeddings
+            product_embeddings = precompute_product_embeddings()
+            current_app.config['PRODUCT_EMBEDDINGS'] = product_embeddings
             
             # Commit changes
             db.session.commit()

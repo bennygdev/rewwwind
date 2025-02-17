@@ -72,6 +72,48 @@
   border: none;
 }
 
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.error {
+  font-size: 0.8em;
+  color: red;
+  margin-top: 5px;
+  display: block;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  font-weight: bold;
+}
+
+.status-enabled {
+  background-color: #e6f7ef;
+  color: #039752;
+}
+
+.status-disabled {
+  background-color: #f8e6e6;
+  color: #dc3545;
+}
+
 @media (max-width: 480px) {
   .settings__content {
     padding: 20px 16px;

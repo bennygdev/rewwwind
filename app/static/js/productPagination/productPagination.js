@@ -11,6 +11,10 @@ document.addEventListener('DOMContentLoaded', function () {
         listViewButton.classList.add('active');
         gridViewButton.classList.remove('active');
         productsContainer.classList.add('list-view');
+        productContainer.forEach(e => {
+            e.style.marginBottom = '0';
+            e.addEventListener('click', (i) => {window.location.href = e.querySelector('a').getAttribute('href')});
+        });
     } else {
         gridViewButton.classList.add('active');
         listViewButton.classList.remove('active');

@@ -27,7 +27,7 @@ function createAccountDetailsChart(canvasId, url, chartType, chartTitle) {
             data: data.data,
             borderColor: chartType === 'pie' ? undefined : '#039752',
             backgroundColor: chartType === 'pie' ? 
-              ['#039752', '#04703E', '#034926', '#023319'] :
+              ['#039752', '#04703E', '#034926', '#023319', '#01231C', '#011D13', '#00110B', '#000502', '#112110', '#223321'] :
               chartType === 'bar' ? '#039752' : undefined,
             tension: 0.1
           }]
@@ -39,10 +39,36 @@ function createAccountDetailsChart(canvasId, url, chartType, chartTitle) {
             title: {
               display: false,
               text: chartTitle
-            }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  let label = context.label || '';
+                  if (chartType === 'pie') {
+                    return `${label}: ${Math.round(context.raw)}`;
+                  } else {
+                    if (label) {
+                      label += ': ';
+                    }
+                    return label + Math.round(context.raw);
+                  }
+                }
+              }
+            },
           }
         }
       };
+
+      if (chartType !== 'pie') {
+        config.options.scales = {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0
+            }
+          }
+        };
+      }
 
       new Chart(canvas, config);
     })

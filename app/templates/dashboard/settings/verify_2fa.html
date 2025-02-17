@@ -1,0 +1,45 @@
+{% extends "dashboard/base.html" %}
+{% set active_page = "settings" %}
+
+{% block styles %}
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='css/dashboard/settings/settings.css') }}">
+{% endblock %}
+
+{% block title %}Verify Two-Factor Authentication{% endblock %}
+
+{% block headerContent %}
+<div class="settings__header">
+  <h1 id="settings__title">Verify Two-Factor Authentication</h1>
+  <p id="settings__subtitles">Enter the verification code sent to your email to complete setup.</p>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="settings__content">
+  {% include "components/flashValidation.html" %}
+
+  <div class="settings__container">
+    <p class="settings__paragraph">A verification code has been sent to your email address ({{ user.email }}). Please enter the 6-digit code below to complete setup.</p>
+    <p class="settings__paragraph"><strong>Note:</strong> The verification code will expire after 5 minutes.</p>
+    
+    <form method="POST">
+      {{ form.hidden_tag() }}
+      <div class="form-group">
+        {{ form.code.label }}
+        {{ form.code(class="form-control", style="width: 150px; font-size: 1.2em; letter-spacing: 0.5em; text-align: center;", autocomplete="off") }}
+        {% if form.code.errors %}
+          {% for error in form.code.errors %}
+            <span class="error">{{ error }}</span>
+          {% endfor %}
+        {% endif %}
+      </div>
+      <br>
+      {{ form.submit(class="settings__button") }}
+    </form>
+  </div>
+  
+  <div class="settings__container">
+    <a href="{{ url_for('dashboard.security_settings') }}" class="settings__button" style="background-color: #666;">Cancel</a>
+  </div>
+</div>
+{% endblock %}

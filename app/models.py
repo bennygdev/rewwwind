@@ -5,6 +5,9 @@ from sqlalchemy import event
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
 from itsdangerous import URLSafeTimedSerializer as Serializer
+import random
+from datetime import datetime, timedelta
+from werkzeug.security import check_password_hash, generate_password_hash
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
@@ -21,6 +24,11 @@ class User(db.Model, UserMixin):
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)  # role table
     created_at = db.Column(db.DateTime(timezone=True), default=func.now())
     updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
+
+    # 2FA fields
+    two_factor_enabled = db.Column(db.Boolean, default=False, nullable=False)
+    two_factor_secret = db.Column(db.String(100), nullable=True)
+    two_factor_expiry = db.Column(db.DateTime(timezone=True), nullable=True)
     
     # favourites
     wishlisted_items = db.Column(db.JSON, nullable=True)
@@ -50,6 +58,19 @@ class User(db.Model, UserMixin):
         return None
 
       return User.query.get(user_id)
+    
+    def generate_2fa_code(self):
+        code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+        self.two_factor_secret = generate_password_hash(code, method='pbkdf2:sha256')
+        self.two_factor_expiry = datetime.now() + timedelta(minutes=5)
+        return code
+    
+    def verify_2fa_code(self, code):
+        if not self.two_factor_secret or not self.two_factor_expiry:
+            return False
+        if datetime.now() > self.two_factor_expiry:
+            return False
+        return check_password_hash(self.two_factor_secret, code)
     
 class BillingAddress(db.Model):
   __tablename__ = 'billing_addresses'
@@ -269,7 +290,7 @@ class tradeDetail(db.Model):
     __tablename__ = 'trade_details'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    images = db.Column(db.JSON, nullable=False)  
+    images = db.Column(db.JSON, nullable=False, default="[]")  
     item_type = db.Column(db.String(100), nullable=False)
     item_condition = db.Column(db.String(100), nullable=False)
     title = db.Column(db.String(255), nullable=False)
@@ -281,8 +302,8 @@ class tradeDetail(db.Model):
 
     user = db.relationship('User', backref='trade_items', lazy=True)
 
-    created_at = db.Column(db.DateTime(timezone=True), default=func.now())
-    updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
+    created_at = db.Column(db.DateTime(timezone=True), default=db.func.now())
+    updated_at = db.Column(db.DateTime(timezone=True), default=db.func.now(), onupdate=db.func.now())
 
     # For shipping and payment NEW!!
     shipping_option = db.Column(db.String(50))
@@ -295,6 +316,14 @@ class tradeDetail(db.Model):
     card_number = db.Column(db.String(4))  
     card_expiry = db.Column(db.String(10))
     card_name = db.Column(db.String(255))
+
+
+    def add_image(self, filename):
+        """ Helper function to add an image filename to the images list """
+        if not self.images:
+            self.images = []
+        self.images.append(filename)
+        db.session.commit()
 
 
 

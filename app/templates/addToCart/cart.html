@@ -103,35 +103,51 @@
         <div class="cart-summary">
           <h3>Cart Total: $<span id="cart-total">{{ cart_total }}</span></h3>
 
-            <!-- Voucher Selection -->
-          <div class=voucher-container">
+          <!-- Voucher Selection -->
+          <!-- Voucher Selection -->
+          <div class="voucher-container">
+            <!-- Applied Voucher Display -->
+            <div id="applied-voucher" style="display: none;" class="applied-voucher">
+              <div class="voucher-info">
+                <span class="voucher-label">Applied Voucher:</span>
+                <span id="voucher-code-display" class="voucher-code"></span>
+                <span id="voucher-discount-display" class="discount"></span>
+              </div>
+              <button type="button" class="remove-voucher-btn" onclick="removeVoucher()">
+                <i class="bi bi-x-circle"></i>
+              </button>
+            </div>
+          
+            <!-- Voucher Input Form -->
             <form id="voucher-form">
-                <select id="voucher-code" name="voucher">
-                    <option value="">Select a Voucher</option>
-                    {% for voucher in vouchers %}
-                    <option value="{{ voucher.voucher_code }}"
-                            data-discount="{{ voucher.discount_value }}"
-                            data-min-purchase="{{ voucher.min_purchase }}"
-                            data-type="{% if voucher.voucherType_id == 1 %}percentage{% elif voucher.voucherType_id == 2 %}fixed_amount{% elif voucher.voucherType_id == 3 %}free_shipping{% endif %}">
-                        {{ voucher.voucher_code }} - {% if voucher.voucherType_id == 1 %}
-                        {{ voucher.discount_value }}% Off
-                        {% elif voucher.voucherType_id == 2 %}
-                        ${{ voucher.discount_value }} Off
-                        {% elif voucher.voucherType_id == 3 %}
-                        Free Shipping
-                        {% endif %}
-                    </option>
-                    {% endfor %}
-                </select>
-                <button type="button" class="btn-primary" onclick="applyVoucher()">Apply</button>
+              {{ voucher_form.csrf_token }}
+              <div class="voucher-input-container">
+                {{ voucher_form.voucher_code(id="voucher-code", placeholder="Enter voucher code", class="form-control") }}
+                {{ voucher_form.submit(class="btn-primary", onclick="applyVoucher(); return false;") }}
+              </div>
+              <p id="discount-message" style="color: #039752; display: none;"></p>
+              <p id="error-message" style="color: #ff0000; display: none;"></p>
             </form>
           </div>
+          
+          <!-- Update the cart summary section -->
+          <div class="cart-summary">
+            <h3>Subtotal: $<span id="original-total">{{ cart_total }}</span></h3>
+            
+            <h3 id="discount-line" style="display: none;" class="discount">Discount: -$<span id="discount-amount">0.00</span></h3>
+            
+            <h3>Final Total: $<span id="final-total">{{ cart_total }}</span></h3>
+            
+            <button type="button" class="btn-primary" id="update-cart-btn">Update Cart</button>
+            <a href="{{ url_for('payment.select_ship') }}" class="btn-primary">Proceed to Checkout</a>
+          </div>
+
 
               <!-- Discount Display -->
-            <p id="discount-message" style="color: green; display: none;"></p>
+            <!-- <p id="discount-message" style="color: green; display: none;"></p>
 
             <button type="button" class="btn-primary" id="update-cart-btn">Update Cart</button>
-            <a href="/checkout" class="btn-primary">Proceed to Checkout</a>
+            <a href="/checkout" class="btn-primary">Proceed to Checkout</a> -->
         </div>
     {% endif %}
 
@@ -147,7 +163,6 @@
 </div>
 
 <script>
-
     document.getElementById('update-cart-btn').addEventListener('click', function () {
         // Trigger the submission of the hidden update-cart-form
         document.getElementById('update-cart-form').submit();
@@ -186,45 +201,87 @@
         .catch(error => console.error('Error:', error));
     }
 
-function applyVoucher() {
-    let voucherDropdown = document.getElementById('voucher-code');
-    let selectedOption = voucherDropdown.options[voucherDropdown.selectedIndex];
-
-    if (!selectedOption.value) {
-        alert("Please select a voucher.");
+    function applyVoucher() {
+      let voucherInput = document.getElementById('voucher-code');
+      let voucherCode = voucherInput.value.trim().toUpperCase();
+      let csrfToken = document.querySelector('input[name="csrf_token"]').value;
+      
+      if (!voucherCode) {
+        showError("Please enter a voucher code.");
         return;
-    }
-
-    let voucherId = selectedOption.value;
-
-    fetch('/apply-voucher', {
+      }
+    
+      fetch('/apply-voucher', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRFToken': csrfToken
         },
-        body: JSON.stringify({ voucher: voucherId })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === "success") {
-            // Update the displayed cart total
-            let cartTotalElement = document.getElementById('cart-total');
-            cartTotalElement.innerText = data.new_total.toFixed(2);
-
-            // Show success message
-            let discountMessage = document.getElementById('discount-message');
-            discountMessage.innerText = `Discount Applied! New Total: $${data.new_total.toFixed(2)}`;
-            discountMessage.style.display = "block";
-        } else {
-            alert(data.message);
+        body: JSON.stringify({ voucher: voucherCode })
+      })
+      .then(response => {
+        if (!response.ok) {
+          return response.json().then(data => {
+            throw new Error(data.message || `HTTP error! Status: ${response.status}`);
+          });
         }
-    })
-    .catch(error => console.error('Error:', error));
-}
-
-
-
+        return response.json();
+      })
+      .then(data => {
+        if (data.status === "success") {
+          // Show the applied voucher details
+          document.getElementById('applied-voucher').style.display = 'flex';
+          document.getElementById('voucher-code-display').textContent = voucherCode;
+          document.getElementById('voucher-discount-display').textContent = ` (-$${data.discount_amount.toFixed(2)})`;
+      
+          // data.new_total = subtotal - discount, and (data.new_total + data.discount_amount) is the original subtotal.
+          document.getElementById('original-total').textContent = (data.new_total + data.discount_amount).toFixed(2);
+          document.getElementById('discount-amount').textContent = data.discount_amount.toFixed(2);
+          document.getElementById('final-total').textContent = data.new_total.toFixed(2);
+      
+          // Hide the voucher input form
+          document.getElementById('voucher-form').style.display = 'none';
+          document.getElementById('error-message').style.display = "none";
+        } else {
+          showError(data.message);
+        }
+      })
+      
+      .catch(error => {
+        console.error('Error:', error);
+        showError(error.message || "An error occurred while applying the voucher. Please try again.");
+      });
+    }
+    
+    function removeVoucher() {
+      // Reset the display
+      document.getElementById('applied-voucher').style.display = 'none';
+      document.getElementById('voucher-form').style.display = 'block';
+      document.getElementById('voucher-code').value = '';
+      document.getElementById('discount-line').style.display = 'none';
+      
+      // Reset the cart total to the original subtotal
+      let subtotal = document.getElementById('cart-subtotal').textContent;
+      document.getElementById('cart-total').textContent = subtotal;
+      
+      fetch('/remove-voucher', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+        }
+      })
+      .catch(error => console.error('Error removing voucher:', error));
+    }
+    
+    function showError(message) {
+      let errorMessage = document.getElementById('error-message');
+      errorMessage.innerText = message;
+      errorMessage.style.display = "block";
+      document.getElementById('discount-message').style.display = "none";
+    }
 </script>
 {% endblock %}
 

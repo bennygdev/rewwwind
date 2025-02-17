@@ -93,7 +93,7 @@ def insert_users():
       db.session.add(user)
 
   db.session.commit()
-  print('Inserted Admin and Owner accounts!')
+  print('Inserted Customer, Admin and Owner accounts!')
 
 def insert_payment_types():
   from .models import PaymentType

@@ -320,3 +320,28 @@ h1 {
     margin-right: 10px;
 }
 
+.voucher-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.voucher-label {
+  font-weight: bold;
+  color: #333;
+}
+
+.voucher-code {
+  color: #039752;
+  font-weight: bold;
+}
+
+#discount-line {
+  color: #039752;
+}
+
+.voucher-input-container {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}

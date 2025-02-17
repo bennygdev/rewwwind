@@ -882,12 +882,16 @@ from datetime import datetime
 from .models import tradeDetail, db, User
 
 def insert_trade_ins():
-    users = User.query.filter_by(role_id=1).all()  # Select customers only
-    if not users:
-        print("No users found! Make sure to run insert_users first.")
+    customer = User.query.filter_by(id=4).first()
+    if not customer:
+        print("Customer with ID 4 not found! Make sure to run insert_users first.")
         return
 
     existing_trade_count = tradeDetail.query.count()  # Count existing records
+
+    # random date
+    start_date = datetime(2024, 6, 1)
+    end_date = datetime(2025, 1, 31)
 
     trade_ins = [
         {
@@ -935,9 +939,58 @@ def insert_trade_ins():
             "item_condition": "Brand New",
             "status": "Approved",
         },
+        {
+            "title": "Harry Potter and the Sorcerer's Stone",
+            "item_type": "book",
+            "genre": "Fantasy",
+            "author_artist": "J.K. Rowling",
+            "isbn_or_cat": "9780590353427",
+            "item_condition": "Like New",
+            "status": "Pending",
+        },
+        {
+            "title": "The Hobbit",
+            "item_type": "book",
+            "genre": "Fantasy",
+            "author_artist": "J.R.R. Tolkien",
+            "isbn_or_cat": "9780618260300",
+            "item_condition": "Lightly Used",
+            "status": "Approved",
+        },
+        {
+            "title": "Pride and Prejudice",
+            "item_type": "book",
+            "genre": "Romance",
+            "author_artist": "Jane Austen",
+            "isbn_or_cat": "9780141439518",
+            "item_condition": "Well Used",
+            "status": "Pending",
+        },
+        {
+            "title": "The Lord of the Rings",
+            "item_type": "book",
+            "genre": "Fantasy",
+            "author_artist": "J.R.R. Tolkien",
+            "isbn_or_cat": "9780618640157",
+            "item_condition": "Like New",
+            "status": "Approved",
+        },
+        {
+            "title": "Animal Farm",
+            "item_type": "book",
+            "genre": "Satire",
+            "author_artist": "George Orwell",
+            "isbn_or_cat": "9780451526342",
+            "item_condition": "Brand New",
+            "status": "Pending",
+        },
     ]
 
     for index, trade in enumerate(trade_ins, start=existing_trade_count + 1):
+        days_range = (end_date - start_date).days
+        random_days = random.randint(0, days_range)
+        random_date = start_date + timedelta(days=random_days)
+        
         trade_in_entry = tradeDetail(
             title=trade["title"],
             item_type=trade["item_type"],
@@ -946,10 +999,11 @@ def insert_trade_ins():
             isbn_or_cat=trade["isbn_or_cat"],
             item_condition=trade["item_condition"],
             status=trade["status"],
-            trade_number=index,  # ✅ Generate unique trade_number
-            created_at=datetime.utcnow(),
+            trade_number=customer.id,
+            created_at=random_date,
+            updated_at=random_date,
         )
         db.session.add(trade_in_entry)
 
     db.session.commit()
-    print("Inserted 5 trade-in listings!")
+    print("Inserted 10 trade-in listings!")

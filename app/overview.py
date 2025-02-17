@@ -158,22 +158,52 @@ def get_product_sales():
     'data': [sale[1] for sale in sales] if sales else []
   }
 
-@overview.route('/api/admin/weekly-signups')
+# @overview.route('/api/admin/weekly-signups')
+# @login_required
+# @role_required(2, 3)
+# def get_weekly_signups():
+#   # Get user registrations grouped by week
+#   signup_data = db.session.query(
+#     func.strftime('%Y-%W', User.created_at).label('week'),
+#     func.count(User.id).label('count')
+#   ).group_by(
+#     func.strftime('%Y-%W', User.created_at)
+#   ).order_by(
+#     func.strftime('%Y-%W', User.created_at)
+#   ).all()
+    
+#   return {
+#     'labels': [signup[0] for signup in signup_data] if signup_data else [],
+#     'data': [signup[1] for signup in signup_data] if signup_data else []
+#   }
+
+@overview.route('/api/admin/monthly-signups')
 @login_required
 @role_required(2, 3)
-def get_weekly_signups():
-  # Get user registrations grouped by week
+def get_monthly_signups():
   signup_data = db.session.query(
-    func.strftime('%Y-%W', User.created_at).label('week'),
+    func.strftime('%Y-%m', User.created_at).label('month'),
     func.count(User.id).label('count')
   ).group_by(
-    func.strftime('%Y-%W', User.created_at)
+    func.strftime('%Y-%m', User.created_at)
   ).order_by(
-    func.strftime('%Y-%W', User.created_at)
+    func.strftime('%Y-%m', User.created_at)
   ).all()
     
+  # convert month to a more readable format
+  formatted_labels = []
+  for signup in signup_data:
+    try:
+      year_month = signup[0].split('-')
+      month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      month_idx = int(year_month[1]) - 1 
+      formatted_month = f"{month_names[month_idx]} {year_month[0]}"
+      formatted_labels.append(formatted_month)
+    except (IndexError, ValueError):
+      formatted_labels.append(signup[0])
+    
   return {
-    'labels': [signup[0] for signup in signup_data] if signup_data else [],
+    'labels': formatted_labels if signup_data else [],
     'data': [signup[1] for signup in signup_data] if signup_data else []
   }
 

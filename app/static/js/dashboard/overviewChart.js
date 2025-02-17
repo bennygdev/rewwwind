@@ -27,7 +27,7 @@ function createChart(canvasId, url, chartType, chartTitle) {
               data: data.data,
               borderColor: chartType === 'pie' ? undefined : '#039752',
               backgroundColor: chartType === 'pie' ? 
-                ['#039752', '#04703E', '#034926', '#023319'] :
+                ['#039752', '#04703E', '#034926', '#023319', '#01231C', '#011D13', '#00110B', '#000502', '#112110', '#223321'] :
                 chartType === 'bar' ? '#039752' : undefined,
               tension: 0.1
             }]
@@ -39,21 +39,52 @@ function createChart(canvasId, url, chartType, chartTitle) {
               title: {
                 display: false,
                 text: chartTitle
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    let label = context.label || '';
+                    if (chartType === 'pie') {
+                      return `${label}: ${Math.round(context.raw)}`;
+                    } else {
+                      if (label) {
+                        label += ': ';
+                      }
+                      return label + Math.round(context.raw);
+                    }
+                  }
+                }
+              },
+              legend: {
+                display: chartType === 'pie' ? true : false,
+                position: 'right'
               }
             }
           }
         };
 
-        new Chart(canvas, config);
-      })
-      .catch(error => {
-        console.error('Error loading chart data:', error);
-        canvas.style.display = 'none';
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'chart-error';
-        errorDiv.textContent = 'Unable to load chart data';
-        canvas.parentNode.appendChild(errorDiv);
-      });
+      // Scales configuration only for bar and line charts
+      if (chartType !== 'pie') {
+        config.options.scales = {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0
+            }
+          }
+        };
+      }
+
+      new Chart(canvas, config);
+    })
+    .catch(error => {
+      console.error('Error loading chart data:', error);
+      canvas.style.display = 'none';
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'chart-error';
+      errorDiv.textContent = 'Unable to load chart data';
+      canvas.parentNode.appendChild(errorDiv);
+    });
 }
 
 // Initialize charts based on user role
@@ -63,7 +94,7 @@ function initializeCharts(roleId) {
     createChart('buyingTrendChart', '/dashboard/api/customer/buying-trend', 'bar', 'Orders');
     createChart('topCategoriesChart', '/dashboard/api/customer/top-categories', 'pie', 'Purchase Categories');
   } else if (roleId === 2 || roleId === 3) {
-    createChart('weeklySignupsChart', '/dashboard/api/admin/weekly-signups', 'line', 'Weekly Sign-ups');
+    createChart('weeklySignupsChart', '/dashboard/api/admin/monthly-signups', 'line', 'Weekly Sign-ups');
     createChart('categorySalesChart', '/dashboard/api/admin/category-sales', 'pie', 'Sales by Category');
     createChart('productSalesChart', '/dashboard/api/admin/product-sales', 'line', 'Monthly Sales');
   }

@@ -2,6 +2,7 @@
 from .models import Product, Category, SubCategory, Order, OrderItem, PaymentInformation, BillingAddress, db, User, Voucher, VoucherType, UserVoucher, Review
 from werkzeug.security import generate_password_hash
 from datetime import datetime, timedelta
+import random
 
 def insert_default_roles():
   from .models import Role
@@ -16,6 +17,7 @@ def insert_default_roles():
   db.session.commit()
   print('Inserted default roles into the database!')
 
+# Real users
 def insert_users():
   from .models import User
   admin1 = User(
@@ -107,6 +109,44 @@ def insert_payment_types():
     
   db.session.commit()
   print('Inserted payment types into the database!')
+
+# Dummy users
+def insert_dummy_users():
+  first_names = ["John", "Jane", "Alice", "Bob", "Charlie", "Diana", "Edward", "Fiona", "George", "Hannah", "Michael", "Sarah", "David", "Emily", "Matthew", "Rebecca", "Jason", "Olivia", "Daniel", "Sophia"]
+  last_names = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez", "Wilson", "Thompson", "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson", "Garcia"]
+    
+  # Date range (June 2024 - Feb 2025)
+  start_date = datetime(2024, 6, 1)
+  end_date = datetime(2025, 2, 28)
+    
+  for i in range(20):
+    # Generate a random date within the range
+    random_days = random.randint(0, (end_date - start_date).days)
+    signup_date = start_date + timedelta(days=random_days)
+        
+    username = f"{first_names[i].lower()}{random.randint(100, 999)}"
+    email = f"{username}@example.com"
+        
+    # Check if user already exists
+    existing_user = User.query.filter_by(email=email).first()
+    if not existing_user:
+      new_user = User(
+        first_name=first_names[i],
+        last_name=last_names[i],
+        username=username,
+        email=email,
+        image=None,
+        google_account=False,
+        password=generate_password_hash(f"password{i+1}", method='pbkdf2:sha256'),
+        orderCount=random.randint(0, 5),
+        role_id=1,
+        created_at=signup_date,
+        updated_at=signup_date
+      )
+      db.session.add(new_user)
+    
+  db.session.commit()
+  print('Inserted 20 dummy users!')
 
 def insert_categories():
     categories = []
@@ -805,12 +845,13 @@ def insert_vouchers():
 
       if new_voucher.voucher_code == 'FIRSTOFF10':
         new_user_voucher2 = UserVoucher(
-        user_id=5,
-        voucher_id=new_voucher.id,
-        expires_at=datetime.now() + timedelta(days=new_voucher.expiry_days)
+          user_id=5,
+          voucher_id=new_voucher.id,
+          expires_at=datetime.now() + timedelta(days=new_voucher.expiry_days)
         )
         db.session.add(new_user_voucher2)
         db.session.commit()
+        
       db.session.add(new_user_voucher)
       db.session.commit()
   print('Inserted default vouchers into the database!')

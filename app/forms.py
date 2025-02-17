@@ -556,6 +556,10 @@ class AddToCartForm(FlaskForm):
   quantity = IntegerField('Quantity')
   submit = SubmitField('Add to Cart')
 
+class ApplyVoucherForm(FlaskForm):
+  voucher_code = StringField('Voucher Code', validators=[DataRequired(), Length(min=3, max=20)])
+  submit = SubmitField('Apply')
+
 #Trade-in form stuff
 class TradeItemForm(FlaskForm):
     item_type = SelectField('Item Type', choices=[

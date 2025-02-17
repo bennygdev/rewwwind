@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app, jsonify
 from . import db, mail, oauth
-from .models import User
+from .models import User, UserVoucher, Voucher
 from .forms import LoginForm, RegisterForm, UsernameForm, RequestResetForm, ResetPasswordForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, logout_user, current_user
@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 import os
 from secrets import token_urlsafe
 from .identicon import create_identicon
+from datetime import datetime, timedelta
 
 auth = Blueprint('auth', __name__)
 
@@ -48,6 +49,18 @@ def google_callback():
     )
     db.session.add(user)
     db.session.commit()
+
+    # add voucher
+    firstoff_voucher = Voucher.query.filter_by(voucher_code='FIRSTOFF10').first()
+    if firstoff_voucher:
+      user_voucher = UserVoucher(
+        user_id=user.id,
+        voucher_id=firstoff_voucher.id,
+        expires_at=datetime.now() + timedelta(days=firstoff_voucher.expiry_days)
+      )
+      db.session.add(user_voucher)
+      db.session.commit()
+      print('First-time purchase voucher assigned to Google user')
 
   login_user(user, remember=True)
   # flash('Logged in successfully!', 'success')
@@ -113,6 +126,18 @@ def register():
         db.session.commit()
         print('account created successfully')
         
+        # add voucher
+        firstoff_voucher = Voucher.query.filter_by(voucher_code='FIRSTOFF10').first()
+        if firstoff_voucher:
+          user_voucher = UserVoucher(
+              user_id=new_user.id,
+              voucher_id=firstoff_voucher.id,
+              expires_at=datetime.now() + timedelta(days=firstoff_voucher.expiry_days)
+          )
+          db.session.add(user_voucher)
+          db.session.commit()
+          print('First-time purchase voucher assigned successfully')
+
         session['user_id'] = new_user.id
         return redirect(url_for('auth.register_step2'))
       except Exception as e:

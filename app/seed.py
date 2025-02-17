@@ -74,7 +74,7 @@ def insert_users():
     email = "dummy@gmail.com",
     image = None,
     google_account = False,
-    password = generate_password_hash("dummy", method='pbkdf2:sha256'),
+    password = generate_password_hash("dummyy", method='pbkdf2:sha256'),
     orderCount = 0,
     role_id = 1
   )
@@ -93,7 +93,7 @@ def insert_users():
       db.session.add(user)
 
   db.session.commit()
-  print('Inserted Admin and Owner accounts!')
+  print('Inserted Customer, Admin and Owner accounts!')
 
 def insert_payment_types():
   from .models import PaymentType

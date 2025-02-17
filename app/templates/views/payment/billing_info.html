@@ -3,7 +3,13 @@
 {% block styles %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/views/pre-payment.css') }}">
 {% endblock %}
-{% block title %}Fill In Your Billing Information{% endblock %}
+{% block title %}
+{% if show != '1' %}
+Fill In Your Billing Information
+{% else %}
+Select a Pick Up Date
+{% endif %}
+{% endblock %}
 
 {% block content %}
 <div class="left">
@@ -22,12 +28,20 @@
         </div>
     </div>
     <div class="header">
-        <h1>Fill Your Billing Information</h1>
-        <span>This is the address your ordered items will be shipped to.</span>
+        <h1>{% if show != '1' %}
+            Fill In Your Billing Information
+            {% else %}
+            Select a Pick Up Date
+            {% endif %}</h1>
+        <span>{% if show != '1' %}
+            This is the address your ordered items will be shipped to.
+            {% else %}
+            More details will be sent to you via email once we are ready.
+            {% endif %}</span>
     </div>
     <form action="{{ url_for('payment.billing_info') }}" method="POST">
         {{ form.hidden_tag() }}
-        {% if show and show != '1' %}
+        {% if show != '1' %}
         <div class="input country">
             <label for="country" title="This is required.">Country <span class="req">*</span></label>
             {% if show == '2' or show == '3' %}
@@ -81,7 +95,7 @@
             {% endfor %}
             {% endif %}
         </div>
-        {% else %}
+        {% elif show == '1' %}
         <div class="input pickup_date">
             <label for="pickup_date" title="This is required.">Pickup Date <span class="req">*</span></label><br>
             {{ form.pickup_date(class='form-date') }}

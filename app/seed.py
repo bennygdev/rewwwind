@@ -1,6 +1,7 @@
 # seed.py
-from .models import Product, Category, SubCategory, Order, OrderItem, PaymentInformation, BillingAddress, db, User, Voucher, VoucherType
+from .models import Product, Category, SubCategory, Order, OrderItem, PaymentInformation, BillingAddress, db, User, Voucher, VoucherType, UserVoucher
 from werkzeug.security import generate_password_hash
+from datetime import datetime, timedelta
 
 def insert_default_roles():
   from .models import Role
@@ -760,6 +761,13 @@ def insert_vouchers():
         is_active=True
       )
       db.session.add(new_voucher)
-    
-  db.session.commit()
+      db.session.commit()
+
+      new_user_voucher = UserVoucher(
+        user_id=4,
+        voucher_id=new_voucher.id,
+        expires_at=datetime.now() + timedelta(days=new_voucher.expiry_days)
+      )
+      db.session.add(new_user_voucher)
+      db.session.commit()
   print('Inserted default vouchers into the database!')

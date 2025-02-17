@@ -64,6 +64,12 @@ class BillingAddress(db.Model):
   created_at = db.Column(db.DateTime(timezone=True), default=func.now())
   updated_at = db.Column(db.DateTime(timezone=True), default=func.now(), onupdate=func.now())
 
+class Pickup(db.Model):
+  __tablename__ = 'pickup'
+  id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+  user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+  pickup_date = db.Column(db.DateTime(timezone=True), nullable=False)
+
 class PaymentInformation(db.Model):
   __tablename__ = 'payment_information'
   id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -169,6 +175,9 @@ class Order(db.Model):
   delivery = db.Column(db.String(100), nullable=False)
   total_amount = db.Column(db.Numeric(10, 2), nullable=False, default=0)
   status = db.Column(db.String(50), default='Pending', nullable=False)
+
+  voucher_id = db.Column(db.Integer, db.ForeignKey('vouchers.id'), nullable=True)
+  voucher = db.relationship('Voucher', backref='orders', lazy=True)
   
   user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
   user = db.relationship('User', back_populates='orders', lazy=True)
@@ -181,6 +190,9 @@ class Order(db.Model):
 
   billing_id = db.Column(db.Integer, db.ForeignKey('billing_addresses.id'), nullable=True)
   billing = db.relationship('BillingAddress', backref='orders', lazy=True)
+
+  pickup_id = db.Column(db.Integer, db.ForeignKey('pickup.id'), nullable=True)
+  pickup = db.relationship('Pickup', backref='orders', lazy=True)
 
   order_items = db.relationship('OrderItem', backref='order', lazy=True) # otm orderitems
 

@@ -2,9 +2,11 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash,
 from flask_login import login_required, current_user
 from sqlalchemy.orm.attributes import flag_modified
 from .roleDecorator import role_required
-from .models import Product, Order, OrderItem, Cart, PaymentInformation, BillingAddress
-from .forms import BillingAddressForm, SelectDeliveryTypeForm, PickupForm
+from .models import Product, Order, OrderItem, Cart, PaymentInformation, BillingAddress, Pickup, Voucher, UserVoucher
+from .forms import BillingAddressForm, SelectDeliveryTypeForm, PickupForm, VoucherSelectForm
 from . import db
+from sqlalchemy.orm.attributes import flag_modified
+from datetime import datetime
 
 import stripe
 
@@ -28,15 +30,26 @@ def create_temp_cart(product_id): # to prevent errors.
         condition = [con for con in product.conditions if con.get('condition') == getcondition]
         if not condition:
             abort(404)
-
-        temp_cart = Cart(
-            user_id=current_user.id,
-            product_id=product_id,
-            product_condition=condition[0],
-            quantity=1
-        )
-        db.session.add(temp_cart)
-        db.session.commit()
+        
+        c_challenge = current_user.cart_items
+        if not c_challenge:
+            temp_cart = Cart(
+                user_id=current_user.id,
+                product_id=product_id,
+                product_condition=condition[0],
+                quantity=1
+            )
+            db.session.add(temp_cart)
+            db.session.commit()
+        else:
+            existing_item = Cart.query.filter_by(user_id=current_user.id, product_id=product_id, product_condition=product.conditions[0]).first()
+            if existing_item:
+                existing_item.quantity += 1
+                flag_modified(existing_item, 'quantity')
+            else:
+                new_item = Cart(user_id=current_user.id, product_id=product_id, product_condition=product.conditions[0], quantity=1)
+                db.session.add(new_item)
+            db.session.commit()
 
     return redirect(url_for('payment.select_ship'))
 
@@ -85,10 +98,12 @@ def billing_info():
             form.unit_number.data = session['billing_info']['unit_number']
             form.postal_code.data = session['billing_info']['postal_code']
             form.phone_number.data = session['billing_info']['phone_number']
+        if show == '1' and session.get('pickup_date', {}).get('date'):
+            form.pickup_date.data = datetime.strptime(session['pickup_date']['date'], '%a, %d %b %Y %H:%M:%S %Z')
 
     else:
         if form.validate_on_submit():
-            if show != '1' or None:
+            if show != '1':
                 if show == '4':
                     co = form.countryInt.data
                 else:
@@ -105,12 +120,28 @@ def billing_info():
                 session['pickup_date'] = {
                     'date': form.pickup_date.data
                 }
+            return redirect(url_for('payment.select_voucher'))
+        else:
+            for err in form.errors:
+                print(err)
+
+    return render_template('/views/payment/billing_info.html', form=form, show=show)
+
+@payment.route('/checkout/select_voucher', methods=['GET', 'POST']) # step 3 form
+@login_required
+def select_voucher():
+    form = VoucherSelectForm()
+    
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            session['voucher'] = {
+                'id': form.voucher.data
+            }
             return redirect(url_for('payment.checkout_cart'))
         else:
             for err in form.errors:
-                print(err, form.errors[err], form.country.data, form.countryInt.data)
-
-    return render_template('/views/payment/billing_info.html', form=form, show=show)
+                print(err)
+    return render_template('/views/payment/select_vouch.html', form=form)
 
 @payment.route('/checkout/cart', methods=['GET'])
 @login_required
@@ -152,6 +183,61 @@ def checkout_cart():
             db.session.commit()
         else:
             customer = stripe.Customer.retrieve(current_user.stripe_id)
+        
+        # total
+        total_amount = sum(item['price_data']['unit_amount'] * item['quantity'] for item in items)
+
+        d_type = session.get('delivery_type', {}).get('type')
+        shipping_cost = 0
+        if d_type == '2' and total_amount / 100 > 30:
+            shipping_cost = 4 * 100
+            ship_name = 'Standard Local Delivery'
+        elif d_type == '3':
+            shipping_cost = 10 * 100
+            ship_name = 'Expedited Local Delivery'
+        elif d_type == '4':
+            shipping_cost = 30 * 100
+            ship_name = 'International Delivery'
+        
+        final_total = total_amount + shipping_cost
+        
+        # voucher
+        v_id = session.get('voucher', {}).get('id')
+        voucher = Voucher.query.get(v_id) if v_id else None
+
+        if voucher:
+            if voucher.voucherType_id == 1:
+                items = [] # reset because no way to apply vouchers without manually adding them in stripe
+                discount = int(final_total * (voucher.discount_value / 100))
+                final_total -= discount
+                items.append({
+                    'price_data': {
+                        'unit_amount': final_total,
+                        'currency': 'sgd',
+                        'product_data': {
+                            'name': 'Discounted Products with code ' + voucher.voucher_code
+                        }
+                    },
+                    'quantity': 1,
+                })
+            elif voucher.voucherType_id == 2:
+                items = [] # reset because no way to apply vouchers without manually adding them in stripe
+                discount = int(voucher.discount_value * 100)
+                final_total -= discount
+                items.append({
+                    'price_data': {
+                        'unit_amount': final_total,
+                        'currency': 'sgd',
+                        'product_data': {
+                            'name': 'Discounted Products with code ' + voucher.voucher_code
+                        }
+                    },
+                    'quantity': 1,
+                })
+            elif voucher.voucherType_id == 3:
+                # Free shipping
+                final_total -= shipping_cost
+                shipping_cost = 0
 
         # Create the Checkout Session
         checkout_session = stripe.checkout.Session.create(
@@ -161,11 +247,25 @@ def checkout_cart():
             cancel_url=url_for('payment.checkout_cancel', _external=True),
             customer=current_user.stripe_id,
             payment_intent_data={
-                'setup_future_usage': 'on_session'
+                'setup_future_usage': 'on_session',
+                'metadata': {
+                    'voucher_id': voucher.id if voucher else None,
+                    'voucher_code': voucher.voucher_code if voucher else None,
+                },
             },
             payment_method_data={
-                'allow_redisplay': 'always'
-            }
+                'allow_redisplay': 'always',
+            },
+            shipping_options=[{
+                'shipping_rate_data': {
+                    'type': 'fixed_amount',
+                    'fixed_amount': {
+                        'amount': shipping_cost,
+                        'currency': 'sgd',
+                    },
+                    'display_name': ship_name,
+                },
+            }] if shipping_cost > 0 else None,
         )
 
     except Exception as e:
@@ -178,7 +278,7 @@ def checkout_cart():
 @role_required(1)
 def success():
     try:
-        print(session.get('billing_info', None), session.get('delivery_type', None))
+        # print(session.get('billing_info', None), session.get('delivery_type', None), session.get('pickup_date', None))
         # retrieve previous checkout session
         checkout_sessions = stripe.checkout.Session.list(customer=current_user.stripe_id, limit=1)
         if not checkout_sessions.data:
@@ -187,16 +287,15 @@ def success():
 
         checkout_session = checkout_sessions.data[0]
 
-        # Retrieve the PaymentIntent
-        payment_intent = stripe.PaymentIntent.retrieve(checkout_session.payment_intent)
-
         # Retrieve the latest charge associated with the PaymentIntent
-        charge = stripe.Charge.retrieve(payment_intent.latest_charge)
+        # charge = stripe.Charge.retrieve(payment_intent.latest_charge)
         
         # Make sure not creating a new entry
+        dt_challenge = session.get('delivery_type', None)
         filled_bd = session.get('billing_info', None)
         bd_challenge = BillingAddress.query.filter_by(user_id= current_user.id).first()
-        if filled_bd:
+        # print(dt_challenge)
+        if dt_challenge['type'] in ['2', '3', '4']:
             if not bd_challenge or bd_challenge.address_one != filled_bd['line1']:
                 # Save the billing address to the BillingAddress table
                 billing_address = BillingAddress(
@@ -211,6 +310,14 @@ def success():
                 db.session.commit()
             else:
                 billing_address = bd_challenge
+        else:
+            filled_pd = session.get('pickup_date', None)
+            pickup = Pickup(
+                user_id=current_user.id,
+                pickup_date=datetime.strptime(filled_pd['date'], '%a, %d %b %Y %H:%M:%S %Z')
+            )
+            db.session.add(pickup)
+            db.session.commit()
 
         # won't save payment info in site since currently being saved in stripe. 
         # i can't find a way to retrieve saved payment info from rewwwind to autofill stripe checkout, so there's that.
@@ -236,6 +343,12 @@ def success():
         # else:
         #     payment_information = p_challenge
 
+        # Retrieve the PaymentIntent
+        payment_intent = stripe.PaymentIntent.retrieve(checkout_session.payment_intent)
+
+        # query voucher id
+        v_id = session.get('voucher', {}).get('id')
+
         # Create the Order
         payment_method = stripe.PaymentMethod.retrieve(payment_intent.payment_method)
         if payment_method.card.brand == 'visa':
@@ -244,12 +357,23 @@ def success():
             methodId = 2
         else:
             methodId = 3
-        print(payment_method.card.brand, 'wtf is this shit')
-        order = Order(
-            user_id=current_user.id,
-            delivery=session.get('delivery_type', None)['type'], 
-            payment_type_id=methodId,
-        )
+        if filled_bd:
+            d_type = ['standard', 'expedited', 'international'][int(dt_challenge['type'])-2]
+            order = Order(
+                user_id=current_user.id,
+                delivery=d_type, 
+                payment_type_id=methodId,
+                billing_id=billing_address.id,
+                voucher_id=v_id if v_id != 0 else None
+            )
+        else:
+            order = Order(
+                user_id=current_user.id,
+                delivery='self-pickup',
+                payment_type_id=methodId,
+                pickup_id=pickup.id,
+                voucher_id=v_id if v_id != 0 else None
+            )
         db.session.add(order)
         db.session.commit()
 
@@ -273,10 +397,20 @@ def success():
                 # Remove the item from the cart
                 db.session.delete(item)
                 db.session.commit()
+        
+        # set vouchers to used, if any.
+        voucher = UserVoucher.query.filter(
+            UserVoucher.user_id == current_user.id,
+            UserVoucher.voucher_id == v_id
+        ).first()
+        if voucher:
+            voucher.is_used = True
+            db.session.commit()
 
         session.pop('delivery_type', None)
         session.pop('billing_info', None)
         session.pop('pickup_date', None)
+        session.pop('voucher', None)
 
         print("Order placed successfully!")
         return redirect(url_for('manageOrders.order_detail', order_id=order.id))

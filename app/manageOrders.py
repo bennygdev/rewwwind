@@ -53,8 +53,12 @@ def orders_listing():
   per_page = 10
 
   orders = orders_query.order_by(Order.id).paginate(page=page, per_page=per_page)
-  total_orders = len(Order.query.all())
-  total_pending = Order.query.filter(Order.status == 'Pending').count()
+  if current_user.role_id != 1:
+    total_orders = len(Order.query.all())
+    total_pending = Order.query.filter(Order.status == 'Pending').count()
+  else:
+    total_orders = len(Order.query.filter(Order.user_id==current_user.id).all())
+    total_pending = Order.query.filter(Order.status == 'Pending', Order.user_id==current_user.id).count()
 
   total_pages = ceil(total_orders / per_page)
 
@@ -160,11 +164,12 @@ def generate_invoice(order_id):
 
   # Billing Information
   pdf.set_font('Arial', 'B', 14)
-  pdf.cell(0, 10, "Billing Information:", ln=True)
-  pdf.set_font('Arial', '', 12)
-  pdf.cell(0, 10, f"Name: {order.user.first_name} {order.user.last_name}", ln=True)
-  pdf.cell(0, 10, f"Address: {order.billing.address_one}", ln=True)
-  pdf.cell(0, 10, f"Phone: {order.billing.phone_number}", ln=True)
+  if order.billing:
+    pdf.cell(0, 10, "Billing Information:", ln=True)
+    pdf.set_font('Arial', '', 12)
+    pdf.cell(0, 10, f"Name: {order.user.first_name} {order.user.last_name}", ln=True)
+    pdf.cell(0, 10, f"Address: {order.billing.address_one}", ln=True)
+    pdf.cell(0, 10, f"Phone: {order.billing.phone_number}", ln=True)
   pdf.ln(10)
 
   # Order Summary
@@ -194,17 +199,56 @@ def generate_invoice(order_id):
   pdf.set_font('Arial', '', 12)  # remove bold
   pdf.cell(0, 10, f"$ {order.total_amount:.2f}", ln=True)  # value
 
+  # item disc
+  if order.voucher and order.voucher.voucherType_id != 3:
+    pdf.set_font('Arial', 'B', 12)  # bold
+    pdf.cell(30, 10, "Discount:", 0, 0)  # label
+    pdf.set_font('Arial', '', 12)  # remove bold
+    if order.voucher.voucherType_id == 1:
+      pdf.cell(0, 9, f"- $ {(float(order.total_amount) * order.voucher.discount_value/100):.2f}", ln=True)  # value
+      disc = float(order.total_amount) * order.voucher.discount_value/100
+    else:
+      pdf.cell(0, 9, f"- $ {(order.voucher.discount_value):.2f}", ln=True)  # value
+      disc = order.voucher.discount_value
+
   # shipping price
   pdf.set_font('Arial', 'B', 12) 
-  pdf.cell(30, 10, "Shipping:", 0, 0) 
-  pdf.set_font('Arial', '', 12) 
-  pdf.cell(0, 10, "$ 30.00", ln=True) 
+  if order.billing:
+    pdf.cell(30, 10, "Shipping:", 0, 0) 
+    pdf.set_font('Arial', '', 12) 
+    if order.delivery == 'international':
+      pdf.cell(0, 10, "$ 30.00", ln=True) 
+      ship_tot = 30
+    elif order.delivery == 'standard':
+      pdf.cell(0, 10, "$ 4.00", ln=True) 
+      ship_tot = 4
+    else:
+      pdf.cell(0, 10, "$ 10.00", ln=True) 
+      ship_tot = 10
+  else:
+    ship_tot = 0
+
+  # ship disc
+  if order.voucher and order.voucher.voucherType_id == 3:
+    pdf.set_font('Arial', 'B', 12) 
+    pdf.cell(30, 10, "Shipping Discount:", 0, 0) 
+    pdf.set_font('Arial', '', 12) 
+    if order.billing:
+      if order.delivery == 'international':
+        pdf.cell(0, 9, "- $ 30.00", ln=True) 
+        disc = 30
+      elif order.delivery == 'standard':
+        pdf.cell(0, 9, "- $ 4.00", ln=True) 
+        disc = 4
+      else:
+        pdf.cell(0, 9, "- $ 10.00", ln=True) 
+        disc = 10
 
   # total
   pdf.set_font('Arial', 'B', 12) 
   pdf.cell(30, 10, "Total:", 0, 0)
   pdf.set_font('Arial', '', 12)
-  pdf.cell(0, 10, f"$ {order.total_amount + 30:.2f}", ln=True)
+  pdf.cell(0, 10, f"$ {(float(order.total_amount) + ship_tot - disc):.2f}", ln=True)
 
   # Output
   response = make_response(pdf.output(dest='S').encode('latin1'))

@@ -5,10 +5,10 @@ Rewwwind is a store that sells second-hand refurbished books and records, which 
 In addition, customers have the option to trade in their used books and records, with the condition depending of the incentive offered, such as cash, credits, discounts, or exclusive rewards.
 
 Members:
-- Benny Goh (Users, Customer Experience)
+- Benny Goh (Users, Customer Experience, Overview/Analytics, Newsletter)
 - Nelson Jonathan (Products, Orders, Checkout)
 - Ryan Yeo (Trade-ins)
-- Femina Jasmin (Wishlist, Vouchers)
+- Femina Jasmin (Wishlist, Vouchers, Cart)
 
 # Features
 - Role-based Dashboard System and Overview: Customised interfaces for Customers, Admins, and Owners, each displaying relevant data and metrics through ChartJS
@@ -28,9 +28,6 @@ Members:
 - Payments: Stripe
 
 # Contributions
-What features did we do? (Paste all contents of this file into readme.so to view editing live)
-
-NOTE: I've moved the instructions to run and contribute to `HOWTORUN.md`, same exact content.
 
 Benny:
 - Project environment and setup
@@ -51,6 +48,7 @@ Benny:
         - Delete Account and related information
     - Security Settings
         - Option to enable/disable 2FA
+        - Enabling 2FA will send a 6 digit code for users to verify their email before activating
         - Change Password
     - Add/Edit/Delete Billing information
     - Add/Edit/Delete Payment information

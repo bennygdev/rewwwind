@@ -11,7 +11,21 @@ Members:
 - Femina Jasmin (Wishlist, Vouchers)
 
 # Features
-WIP (will be updated before presentation)
+- Role-based Dashboard System and Overview: Customised interfaces for Customers, Admins, and Owners, each displaying relevant data and metrics through ChartJS
+- Comprehensive user system: Account listing, view customer statistics, add/edit/delete user profile, billing and payment information, adjust notification and security settings. Users can enable 2FA authentication, and can too register/login with Google.
+- Chat feature: Customers can inquire with our store's AI for enquiries and support, customers can in addition switch to chatting with a support representative.
+- Newsletter: Customers have the ability to sign up for newsletter and receive subscription emails.
+- Voucher system: Ability to create and gift vouchers to customers.
+- Streamlined Products system: Able to search and order products, ability to search via uploading images and ability to rate and add reviews.
+- Checkout system: Users can dynamically apply vouchers and checkout with vouchers applied. The checkout ordering process is handled via Stripe.
+- Trade-in system: Ability to file out a trade-in application and fill out details based on status of approval. The customer will then be compensated according to the item condition.
+
+# Technologies
+- Frontend: HTML, JavaScript, CSS, Bootstrap
+- Backend: Python, Flask, WTForms, Flask-Mail, SQLAlchemy
+- Technologies: PyTorch, Google OAuth, Dotenv, PyPDF
+- APIs: ChartJS, Google Gemini, Socketio, Cloudinary
+- Payments: Stripe
 
 # Contributions
 What features did we do? (Paste all contents of this file into readme.so to view editing live)
@@ -29,18 +43,20 @@ Benny:
     - Shows admin related data and metrics on a dashboard using ChartJS (Only viewable for Admins, Owners)
 - Profile Page
     - Shows user's recent orders
-    - Has a product recommendation algorithm that recommends products based on user's order history
+    - Has a product recommendation algorithm that recommends products based on user's order history (Recommends 5 products based on user's ordered category ratio)
 - User Settings
     - Edit personal information
         - Edit personal particulars, including profile picture
         - Change email
-        - Change Password
         - Delete Account and related information
+    - Security Settings
+        - Option to enable/disable 2FA
+        - Change Password
     - Add/Edit/Delete Billing information
     - Add/Edit/Delete Payment information
     - Ability to subscribe and unsubscribe to newsletter notifications
 - Authentication
-    - Ability to register normally or with google
+    - Ability to register normally or with google login (OAuth)
         - Username suggestions when setting username
     - Ability to login normally or with google
     - Two-Factor Authentication (2FA) via email. Users can activate and deactivate 2FA via settings. 6 Digit code is provided for verification.
@@ -54,14 +70,14 @@ Benny:
     - Account password change (Same for roles I described)
     - Owner has the ability to add any role-level accounts
 - Customer Chat
-    - Use of socket to faciliate communication between admin (as support representative) and customer
+    - Use of socketio to faciliate communication between customer and admin (as support representative) and customer
     - Typing indicators
     - Ability to save and summarise chat conversation, and view it later (Chat summary by Gemini AI)
     - Chat History Page (To view previous chat conversations)
         - Ability to search, paginate and filter chat conversations
         - Ability to compensate vouchers to customers
 - Chat with AI
-    - Ability to chat with AI, which will provide product recommendations and store-related inquiries. (Using Gemini AI)
+    - Ability to chat with AI, which will provide product/search recommendations and store-related inquiries. (Using Gemini AI)
 - Newsletter
     - Ability for users to subscribe to newsletter
     - Ability to search and delete users from mailing listing

@@ -132,8 +132,10 @@ Nelson:
 Ryan:
 - Drafted the overall UI/UX for the Trade-in, and Condition Guidelines onboarding pages.
 - Trade in request form and Dashboard (For both Customer and Admin sides)
-   - Customers can send in trade-in requests where Admin can approve or reject their request
-   - For approved requests, customers can input their payment details and method of drop-off
+   - Customers can send in trade-in requests
+   - Admin can view request details from their dashboard, and Approve or Reject requests
+   - For Approved requests, customers can input their payment details and method of drop-off,
+     where payment will be done manually (PayNow, Transfer)
 
 Femina:
 - Wishlist creation

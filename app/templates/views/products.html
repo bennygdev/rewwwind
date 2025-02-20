@@ -112,8 +112,8 @@
           <span><i class="bi bi-star-fill"></i>&nbsp;{{ rating }}</span>
         </div>
         <div class="image">
-          <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}"/>
-          <!-- <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ product.image_thumbnail }}" alt="{{ product.name }}"/> -->
+          <!-- <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}"/> -->
+          <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ product.image_thumbnail }}" alt="{{ product.name }}"/>
         </div>
         {% if current_user.role_id == 1 %}
         <div class="favourites" title="{% if current_user.wishlisted_items and product.id in current_user.wishlisted_items %}Remove from Favourites{% else %}Add to Favourites{% endif %}">

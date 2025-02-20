@@ -514,6 +514,7 @@ margin-bottom: 0;
   position: absolute;
   top: 20px;
   right: 20px;
+  cursor: pointer;
 }
 
 .success h2, .delete h2 {

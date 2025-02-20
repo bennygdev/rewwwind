@@ -560,7 +560,7 @@ def insert_reviews():
   from sqlalchemy.orm.attributes import flag_modified
 
   for product in products:
-    for x in range(randint(1,7)):
+    for x in range(randint(1,3)):
       rev = Review(
         show_username=[True, False][randint(0,1)],
         rating=randint(3,5),

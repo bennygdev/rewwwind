@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
         productsContainer.classList.add('list-view');
         productContainer.forEach(e => {
             e.style.marginBottom = '0';
-            e.addEventListener('click', (i) => {window.location.href = e.querySelector('a').getAttribute('href')});
+            e.addEventListener('click', () => {window.location.href = e.querySelector('a').getAttribute('href')});
         });
     } else {
         gridViewButton.classList.add('active');
@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
             productsContainer.classList.add('list-view');
             productContainer.forEach(e => {
                 e.style.marginBottom = '0';
-                e.addEventListener('click', (i) => {window.location.href = e.querySelector('a').getAttribute('href')});
+                e.addEventListener('click', () => {window.location.href = e.querySelector('a').getAttribute('href')});
             });
             localStorage.setItem('viewMode', 'list');
         }

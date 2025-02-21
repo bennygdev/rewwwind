@@ -39,6 +39,7 @@ def precompute_product_embeddings():
                 if os.path.exists(full_image_path):
                     embedding = extract_image_embedding(full_image_path)
                     product_embeddings[image_path] = embedding
+                    # print(embedding)
     return product_embeddings
 
 # Function to find the closest matching product image
@@ -70,17 +71,8 @@ def upload_image():
             uploaded_image_path = os.path.join(current_app.static_folder, 'media', 'challenge', "uploaded_image.jpg")
             uploaded_image.save(uploaded_image_path)
             
-            # Access embeddings from app config
-            product_embeddings = current_app.config['PRODUCT_EMBEDDINGS']
-            image_paths = list(product_embeddings.keys())
-            embeddings_array = np.array(list(product_embeddings.values()))
-            
-            # Find the closest matching product image
-            query_embedding = extract_image_embedding(uploaded_image_path)
-            distances = cdist([query_embedding], embeddings_array, metric='cosine')[0]
-            closest_index = np.argmin(distances)
-            closest_image_path = image_paths[closest_index]
-            closest_distance = distances[closest_index]
+            # Access embeddings
+            closest_image_path, closest_distance = find_matching_product(uploaded_image_path)
 
             print(f"Closest Image Path: {closest_image_path}")
             print(f"Closest Distance: {closest_distance}")
@@ -133,11 +125,11 @@ def pagination(featured=None):
 
     if category_filter:
         products_query = products_query.join(Product.category).filter(Category.category_name == category_filter.title())
-    if subcategory_filter and len(subcategory_filter) != 1:
+    if subcategory_filter and '' not in subcategory_filter:
         if 'or' in match_req:
             products_query = products_query.join(Product.subcategories).filter(
                 SubCategory.subcategory_name.in_([entry.title() for entry in subcategory_filter])
-            )
+            ).distinct()
         elif 'and' in match_req:
             products_query = products_query.join(Product.subcategories).filter( 
                 SubCategory.subcategory_name.in_([entry.title() for entry in subcategory_filter])

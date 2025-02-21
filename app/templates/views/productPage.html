@@ -13,14 +13,14 @@
 <div class="product">
   <div class="product__left">
     <div class="image__container">
-      <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}"/>
-      <!-- <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ product.image_thumbnail }}" alt="{{ product.name }}"/> -->
+      <!-- <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}"/> -->
+      <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ product.image_thumbnail }}" alt="{{ product.name }}"/>
     </div>
     <div class="image-list">
       {% for image in product.images %}
       <div class="image__container ignore">
-        <img src="{{ url_for('static', filename='media/uploads/' + image) }}" alt="{{ product.name }}">
-        <!-- <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ image }}" alt="{{ product.name }}"/> -->
+        <!-- <img src="{{ url_for('static', filename='media/uploads/' + image) }}" alt="{{ product.name }}"> -->
+        <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ image }}" alt="{{ product.name }}"/>
       </div>
       {% endfor %}
     </div>
@@ -174,7 +174,7 @@
           <p class="date"><i class="bi bi-calendar-plus-fill"></i>&nbsp;&nbsp;Reviewed on {{ review.created_at.strftime('%Y-%m-%d') }}</p>
           <p class="description">{{ review.description }}</p>
         </div>
-        {% if user.username == review.user.username or user.role_id in [2, 3] %}
+        {% if user.username == review.user.username %}
         <div class="mods">
           <div class="mod-container update">
             <form action="{{ url_for('productPagination.update_review', product_id=product.id, review_id=review.id) }}">

@@ -193,12 +193,12 @@
                             <td>${{ order.total_amount }}</td>
                         </tr>
                         {% if order.voucher_id and order.voucher.voucherType_id != 3 %}
-                        {% if order.voucher.voucherType_id == 2 %}
+                        {% if order.voucher.voucherType_id == 1 %}
                         <tr class="voucher">
                             <td>Voucher Discount</td>
                             <td>{{ order.voucher.voucher_code }}</td>
-                            {% set disc = order.total_amount|float * order.voucher.discount_value/100 %}
-                            <td>{{ '{:.2f}'.format(disc) }}</td>
+                            {% set disc = order.voucher.discount_value %}
+                            <td>&minus; &dollar;{{ '{:.2f}'.format(disc) }}</td>
                         </tr>
                         {% else %}
                         <tr>
@@ -338,11 +338,21 @@
                             <td>${{ order.total_amount }}</td>
                         </tr>
                         {% if order.voucher_id and order.voucher.voucherType_id != 3 %}
+                        {% if order.voucher.voucherType_id == 1 %}
                         <tr class="voucher">
                             <td>Voucher Discount</td>
                             <td>{{ order.voucher.voucher_code }}</td>
-                            <td>{{ '{:.2f}'.format(order.voucher.discount_value) }}</td>
+                            {% set disc = order.voucher.discount_value %}
+                            <td>&minus; &dollar;{{ '{:.2f}'.format(disc) }}</td>
                         </tr>
+                        {% else %}
+                        <tr>
+                            <td>Voucher Discount</td>
+                            <td>{{ order.voucher.voucher_code }}</td>
+                            {% set disc = order.total_amount|float * order.voucher.discount_value/100 %}
+                            <td>&minus; &dollar;{{ '{:.2f}'.format(disc) }}</td>
+                        </tr>
+                        {% endif %}
                         {% endif %}
                         <!-- <tr class="discount"></tr> -->
                         {% if order.delivery != 'self-pickup' %}
@@ -381,7 +391,7 @@
                         <tr class="total">
                             <td><h3>Total</h3></td>
                             <td></td>
-                            <td><h3>&dollar;{{ '{:.2f}'.format(order.total_amount + (ship_tot if ship_tot else 0)) }}</h3></td>
+                            <td><h3>&dollar;{{ '{:.2f}'.format(order.total_amount|float + (ship_tot if ship_tot else 0) - (disc if disc else 0)) }}</h3></td>
                         </tr>
                     </table>
                     <div class="total">

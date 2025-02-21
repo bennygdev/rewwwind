@@ -149,8 +149,8 @@
         <tr product-id="{{ product.id }}">
             <td class="productName">
                 <div class="thumbnail">
-                    <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}"/>
-                    <!-- <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ product.image_thumbnail }}" alt="{{ product.name }}"/> -->
+                    <!-- <img src="{{ url_for('static', filename='media/uploads/' + product.image_thumbnail) }}" alt="{{ product.name }}"/> -->
+                    <img src="https://res.cloudinary.com/dyduc8kjz/image/upload/v1738220526/{{ product.image_thumbnail }}" alt="{{ product.name }}"/>
                 </div>
                 <div class="name"><p>{{ product.name }}</p><p>ID: {{ product.id }}</p></div>
             </td>

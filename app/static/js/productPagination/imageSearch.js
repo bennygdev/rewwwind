@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-    if (window.location.href.includes('/products')) {
+    if (window.location.href.includes('/products') && window.location.href.slice(window.location.href.length-9, window.location.href.length) == 'products/') {
         const dragDropArea = document.getElementById('drag-drop-area');
         const fileInput = document.getElementById('file-input');
         const previewImage = document.getElementById('preview-image');
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function test() {
-        if (window.location.href.includes('/products')) {
+        if (window.location.href.slice(window.location.href.length-9, window.location.href.length) == 'products/') {
             localStorage.setItem('toggleImg', '0')
             overlay.style.display = 'block';
             modal.style.display = 'flex';
